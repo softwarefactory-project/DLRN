@@ -15,6 +15,8 @@ Builds and maintains yum repositories following openstacks uptream repositories
 
 Setup
 -----
+::
+
     yum install docker-io git createrepo python-virtualenv
     systemctl start httpd
     systemctl start docker
@@ -28,5 +30,6 @@ Setup
     python setup.py develop
     # edit projects.ini if needed
     delorean --config-file projects.ini
+
 
 * TODO
