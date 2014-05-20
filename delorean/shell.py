@@ -77,7 +77,7 @@ def build(cp, project, commit):
         sh.docker("rm", "builder")
     except:
         pass
-    print sh.docker("run", "-t", "--volume=%s:/data"%datadir, "--volume=%s:/scripts"%scriptsdir, "--name", "builder", "delorean/fedora", "/scripts/build_rpm.sh", project, "/data/%s"%yumrepodir)
+    print sh.docker("run", "-t", "--volume=%s:/data"%datadir, "--volume=%s:/scripts"%scriptsdir, "--name", "builder", "delorean/fedora", "/scripts/build_rpm_wrapper.sh", project, "/data/%s"%yumrepodir)
     time.sleep(3)
     sh.docker("rm", "builder")
 
