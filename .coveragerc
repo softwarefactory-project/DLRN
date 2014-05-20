@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = delorean
+omit = delorean/tests/*,delorean/openstack/*
+
+[report]
+ignore-errors = True
