@@ -53,7 +53,7 @@ def getinfo(cp, last_processed, project, repo, spec, toprocess):
     git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
     git.fetch("origin")
 
-    lines = git.log("--pretty=format:'%ct %H'", last_processed, "--first-parent")
+    lines = git.log("--pretty=format:'%ct %H'", last_processed, "--first-parent", "origin/master")
     for line in lines:
         toprocess.append(str(line).strip().strip("'").split(" "))
         toprocess[-1].append(project)
