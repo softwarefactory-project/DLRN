@@ -148,7 +148,7 @@ gpgcheck=0"""%(project, commit, cp.get("DEFAULT", "baseurl"), yumrepodir))
 
 def genreport(cp):
     html = ["<html><head/><body><table>"]
-    commits = session.query(Commit).order_by(Commit.dt_commit).limit(300)
+    commits = session.query(Commit).order_by(desc(Commit.dt_commit)).limit(300)
     for commit in commits:
         html.append("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td><a href=\"%s\">repo</a></td></tr>"%(commit.dt_commit, commit.project_name, commit.commit_hash, commit.status, "%s/%s/%s"%(commit.commit_hash[:2], commit.commit_hash[2:4], commit.commit_hash)))
 
