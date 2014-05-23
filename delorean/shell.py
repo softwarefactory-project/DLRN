@@ -1,10 +1,34 @@
 import ConfigParser
 import argparse
+import datetime
+import logging
 import os
+import shutil
 import sys
 import time
 
 import sh
+
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import desc
+
+Base = declarative_base()
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("delorean")
+
+class Commit(Base):
+    __tablename__ = "commits"
+
+    id = Column(Integer, primary_key=True)
+    dt_commit = Column(Integer)
+    dt_finished = Column(DateTime)
+    project_name = Column(String)
+    commit_hash = Column(String)
+    status = Column(String)
+    rpms = Column(String)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -14,27 +38,38 @@ def main():
     cp = ConfigParser.RawConfigParser()
     cp.read(options.config_file)
 
-    last_processed_file = os.path.join(cp.get("DEFAULT", "datadir"), "last_processed")
-    last_processed = "-1"
-    if os.path.exists(last_processed_file):
-        fp = open(last_processed_file)
-        last_processed = "--after=%s"%fp.read().strip()
-        fp.close()
+    engine = create_engine('sqlite:///commits.sqlite')
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    global session
+    session = Session()
 
+
+    # Build a list of commits we need to process
     toprocess = []
     for project in cp.sections():
+        since = "-1"
+        commit = session.query(Commit).filter(Commit.project_name==project).order_by(desc(Commit.dt_commit)).first()
+        if commit:
+            since="--after=%d" % (commit.dt_commit+1)
         repo=cp.get(project, "repo")
         spec=cp.get(project, "spec")
-        getinfo(cp, last_processed, project, repo, spec, toprocess)
+        getinfo(cp, project, repo, spec, toprocess, since)
 
     toprocess.sort()
     for dt, commit, project in toprocess:
-        build(cp, project, commit)
-        fp = open(last_processed_file, "w")
-        fp.write(str(dt))
-        fp.close()
+        logger.info("Processing %s %s"%(project, commit))
+        try:
+            built_rpms = build(cp, dt, project, commit)
+        except:
+            logger.exception("Error while building packages for %s" % project)
+            session.add(Commit(dt_commit=dt, project_name=project, commit_hash=commit, status="FAILED"))
+        else:
+            session.add(Commit(dt_commit=dt, project_name=project, rpms=",".join(built_rpms), commit_hash=commit, status="SUCCESS"))
+        session.commit()
+    genreport(cp)
 
-def getinfo(cp, last_processed, project, repo, spec, toprocess):
+def getinfo(cp, project, repo, spec, toprocess, since):
     repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
     spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
 
@@ -53,58 +88,53 @@ def getinfo(cp, last_processed, project, repo, spec, toprocess):
     git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
     git.fetch("origin")
 
-    lines = git.log("--pretty=format:'%ct %H'", last_processed, "--first-parent", "origin/master")
+    lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent", "origin/master")
     for line in lines:
         toprocess.append(str(line).strip().strip("'").split(" "))
         toprocess[-1].append(project)
+        toprocess[-1][0] = float(toprocess[-1][0])
     return toprocess
 
-def getcurrentrpmdir(data, project):
-    return os.path.join(data, "current_"+project)
-
-def build(cp, project, commit):
+def build(cp, dt, project, commit):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
-    scriptsdir = "/home/derekh/workarea/delorean/scripts" # TODO <---
+    # TODO : only working by convention need to improve
+    scriptsdir = datadir.replace("data", "scripts")
     yumrepodir = os.path.join("repos", commit[:2], commit[2:4], commit)
+    yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
-    print project, commit
-    if not os.path.exists(os.path.join(datadir, yumrepodir)):
-        os.makedirs(os.path.join(datadir, yumrepodir))
-    if os.path.exists(os.path.join(datadir, yumrepodir, "current.repo")):
-        return
-    print sh.git("--git-dir", "data/%s/.git"%project, "--work-tree=data/%s"%project, "reset", "--hard", commit)
+    # If yum repo already exists remove it and assume we're starting fresh    
+    if os.path.exists(yumrepodir_abs):
+        shutil.rmtree(yumrepodir_abs)
+    os.makedirs(yumrepodir_abs)
+
+    sh.git("--git-dir", "data/%s/.git"%project, "--work-tree=data/%s"%project, "reset", "--hard", commit)
     try:
         sh.docker("rm", "builder")
     except:
         pass
-    print sh.docker("run", "-t", "--volume=%s:/data"%datadir, "--volume=%s:/scripts"%scriptsdir, "--name", "builder", "delorean/fedora", "/scripts/build_rpm_wrapper.sh", project, "/data/%s"%yumrepodir)
+    sh.docker("run", "-t", "--volume=%s:/data"%datadir, "--volume=%s:/scripts"%scriptsdir, "--name", "builder", "delorean/fedora", "/scripts/build_rpm_wrapper.sh", project, "/data/%s"%yumrepodir)
+        
     time.sleep(3)
     sh.docker("rm", "builder")
 
-    rpmdir = getcurrentrpmdir(datadir, project)
-    if not os.path.exists(rpmdir):
-        os.makedirs(rpmdir)
-
-    for rpm in os.listdir(rpmdir):
-        os.remove(os.path.join(rpmdir,rpm))
-
-    for rpm in os.listdir(os.path.join(datadir,yumrepodir)):
-        os.symlink(os.path.join(datadir,yumrepodir,rpm), os.path.join(rpmdir, os.path.split(rpm)[1]))
-
+    built_rpms = []
+    for rpm in os.listdir(yumrepodir_abs):
+        if rpm.endswith(".rpm"):
+            built_rpms.append(os.path.join(yumrepodir, rpm))
 
     for otherproject in cp.sections():
         if otherproject == project:
             continue
-        if os.path.exists(getcurrentrpmdir(datadir, otherproject)):
-            for rpm in os.listdir(getcurrentrpmdir(datadir, otherproject)):
-                # Don't copy the logs
-                print os.path.realpath(os.path.join(getcurrentrpmdir(datadir, otherproject), rpm)), os.path.join(datadir, yumrepodir, rpm)
-                if rpm.endswith(".rpm"):
-                    os.symlink(os.path.realpath(os.path.join(getcurrentrpmdir(datadir, otherproject), rpm)), os.path.join(datadir, yumrepodir, rpm))
+        last_success = session.query(Commit).filter(Commit.project_name==otherproject).filter(Commit.status=="SUCCESS").order_by(desc(Commit.dt_commit)).first()
+        if not last_success:
+            continue
+        rpms = last_success.rpms.split(",")
+        for rpm in rpms:
+            os.symlink(os.path.join(datadir, rpm), os.path.join(yumrepodir_abs, os.path.split(rpm)[1]))
 
+    sh.createrepo(yumrepodir_abs)
 
-    print sh.createrepo(os.path.join(datadir, yumrepodir))
-    fp = open(os.path.join(datadir, yumrepodir, "current.repo"), "w")
+    fp = open(os.path.join(yumrepodir_abs, "delorean.repo"), "w")
     fp.write("""[delorean]
 name=delorean-%s-%s
 baseurl=%s/%s
@@ -112,5 +142,19 @@ enabled=1
 gpgcheck=0"""%(project, commit, cp.get("DEFAULT", "baseurl"), yumrepodir))
     fp.close()
 
-    os.symlink(os.path.join(datadir, yumrepodir), os.path.join(datadir, "repos", "current_"))
+    os.symlink(yumrepodir_abs, os.path.join(datadir, "repos", "current_"))
     os.rename(os.path.join(datadir, "repos", "current_"), os.path.join(datadir, "repos", "current"))
+    return built_rpms
+
+def genreport(cp):
+    html = ["<html><head/><body><table>"]
+    commits = session.query(Commit).order_by(Commit.dt_commit).limit(300)
+    for commit in commits:
+        html.append("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td><a href=\"%s\">repo</a></td></tr>"%(commit.dt_commit, commit.project_name, commit.commit_hash, commit.status, "%s/%s/%s"%(commit.commit_hash[:2], commit.commit_hash[2:4], commit.commit_hash)))
+
+    html.append("</table></html>")
+
+    fp=open(os.path.join(cp.get("DEFAULT", "datadir"), "repos", "report.html"), "w")
+    fp.write("".join(html))
+    fp.close()
+
