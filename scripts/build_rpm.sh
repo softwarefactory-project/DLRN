@@ -17,6 +17,9 @@ cd ~/rpmbuild/SPECS/
 VERSION=${TARBALL%%.tar*}
 VERSION=${VERSION//*-}
 
+# Add the mostcurrent repo, we may have dependencies in it
+echo -e '[current]\nbaseurl=file:///data/repos/current\nenabled=1\ngpgcheck=0' > /etc/yum.repos.d/current.repo
+
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
 yum-builddep -y *.spec
