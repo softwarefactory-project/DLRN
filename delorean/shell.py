@@ -167,7 +167,7 @@ def genreport(cp):
     commits = session.query(Commit).order_by(desc(Commit.dt_commit)).limit(300)
     for commit in commits:
         html.append("<tr>")
-        html.append("<td>%s</td>" % commit.dt_commit)
+        html.append("<td>%s</td>" % time.ctime(commit.dt_commit))
         html.append("<td>%s</td>" % commit.project_name)
         html.append("<td>%s</td>" % commit.commit_hash)
         html.append("<td>%s</td>" % commit.status)
