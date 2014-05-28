@@ -144,8 +144,8 @@ def build(cp, dt, project, commit):
             continue
         rpms = last_success.rpms.split(",")
         for rpm in rpms:
-            os.symlink(os.path.join(datadir, rpm),
-                       os.path.join(yumrepodir_abs, os.path.split(rpm)[1]))
+            rpm_link_src = os.path.join(yumrepodir_abs, os.path.split(rpm)[1])
+            os.symlink(os.path.relpath(os.path.join(datadir, rpm), yumrepodir_abs), rpm_link_src)
 
     sh.createrepo(yumrepodir_abs)
 
@@ -155,9 +155,10 @@ def build(cp, dt, project, commit):
                              yumrepodir))
     fp.close()
 
-    os.symlink(yumrepodir_abs, os.path.join(datadir, "repos", "current_"))
-    os.rename(os.path.join(datadir, "repos", "current_"),
-              os.path.join(datadir, "repos", "current"))
+    current_repo_dir = os.path.join(datadir, "repos", "current")
+    os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, "repos")),
+               current_repo_dir+"_")
+    os.rename(current_repo_dir+"_", current_repo_dir)
     return built_rpms
 
 
