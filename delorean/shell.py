@@ -71,7 +71,7 @@ def main():
                         rpms=",".join(built_rpms), commit_hash=commit,
                         status="SUCCESS"))
         session.commit()
-    genreport(cp)
+        genreport(cp)
 
 
 def getinfo(cp, project, repo, spec, toprocess, since):
