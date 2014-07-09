@@ -1,4 +1,4 @@
 #!/bin/bash -xe
 
-/scripts/build_rpm.sh $@ &> $2/rpmbuild.log
+/scripts/build_rpm.sh $@ &> $3/rpmbuild.log
 

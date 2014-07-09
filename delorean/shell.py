@@ -54,14 +54,16 @@ def main():
         if commit:
             since = "--after=%d" % (commit.dt_commit + 1)
         repo = cp.get(project, "repo")
-        spec = cp.get(project, "spec")
-        getinfo(cp, project, repo, spec, toprocess, since)
+        spec = cp.get(project, "spec_repo")
+        spec_dir = cp.get(project, "spec_dir") or "."
+
+        getinfo(cp, project, repo, spec, spec_dir, toprocess, since)
 
     toprocess.sort()
-    for dt, commit, project in toprocess:
+    for dt, commit, project, spec_subdir in toprocess:
         logger.info("Processing %s %s" % (project, commit))
         try:
-            built_rpms = build(cp, dt, project, commit)
+            built_rpms = build(cp, dt, project, spec_subdir, commit)
         except:
             logger.exception("Error while building packages for %s" % project)
             session.add(Commit(dt_commit=dt, project_name=project,
@@ -73,35 +75,39 @@ def main():
         session.commit()
         genreport(cp)
 
-
-def getinfo(cp, project, repo, spec, toprocess, since):
-    repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
-    spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
-
-    # Get the most uptodate spec
-    if not os.path.exists(spec_dir):
-        sh.git.clone(spec, spec_dir)
-    git = sh.git.bake(_cwd=spec_dir, _tty_out=False)
+def refreshrepo(url, path):
+    print "Getting %s to %s"%(url, path)
+    if not os.path.exists(path):
+        sh.git.clone(url, path)
+    git = sh.git.bake(_cwd=path, _tty_out=False)
     git.fetch("origin")
     git.reset("--hard", "origin/master")
 
-    # Get the most uptodate source
-    if not os.path.exists(repo_dir):
-        sh.git.clone(repo, repo_dir)
+def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since):
+    repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
+    spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
+
+    global_spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), "global_spec")
+    global_spec_repo = cp.get("DEFAULT", "spec_repo")
+
+    if global_spec_repo and global_spec_repo == spec:
+        refreshrepo(global_spec_repo, global_spec_dir)
+    else:
+        refreshrepo(spec, spec_dir)
+    refreshrepo(repo, repo_dir)
 
     git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
-    git.fetch("origin")
-
     lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
                     "origin/master")
     for line in lines:
         toprocess.append(str(line).strip().strip("'").split(" "))
         toprocess[-1].append(project)
+        toprocess[-1].append(spec_subdir)
         toprocess[-1][0] = float(toprocess[-1][0])
     return toprocess
 
 
-def build(cp, dt, project, commit):
+def build(cp, dt, project, spec_subdir, commit):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     # TODO : only working by convention need to improve
     scriptsdir = datadir.replace("data", "scripts")
@@ -116,22 +122,29 @@ def build(cp, dt, project, commit):
     sh.git("--git-dir", "data/%s/.git" % project,
            "--work-tree=data/%s" % project, "reset", "--hard", commit)
     try:
+        sh.docker("kill", "builder")
+    except:
+        pass
+
+    # looks like we need to give the container time to die
+    time.sleep(10)
+    try:
         sh.docker("rm", "builder")
     except:
         pass
+
     sh.docker("run", "-t", "--volume=%s:/data" % datadir,
               "--volume=%s:/scripts" % scriptsdir,
               "--name", "builder", "delorean/fedora",
-              "/scripts/build_rpm_wrapper.sh", project,
+              "/scripts/build_rpm_wrapper.sh", project, spec_subdir,
               "/data/%s" % yumrepodir)
-
-    time.sleep(3)
-    sh.docker("rm", "builder")
 
     built_rpms = []
     for rpm in os.listdir(yumrepodir_abs):
         if rpm.endswith(".rpm"):
             built_rpms.append(os.path.join(yumrepodir, rpm))
+    if not built_rpms:
+        raise Exception("No rpms built for %s" % project)
 
     for otherproject in cp.sections():
         if otherproject == project:
