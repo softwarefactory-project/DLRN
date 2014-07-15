@@ -31,5 +31,18 @@ Setup
     # edit projects.ini if needed
     delorean --config-file projects.ini
 
+Dependencies
+------------
+In order to build Some of the projects here require others, as a result the
+first build of some projects may fail, the simplies solution at the moment 
+is to allow this to happen, delete the record of the failed builds from the
+database and rerun delorean.
+
+::
+    $ sudo sqlite3 commits.sqlite 
+    SQLite version 3.8.5 2014-06-04 14:06:34
+    Enter ".help" for usage hints.
+    sqlite> delete from commits where status == "FAILED";
+
 
 * TODO
