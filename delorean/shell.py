@@ -127,7 +127,7 @@ def build(cp, dt, project, spec_subdir, commit):
         pass
 
     # looks like we need to give the container time to die
-    time.sleep(10)
+    time.sleep(20)
     try:
         sh.docker("rm", "builder")
     except:
