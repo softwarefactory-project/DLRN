@@ -17,7 +17,7 @@ Setup
 -----
 ::
 
-    yum install docker-io git createrepo python-virtualenv
+    yum install docker-io git createrepo python-virtualenv git-hg
     systemctl start httpd
     systemctl start docker
     # Add the user you intend to run as to the docker group and login again
