@@ -17,7 +17,9 @@ cd ~/rpmbuild/SPECS/
 
 
 # Add the mostcurrent repo, we may have dependencies in it
-echo -e '[current]\nname=current\nbaseurl=file:///data/repos/current\nenabled=1\ngpgcheck=0' > /etc/yum.repos.d/current.repo
+if [ -e /data/repos/current ] ; then
+    echo -e '[current]\nname=current\nbaseurl=file:///data/repos/current\nenabled=1\ngpgcheck=0' > /etc/yum.repos.d/current.repo
+fi
 
 sed -i -e "s/VERSIONDIR/$VERSION/g" *.spec
 VERSION=${VERSION/-/.}
