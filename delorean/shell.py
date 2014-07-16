@@ -29,6 +29,7 @@ class Commit(Base):
     commit_hash = Column(String)
     status = Column(String)
     rpms = Column(String)
+    notes = Column(String)
 
 
 def main():
@@ -62,16 +63,17 @@ def main():
     toprocess.sort()
     for dt, commit, project, spec_subdir in toprocess:
         logger.info("Processing %s %s" % (project, commit))
+        notes  = ""
         try:
-            built_rpms = build(cp, dt, project, spec_subdir, commit)
+            built_rpms, notes = build(cp, dt, project, spec_subdir, commit)
         except:
             logger.exception("Error while building packages for %s" % project)
             session.add(Commit(dt_commit=dt, project_name=project,
-                        commit_hash=commit, status="FAILED"))
+                        commit_hash=commit, status="FAILED", notes=notes))
         else:
             session.add(Commit(dt_commit=dt, project_name=project,
                         rpms=",".join(built_rpms), commit_hash=commit,
-                        status="SUCCESS"))
+                        status="SUCCESS", notes=notes))
         session.commit()
         genreport(cp)
 
@@ -146,6 +148,10 @@ def build(cp, dt, project, spec_subdir, commit):
     if not built_rpms:
         raise Exception("No rpms built for %s" % project)
 
+    notes="OK"
+    if not os.path.isfile(os.path.join(yumrepodir_abs, "installed")):
+        notes="Error installing"
+
     for otherproject in cp.sections():
         if otherproject == project:
             continue
@@ -172,7 +178,7 @@ def build(cp, dt, project, spec_subdir, commit):
     os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, "repos")),
                current_repo_dir+"_")
     os.rename(current_repo_dir+"_", current_repo_dir)
-    return built_rpms
+    return built_rpms, notes
 
 
 def genreport(cp):
@@ -184,6 +190,7 @@ def genreport(cp):
         html.append("<td>%s</td>" % commit.project_name)
         html.append("<td>%s</td>" % commit.commit_hash)
         html.append("<td>%s</td>" % commit.status)
+        html.append("<td>%s</td>" % commit.notes)
         html.append("<td><a href=\"%s\">repo</a></td>" %
                     ("%s/%s/%s" % (commit.commit_hash[:2],
                      commit.commit_hash[2:4],

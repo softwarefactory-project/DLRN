@@ -28,3 +28,5 @@ sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
 yum-builddep -y *.spec
 rpmbuild -ba *.spec
 find /rpmbuild/RPMS /rpmbuild/SRPMS -type f | xargs cp -t $3
+
+yum install -y --nogpg $(find $3 -name "*rpm" | grep -v src.rpm) && touch $3/installed || true
