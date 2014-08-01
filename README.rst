@@ -21,7 +21,7 @@ Setup
     systemctl start httpd
     systemctl start docker
     # Add the user you intend to run as to the docker group and login again
-    git clone https://github.com/derekhiggins/delorean.git
+    git clone https://github.com/openstack-packages/delorean.git
     cd delorean
     ./scripts/create_build_image.sh
     virtualenv ../delorean-venv
