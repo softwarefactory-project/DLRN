@@ -56,7 +56,8 @@ def main():
             since = "--after=%d" % (commit.dt_commit + 1)
         repo = cp.get(project, "repo")
         spec = cp.get(project, "spec_repo")
-        spec_dir = cp.get(project, "spec_dir") or "."
+        # Support the specs in a subdir of spec_repo
+        spec_dir = cp.get(project, "spec_dir")
 
         getinfo(cp, project, repo, spec, spec_dir, toprocess, since)
 
@@ -77,25 +78,22 @@ def main():
         session.commit()
         genreport(cp)
 
-def refreshrepo(url, path):
+def refreshrepo(url, path, branch="master"):
     print "Getting %s to %s"%(url, path)
     if not os.path.exists(path):
-        sh.git.clone(url, path)
+        sh.git.clone(url, path, "-b", branch)
+    return
     git = sh.git.bake(_cwd=path, _tty_out=False)
     git.fetch("origin")
-    git.reset("--hard", "origin/master")
+    git.reset("--hard", "origin/%s"%branch)
 
 def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since):
     repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
     spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
+    # TODO : Add support for multiple distros
+    spec_branch = cp.get(project, "distros")
 
-    global_spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), "global_spec")
-    global_spec_repo = cp.get("DEFAULT", "spec_repo")
-
-    if global_spec_repo and global_spec_repo == spec:
-        refreshrepo(global_spec_repo, global_spec_dir)
-    else:
-        refreshrepo(spec, spec_dir)
+    refreshrepo(spec, spec_dir, spec_branch)
     refreshrepo(repo, repo_dir)
 
     git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
@@ -107,6 +105,27 @@ def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since):
         toprocess[-1].append(spec_subdir)
         toprocess[-1][0] = float(toprocess[-1][0])
     return toprocess
+
+def testpatches(project, commit, datadir):
+    git = sh.git.bake(_cwd="data/%s_spec/" % project, _tty_out=False)
+    try:
+        # This remote mightn't exist yet
+        git.remote("rm", "upstream")
+    except:
+        pass
+    git.remote("add", "upstream", "-f", "file://%s/%s/" % (datadir, project))
+    try:
+        git.checkout("master-patches")
+    except:
+        # This project doesn't have a master-patches branch
+        return
+    git.reset("--hard", "origin/master-patches")
+    try:
+        git.rebase(commit)
+    except:
+        git.rebase("--abort")
+        raise Exception("Patches rebase failed")
+    git.checkout("f20-master")
 
 
 def build(cp, dt, project, spec_subdir, commit):
@@ -120,6 +139,10 @@ def build(cp, dt, project, spec_subdir, commit):
     if os.path.exists(yumrepodir_abs):
         shutil.rmtree(yumrepodir_abs)
     os.makedirs(yumrepodir_abs)
+
+    # We need to make sure if any patches exist in the master-patches branch
+    # they they can still be applied to upstream master, if they can we stop
+    testpatches(project, commit, datadir)
 
     sh.git("--git-dir", "data/%s/.git" % project,
            "--work-tree=data/%s" % project, "reset", "--hard", commit)
