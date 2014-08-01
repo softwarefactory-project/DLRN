@@ -70,4 +70,4 @@ yum-builddep -y *.spec
 rpmbuild -ba *.spec  --define="upstream_version $UPSTREAMVERSION"
 find /rpmbuild/RPMS /rpmbuild/SRPMS -type f | xargs cp -t $3
 
-yum install -y --nogpg $(find $3 -name "*rpm" | grep -v src.rpm) && touch $3/installed || true
+yum install -y --nogpg $(find $3 -type f -name "*rpm" | grep -v src.rpm) && touch $3/installed || true
