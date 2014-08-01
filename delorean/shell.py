@@ -82,7 +82,6 @@ def refreshrepo(url, path, branch="master"):
     print "Getting %s to %s"%(url, path)
     if not os.path.exists(path):
         sh.git.clone(url, path, "-b", branch)
-    return
     git = sh.git.bake(_cwd=path, _tty_out=False)
     git.fetch("origin")
     git.reset("--hard", "origin/%s"%branch)
