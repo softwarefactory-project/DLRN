@@ -24,6 +24,10 @@ elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(g.+) ]] ; then
 elif [[ "$UPSTREAMVERSION" =~ ^([.0-9]*)$ ]] ; then
     VERSION=${BASH_REMATCH[1]}
     RELEASE=1
+    # python-alembic version=0.6.6 but tarball is 0.6.6dev
+    if [[ "$TARBALL" =~ dev\.t ]] ; then
+        UPSTREAMVERSION=${UPSTREAMVERSION}dev
+    fi
 # 2.2.0.0a3
 elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(.+) ]] ; then
     VERSION=${BASH_REMATCH[1]}
