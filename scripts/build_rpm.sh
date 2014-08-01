@@ -39,6 +39,13 @@ else
     RELEASE=$UPSTREAMVERSION
 fi
 
+# https://bugs.launchpad.net/tripleo/+bug/1351491
+if [[ "$1" =~  ^(diskimage-builder|openstack-tripleo|openstack-tripleo-heat-templates|openstack-tripleo-image-elements)$ ]] ; then
+    if [ "$VERSION" == "0.0.1" ] ; then
+        $VERSION=$(git tag | sort -V | tail -n 1)
+   fi
+fi
+
 mv dist/$TARBALL ~/rpmbuild/SOURCES/
 
 # The project may have either it's own spec repo of use a subdirectory of the global one
