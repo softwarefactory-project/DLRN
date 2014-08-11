@@ -67,10 +67,10 @@ def main():
         notes  = ""
         try:
             built_rpms, notes = build(cp, dt, project, spec_subdir, commit)
-        except:
+        except Exception as e:
             logger.exception("Error while building packages for %s" % project)
             session.add(Commit(dt_commit=dt, project_name=project,
-                        commit_hash=commit, status="FAILED", notes=notes))
+                        commit_hash=commit, status="FAILED", notes=getattr(e, "message", notes)))
         else:
             session.add(Commit(dt_commit=dt, project_name=project,
                         rpms=",".join(built_rpms), commit_hash=commit,
