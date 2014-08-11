@@ -84,6 +84,7 @@ def refreshrepo(url, path, branch="master"):
         sh.git.clone(url, path, "-b", branch)
     git = sh.git.bake(_cwd=path, _tty_out=False)
     git.fetch("origin")
+    git.checkout(branch)
     git.reset("--hard", "origin/%s"%branch)
 
 def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since):
