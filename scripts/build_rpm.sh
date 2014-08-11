@@ -42,7 +42,7 @@ fi
 # https://bugs.launchpad.net/tripleo/+bug/1351491
 if [[ "$1" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
     if [ "$VERSION" == "0.0.1" ] ; then
-        $VERSION=$(git tag | sort -V | tail -n 1)
+        VERSION=$(git tag | sort -V | tail -n 1)
    fi
 fi
 
