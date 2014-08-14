@@ -158,11 +158,14 @@ def build(cp, dt, project, spec_subdir, commit):
     except:
         pass
 
-    sh.docker("run", "-t", "--volume=%s:/data" % datadir,
+    try:
+        sh.docker("run", "-t", "--volume=%s:/data" % datadir,
               "--volume=%s:/scripts" % scriptsdir,
               "--name", "builder", "delorean/fedora",
               "/scripts/build_rpm_wrapper.sh", project, spec_subdir,
               "/data/%s" % yumrepodir)
+    except:
+        raise Exception("Error while building packages")
 
     built_rpms = []
     for rpm in os.listdir(yumrepodir_abs):
@@ -213,7 +216,7 @@ def genreport(cp):
         html.append("<td>%s</td>" % commit.project_name)
         html.append("<td>%s</td>" % commit.commit_hash)
         html.append("<td>%s</td>" % commit.status)
-        html.append("<td>%s</td>" % commit.notes)
+        html.append("<td>%s</td>" % commit.notes[:50])
         html.append("<td><a href=\"%s\">repo</a></td>" %
                     ("%s/%s/%s" % (commit.commit_hash[:2],
                      commit.commit_hash[2:4],
