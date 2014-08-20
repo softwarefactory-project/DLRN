@@ -35,6 +35,7 @@ class Commit(Base):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config-file', help="Config File")
+    parser.add_argument('--local', action="store_true", help="Use local git repo's if possible")
 
     options, args = parser.parse_known_args(sys.argv[1:])
     cp = ConfigParser.RawConfigParser()
@@ -59,7 +60,7 @@ def main():
         # Support the specs in a subdir of spec_repo
         spec_dir = cp.get(project, "spec_dir")
 
-        getinfo(cp, project, repo, spec, spec_dir, toprocess, since)
+        getinfo(cp, project, repo, spec, spec_dir, toprocess, since, options.local)
 
     toprocess.sort()
     for dt, commit, project, spec_subdir in toprocess:
@@ -78,23 +79,25 @@ def main():
         session.commit()
         genreport(cp)
 
-def refreshrepo(url, path, branch="master"):
+def refreshrepo(url, path, branch="master", local=False):
     print "Getting %s to %s"%(url, path)
     if not os.path.exists(path):
         sh.git.clone(url, path, "-b", branch)
+    if local is True:
+        return
     git = sh.git.bake(_cwd=path, _tty_out=False)
     git.fetch("origin")
     git.checkout(branch)
     git.reset("--hard", "origin/%s"%branch)
 
-def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since):
+def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since, local=False):
     repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
     spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
     # TODO : Add support for multiple distros
     spec_branch = cp.get(project, "distros")
 
-    refreshrepo(spec, spec_dir, spec_branch)
-    refreshrepo(repo, repo_dir)
+    refreshrepo(spec, spec_dir, spec_branch, local=local)
+    refreshrepo(repo, repo_dir, local=local)
 
     git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
     lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
