@@ -63,11 +63,11 @@ def main():
         getinfo(cp, project, repo, spec, spec_dir, toprocess, since, options.local)
 
     toprocess.sort()
-    for dt, commit, project, spec_subdir in toprocess:
+    for dt, commit, project, spec_subdir, repo_dir in toprocess:
         logger.info("Processing %s %s" % (project, commit))
         notes  = ""
         try:
-            built_rpms, notes = build(cp, dt, project, spec_subdir, commit)
+            built_rpms, notes = build(cp, dt, project, spec_subdir, repo_dir, commit)
         except Exception as e:
             logger.exception("Error while building packages for %s" % project)
             session.add(Commit(dt_commit=dt, project_name=project,
@@ -91,22 +91,38 @@ def refreshrepo(url, path, branch="master", local=False):
     git.reset("--hard", "origin/%s"%branch)
 
 def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since, local=False):
-    repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
     spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
     # TODO : Add support for multiple distros
     spec_branch = cp.get(project, "distros")
 
     refreshrepo(spec, spec_dir, spec_branch, local=local)
-    refreshrepo(repo, repo_dir, local=local)
 
-    git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
-    lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
-                    "origin/master")
-    for line in lines:
-        toprocess.append(str(line).strip().strip("'").split(" "))
-        toprocess[-1].append(project)
-        toprocess[-1].append(spec_subdir)
-        toprocess[-1][0] = float(toprocess[-1][0])
+    # repo is a comma seperate list, if it contains more then one entry we
+    # git clone into a project subdirectory
+    repos = repo.split(",")
+    project_toprocess = []
+    for repo in repos:
+        repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
+        if len(repos) > 1:
+            repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
+        refreshrepo(repo, repo_dir, local=local)
+
+        git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
+        lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
+                        "origin/master")
+        for line in lines:
+            project_toprocess.append(str(line).strip().strip("'").split(" "))
+            project_toprocess[-1].append(project)
+            project_toprocess[-1].append(spec_subdir)
+            project_toprocess[-1].append(repo_dir)
+            project_toprocess[-1][0] = float(project_toprocess[-1][0])
+
+    # If since == -1, then we only want to trigger a build for the most recent
+    # puppet module to change
+    if since == "-1":
+        project_toprocess.sort()
+        del project_toprocess[:-1]
+    toprocess.extend(project_toprocess)
     return toprocess
 
 def testpatches(project, commit, datadir):
@@ -116,6 +132,11 @@ def testpatches(project, commit, datadir):
         git.remote("rm", "upstream")
     except:
         pass
+
+    # If the upstream dir is not a git repo, it contains multiple git repos
+    # We don't test patches on these
+    if not os.path.isdir(os.path.join(datadir, project, ".git")):
+        return
     git.remote("add", "upstream", "-f", "file://%s/%s/" % (datadir, project))
     try:
         git.checkout("master-patches")
@@ -131,7 +152,7 @@ def testpatches(project, commit, datadir):
     git.checkout("f20-master")
 
 
-def build(cp, dt, project, spec_subdir, commit):
+def build(cp, dt, project, spec_subdir, repo_dir, commit):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     # TODO : only working by convention need to improve
     scriptsdir = datadir.replace("data", "scripts")
@@ -147,8 +168,8 @@ def build(cp, dt, project, spec_subdir, commit):
     # they they can still be applied to upstream master, if they can we stop
     testpatches(project, commit, datadir)
 
-    sh.git("--git-dir", "data/%s/.git" % project,
-           "--work-tree=data/%s" % project, "reset", "--hard", commit)
+    sh.git("--git-dir", "%s/.git" % repo_dir,
+           "--work-tree=%s" % repo_dir, "reset", "--hard", commit)
     try:
         sh.docker("kill", "builder")
     except:
