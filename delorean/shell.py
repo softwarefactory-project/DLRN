@@ -1,10 +1,14 @@
 import ConfigParser
 import argparse
+import copy
 import logging
 import os
 import shutil
+import smtplib
 import sys
 import time
+
+from email.mime.text import MIMEText
 
 import sh
 
@@ -13,10 +17,26 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import desc
 
+import rdoinfo
+
 Base = declarative_base()
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("delorean")
+
+
+notification_email = """
+A build of the package %(name)s has failed against the current master[1] of
+the upstream project, please see log[2] and update the packaging[3].
+
+You are receiving this email because you are listed as on of the
+maintainers for the %(name)s package[4].
+
+[1] - %(upstream)s
+[2] - %(logurl)s
+[3] - %(master-distgit)s
+[4] - https://github.com/redhat-openstack/rdoinfo/blob/master/rdo.yml
+"""
 
 
 class Commit(Base):
@@ -34,10 +54,15 @@ class Commit(Base):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config-file', help="Config File")
-    parser.add_argument('--local', action="store_true", help="Use local git repo's if possible")
+    parser.add_argument('--config-file', help="Config file")
+    parser.add_argument('--info-file', help="Package info file")
+    parser.add_argument('--local', action="store_true",
+                        help="Use local git repo's if possible")
 
     options, args = parser.parse_known_args(sys.argv[1:])
+
+    package_info = rdoinfo.parse_info_file(options.info_file)
+
     cp = ConfigParser.RawConfigParser()
     cp.read(options.config_file)
 
@@ -49,29 +74,30 @@ def main():
 
     # Build a list of commits we need to process
     toprocess = []
-    for project in cp.sections():
+    for package in package_info["packages"]:
+        project = package["name"]
         since = "-1"
         commit = session.query(Commit).filter(Commit.project_name == project).\
             order_by(desc(Commit.dt_commit)).first()
         if commit:
             since = "--after=%d" % (commit.dt_commit + 1)
-        repo = cp.get(project, "repo")
-        spec = cp.get(project, "spec_repo")
-        # Support the specs in a subdir of spec_repo
-        spec_dir = cp.get(project, "spec_dir")
-
-        getinfo(cp, project, repo, spec, spec_dir, toprocess, since, options.local)
+        repo = package["upstream"]
+        spec = package["master-distgit"]
+        getinfo(cp, project, repo, spec, toprocess, since, options.local)
 
     toprocess.sort()
-    for dt, commit, project, spec_subdir, repo_dir in toprocess:
+    for dt, commit, project, repo_dir in toprocess:
         logger.info("Processing %s %s" % (project, commit))
-        notes  = ""
+        notes = ""
         try:
-            built_rpms, notes = build(cp, dt, project, spec_subdir, repo_dir, commit)
+            built_rpms, notes = build(cp, package_info, dt,
+                                      project, repo_dir, commit)
         except Exception as e:
             logger.exception("Error while building packages for %s" % project)
             session.add(Commit(dt_commit=dt, project_name=project,
-                        commit_hash=commit, status="FAILED", notes=getattr(e, "message", notes)))
+                        commit_hash=commit, status="FAILED",
+                        notes=getattr(e, "message", notes)))
+            sendnotifymail(cp, package_info, project, commit)
         else:
             session.add(Commit(dt_commit=dt, project_name=project,
                         rpms=",".join(built_rpms), commit_hash=commit,
@@ -79,8 +105,36 @@ def main():
         session.commit()
         genreport(cp)
 
+
+def sendnotifymail(cp, package_info, project, commit):
+    error_details = copy.copy(
+        [package for package in package_info["packages"]
+            if package["name"] == project][0])
+    error_details["logurl"] = "%s/%s" % (cp.get("DEFAULT", "baseurl"),
+            os.path.join("repos", commit[:2], commit[2:4], commit)
+    )
+    error_body = notification_email % error_details
+
+    msg = MIMEText(error_body)
+    msg['Subject'] = '[delorean] %s master package build failed' % project
+
+    email_from = 'no-reply@delorean.com'
+    msg['From'] = email_from
+
+    email_to = error_details['maintainers']
+    msg['To'] = "packagers"
+
+    smtpserver = cp.get("DEFAULT", "smtpserver")
+    if smtpserver:
+        s = smtplib.SMTP(cp.get("DEFAULT", "smtpserver"))
+        s.sendmail(email_from, email_to, msg.as_string())
+        s.quit()
+    else:
+        logger.info("Skipping notify email to %r" % email_to)
+
+
 def refreshrepo(url, path, branch="master", local=False):
-    print "Getting %s to %s"%(url, path)
+    logger.info("Getting %s to %s" % (url, path))
     if not os.path.exists(path):
         sh.git.clone(url, path, "-b", branch)
     if local is True:
@@ -88,18 +142,21 @@ def refreshrepo(url, path, branch="master", local=False):
     git = sh.git.bake(_cwd=path, _tty_out=False)
     git.fetch("origin")
     git.checkout(branch)
-    git.reset("--hard", "origin/%s"%branch)
+    git.reset("--hard", "origin/%s" % branch)
 
-def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since, local=False):
+
+def getinfo(cp, project, repo, spec, toprocess, since, local=False):
     spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
     # TODO : Add support for multiple distros
-    spec_branch = cp.get(project, "distros")
+    spec_branch = cp.get("DEFAULT", "distros")
 
     refreshrepo(spec, spec_dir, spec_branch, local=local)
 
-    # repo is a comma seperate list, if it contains more then one entry we
+    # repo is usually a string, but if it contains more then one entry we
     # git clone into a project subdirectory
-    repos = repo.split(",")
+    repos = [repo]
+    if isinstance(repo, list):
+        repos = repo
     project_toprocess = []
     for repo in repos:
         repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
@@ -113,7 +170,6 @@ def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since, local=False)
         for line in lines:
             project_toprocess.append(str(line).strip().strip("'").split(" "))
             project_toprocess[-1].append(project)
-            project_toprocess[-1].append(spec_subdir)
             project_toprocess[-1].append(repo_dir)
             project_toprocess[-1][0] = float(project_toprocess[-1][0])
 
@@ -124,6 +180,7 @@ def getinfo(cp, project, repo, spec, spec_subdir, toprocess, since, local=False)
         del project_toprocess[:-1]
     toprocess.extend(project_toprocess)
     return toprocess
+
 
 def testpatches(project, commit, datadir):
     git = sh.git.bake(_cwd="data/%s_spec/" % project, _tty_out=False)
@@ -152,7 +209,7 @@ def testpatches(project, commit, datadir):
     git.checkout("f20-master")
 
 
-def build(cp, dt, project, spec_subdir, repo_dir, commit):
+def build(cp, package_info, dt, project, repo_dir, commit):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     # TODO : only working by convention need to improve
     scriptsdir = datadir.replace("data", "scripts")
@@ -184,10 +241,10 @@ def build(cp, dt, project, spec_subdir, repo_dir, commit):
 
     try:
         sh.docker("run", "-t", "--volume=%s:/data" % datadir,
-              "--volume=%s:/scripts" % scriptsdir,
-              "--name", "builder", "delorean/fedora",
-              "/scripts/build_rpm_wrapper.sh", project, spec_subdir,
-              "/data/%s" % yumrepodir)
+                  "--volume=%s:/scripts" % scriptsdir,
+                  "--name", "builder", "delorean/fedora",
+                  "/scripts/build_rpm_wrapper.sh", project,
+                  "/data/%s" % yumrepodir)
     except:
         raise Exception("Error while building packages")
 
@@ -198,11 +255,12 @@ def build(cp, dt, project, spec_subdir, repo_dir, commit):
     if not built_rpms:
         raise Exception("No rpms built for %s" % project)
 
-    notes="OK"
+    notes = "OK"
     if not os.path.isfile(os.path.join(yumrepodir_abs, "installed")):
-        notes="Error installing"
+        notes = "Error installing"
 
-    for otherproject in cp.sections():
+    packages = [package["name"] for package in package_info["packages"]]
+    for otherproject in packages:
         if otherproject == project:
             continue
         last_success = session.query(Commit).\
@@ -214,7 +272,8 @@ def build(cp, dt, project, spec_subdir, repo_dir, commit):
         rpms = last_success.rpms.split(",")
         for rpm in rpms:
             rpm_link_src = os.path.join(yumrepodir_abs, os.path.split(rpm)[1])
-            os.symlink(os.path.relpath(os.path.join(datadir, rpm), yumrepodir_abs), rpm_link_src)
+            os.symlink(os.path.relpath(os.path.join(datadir, rpm),
+                       yumrepodir_abs), rpm_link_src)
 
     sh.createrepo(yumrepodir_abs)
 
