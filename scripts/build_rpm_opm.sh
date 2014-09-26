@@ -21,7 +21,7 @@ cd ~/rpmbuild/SPECS/
 # VERSION and get RELEASE from $2 (contains commit ID of project that triggered the build)
 UPSTREAMVERSION=2014.2
 VERSION=2014.2
-RELEASE=dev.${3##*/}
+RELEASE=dev.${2##*/}
 
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
