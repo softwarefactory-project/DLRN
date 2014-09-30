@@ -183,7 +183,8 @@ def getinfo(cp, project, repo, spec, toprocess, since, local=False):
 
 
 def testpatches(project, commit, datadir):
-    git = sh.git.bake(_cwd="data/%s_spec/" % project, _tty_out=False)
+    spec_dir = os.path.join(datadir, project+"_spec")
+    git = sh.git.bake(_cwd=spec_dir, _tty_out=False)
     try:
         # This remote mightn't exist yet
         git.remote("rm", "upstream")
