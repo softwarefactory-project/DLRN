@@ -1,9 +1,14 @@
 #!/bin/bash -xe
 
-mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $2
+PROJECT_NAME=$1
+OUTPUT_DIRECTORY=$2
+USER_ID=$3 # chown resulting files to this UID
+GROUP_ID=$4 # chown resulting files to this GUID
+
+mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
 yum install -y --nogpg python-pip
 
-cd /data/$1
+cd /data/$PROJECT_NAME
 rm -f dist/*
 python setup.py sdist
 TARBALL=$(ls dist)
@@ -40,7 +45,7 @@ else
 fi
 
 # https://bugs.launchpad.net/tripleo/+bug/1351491
-if [[ "$1" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
+if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
     if [ "$VERSION" == "0.0.1" ] ; then
         VERSION=$(git tag | sort -V | tail -n 1)
    fi
@@ -48,11 +53,10 @@ fi
 
 mv dist/$TARBALL ~/rpmbuild/SOURCES/
 
-cd /data/$1_spec
+cd /data/${PROJECT_NAME}_spec
 cp * ~/rpmbuild/SOURCES/
 cp *.spec ~/rpmbuild/SPECS/
 cd ~/rpmbuild/SPECS/
-
 
 # Add the mostcurrent repo, we may have dependencies in it
 if [ -e /data/repos/current/repodata ] ; then
@@ -67,6 +71,8 @@ sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
 cat *.spec
 yum-builddep -y *.spec
 rpmbuild -ba *.spec  --define="upstream_version $UPSTREAMVERSION"
-find /rpmbuild/RPMS /rpmbuild/SRPMS -type f | xargs cp -t $2
+find ~/rpmbuild/RPMS ~/rpmbuild/SRPMS -type f | xargs cp -t $OUTPUT_DIRECTORY
 
-yum install -y --nogpg $(find $2 -type f -name "*rpm" | grep -v src.rpm) && touch $2/installed || true
+yum install -y --nogpg $(find $OUTPUT_DIRECTORY -type f -name "*rpm" | grep -v src.rpm) && touch $OUTPUT_DIRECTORY/installed || true
+
+chown -R $USER_ID:$GROUP_ID $OUTPUT_DIRECTORY
