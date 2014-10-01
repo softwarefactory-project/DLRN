@@ -55,6 +55,8 @@ class Commit(Base):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config-file', help="Config file")
+    parser.add_argument('--build-env', action='append',
+                        help="Variables for the build environment.")
     parser.add_argument('--info-file', help="Package info file")
     parser.add_argument('--local', action="store_true",
                         help="Use local git repo's if possible")
@@ -91,7 +93,8 @@ def main():
         notes = ""
         try:
             built_rpms, notes = build(cp, package_info, dt,
-                                      project, repo_dir, commit)
+                                      project, repo_dir, commit,
+                                      options.build_env)
         except Exception as e:
             logger.exception("Error while building packages for %s" % project)
             session.add(Commit(dt_commit=dt, project_name=project,
@@ -210,7 +213,7 @@ def testpatches(project, commit, datadir):
     git.checkout("f20-master")
 
 
-def build(cp, package_info, dt, project, repo_dir, commit):
+def build(cp, package_info, dt, project, repo_dir, commit, env_vars):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     # TODO : only working by convention need to improve
     scriptsdir = datadir.replace("data", "scripts")
@@ -240,12 +243,21 @@ def build(cp, package_info, dt, project, repo_dir, commit):
     except:
         pass
 
+    docker_run_cmd = []
+    # expand the env name=value pairs into docker arguments
+    if env_vars:
+        for env_var in env_vars:
+            docker_run_cmd.append('--env')
+            docker_run_cmd.append(env_var)
+
+    docker_run_cmd.extend(["-t", "--volume=%s:/data" % datadir,
+                           "--volume=%s:/scripts" % scriptsdir,
+                           "--name", "builder", "delorean/fedora",
+                           "/scripts/build_rpm_wrapper.sh", project,
+                           "/data/%s" % yumrepodir, str(os.getuid()),
+                           str(os.getgid())])
     try:
-        sh.docker("run", "-t", "--volume=%s:/data" % datadir,
-                  "--volume=%s:/scripts" % scriptsdir,
-                  "--name", "builder", "delorean/fedora",
-                  "/scripts/build_rpm_wrapper.sh", project,
-                  "/data/%s" % yumrepodir, str(os.getuid()), str(os.getgid()))
+        sh.docker("run", docker_run_cmd)
     except:
         raise Exception("Error while building packages")
 
