@@ -245,7 +245,7 @@ def build(cp, package_info, dt, project, repo_dir, commit):
                   "--volume=%s:/scripts" % scriptsdir,
                   "--name", "builder", "delorean/fedora",
                   "/scripts/build_rpm_wrapper.sh", project,
-                  "/data/%s" % yumrepodir)
+                  "/data/%s" % yumrepodir, str(os.getuid()), str(os.getgid()))
     except:
         raise Exception("Error while building packages")
 
