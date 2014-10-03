@@ -29,13 +29,17 @@ notification_email = """
 A build of the package %(name)s has failed against the current master[1] of
 the upstream project, please see log[2] and update the packaging[3].
 
-You are receiving this email because you are listed as on of the
+You are receiving this email because you are listed as one of the
 maintainers for the %(name)s package[4].
+
+If you have any questions please see the FAQ[5], feel free to ask new questions
+on there and we will add the answer as soon as possible.
 
 [1] - %(upstream)s
 [2] - %(logurl)s
 [3] - %(master-distgit)s
 [4] - https://github.com/redhat-openstack/rdoinfo/blob/master/rdo.yml
+[5] - https://etherpad.openstack.org/p/delorean-packages
 """
 
 
@@ -129,6 +133,7 @@ def sendnotifymail(cp, package_info, project, commit):
 
     smtpserver = cp.get("DEFAULT", "smtpserver")
     if smtpserver:
+        logger.info("Sending notify email to %r" % email_to)
         s = smtplib.SMTP(cp.get("DEFAULT", "smtpserver"))
         s.sendmail(email_from, email_to, msg.as_string())
         s.quit()
