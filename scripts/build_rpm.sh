@@ -6,7 +6,7 @@ USER_ID=$3 # chown resulting files to this UID
 GROUP_ID=$4 # chown resulting files to this GUID
 
 mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
-yum install -y --nogpg python-pip
+yum install -y --nogpg python-pip python-pbr
 
 cd /data/$PROJECT_NAME
 rm -f dist/*
