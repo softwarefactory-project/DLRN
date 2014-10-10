@@ -60,6 +60,10 @@ def main():
     parser.add_argument('--info-file', help="Package info file")
     parser.add_argument('--local', action="store_true",
                         help="Use local git repo's if possible")
+    parser.add_argument('--head-only', action="store_true",
+                        help="Build from the most recent Git commit only.")
+    parser.add_argument('--package-name',
+                        help="Build a specific package name only.")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
@@ -85,7 +89,15 @@ def main():
             since = "--after=%d" % (commit.dt_commit + 1)
         repo = package["upstream"]
         spec = package["master-distgit"]
-        getinfo(cp, project, repo, spec, toprocess, since, options.local)
+        if not options.package_name or package["name"] == options.package_name:
+            project_toprocess = getinfo(cp, project, repo, spec, since,
+                                        options.local)
+            # If since == -1, then we only want to trigger a build for the
+            # most recent change
+            if since == "-1" or options.head_only:
+                project_toprocess.sort()
+                del project_toprocess[:-1]
+            toprocess.extend(project_toprocess)
 
     toprocess.sort()
     for dt, commit, project, repo_dir in toprocess:
@@ -148,7 +160,7 @@ def refreshrepo(url, path, branch="master", local=False):
     git.reset("--hard", "origin/%s" % branch)
 
 
-def getinfo(cp, project, repo, spec, toprocess, since, local=False):
+def getinfo(cp, project, repo, spec, since, local=False):
     spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
     # TODO : Add support for multiple distros
     spec_branch = cp.get("DEFAULT", "distros")
@@ -176,14 +188,7 @@ def getinfo(cp, project, repo, spec, toprocess, since, local=False):
             project_toprocess[-1].append(repo_dir)
             project_toprocess[-1][0] = float(project_toprocess[-1][0])
 
-    # If since == -1, then we only want to trigger a build for the most recent
-    # puppet module to change
-    if since == "-1":
-        project_toprocess.sort()
-        del project_toprocess[:-1]
-    toprocess.extend(project_toprocess)
-    return toprocess
-
+    return project_toprocess
 
 def testpatches(project, commit, datadir):
     spec_dir = os.path.join(datadir, project+"_spec")
@@ -259,6 +264,7 @@ def build(cp, package_info, dt, project, repo_dir, commit, env_vars):
     try:
         sh.docker("run", docker_run_cmd)
     except:
+        logger.error('Build failed. See logs at: ./data/%s/' % yumrepodir)
         raise Exception("Error while building packages")
 
     built_rpms = []
