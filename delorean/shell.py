@@ -116,6 +116,16 @@ def main():
             session.add(Commit(dt_commit=dt, project_name=project,
                         commit_hash=commit, status="FAILED",
                         notes=getattr(e, "message", notes)))
+
+            # If the log file hasn't been created we add what we have
+            # This happens if the rpm build script didn't run.
+            datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
+            logfile = os.path.join(datadir, "repos",
+                                   getshardedcommitdir(commit), "rpmbuild.log")
+            if not os.path.exists(logfile):
+                fp = open(logfile, "w")
+                fp.write(getattr(e, "message", notes))
+                fp.close()
             sendnotifymail(cp, package_info, project, commit)
         else:
             session.add(Commit(dt_commit=dt, project_name=project,
@@ -125,13 +135,17 @@ def main():
         genreport(cp)
 
 
+def getshardedcommitdir(commit):
+    return os.path.join(commit[:2], commit[2:4], commit)
+
+
 def sendnotifymail(cp, package_info, project, commit):
     error_details = copy.copy(
         [package for package in package_info["packages"]
             if package["name"] == project][0])
     error_details["logurl"] = "%s/%s" % (cp.get("DEFAULT", "baseurl"),
-            os.path.join("repos", commit[:2], commit[2:4], commit)
-    )
+                                         os.path.join("repos",
+                                         getshardedcommitdir(commit)))
     error_body = notification_email % error_details
 
     msg = MIMEText(error_body)
@@ -195,6 +209,7 @@ def getinfo(cp, project, repo, spec, since, local=False):
 
     return project_toprocess
 
+
 def testpatches(project, commit, datadir):
     spec_dir = os.path.join(datadir, project+"_spec")
     git = sh.git.bake(_cwd=spec_dir, _tty_out=False)
@@ -227,7 +242,7 @@ def build(cp, package_info, dt, project, repo_dir, commit, env_vars):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     # TODO : only working by convention need to improve
     scriptsdir = datadir.replace("data", "scripts")
-    yumrepodir = os.path.join("repos", commit[:2], commit[2:4], commit)
+    yumrepodir = os.path.join("repos", getshardedcommitdir(commit))
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
     # If yum repo already exists remove it and assume we're starting fresh
@@ -325,9 +340,7 @@ def genreport(cp):
         html.append("<td>%s</td>" % commit.status)
         html.append("<td>%s</td>" % commit.notes[:50])
         html.append("<td><a href=\"%s\">repo</a></td>" %
-                    ("%s/%s/%s" % (commit.commit_hash[:2],
-                     commit.commit_hash[2:4],
-                     commit.commit_hash)))
+                    getshardedcommitdir(commit.commit_hash))
         html.append("</tr>")
     html.append("</table></html>")
 
