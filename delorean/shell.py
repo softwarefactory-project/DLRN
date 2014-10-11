@@ -48,12 +48,16 @@ class Commit(Base):
 
     id = Column(Integer, primary_key=True)
     dt_commit = Column(Integer)
-    dt_finished = Column(DateTime)
     project_name = Column(String)
+    repo_dir = Column(String)
     commit_hash = Column(String)
+    spec_hash = Column(String)
     status = Column(String)
     rpms = Column(String)
     notes = Column(String)
+
+    def __cmp__(self, b):
+        return cmp(self.dt_commit, b.dt_commit)
 
 
 def main():
@@ -104,33 +108,39 @@ def main():
             toprocess.extend(project_toprocess)
 
     toprocess.sort()
-    for dt, commit, project, repo_dir in toprocess:
-        logger.info("Processing %s %s" % (project, commit))
+    for commit in toprocess:
+        project = commit.project_name
+        commit_hash = commit.commit_hash
+        dt = commit.dt_commit
+        repo_dir = commit.repo_dir
+
+        logger.info("Processing %s %s" % (project, commit_hash))
         notes = ""
         try:
-            built_rpms, notes = build(cp, package_info, dt,
-                                      project, repo_dir, commit,
-                                      options.build_env)
+            built_rpms, notes = build(cp, package_info, dt, project, repo_dir,
+                                      commit_hash, options.build_env)
         except Exception as e:
             logger.exception("Error while building packages for %s" % project)
-            session.add(Commit(dt_commit=dt, project_name=project,
-                        commit_hash=commit, status="FAILED",
-                        notes=getattr(e, "message", notes)))
+            commit.status = "FAILED"
+            commit.notes = getattr(e, "message", notes)
+            session.add(commit)
 
             # If the log file hasn't been created we add what we have
             # This happens if the rpm build script didn't run.
             datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
             logfile = os.path.join(datadir, "repos",
-                                   getshardedcommitdir(commit), "rpmbuild.log")
+                                   getshardedcommitdir(commit_hash),
+                                   "rpmbuild.log")
             if not os.path.exists(logfile):
                 fp = open(logfile, "w")
                 fp.write(getattr(e, "message", notes))
                 fp.close()
-            sendnotifymail(cp, package_info, project, commit)
+            sendnotifymail(cp, package_info, project, commit_hash)
         else:
-            session.add(Commit(dt_commit=dt, project_name=project,
-                        rpms=",".join(built_rpms), commit_hash=commit,
-                        status="SUCCESS", notes=notes))
+            commit.status = "SUCCESS"
+            commit.notes = notes
+            commit.rpms = ",".join(built_rpms)
+            session.add(commit)
         session.commit()
         genreport(cp)
 
@@ -171,12 +181,13 @@ def refreshrepo(url, path, branch="master", local=False):
     logger.info("Getting %s to %s" % (url, path))
     if not os.path.exists(path):
         sh.git.clone(url, path, "-b", branch)
-    if local is True:
-        return
+
     git = sh.git.bake(_cwd=path, _tty_out=False)
-    git.fetch("origin")
+    if local is False:
+        git.fetch("origin")
     git.checkout(branch)
     git.reset("--hard", "origin/%s" % branch)
+    return str(git("rev-parse", "HEAD")).strip()
 
 
 def getinfo(cp, project, repo, spec, since, local=False):
@@ -184,7 +195,7 @@ def getinfo(cp, project, repo, spec, since, local=False):
     # TODO : Add support for multiple distros
     spec_branch = cp.get("DEFAULT", "distros")
 
-    refreshrepo(spec, spec_dir, spec_branch, local=local)
+    spec_hash = refreshrepo(spec, spec_dir, spec_branch, local=local)
 
     # repo is usually a string, but if it contains more then one entry we
     # git clone into a project subdirectory
@@ -202,11 +213,11 @@ def getinfo(cp, project, repo, spec, since, local=False):
         lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
                         "origin/master")
         for line in lines:
-            project_toprocess.append(str(line).strip().strip("'").split(" "))
-            project_toprocess[-1].append(project)
-            project_toprocess[-1].append(repo_dir)
-            project_toprocess[-1][0] = float(project_toprocess[-1][0])
-
+            dt, commit_hash = str(line).strip().strip("'").split(" ")
+            commit = Commit(dt_commit=dt, project_name=project,
+                            commit_hash=commit_hash, repo_dir=repo_dir,
+                            spec_hash=spec_hash)
+            project_toprocess.append(commit)
     return project_toprocess
 
 
