@@ -91,10 +91,15 @@ def main():
     for package in package_info["packages"]:
         project = package["name"]
         since = "-1"
+        spec_hash = None
         commit = session.query(Commit).filter(Commit.project_name == project).\
-            order_by(desc(Commit.dt_commit)).first()
+            order_by(desc(Commit.dt_commit)).\
+            order_by(desc(Commit.id)).first()
         if commit:
-            since = "--after=%d" % (commit.dt_commit + 1)
+            # This will return all commits since the last handled commit
+            # including the last handled commit, remove it later if needed.
+            since = "--after=%d" % (commit.dt_commit)
+            spec_hash = commit.spec_hash
         repo = package["upstream"]
         spec = package["master-distgit"]
         if not options.package_name or package["name"] == options.package_name:
@@ -105,6 +110,14 @@ def main():
             if since == "-1" or options.head_only:
                 project_toprocess.sort()
                 del project_toprocess[:-1]
+
+            # The first entry in the list of commits is a commit we have
+            # already processed, we want to process it again if the
+            # spec hash has changed
+            if project_toprocess and commit and \
+               project_toprocess[0].commit_hash == commit.commit_hash and \
+               project_toprocess[0].spec_hash == commit.spec_hash:
+                del project_toprocess[0]
             toprocess.extend(project_toprocess)
 
     toprocess.sort()
