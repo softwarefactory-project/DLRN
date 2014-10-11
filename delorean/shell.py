@@ -59,6 +59,13 @@ class Commit(Base):
     def __cmp__(self, b):
         return cmp(self.dt_commit, b.dt_commit)
 
+    def getshardedcommitdir(self):
+        spec_hash_suffix = ""
+        if self.spec_hash:
+            spec_hash_suffix = "_%s" % self.spec_hash[:8]
+        return os.path.join(self.commit_hash[:2], self.commit_hash[2:4],
+                            self.commit_hash + spec_hash_suffix)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -91,10 +98,15 @@ def main():
     for package in package_info["packages"]:
         project = package["name"]
         since = "-1"
+        spec_hash = None
         commit = session.query(Commit).filter(Commit.project_name == project).\
-            order_by(desc(Commit.dt_commit)).first()
+            order_by(desc(Commit.dt_commit)).\
+            order_by(desc(Commit.id)).first()
         if commit:
-            since = "--after=%d" % (commit.dt_commit + 1)
+            # This will return all commits since the last handled commit
+            # including the last handled commit, remove it later if needed.
+            since = "--after=%d" % (commit.dt_commit)
+            spec_hash = commit.spec_hash
         repo = package["upstream"]
         spec = package["master-distgit"]
         if not options.package_name or package["name"] == options.package_name:
@@ -105,20 +117,27 @@ def main():
             if since == "-1" or options.head_only:
                 project_toprocess.sort()
                 del project_toprocess[:-1]
+
+            # The first entry in the list of commits is a commit we have
+            # already processed, we want to process it again if the
+            # spec hash has changed
+            if project_toprocess and commit and \
+               project_toprocess[0].commit_hash == commit.commit_hash and \
+               project_toprocess[0].spec_hash == commit.spec_hash:
+                del project_toprocess[0]
             toprocess.extend(project_toprocess)
 
     toprocess.sort()
     for commit in toprocess:
         project = commit.project_name
         commit_hash = commit.commit_hash
-        dt = commit.dt_commit
-        repo_dir = commit.repo_dir
+        spec_hash = commit.spec_hash
 
         logger.info("Processing %s %s" % (project, commit_hash))
         notes = ""
         try:
-            built_rpms, notes = build(cp, package_info, dt, project, repo_dir,
-                                      commit_hash, options.build_env)
+            built_rpms, notes = build(cp, package_info,
+                                      commit, options.build_env)
         except Exception as e:
             logger.exception("Error while building packages for %s" % project)
             commit.status = "FAILED"
@@ -129,13 +148,13 @@ def main():
             # This happens if the rpm build script didn't run.
             datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
             logfile = os.path.join(datadir, "repos",
-                                   getshardedcommitdir(commit_hash),
+                                   commit.getshardedcommitdir(),
                                    "rpmbuild.log")
             if not os.path.exists(logfile):
                 fp = open(logfile, "w")
                 fp.write(getattr(e, "message", notes))
                 fp.close()
-            sendnotifymail(cp, package_info, project, commit_hash)
+            sendnotifymail(cp, package_info, commit)
         else:
             commit.status = "SUCCESS"
             commit.notes = notes
@@ -145,21 +164,18 @@ def main():
         genreport(cp)
 
 
-def getshardedcommitdir(commit):
-    return os.path.join(commit[:2], commit[2:4], commit)
-
-
-def sendnotifymail(cp, package_info, project, commit):
+def sendnotifymail(cp, package_info, commit):
     error_details = copy.copy(
         [package for package in package_info["packages"]
-            if package["name"] == project][0])
+            if package["name"] == commit.project_name][0])
     error_details["logurl"] = "%s/%s" % (cp.get("DEFAULT", "baseurl"),
                                          os.path.join("repos",
-                                         getshardedcommitdir(commit)))
+                                         commit.getshardedcommitdir()))
     error_body = notification_email % error_details
 
     msg = MIMEText(error_body)
-    msg['Subject'] = '[delorean] %s master package build failed' % project
+    msg['Subject'] = '[delorean] %s master package build failed' % \
+                     commit.project_name
 
     email_from = 'no-reply@delorean.com'
     msg['From'] = email_from
@@ -249,12 +265,16 @@ def testpatches(project, commit, datadir):
     git.checkout("f20-master")
 
 
-def build(cp, package_info, dt, project, repo_dir, commit, env_vars):
+def build(cp, package_info, commit, env_vars):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     # TODO : only working by convention need to improve
     scriptsdir = datadir.replace("data", "scripts")
-    yumrepodir = os.path.join("repos", getshardedcommitdir(commit))
+    yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
+
+    commit_hash = commit.commit_hash
+    project_name = commit.project_name
+    repo_dir = commit.repo_dir
 
     # If yum repo already exists remove it and assume we're starting fresh
     if os.path.exists(yumrepodir_abs):
@@ -263,10 +283,10 @@ def build(cp, package_info, dt, project, repo_dir, commit, env_vars):
 
     # We need to make sure if any patches exist in the master-patches branch
     # they they can still be applied to upstream master, if they can we stop
-    testpatches(project, commit, datadir)
+    testpatches(project_name, commit_hash, datadir)
 
     sh.git("--git-dir", "%s/.git" % repo_dir,
-           "--work-tree=%s" % repo_dir, "reset", "--hard", commit)
+           "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
     try:
         sh.docker("kill", "builder")
     except:
@@ -289,7 +309,7 @@ def build(cp, package_info, dt, project, repo_dir, commit, env_vars):
     docker_run_cmd.extend(["-t", "--volume=%s:/data" % datadir,
                            "--volume=%s:/scripts" % scriptsdir,
                            "--name", "builder", "delorean/fedora",
-                           "/scripts/build_rpm_wrapper.sh", project,
+                           "/scripts/build_rpm_wrapper.sh", project_name,
                            "/data/%s" % yumrepodir, str(os.getuid()),
                            str(os.getgid())])
     try:
@@ -303,7 +323,7 @@ def build(cp, package_info, dt, project, repo_dir, commit, env_vars):
         if rpm.endswith(".rpm"):
             built_rpms.append(os.path.join(yumrepodir, rpm))
     if not built_rpms:
-        raise Exception("No rpms built for %s" % project)
+        raise Exception("No rpms built for %s" % project_name)
 
     notes = "OK"
     if not os.path.isfile(os.path.join(yumrepodir_abs, "installed")):
@@ -311,7 +331,7 @@ def build(cp, package_info, dt, project, repo_dir, commit, env_vars):
 
     packages = [package["name"] for package in package_info["packages"]]
     for otherproject in packages:
-        if otherproject == project:
+        if otherproject == project_name:
             continue
         last_success = session.query(Commit).\
             filter(Commit.project_name == otherproject).\
@@ -329,8 +349,8 @@ def build(cp, package_info, dt, project, repo_dir, commit, env_vars):
 
     fp = open(os.path.join(yumrepodir_abs, "delorean.repo"), "w")
     fp.write("[delorean]\nname=delorean-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
-             "gpgcheck=0" % (project, commit, cp.get("DEFAULT", "baseurl"),
-                             yumrepodir))
+             "gpgcheck=0" % (project_name, commit_hash,
+                             cp.get("DEFAULT", "baseurl"), yumrepodir))
     fp.close()
 
     current_repo_dir = os.path.join(datadir, "repos", "current")
@@ -351,7 +371,7 @@ def genreport(cp):
         html.append("<td>%s</td>" % commit.status)
         html.append("<td>%s</td>" % commit.notes[:50])
         html.append("<td><a href=\"%s\">repo</a></td>" %
-                    getshardedcommitdir(commit.commit_hash))
+                    commit.getshardedcommitdir())
         html.append("</tr>")
     html.append("</table></html>")
 
