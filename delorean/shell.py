@@ -67,6 +67,25 @@ class Commit(Base):
                             self.commit_hash + spec_hash_suffix)
 
 
+class Project(Base):
+    __tablename__ = "projects"
+
+    id = Column(Integer, primary_key=True)
+    project_name = Column(String)
+    last_email = Column(Integer)
+
+    # Returns True if the last email sent for this project
+    # was less then 24 hours ago
+    def suppress_email(self):
+        ct = time.time()
+        if ct - self.last_email > 86400:
+            return False
+        return True
+
+    def sent_email(self):
+        self.last_email = int(time.time())
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config-file', help="Config file")
@@ -129,6 +148,11 @@ def main():
     toprocess.sort()
     for commit in toprocess:
         project = commit.project_name
+
+        project_info = session.query(Project).filter(Project.project_name == project).first()
+        if not project_info:
+            project_info = Project(project_name=project, last_email=0)
+
         commit_hash = commit.commit_hash
         spec_hash = commit.spec_hash
 
@@ -153,7 +177,10 @@ def main():
                 fp = open(logfile, "w")
                 fp.write(getattr(e, "message", notes))
                 fp.close()
-            sendnotifymail(cp, package_info, commit)
+
+            if not project_info.suppress_email():
+                sendnotifymail(cp, package_info, commit)
+                project_info.sent_email()
         else:
             commit.status = "SUCCESS"
             commit.notes = notes
