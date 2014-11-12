@@ -187,7 +187,8 @@ def main():
             commit.rpms = ",".join(built_rpms)
             session.add(commit)
         session.commit()
-        genreport(cp)
+        genreports(cp, package_info)
+    genreports(cp, package_info)
 
 
 def sendnotifymail(cp, package_info, commit):
@@ -354,7 +355,7 @@ def build(cp, package_info, commit, env_vars):
 
     notes = "OK"
     if not os.path.isfile(os.path.join(yumrepodir_abs, "installed")):
-        notes = "Error installing"
+        raise Exception("Error installing %s" % project_name)
 
     packages = [package["name"] for package in package_info["packages"]]
     for otherproject in packages:
@@ -387,7 +388,8 @@ def build(cp, package_info, commit, env_vars):
     return built_rpms, notes
 
 
-def genreport(cp):
+def genreports(cp, package_info):
+    # Generate report of the last 300 package builds
     html = ["<html><head/><body><table>"]
     commits = session.query(Commit).order_by(desc(Commit.dt_commit)).limit(300)
     for commit in commits:
@@ -404,6 +406,40 @@ def genreport(cp):
 
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
                                "repos", "report.html")
+    fp = open(report_file, "w")
+    fp.write("".join(html))
+    fp.close()
+
+    # Generate report of status for each project
+    html = ["<html><head/><body><table>"]
+    html.append("<tr><td>Name</td><td>Failures</td><td>Last Success</td></tr>")
+    packages = [package for package in package_info["packages"]]
+    # Find the most recent successfull build
+    # then report on failures since then
+    for package in packages:
+        name = package["name"]
+        commits = session.query(Commit).filter(Commit.project_name == name).\
+            filter(Commit.status == "SUCCESS").\
+            order_by(desc(Commit.dt_commit)).limit(1)
+        last_success = commits.first()
+        last_success_dt = 0
+        if last_success is not None:
+            last_success_dt = last_success.dt_commit
+
+        commits = session.query(Commit).filter(Commit.project_name == name).\
+            filter(Commit.status == "FAILED", Commit.dt_commit > last_success_dt)
+        if commits.count() == 0:
+            continue
+
+        html.append("<tr>")
+        html.append("<td>%s</td>" % name)
+        html.append("<td>%s</td>" % commits.count())
+        html.append("<td>%s</td>" % time.ctime(last_success_dt))
+        html.append("</tr>")
+    html.append("</table></html>")
+
+    report_file = os.path.join(cp.get("DEFAULT", "datadir"),
+                               "repos", "status_report.html")
     fp = open(report_file, "w")
     fp.write("".join(html))
     fp.close()
