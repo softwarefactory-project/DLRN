@@ -20,6 +20,10 @@ mv *.tar.gz ~/rpmbuild/SOURCES/
 cd /data/${PROJECT_NAME}_spec
 cp * ~/rpmbuild/SOURCES/
 cp *.spec ~/rpmbuild/SPECS/
+# Generate a diff of this spec repo when compared to Fedora Rawhide
+if git fetch http://pkgs.fedoraproject.org/git/$PROJECT_NAME master ; then
+    git diff HEAD..FETCH_HEAD > $OUTPUT_DIRECTORY/spec_delta.diff
+fi
 cd ~/rpmbuild/SPECS/
 
 # The puppet module package isn't based on any single repo so for now we hardcode

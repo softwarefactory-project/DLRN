@@ -401,6 +401,8 @@ def genreports(cp, package_info):
         html.append("<td>%s</td>" % commit.notes[:50])
         html.append("<td><a href=\"%s\">repo</a></td>" %
                     commit.getshardedcommitdir())
+        html.append("<td><a href=\"%s/spec_delta.diff\">spec delta</a></td>" %
+                    commit.getshardedcommitdir())
         html.append("</tr>")
     html.append("</table></html>")
 
