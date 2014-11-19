@@ -34,7 +34,7 @@ elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(g.+) ]] ; then
 # Only version e.g. 1.7.3
 elif [[ "$UPSTREAMVERSION" =~ ^([.0-9]*)$ ]] ; then
     VERSION=${BASH_REMATCH[1]}
-    RELEASE=1
+    RELEASE=999 # Release should be greater then any distro versions
     # python-alembic version=0.6.6 but tarball is 0.6.6dev
     if [[ "$TARBALL" =~ dev\.t ]] ; then
         UPSTREAMVERSION=${UPSTREAMVERSION}dev
