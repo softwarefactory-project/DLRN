@@ -8,6 +8,10 @@ GROUP_ID=$4 # chown resulting files to this GUID
 mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
 yum install -y --nogpg python-pip python-pbr
 
+# So that we don't have to maintain packaging for all dependencies we install RDO
+# Which will contain a lot of the non openstack dependencies
+yum install -y --nogpg https://rdo.fedorapeople.org/openstack-juno/rdo-release-juno.rpm
+
 cd /data/$PROJECT_NAME
 rm -f dist/*
 python setup.py sdist
