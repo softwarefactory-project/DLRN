@@ -16,7 +16,9 @@ cd /data/$PROJECT_NAME
 rm -f dist/*
 python setup.py sdist
 TARBALL=$(ls dist)
-UPSTREAMVERSION=$(python setup.py --version)
+# setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
+# so only look at the last line for version
+UPSTREAMVERSION=$(python setup.py --version | tail -n 1)
 # version-release e.g 1.0.0-d7f1b849
 if [[ "$UPSTREAMVERSION" =~ (.*?)-(.+) ]] ; then
     VERSION=${BASH_REMATCH[1]}
