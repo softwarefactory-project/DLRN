@@ -98,6 +98,10 @@ def main():
                         help="Build from the most recent Git commit only.")
     parser.add_argument('--package-name',
                         help="Build a specific package name only.")
+    parser.add_argument('--dev', action="store_true",
+                        help="Don't reset packaging git repo, force build "\
+                             "and add public master repo for dependencies "\
+                             "(dev mode).")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
@@ -130,7 +134,7 @@ def main():
         spec = package["master-distgit"]
         if not options.package_name or package["name"] == options.package_name:
             project_toprocess = getinfo(cp, project, repo, spec, since,
-                                        options.local)
+                                        options.local, options.dev)
             # If since == -1, then we only want to trigger a build for the
             # most recent change
             if since == "-1" or options.head_only:
@@ -138,8 +142,8 @@ def main():
 
             # The first entry in the list of commits is a commit we have
             # already processed, we want to process it again if the
-            # spec hash has changed
-            if project_toprocess and commit and \
+            # spec hash has changed or we are in dev mode
+            if project_toprocess and commit and options.dev is False and \
                project_toprocess[0].commit_hash == commit.commit_hash and \
                project_toprocess[0].spec_hash == commit.spec_hash:
                 del project_toprocess[0]
@@ -160,7 +164,7 @@ def main():
         notes = ""
         try:
             built_rpms, notes = build(cp, package_info,
-                                      commit, options.build_env)
+                                      commit, options.build_env, options.dev)
         except Exception as e:
             logger.exception("Error while building packages for %s" % project)
             commit.status = "FAILED"
@@ -186,6 +190,8 @@ def main():
             commit.notes = notes
             commit.rpms = ",".join(built_rpms)
             session.add(commit)
+        if options.dev is False:
+            session.commit()
         session.commit()
         genreports(cp, package_info)
     genreports(cp, package_info)
@@ -233,12 +239,14 @@ def refreshrepo(url, path, branch="master", local=False):
     return str(git("rev-parse", "HEAD")).strip()
 
 
-def getinfo(cp, project, repo, spec, since, local=False):
+def getinfo(cp, project, repo, spec, since, local, dev_mode):
     spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
     # TODO : Add support for multiple distros
     spec_branch = cp.get("DEFAULT", "distros")
 
-    spec_hash = refreshrepo(spec, spec_dir, spec_branch, local=local)
+    spec_hash = "dev"
+    if dev_mode is False:
+        refreshrepo(spec, spec_dir, spec_branch, local=local)
 
     # repo is usually a string, but if it contains more then one entry we
     # git clone into a project subdirectory
@@ -257,7 +265,7 @@ def getinfo(cp, project, repo, spec, since, local=False):
                         "origin/master")
         for line in lines:
             dt, commit_hash = str(line).strip().strip("'").split(" ")
-            commit = Commit(dt_commit=dt, project_name=project,
+            commit = Commit(dt_commit=float(dt), project_name=project,
                             commit_hash=commit_hash, repo_dir=repo_dir,
                             spec_hash=spec_hash)
             project_toprocess.append(commit)
@@ -293,7 +301,7 @@ def testpatches(project, commit, datadir):
     git.checkout("f20-master")
 
 
-def build(cp, package_info, commit, env_vars):
+def build(cp, package_info, commit, env_vars, dev_mode):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     # TODO : only working by convention need to improve
     scriptsdir = datadir.replace("data", "scripts")
@@ -311,7 +319,8 @@ def build(cp, package_info, commit, env_vars):
 
     # We need to make sure if any patches exist in the master-patches branch
     # they they can still be applied to upstream master, if they can we stop
-    testpatches(project_name, commit_hash, datadir)
+    if dev_mode is False:
+        testpatches(project_name, commit_hash, datadir)
 
     sh.git("--git-dir", "%s/.git" % repo_dir,
            "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
@@ -333,6 +342,9 @@ def build(cp, package_info, commit, env_vars):
         for env_var in env_vars:
             docker_run_cmd.append('--env')
             docker_run_cmd.append(env_var)
+    if dev_mode is True:
+            docker_run_cmd.append('--env')
+            docker_run_cmd.append("DELOREAN_DEV=1")
 
     docker_run_cmd.extend(["-t", "--volume=%s:/data" % datadir,
                            "--volume=%s:/scripts" % scriptsdir,
