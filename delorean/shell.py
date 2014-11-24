@@ -377,7 +377,7 @@ def build(cp, package_info, commit, env_vars):
 
     fp = open(os.path.join(yumrepodir_abs, "delorean.repo"), "w")
     fp.write("[delorean]\nname=delorean-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
-             "gpgcheck=0" % (project_name, commit_hash,
+             "gpgcheck=0\npriority=1" % (project_name, commit_hash,
                              cp.get("DEFAULT", "baseurl"), yumrepodir))
     fp.close()
 
