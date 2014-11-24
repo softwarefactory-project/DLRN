@@ -12,6 +12,12 @@ yum install -y --nogpg python-pip python-pbr
 # Which will contain a lot of the non openstack dependencies
 yum install -y --nogpg https://rdo.fedorapeople.org/openstack-juno/rdo-release-juno.rpm
 
+# If in dev mode the user might not be building all of the packages, so we need
+# to add the current upstream repository in order to have access to current dependencies
+if [ "$DELOREAN_DEV" == "1" ] ; then
+    curl http://209.132.178.33/repos/current/delorean.repo > /etc/yum.repos.d/public_current.repo
+fi
+
 cd /data/$PROJECT_NAME
 rm -f dist/*
 python setup.py sdist
