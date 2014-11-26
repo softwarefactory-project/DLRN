@@ -141,13 +141,17 @@ def main():
                 del project_toprocess[:-1]
 
             # The first entry in the list of commits is a commit we have
-            # already processed, we want to process it again if the
-            # spec hash has changed or we are in dev mode
-            if project_toprocess and commit and options.dev is False and \
-               project_toprocess[0].commit_hash == commit.commit_hash and \
-               project_toprocess[0].spec_hash == commit.spec_hash:
-                del project_toprocess[0]
-            toprocess.extend(project_toprocess)
+            # already processed, we want to process it again only if in dev
+            # mode or spec hash has changed, we can't simply check against the
+            # last commit in the db, as multiple commits can have the same
+            # commit date
+            for commit_toprocess in project_toprocess:
+                if (options.dev is True) or \
+                   (not session.query(Commit).filter(
+                        Commit.project_name == project,
+                        Commit.commit_hash == commit_toprocess.commit_hash,
+                        Commit.spec_hash == commit_toprocess.spec_hash).all()):
+                    toprocess.append(commit_toprocess)
 
     toprocess.sort()
     for commit in toprocess:
