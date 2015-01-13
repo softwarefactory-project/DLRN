@@ -21,8 +21,9 @@ import rdoinfo
 
 Base = declarative_base()
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("delorean")
+logger.setLevel(logging.INFO)
 
 
 notification_email = """
