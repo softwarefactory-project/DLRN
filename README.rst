@@ -15,10 +15,11 @@ Builds and maintains yum repositories following openstacks uptream repositories
 
 Setup
 -----
-::
 
-    yum install docker-io git createrepo python-virtualenv git-hg
-    systemctl start httpd
+.. code-block:: bash
+
+    yum install docker-io git{,-hg} createrepo python-{virtualenv,pip} httpd
+    systemctl start httpd # only if you wish to serve repos/reports
     systemctl start docker
     # Add the user you intend to run as to the docker group and login again
     git clone https://github.com/openstack-packages/delorean.git
@@ -28,8 +29,12 @@ Setup
     . ../delorean-venv/bin/activate
     pip install -r requirements.txt
     python setup.py develop
-    # edit projects.ini if needed
-    delorean --config-file projects.ini
+    # edit projects.ini if needed; set datadir to /var/www/html if serving
+    cd
+    git clone https://github.com/redhat-openstack/rdoinfo
+    cd delorean/delorean
+    ln -sv ~/rdoinfo/rdoinfo/__init__.py rdoinfo.py
+    delorean --config-file projects.ini --info-file ~/rdoinfo/rdo.yml
 
 Dependencies
 ------------
@@ -38,7 +43,8 @@ first build of some projects may fail, the simplies solution at the moment
 is to allow this to happen, delete the record of the failed builds from the
 database and rerun delorean.
 
-::
+.. code-block:: bash
+
     $ sudo sqlite3 commits.sqlite 
     SQLite version 3.8.5 2014-06-04 14:06:34
     Enter ".help" for usage hints.
