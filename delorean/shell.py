@@ -371,6 +371,7 @@ def build(cp, package_info, commit, env_vars, dev_mode):
 
     notes = "OK"
     if not os.path.isfile(os.path.join(yumrepodir_abs, "installed")):
+        logger.error('Build failed. See logs at: ./data/%s/' % yumrepodir)
         raise Exception("Error installing %s" % project_name)
 
     packages = [package["name"] for package in package_info["packages"]]
