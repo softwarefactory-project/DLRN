@@ -4,3 +4,4 @@ oslo.config
 sh
 SQLAlchemy
 PyYAML
+rdopkg>=0.23

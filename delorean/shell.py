@@ -17,7 +17,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import desc
 
-import rdoinfo
+from rdopkg.actionmods import rdoinfo
+import rdopkg.conf
 
 Base = declarative_base()
 
@@ -92,7 +93,6 @@ def main():
     parser.add_argument('--config-file', help="Config file")
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
-    parser.add_argument('--info-file', help="Package info file")
     parser.add_argument('--local', action="store_true",
                         help="Use local git repo's if possible")
     parser.add_argument('--head-only', action="store_true",
@@ -106,7 +106,7 @@ def main():
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
-    package_info = rdoinfo.parse_info_file(options.info_file)
+    package_info = getpkginfo()
 
     cp = ConfigParser.RawConfigParser()
     cp.read(options.config_file)
@@ -199,6 +199,15 @@ def main():
             session.commit()
         genreports(cp, package_info)
     genreports(cp, package_info)
+
+
+def getpkginfo():
+    inforepo = rdoinfo.RdoinfoRepo(rdopkg.conf.cfg['HOME_DIR'],
+                                   rdopkg.conf.cfg['RDOINFO_REPO'],
+                                   verbose=False)
+    # rdopkg will clone/pull rdoinfo repo as needed and parse rdo.yml
+    inforepo.init()
+    return inforepo.get_info()
 
 
 def sendnotifymail(cp, package_info, commit):
