@@ -9,11 +9,6 @@ sudo systemctl start docker
 # Display the current commit
 git log -1
 
-# Set up rdoinfo
-# TODO(derekh): Remove this once we're using rdopkg
-git clone https://github.com/redhat-openstack/rdoinfo.git --depth 1
-export PYTHONPATH=rdoinfo
-
 # Run unit tests
 tox -epy27
 
@@ -26,4 +21,4 @@ tox -epep8
 # And Run delorean against a project
 set +u
 . .tox/py27/bin/activate
-delorean --config-file projects.ini --info-file ./rdoinfo/rdo.yml --head-only --package-name python-keystoneclient --dev
+delorean --config-file projects.ini --head-only --package-name python-keystoneclient --dev

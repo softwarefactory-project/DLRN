@@ -41,9 +41,6 @@ hack on.
             systemctl start httpd.service
             cd ~
             git clone https://github.com/openstack-packages/delorean
-            git clone https://github.com/redhat-openstack/rdoinfo
-            cd delorean/delorean
-            ln -sv ~/rdoinfo/rdoinfo/__init__.py rdoinfo.py
             cd ~/delorean
             virtualenv .venv
             source .venv/bin/activate
@@ -57,7 +54,7 @@ hack on.
             sed -i s:./data:/root/delorean/data: ~/delorean/projects.ini
             chmod +x /root
             ln -s /root/delorean/data/repos /var/www/html/
-            delorean --config-file ~/delorean/projects.ini --info-file ~/rdoinfo/rdo.yml
+            delorean --config-file ~/delorean/projects.ini
             sqlite3 ~/delorean/commits.sqlite < ~/fix-fails.sql
             echo "*/5 * * * * root /root/run.sh" >> /etc/crontab
         path: /root/setup.sh
@@ -76,7 +73,7 @@ hack on.
             cd ~/delorean
 
             echo `date` "Starting delorean run." >> $LOGFILE
-            delorean --config-file ~/delorean/projects.ini --info-file ~/rdoinfo/rdo.yml 2>> $LOGFILE
+            delorean --config-file ~/delorean/projects.ini 2>> $LOGFILE
             echo `date` "Delorean run complete." >> $LOGFILE
         path:  /root/run.sh
         permissions: 0744
@@ -123,10 +120,7 @@ Checkout the Source code and install a virtualenv:
 .. code-block:: bash
 
     $ git clone https://github.com/openstack-packages/delorean.git
-    $ git clone https://github.com/redhat-openstack/rdoinfo
-    $ cd delorean/delorean
-    $ ln -sv ../../rdoinfo/rdoinfo/__init__.py rdoinfo.py
-    $ cd ..
+    $ cd delorean
     $ virtualenv .venv
     $ source .venv/bin/activate
     $ pip install -r requirements.txt

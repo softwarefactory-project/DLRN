@@ -29,7 +29,10 @@ from sqlalchemy import create_engine, Column, desc, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-import rdoinfo
+import rdopkg.utils.log
+rdopkg.utils.log.set_colors('no')
+from rdopkg.actionmods import rdoinfo
+import rdopkg.conf
 
 Base = declarative_base()
 
@@ -108,9 +111,9 @@ def main():
     parser.add_argument('--config-file',
                         help="Config file (required)",
                         required=True)
-    parser.add_argument('--info-file',
-                        help="Package info file (required)",
-                        required=True)
+    parser.add_argument('--info-repo',
+                        help="use local rdoinfo repo instead of"
+                             "fetching default one using rdopkg")
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
     parser.add_argument('--local', action="store_true",
@@ -126,10 +129,10 @@ def main():
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
-    package_info = rdoinfo.parse_info_file(options.info_file)
-
     cp = configparser.RawConfigParser()
     cp.read(options.config_file)
+
+    package_info = getpkginfo(local_info_repo=options.info_repo)
 
     engine = create_engine('sqlite:///commits.sqlite')
     Base.metadata.create_all(engine)
@@ -220,6 +223,20 @@ def main():
         genreports(cp, package_info)
     genreports(cp, package_info)
     return exit_code
+
+
+def getpkginfo(local_info_repo=None):
+    inforepo = None
+    if local_info_repo:
+        inforepo = rdoinfo.RdoinfoRepo(local_repo_path=local_info_repo,
+                                       verbose=False)
+    else:
+        inforepo = rdoinfo.RdoinfoRepo(rdopkg.conf.cfg['HOME_DIR'],
+                                       rdopkg.conf.cfg['RDOINFO_REPO'],
+                                       verbose=False)
+        # rdopkg will clone/pull rdoinfo repo as needed (~/.rdopkg/rdoinfo)
+        inforepo.init()
+    return inforepo.get_info()
 
 
 def sendnotifymail(cp, package_info, commit):
