@@ -1,5 +1,18 @@
-import ConfigParser
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+
 import argparse
+import ConfigParser
 import copy
 import logging
 import os
@@ -12,10 +25,9 @@ from email.mime.text import MIMEText
 
 import sh
 
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, desc, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import desc
 
 import rdoinfo
 
@@ -93,8 +105,12 @@ def main():
     # saying "optional arguments" to just "arguments":
     parser._optionals.title = 'arguments'
 
-    parser.add_argument('--config-file', help="Config file (required)", required=True)
-    parser.add_argument('--info-file', help="Package info file (required)", required=True)
+    parser.add_argument('--config-file',
+                        help="Config file (required)",
+                        required=True)
+    parser.add_argument('--info-file',
+                        help="Package info file (required)",
+                        required=True)
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
     parser.add_argument('--local', action="store_true",
@@ -104,8 +120,8 @@ def main():
     parser.add_argument('--package-name',
                         help="Build a specific package name only.")
     parser.add_argument('--dev', action="store_true",
-                        help="Don't reset packaging git repo, force build "\
-                             "and add public master repo for dependencies "\
+                        help="Don't reset packaging git repo, force build "
+                             "and add public master repo for dependencies "
                              "(dev mode).")
 
     options, args = parser.parse_known_args(sys.argv[1:])
@@ -126,7 +142,6 @@ def main():
     for package in package_info["packages"]:
         project = package["name"]
         since = "-1"
-        spec_hash = None
         commit = session.query(Commit).filter(Commit.project_name == project).\
             order_by(desc(Commit.dt_commit)).\
             order_by(desc(Commit.id)).first()
@@ -134,7 +149,6 @@ def main():
             # This will return all commits since the last handled commit
             # including the last handled commit, remove it later if needed.
             since = "--after=%d" % (commit.dt_commit)
-            spec_hash = commit.spec_hash
         repo = package["upstream"]
         spec = package["master-distgit"]
         if not options.package_name or package["name"] == options.package_name:
@@ -162,12 +176,12 @@ def main():
     for commit in toprocess:
         project = commit.project_name
 
-        project_info = session.query(Project).filter(Project.project_name == project).first()
+        project_info = session.query(Project).filter(
+            Project.project_name == project).first()
         if not project_info:
             project_info = Project(project_name=project, last_email=0)
 
         commit_hash = commit.commit_hash
-        spec_hash = commit.spec_hash
 
         logger.info("Processing %s %s" % (project, commit_hash))
         notes = ""
@@ -248,8 +262,8 @@ def refreshrepo(url, path, branch="master", local=False):
 
 
 def getinfo(cp, project, repo, spec, since, local, dev_mode):
-    spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project+"_spec")
-    # TODO : Add support for multiple distros
+    spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project + "_spec")
+    # TODO(someone) : Add support for multiple distros
     spec_branch = cp.get("DEFAULT", "distros")
 
     spec_hash = "dev"
@@ -282,12 +296,12 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode):
 
 
 def testpatches(project, commit, datadir):
-    spec_dir = os.path.join(datadir, project+"_spec")
+    spec_dir = os.path.join(datadir, project + "_spec")
     git = sh.git.bake(_cwd=spec_dir, _tty_out=False)
     try:
         # This remote mightn't exist yet
         git.remote("rm", "upstream")
-    except:
+    except Exception:
         pass
 
     # If the upstream dir is not a git repo, it contains multiple git repos
@@ -297,13 +311,13 @@ def testpatches(project, commit, datadir):
     git.remote("add", "upstream", "-f", "file://%s/%s/" % (datadir, project))
     try:
         git.checkout("master-patches")
-    except:
+    except Exception:
         # This project doesn't have a master-patches branch
         return
     git.reset("--hard", "origin/master-patches")
     try:
         git.rebase(commit)
-    except:
+    except Exception:
         git.rebase("--abort")
         raise Exception("Patches rebase failed")
     git.checkout("f20-master")
@@ -311,7 +325,7 @@ def testpatches(project, commit, datadir):
 
 def build(cp, package_info, commit, env_vars, dev_mode):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
-    # TODO : only working by convention need to improve
+    # TODO(trown) : only working by convention need to improve
     scriptsdir = datadir.replace("data", "scripts")
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
@@ -334,14 +348,14 @@ def build(cp, package_info, commit, env_vars, dev_mode):
            "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
     try:
         sh.docker("kill", "builder")
-    except:
+    except Exception:
         pass
 
     # looks like we need to give the container time to die
     time.sleep(20)
     try:
         sh.docker("rm", "builder")
-    except:
+    except Exception:
         pass
 
     docker_run_cmd = []
@@ -362,7 +376,7 @@ def build(cp, package_info, commit, env_vars, dev_mode):
                            str(os.getgid())])
     try:
         sh.docker("run", docker_run_cmd)
-    except:
+    except Exception:
         logger.error('Build failed. See logs at: ./data/%s/' % yumrepodir)
         raise Exception("Error while building packages")
 
@@ -399,13 +413,14 @@ def build(cp, package_info, commit, env_vars, dev_mode):
     fp = open(os.path.join(yumrepodir_abs, "delorean.repo"), "w")
     fp.write("[delorean]\nname=delorean-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
              "gpgcheck=0\npriority=1" % (project_name, commit_hash,
-                             cp.get("DEFAULT", "baseurl"), yumrepodir))
+                                         cp.get("DEFAULT", "baseurl"),
+                                         yumrepodir))
     fp.close()
 
     current_repo_dir = os.path.join(datadir, "repos", "current")
     os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, "repos")),
-               current_repo_dir+"_")
-    os.rename(current_repo_dir+"_", current_repo_dir)
+               current_repo_dir + "_")
+    os.rename(current_repo_dir + "_", current_repo_dir)
     return built_rpms, notes
 
 
@@ -450,7 +465,8 @@ def genreports(cp, package_info):
             last_success_dt = last_success.dt_commit
 
         commits = session.query(Commit).filter(Commit.project_name == name).\
-            filter(Commit.status == "FAILED", Commit.dt_commit > last_success_dt)
+            filter(Commit.status == "FAILED",
+                   Commit.dt_commit > last_success_dt)
         if commits.count() == 0:
             continue
 
