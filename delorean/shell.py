@@ -89,12 +89,16 @@ class Project(Base):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config-file', help="Config file")
+    # Some of the non-positional arguments are required, so change the text
+    # saying "optional arguments" to just "arguments":
+    parser._optionals.title = 'arguments'
+
+    parser.add_argument('--config-file', help="Config file (required)", required=True)
+    parser.add_argument('--info-file', help="Package info file (required)", required=True)
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
-    parser.add_argument('--info-file', help="Package info file")
     parser.add_argument('--local', action="store_true",
-                        help="Use local git repo's if possible")
+                        help="Use local git repos if possible")
     parser.add_argument('--head-only', action="store_true",
                         help="Build from the most recent Git commit only.")
     parser.add_argument('--package-name',
