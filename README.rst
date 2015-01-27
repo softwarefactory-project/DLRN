@@ -4,12 +4,6 @@ delorean
 
 Delorean builds and maintains yum repositories following openstacks uptream repositories.
 
-* Free software: Apache license
-* Documentation: http://docs.openstack.org/developer/delorean
-* Source: http://git.openstack.org/cgit/stackforge/delorean
-* Bugs: http://bugs.launchpad.net/delorean
-
-
 Setup
 -----
 
@@ -38,10 +32,10 @@ Running
 
 Dependencies
 ------------
-In order to build Some of the projects here require others, as a result the
-first build of some projects may fail, the simplest solution at the moment
-is to allow this to happen, delete the record of the failed builds from the
-database and rerun delorean.
+Some of the projects require others to build. As a result the first build of 
+some projects may fail. The simplest solution at the moment is to allow this
+to happen, and delete the record of the failed builds from the database and
+rerun delorean.
 
 .. code-block:: bash
 
