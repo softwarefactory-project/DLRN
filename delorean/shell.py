@@ -235,7 +235,7 @@ def refreshrepo(url, path, branch="master", local=False):
     if not os.path.exists(path):
         sh.git.clone(url, path, "-b", branch)
 
-    git = sh.git.bake(_cwd=path, _tty_out=False)
+    git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
     if local is False:
         try:
             git.fetch("origin")
