@@ -237,7 +237,15 @@ def refreshrepo(url, path, branch="master", local=False):
 
     git = sh.git.bake(_cwd=path, _tty_out=False)
     if local is False:
-        git.fetch("origin")
+        try:
+            git.fetch("origin")
+        except:
+            # Sometimes hg repositories get into a invalid state leaving them
+            # unusable, to avoid a looping error just remove it so it will be
+            # recloned.
+            logger.error("Error fetching into %s, deleting." % (path))
+            sh.rm("-rf", path)
+            raise
     git.checkout(branch)
     git.reset("--hard", "origin/%s" % branch)
     return str(git("rev-parse", "HEAD")).strip()
