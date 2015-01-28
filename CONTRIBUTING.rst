@@ -31,7 +31,7 @@ Checkout the Source code and install a virtualenv:
     $ ln -sv ../../rdoinfo/rdoinfo/__init__.py rdoinfo.py
     $ cd ..
     $ virtualenv .venv
-    $ source .venv/activate
+    $ source .venv/bin/activate
     $ pip install -r requirements.txt
     $ pip install -r test-requirements.txt
     $ python setup.py develop
