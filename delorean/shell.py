@@ -332,17 +332,6 @@ def build(cp, package_info, commit, env_vars, dev_mode):
 
     sh.git("--git-dir", "%s/.git" % repo_dir,
            "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
-    try:
-        sh.docker("kill", "builder")
-    except:
-        pass
-
-    # looks like we need to give the container time to die
-    time.sleep(20)
-    try:
-        sh.docker("rm", "builder")
-    except:
-        pass
 
     docker_run_cmd = []
     # expand the env name=value pairs into docker arguments
@@ -362,9 +351,20 @@ def build(cp, package_info, commit, env_vars, dev_mode):
                            str(os.getgid())])
     try:
         sh.docker("run", docker_run_cmd)
-    except:
-        logger.error('Build failed. See logs at: ./data/%s/' % yumrepodir)
-        raise Exception("Error while building packages")
+    except Exception as e:
+        logger.error('Docker cmd failed. See logs at: ./data/%s/' % yumrepodir)
+        raise e
+    finally:
+        # Kill builder if running and remove if present
+        try:
+            sh.docker("kill", "builder")
+            sh.docker("wait", "builder")
+        except Exception:
+            pass
+        try:
+            sh.docker("rm", "builder")
+        except Exception:
+            pass
 
     built_rpms = []
     for rpm in os.listdir(yumrepodir_abs):
