@@ -28,8 +28,8 @@ cd ~/rpmbuild/SPECS/
 
 # The puppet module package isn't based on any single repo so for now we hardcode
 # VERSION and get RELEASE from $OUTPUT_DIRECTORY (contains commit ID of project that triggered the build)
-UPSTREAMVERSION=2014.2
-VERSION=2014.2
+UPSTREAMVERSION=2015.1
+VERSION=2015.1
 RELEASE=dev.${2##*/}
 
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
