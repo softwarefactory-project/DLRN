@@ -289,7 +289,7 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode):
     return project_toprocess
 
 
-def testpatches(project, commit, datadir):
+def testpatches(cp, project, commit, datadir):
     spec_dir = os.path.join(datadir, project+"_spec")
     git = sh.git.bake(_cwd=spec_dir, _tty_out=False)
     try:
@@ -314,7 +314,8 @@ def testpatches(project, commit, datadir):
     except:
         git.rebase("--abort")
         raise Exception("Patches rebase failed")
-    git.checkout("f20-master")
+    spec_branch = cp.get("DEFAULT", "distros")
+    git.checkout(spec_branch)
 
 
 def build(cp, package_info, commit, env_vars, dev_mode):
@@ -336,7 +337,7 @@ def build(cp, package_info, commit, env_vars, dev_mode):
     # We need to make sure if any patches exist in the master-patches branch
     # they they can still be applied to upstream master, if they can we stop
     if dev_mode is False:
-        testpatches(project_name, commit_hash, datadir)
+        testpatches(cp, project_name, commit_hash, datadir)
 
     sh.git("--git-dir", "%s/.git" % repo_dir,
            "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
