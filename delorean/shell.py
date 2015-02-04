@@ -322,6 +322,7 @@ def build(cp, package_info, commit, env_vars, dev_mode):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     # TODO : only working by convention need to improve
     scriptsdir = datadir.replace("data", "scripts")
+    target = cp.get("DEFAULT", "target")
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
@@ -365,7 +366,7 @@ def build(cp, package_info, commit, env_vars, dev_mode):
 
     docker_run_cmd.extend(["-t", "--volume=%s:/data" % datadir,
                            "--volume=%s:/scripts" % scriptsdir,
-                           "--name", "builder", "delorean/fedora",
+                           "--name", "builder", "delorean/%s" % target,
                            "/scripts/build_rpm_wrapper.sh", project_name,
                            "/data/%s" % yumrepodir, str(os.getuid()),
                            str(os.getgid())])
