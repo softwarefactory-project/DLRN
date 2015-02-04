@@ -11,6 +11,7 @@ cd /data/$PROJECT_NAME
 for REPO in */.git ; do
     REPO=${REPO%%/*} # remove the /.git
     NAME=${REPO%%.git} # remove the .git, it may or may not be present
+    NAME=`echo $NAME | sed -r 's/_/-/'` # Some puppet modules names are not compliant (Ex: puppet_aviator)
     SNAME=${NAME#*-} # remove the puppetlabs-
     tar --transform="s/$REPO/$NAME-master/" --exclude=.git -czf ${SNAME}-master.tar.gz $REPO
 done
