@@ -10,7 +10,9 @@ yum install -y --nogpg python-pip python-pbr
 
 # So that we don't have to maintain packaging for all dependencies we install RDO
 # Which will contain a lot of the non openstack dependencies
-yum install -y --nogpg https://rdo.fedorapeople.org/openstack-juno/rdo-release-juno.rpm
+if ! rpm -q rdo-release-juno ; then
+    yum install -y --nogpg https://rdo.fedorapeople.org/openstack-juno/rdo-release-juno.rpm
+fi
 
 # If in dev mode the user might not be building all of the packages, so we need
 # to add the current upstream repository in order to have access to current dependencies
