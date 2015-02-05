@@ -153,7 +153,7 @@ def main():
         spec = package["master-distgit"]
         if not options.package_name or package["name"] == options.package_name:
             project_toprocess = getinfo(cp, project, repo, spec, since,
-                                        options.local, options.dev)
+                                        options.local, options.dev, package)
             # If since == -1, then we only want to trigger a build for the
             # most recent change
             if since == "-1" or options.head_only:
@@ -269,10 +269,25 @@ def refreshrepo(url, path, branch="master", local=False):
     return str(git("rev-parse", "HEAD")).strip()
 
 
-def getinfo(cp, project, repo, spec, since, local, dev_mode):
+def getspecbranch(cp, package):
+    if 'spec-branch' in package:
+        return package['spec-branch']
+    else:
+        return cp.get("DEFAULT", "distros")
+
+
+def getsourcebranch(cp, package):
+    if 'source-branch' in package:
+        return package['source-branch']
+    else:
+        return cp.get("DEFAULT", "source")
+
+
+def getinfo(cp, project, repo, spec, since, local, dev_mode, package):
     spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project + "_spec")
     # TODO(someone) : Add support for multiple distros
-    spec_branch = cp.get("DEFAULT", "distros")
+    spec_branch = getspecbranch(cp, package)
+    source_branch = getsourcebranch(cp, package)
 
     spec_hash = "dev"
     if dev_mode is False:
@@ -288,7 +303,7 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode):
         repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
         if len(repos) > 1:
             repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
-        refreshrepo(repo, repo_dir, local=local)
+        refreshrepo(repo, repo_dir, source_branch, local=local)
 
         git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
         lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
@@ -328,8 +343,7 @@ def testpatches(cp, project, commit, datadir):
     except Exception:
         git.rebase("--abort")
         raise Exception("Patches rebase failed")
-    spec_branch = cp.get("DEFAULT", "distros")
-    git.checkout(spec_branch)
+    git.checkout("f20-master")
 
 
 def build(cp, package_info, commit, env_vars, dev_mode):
@@ -350,7 +364,7 @@ def build(cp, package_info, commit, env_vars, dev_mode):
 
     # We need to make sure if any patches exist in the master-patches branch
     # they they can still be applied to upstream master, if they can we stop
-    if dev_mode is False:
+    if not (dev_mode or cp.get("DEFAULT", "testpatches")):
         testpatches(cp, project_name, commit_hash, datadir)
 
     sh.git("--git-dir", "%s/.git" % repo_dir,
