@@ -334,8 +334,7 @@ def testpatches(cp, project, commit, datadir):
 
 def build(cp, package_info, commit, env_vars, dev_mode):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
-    # TODO(trown) : only working by convention need to improve
-    scriptsdir = datadir.replace("data", "scripts")
+    scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
     target = cp.get("DEFAULT", "target")
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
