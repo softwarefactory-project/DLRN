@@ -273,6 +273,7 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode):
     spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project + "_spec")
     # TODO(someone) : Add support for multiple distros
     spec_branch = cp.get("DEFAULT", "distros")
+    master_branch = cp.get("DEFAULT", "master")
 
     spec_hash = "dev"
     if dev_mode is False:
@@ -288,7 +289,7 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode):
         repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
         if len(repos) > 1:
             repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
-        refreshrepo(repo, repo_dir, local=local)
+        refreshrepo(repo, repo_dir, master_branch, local=local)
 
         git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
         lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
