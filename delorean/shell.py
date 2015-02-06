@@ -12,7 +12,6 @@
 
 
 import argparse
-import ConfigParser
 import copy
 import logging
 import os
@@ -24,6 +23,7 @@ import time
 from email.mime.text import MIMEText
 
 import sh
+from six.moves import configparser
 
 from sqlalchemy import create_engine, Column, desc, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
@@ -128,7 +128,7 @@ def main():
 
     package_info = rdoinfo.parse_info_file(options.info_file)
 
-    cp = ConfigParser.RawConfigParser()
+    cp = configparser.RawConfigParser()
     cp.read(options.config_file)
 
     engine = create_engine('sqlite:///commits.sqlite')
