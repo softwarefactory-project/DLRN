@@ -375,7 +375,8 @@ def build(cp, package_info, commit, env_vars, dev_mode):
     try:
         sh.docker("run", docker_run_cmd)
     except Exception as e:
-        logger.error('Docker cmd failed. See logs at: ./data/%s/' % yumrepodir)
+        logger.error('Docker cmd failed. See logs at: %s/%s/' % (datadir,
+                                                                 yumrepodir))
         raise e
     finally:
         # Kill builder if running and remove if present
