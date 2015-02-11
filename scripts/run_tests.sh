@@ -21,7 +21,7 @@ tox -epy27
 tox -epep8
 
 # Create a build image
-./scripts/create_build_image.sh
+./scripts/create_build_image.sh fedora
 
 # And Run delorean against a project
 set +u
