@@ -274,9 +274,12 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode):
     # TODO(someone) : Add support for multiple distros
     spec_branch = cp.get("DEFAULT", "distros")
 
-    spec_hash = "dev"
     if dev_mode is False:
         spec_hash = refreshrepo(spec, spec_dir, spec_branch, local=local)
+    else:
+        spec_hash = "dev"
+        if not os.path.isdir(spec_dir):
+            refreshrepo(spec, spec_dir, spec_branch, local=local)
 
     # repo is usually a string, but if it contains more then one entry we
     # git clone into a project subdirectory
