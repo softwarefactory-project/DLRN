@@ -1,10 +1,11 @@
 #!/bin/bash -xe
 
 SCRIPTDIR=$(realpath $(dirname $0))
+DISTRO=${1-fedora}
 
-
-docker rm build_image || true
-docker run -i --volume=$SCRIPTDIR:/scripts --name build_image fedora /scripts/update_image.sh
-docker rmi delorean/fedora || true
-docker commit build_image delorean/fedora
-docker rm build_image
+if [ $DISTRO != "rhel" ] ; then
+    docker build -t delorean/$DISTRO $SCRIPTDIR/dockerfiles/$DISTRO
+else
+    # TODO(derekh): handle the rhel case as a Dockerfile
+    $SCRIPTDIR/create_rhel_build_image.sh
+fi
