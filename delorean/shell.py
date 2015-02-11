@@ -173,6 +173,7 @@ def main():
                     toprocess.append(commit_toprocess)
 
     toprocess.sort()
+    exit_code = 0
     for commit in toprocess:
         project = commit.project_name
 
@@ -189,6 +190,7 @@ def main():
             built_rpms, notes = build(cp, package_info,
                                       commit, options.build_env, options.dev)
         except Exception as e:
+            exit_code = 1
             logger.exception("Error while building packages for %s" % project)
             commit.status = "FAILED"
             commit.notes = getattr(e, "message", notes)
@@ -217,6 +219,7 @@ def main():
             session.commit()
         genreports(cp, package_info)
     genreports(cp, package_info)
+    return exit_code
 
 
 def sendnotifymail(cp, package_info, commit):
