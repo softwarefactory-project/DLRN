@@ -374,7 +374,8 @@ def build(cp, package_info, commit, env_vars, dev_mode):
 
     docker_run_cmd.extend(["-t", "--volume=%s:/data" % datadir,
                            "--volume=%s:/scripts" % scriptsdir,
-                           "--name", "builder", "delorean/%s" % target,
+                           "--name", "builder-%s" % target,
+                           "delorean/%s" % target,
                            "/scripts/build_rpm_wrapper.sh", project_name,
                            "/data/%s" % yumrepodir, str(os.getuid()),
                            str(os.getgid())])
@@ -385,14 +386,14 @@ def build(cp, package_info, commit, env_vars, dev_mode):
                                                                  yumrepodir))
         raise e
     finally:
-        # Kill builder if running and remove if present
+        # Kill builder-"target" if running and remove if present
         try:
-            sh.docker("kill", "builder")
-            sh.docker("wait", "builder")
+            sh.docker("kill", "builder-%s" % target)
+            sh.docker("wait", "builder-%s" % target)
         except Exception:
             pass
         try:
-            sh.docker("rm", "builder")
+            sh.docker("rm", "builder-%s" % target)
         except Exception:
             pass
 
