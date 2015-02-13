@@ -309,35 +309,6 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode):
     return project_toprocess
 
 
-def testpatches(cp, project, commit, datadir):
-    spec_dir = os.path.join(datadir, project + "_spec")
-    git = sh.git.bake(_cwd=spec_dir, _tty_out=False)
-    try:
-        # This remote mightn't exist yet
-        git.remote("rm", "upstream")
-    except Exception:
-        pass
-
-    # If the upstream dir is not a git repo, it contains multiple git repos
-    # We don't test patches on these
-    if not os.path.isdir(os.path.join(datadir, project, ".git")):
-        return
-    git.remote("add", "upstream", "-f", "file://%s/%s/" % (datadir, project))
-    try:
-        git.checkout("master-patches")
-    except Exception:
-        # This project doesn't have a master-patches branch
-        return
-    git.reset("--hard", "origin/master-patches")
-    try:
-        git.rebase(commit)
-    except Exception:
-        git.rebase("--abort")
-        raise Exception("Patches rebase failed")
-    spec_branch = cp.get("DEFAULT", "distros")
-    git.checkout(spec_branch)
-
-
 def build(cp, package_info, commit, env_vars, dev_mode):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
@@ -353,11 +324,6 @@ def build(cp, package_info, commit, env_vars, dev_mode):
     if os.path.exists(yumrepodir_abs):
         shutil.rmtree(yumrepodir_abs)
     os.makedirs(yumrepodir_abs)
-
-    # We need to make sure if any patches exist in the master-patches branch
-    # they they can still be applied to upstream master, if they can we stop
-    if dev_mode is False:
-        testpatches(cp, project_name, commit_hash, datadir)
 
     sh.git("--git-dir", "%s/.git" % repo_dir,
            "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
