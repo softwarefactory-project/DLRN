@@ -398,7 +398,7 @@ def build(cp, package_info, commit, env_vars, dev_mode):
     fp.write("[delorean]\nname=delorean-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
              "gpgcheck=0\npriority=1" % (project_name, commit_hash,
                                          cp.get("DEFAULT", "baseurl"),
-                                         yumrepodir))
+                                         commit.getshardedcommitdir()))
     fp.close()
 
     current_repo_dir = os.path.join(datadir, "repos", "current")
