@@ -23,6 +23,20 @@ tox -epep8
 # Create a build image
 ./scripts/create_build_image.sh fedora
 
+export GERRIT_PROJECT=openstack-packages/instack-undercloud
+export GERRIT_REFSPEC=refs/changes/50/215550/1
+# If this is a CI run for one of the spec files then we pre download it
+# into the data directory, delorean wont change it because we are using --dev
+if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delorean" ] ; then
+    mkdir data
+    PROJECT_SPEC_DIR=${GERRIT_PROJECT#*/}_spec
+    git clone https://review.gerrithub.io/"$GERRIT_PROJECT" data/$PROJECT_SPEC_DIR
+    pushd data/$PROJECT_SPEC_DIR
+    git fetch https://review.gerrithub.io/$GERRIT_PROJECT $GERRIT_REFSPEC && git checkout FETCH_HEAD
+    popd
+fi
+
+
 # And Run delorean against a project
 set +u
 . .tox/py27/bin/activate
