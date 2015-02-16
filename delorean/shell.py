@@ -265,7 +265,7 @@ def refreshrepo(url, path, branch="master", local=False):
             # unusable, to avoid a looping error just remove it so it will be
             # recloned.
             logger.error("Error fetching into %s, deleting." % (path))
-            sh.rm("-rf", path)
+            sh.sudo("rm", "-rf", path)
             raise
     git.checkout(branch)
     git.reset("--hard", "origin/%s" % branch)
