@@ -47,7 +47,7 @@ The configuration file looks like this:
     [DEFAULT]
     datadir=./data
     baseurl=http://trunk.rdoproject.org/
-    distros=f20-master
+    distro=f20-master
     smtpserver=
 
 * ``datadir`` is the directory where the packages and repositories will be created.
@@ -55,8 +55,7 @@ The configuration file looks like this:
 * ``baseurl`` is the URL to the data-directory, as hosted by your web-server. Unless you are
   installing Delorean for local use only, this must be a publicly accessible URL.
 
-* ``distros`` is the distribution to use for building the packages. Currently only one
-  distribution is supported.
+* ``distro`` is the distribution to use for building the packages.
 
 * ``smtpserver`` is the address of the mail server for sending out notification emails.
   If this is empty no emails will be sent out. If you are running Delorean locally,
