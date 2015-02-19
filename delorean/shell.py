@@ -67,7 +67,7 @@ class Commit(Base):
     project_name = Column(String)
     repo_dir = Column(String)
     commit_hash = Column(String)
-    spec_hash = Column(String)
+    distro_hash = Column(String)
     status = Column(String)
     rpms = Column(String)
     notes = Column(String)
@@ -76,11 +76,11 @@ class Commit(Base):
         return cmp(self.dt_commit, b.dt_commit)
 
     def getshardedcommitdir(self):
-        spec_hash_suffix = ""
-        if self.spec_hash:
-            spec_hash_suffix = "_%s" % self.spec_hash[:8]
+        distro_hash_suffix = ""
+        if self.distro_hash:
+            distro_hash_suffix = "_%s" % self.distro_hash[:8]
         return os.path.join(self.commit_hash[:2], self.commit_hash[2:4],
-                            self.commit_hash + spec_hash_suffix)
+                            self.commit_hash + distro_hash_suffix)
 
 
 class Project(Base):
@@ -153,9 +153,9 @@ def main():
             # including the last handled commit, remove it later if needed.
             since = "--after=%d" % (commit.dt_commit)
         repo = package["upstream"]
-        spec = package["master-distgit"]
+        distro = package["master-distgit"]
         if not options.package_name or package["name"] == options.package_name:
-            project_toprocess = getinfo(cp, project, repo, spec, since,
+            project_toprocess = getinfo(cp, project, repo, distro, since,
                                         options.local, options.dev, package)
             # If since == -1, then we only want to trigger a build for the
             # most recent change
@@ -164,7 +164,7 @@ def main():
 
             # The first entry in the list of commits is a commit we have
             # already processed, we want to process it again only if in dev
-            # mode or spec hash has changed, we can't simply check against the
+            # mode or distro hash has changed, we can't simply check against the
             # last commit in the db, as multiple commits can have the same
             # commit date
             for commit_toprocess in project_toprocess:
@@ -172,7 +172,7 @@ def main():
                    (not session.query(Commit).filter(
                         Commit.project_name == project,
                         Commit.commit_hash == commit_toprocess.commit_hash,
-                        Commit.spec_hash == commit_toprocess.spec_hash).all()):
+                        Commit.distro_hash == commit_toprocess.distro_hash).all()):
                     toprocess.append(commit_toprocess)
 
     toprocess.sort()
@@ -289,11 +289,11 @@ def refreshrepo(url, path, branch="master", local=False):
     return str(git("rev-parse", "HEAD")).strip()
 
 
-def getspecbranch(cp, package):
-    if 'spec-branch' in package:
-        return package['spec-branch']
+def getdistrobranch(cp, package):
+    if 'distro-branch' in package:
+        return package['distro-branch']
     else:
-        return cp.get("DEFAULT", "distros")
+        return cp.get("DEFAULT", "distro")
 
 
 def getsourcebranch(cp, package):
@@ -303,18 +303,17 @@ def getsourcebranch(cp, package):
         return cp.get("DEFAULT", "source")
 
 
-def getinfo(cp, project, repo, spec, since, local, dev_mode, package):
-    spec_dir = os.path.join(cp.get("DEFAULT", "datadir"), project + "_spec")
-    # TODO(someone) : Add support for multiple distros
-    spec_branch = getspecbranch(cp, package)
+def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
+    distro_dir = os.path.join(cp.get("DEFAULT", "datadir"), project + "_distro")
+    distro_branch = getdistrobranch(cp, package)
     source_branch = getsourcebranch(cp, package)
 
     if dev_mode is False:
-        spec_hash = refreshrepo(spec, spec_dir, spec_branch, local=local)
+        distro_hash = refreshrepo(distro, distro_dir, distro_branch, local=local)
     else:
-        spec_hash = "dev"
-        if not os.path.isdir(spec_dir):
-            refreshrepo(spec, spec_dir, spec_branch, local=local)
+        distro_hash = "dev"
+        if not os.path.isdir(distro_dir):
+            refreshrepo(distro, distro_dir, distro_branch, local=local)
 
     # repo is usually a string, but if it contains more then one entry we
     # git clone into a project subdirectory
@@ -335,7 +334,7 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode, package):
             dt, commit_hash = str(line).strip().strip("'").split(" ")
             commit = Commit(dt_commit=float(dt), project_name=project,
                             commit_hash=commit_hash, repo_dir=repo_dir,
-                            spec_hash=spec_hash)
+                            distro_hash=distro_hash)
             project_toprocess.append(commit)
     project_toprocess.sort()
     return project_toprocess
@@ -453,7 +452,7 @@ def genreports(cp, package_info):
         html.append("<td>%s</td>" % commit.notes[:50])
         html.append("<td><a href=\"%s\">repo</a></td>" %
                     commit.getshardedcommitdir())
-        html.append("<td><a href=\"%s/spec_delta.diff\">spec delta</a></td>" %
+        html.append("<td><a href=\"%s/distro_delta.diff\">distro delta</a></td>" %
                     commit.getshardedcommitdir())
         html.append("</tr>")
     html.append("</table></html>")
