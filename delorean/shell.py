@@ -313,7 +313,7 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode, package):
 
         git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
         lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
-                        "origin/master")
+                        "origin/%s" % source_branch)
         for line in lines:
             dt, commit_hash = str(line).strip().strip("'").split(" ")
             commit = Commit(dt_commit=float(dt), project_name=project,
