@@ -18,8 +18,10 @@ tox -epy27
 # Run pep8 tests
 tox -epep8
 
-# Create a build image
+# Create build images, this will endup being a noop on hosts where
+# it was already run if the dockerfile hasn't changed
 ./scripts/create_build_image.sh fedora
+./scripts/create_build_image.sh centos
 
 # If this is a CI run for one of the spec files then we pre download it
 # into the data directory, delorean wont change it because we are using --dev
@@ -38,4 +40,11 @@ fi
 set +u
 . .tox/py27/bin/activate
 set -u
+delorean --config-file projects.ini --head-only --package-name $(./scripts/map-project-name $PROJECT_TO_BUILD) --dev
+
+# Switch to a centos target
+sed -i -e 's%target=.*%target=centos%' projects.ini
+sed -i -e 's%baseurl=.*%baseurl=http://trunk.rdoproject.org/centos70%' projects.ini
+
+# And run delorean again, for the moment we mask failures i.e. report only until we're sure all the specs run
 delorean --config-file projects.ini --head-only --package-name $(./scripts/map-project-name $PROJECT_TO_BUILD) --dev
