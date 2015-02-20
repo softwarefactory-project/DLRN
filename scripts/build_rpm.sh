@@ -42,7 +42,9 @@ elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(g.+) ]] ; then
 # Only version e.g. 1.7.3
 elif [[ "$UPSTREAMVERSION" =~ ^([.0-9]*)$ ]] ; then
     VERSION=${BASH_REMATCH[1]}
-    RELEASE=999 # Release should be greater then any distro versions
+    # try to follow Fedora guidelines for git snapshots (but include time too)
+    # http://fedoraproject.org/wiki/Packaging:NamingGuidelines#Pre-Release_packages
+    RELEASE=$(date -u +"0.99.%Y%m%d.%H%Mgit")
     # python-alembic version=0.6.6 but tarball is 0.6.6dev
     if [[ "$TARBALL" =~ dev\.t ]] ; then
         UPSTREAMVERSION=${UPSTREAMVERSION}dev
