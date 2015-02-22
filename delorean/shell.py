@@ -19,6 +19,7 @@ import shutil
 import smtplib
 import sys
 from time import time, gmtime, ctime, strftime
+import gzip
 
 from email.mime.text import MIMEText
 
@@ -73,7 +74,7 @@ class Commit(Base):
     commit_hash = Column(String)
     distro_hash = Column(String)
     status = Column(String)
-    rpms = Column(String)
+    packages = Column(String)
     notes = Column(String)
     flags = Column(Integer, default=0)
 
@@ -136,6 +137,10 @@ def main():
     parser.add_argument('--use-public', action="store_true",
                         help="Use the public master repo for dependencies "
                              "when doing install verification.")
+    parser.add_argument('--package-type', default='rpm',
+                        choices=['rpm', 'deb'],
+                        help="Build a specific package type. Defaults to "
+                             "rpm, allowed values are rpm or deb.")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
@@ -204,9 +209,9 @@ def main():
         logger.info("Processing %s %s" % (project, commit_hash))
         notes = ""
         try:
-            built_rpms, notes = build(cp, package_info,
+            built_pkgs, notes = build(cp, package_info,
                                       commit, options.build_env, options.dev,
-                                      options.use_public)
+                                      options.use_public, options.package_type)
         except Exception as e:
             exit_code = 1
             logger.exception("Error while building packages for %s" % project)
@@ -215,11 +220,11 @@ def main():
             session.add(commit)
 
             # If the log file hasn't been created we add what we have
-            # This happens if the rpm build script didn't run.
+            # This happens if the package build script didn't run.
             datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
             logfile = os.path.join(datadir, "repos",
                                    commit.getshardedcommitdir(),
-                                   "rpmbuild.log")
+                                   "%sbuild.log" % options.package_type)
             if not os.path.exists(logfile):
                 fp = open(logfile, "w")
                 fp.write(getattr(e, "message", notes))
@@ -231,7 +236,7 @@ def main():
         else:
             commit.status = "SUCCESS"
             commit.notes = notes
-            commit.rpms = ",".join(built_rpms)
+            commit.packages = ",".join(built_pkgs)
             session.add(commit)
         if options.dev is False:
             session.commit()
@@ -399,7 +404,8 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
     return project_toprocess
 
 
-def build(cp, package_info, commit, env_vars, dev_mode, use_public):
+def build(cp, package_info, commit, env_vars, dev_mode, use_public,
+          package_type):
 
     # Set the build timestamp to now
     commit.dt_build = int(time())
@@ -434,35 +440,24 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
 
     docker_run_cmd.extend(["-t", "--volume=%s:/data" % datadir,
                            "--volume=%s:/scripts" % scriptsdir,
-                           "--name", "builder-%s" % target,
+                           "--name", "builder-%s" % target, "--rm",
                            "delorean/%s" % target,
-                           "/scripts/build_rpm_wrapper.sh", project_name,
-                           "/data/%s" % yumrepodir, str(os.getuid()),
-                           str(os.getgid())])
+                           "/scripts/build_%s_wrapper.sh" % package_type,
+                           project_name, "/data/%s" % yumrepodir,
+                           str(os.getuid()), str(os.getgid())])
     try:
         sh.docker("run", docker_run_cmd)
     except Exception as e:
         logger.error('Docker cmd failed. See logs at: %s/%s/' % (datadir,
                                                                  yumrepodir))
         raise e
-    finally:
-        # Kill builder-"target" if running and remove if present
-        try:
-            sh.docker("kill", "builder-%s" % target)
-            sh.docker("wait", "builder-%s" % target)
-        except Exception:
-            pass
-        try:
-            sh.docker("rm", "builder-%s" % target)
-        except Exception:
-            pass
 
-    built_rpms = []
-    for rpm in os.listdir(yumrepodir_abs):
-        if rpm.endswith(".rpm"):
-            built_rpms.append(os.path.join(yumrepodir, rpm))
-    if not built_rpms:
-        raise Exception("No rpms built for %s" % project_name)
+    built_pkgs = []
+    for package in os.listdir(yumrepodir_abs):
+        if os.path.splitext(package)[1] in (".deb", ".dsc", ".gz", ".rpm"):
+            built_pkgs.append(os.path.join(yumrepodir, package))
+    if not built_pkgs:
+        raise Exception("No packages built for %s" % project_name)
 
     notes = "OK"
     if not os.path.isfile(os.path.join(yumrepodir_abs, "installed")):
@@ -480,29 +475,42 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
             order_by(desc(Commit.id)).first()
         if not last_success:
             continue
-        rpms = last_success.rpms.split(",")
-        for rpm in rpms:
-            rpm_link_src = os.path.join(yumrepodir_abs, os.path.split(rpm)[1])
-            os.symlink(os.path.relpath(os.path.join(datadir, rpm),
-                       yumrepodir_abs), rpm_link_src)
+        built_pkgs = last_success.packages.split(",")
+        for pkg in built_pkgs:
+            rpm_link_src = os.path.join(yumrepodir_abs, os.path.split(pkg)[1])
+            if not os.path.exists(rpm_link_src):
+                os.symlink(os.path.relpath(os.path.join(datadir, pkg),
+                           yumrepodir_abs), rpm_link_src)
 
-    sh.createrepo(yumrepodir_abs)
+    if package_type == "rpm":
+        sh.createrepo(yumrepodir_abs)
 
-    fp = open(os.path.join(yumrepodir_abs,
+        fp = open(os.path.join(yumrepodir_abs,
                            "%s.repo" % cp.get("DEFAULT", "reponame")), "w")
-    fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
-             "gpgcheck=0\npriority=1" % (cp.get("DEFAULT", "reponame"),
-                                         cp.get("DEFAULT", "reponame"),
-                                         project_name, commit_hash,
-                                         cp.get("DEFAULT", "baseurl"),
-                                         commit.getshardedcommitdir()))
-    fp.close()
-
+        fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
+                 "gpgcheck=0\npriority=1" % (cp.get("DEFAULT", "reponame"),
+                                             cp.get("DEFAULT", "reponame"),
+                                             project_name, commit_hash,
+                                             cp.get("DEFAULT", "baseurl"),
+                                             commit.getshardedcommitdir()))
+        fp.close()
+    elif package_type == "deb":
+        packages = gzip.GzipFile(os.path.join(yumrepodir_abs, "Packages.gz"),
+                                 "w")
+        sources = gzip.GzipFile(os.path.join(yumrepodir_abs, "Sources.gz"),
+                                "w")
+        cur_dir = os.getcwd()
+        os.chdir(yumrepodir_abs)
+        sh.apt_ftparchive("packages", ".", _out=packages)
+        sh.apt_ftparchive("sources", ".", _out=sources)
+        os.chdir(cur_dir)
     current_repo_dir = os.path.join(datadir, "repos", "current")
-    os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, "repos")),
+    os.symlink(os.path.relpath(yumrepodir_abs,
+                               os.path.join(datadir, "repos")),
                current_repo_dir + "_")
     os.rename(current_repo_dir + "_", current_repo_dir)
-    return built_rpms, notes
+
+    return built_pkgs, notes
 
 
 def genreports(cp, package_info):
