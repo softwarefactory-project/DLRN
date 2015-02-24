@@ -7,13 +7,29 @@ GROUP_ID=$4 # chown resulting files to this GUID
 
 mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
 
+# check if spec has multiple Source fields
+sources_spec=$(grep ^Source /data/${PROJECT_NAME}_spec/*.spec|wc -l)
+sources_upstream=$(ls -d /data/${PROJECT_NAME}/*/.git|wc -l)
+
 cd /data/$PROJECT_NAME
 for REPO in */.git ; do
     REPO=${REPO%%/*} # remove the /.git
     NAME=${REPO%%.git} # remove the .git, it may or may not be present
+    if [ $sources_upstream = 1 ]; then
+        # Special case for github.com/redhat-openstack/openstack-puppet-modules
+        # as the only source repo listed as "upstream" in rdoinfo
+        tar --transform="s/$REPO/openstack-puppet-modules-master-patches/" --exclude=.git -czf openstack-puppet-modules-master-patches.tar.gz $REPO
+        break
+    fi
     NAME=`echo $NAME | sed -r 's/_/-/'` # Some puppet modules names are not compliant (Ex: puppet_aviator)
     SNAME=${NAME#*-} # remove the puppetlabs-
-    tar --transform="s/$REPO/$NAME-master/" --exclude=.git -czf ${SNAME}-master.tar.gz $REPO
+    if [ $sources_spec = 1 ]; then
+        # new OPM spec: combine all modules into one tarballs
+        tar --append --transform="s#$REPO#openstack-puppet-modules-master-patches/$NAME#" --exclude=.git -zf openstack-puppet-modules-master-patches.tar.gz $REPO
+    else
+        # old OPM spec with separate Source for each puppet module
+        tar --transform="s/$REPO/$NAME-master/" --exclude=.git -czf ${SNAME}-master.tar.gz $REPO
+    fi
 done
 
 mv *.tar.gz ~/rpmbuild/SOURCES/
