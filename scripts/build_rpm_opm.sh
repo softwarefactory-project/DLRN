@@ -11,6 +11,7 @@ mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
 sources_spec=$(grep ^Source /data/${PROJECT_NAME}_spec/*.spec|wc -l)
 sources_upstream=$(ls -d /data/${PROJECT_NAME}/*/.git|wc -l)
 
+rm -f openstack-puppet-modules-master-patches.tar* Puppetfile
 cd /data/$PROJECT_NAME
 for REPO in */.git ; do
     REPO=${REPO%%/*} # remove the /.git
@@ -24,14 +25,20 @@ for REPO in */.git ; do
     NAME=`echo $NAME | sed -r 's/_/-/'` # Some puppet modules names are not compliant (Ex: puppet_aviator)
     SNAME=${NAME#*-} # remove the puppetlabs-
     if [ $sources_spec = 1 ]; then
-        # new OPM spec: combine all modules into one tarballs
-        tar --append --transform="s#$REPO#openstack-puppet-modules-master-patches/$NAME#" --exclude=.git -zf openstack-puppet-modules-master-patches.tar.gz $REPO
+        # new OPM spec: combine all modules into one tarball
+        tar --append --transform="s#$REPO#openstack-puppet-modules-master-patches/$SNAME#" --exclude=.git -f openstack-puppet-modules-master-patches.tar $REPO
+        # fake Puppetfile for new OPM spec
+        printf "mod '$SNAME'\n\n" >> Puppetfile
     else
         # old OPM spec with separate Source for each puppet module
         tar --transform="s/$REPO/$NAME-master/" --exclude=.git -czf ${SNAME}-master.tar.gz $REPO
     fi
 done
 
+if [ -f openstack-puppet-modules-master-patches.tar ]; then
+    tar --append --transform="s#Puppetfile#openstack-puppet-modules-master-patches/Puppetfile#" -f openstack-puppet-modules-master-patches.tar Puppetfile
+    gzip openstack-puppet-modules-master-patches.tar
+fi
 mv *.tar.gz ~/rpmbuild/SOURCES/
 
 cd /data/${PROJECT_NAME}_spec
