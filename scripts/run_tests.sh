@@ -11,6 +11,7 @@ git log -1
 
 # Build this if not building a specific project
 PROJECT_TO_BUILD=python-keystoneclient
+PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
 
 # Run unit tests
 tox -epy27
@@ -28,7 +29,8 @@ tox -epep8
 if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delorean" ] ; then
     mkdir -p data/repos
     PROJECT_TO_BUILD=${GERRIT_PROJECT#*/}
-    PROJECT_SPEC_DIR=${PROJECT_TO_BUILD}_spec
+    PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
+    PROJECT_SPEC_DIR=${PROJECT_TO_BUILD_MAPPED}_spec
     git clone https://review.gerrithub.io/"$GERRIT_PROJECT" data/$PROJECT_SPEC_DIR
     pushd data/$PROJECT_SPEC_DIR
     git fetch https://review.gerrithub.io/$GERRIT_PROJECT $GERRIT_REFSPEC && git checkout FETCH_HEAD
@@ -40,7 +42,7 @@ fi
 set +u
 . .tox/py27/bin/activate
 set -u
-delorean --config-file projects.ini --head-only --package-name $(./scripts/map-project-name $PROJECT_TO_BUILD) --dev
+delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
 
 # Copy files to be archived
 cp -r data/repos logs/fedora
@@ -50,7 +52,7 @@ sed -i -e 's%target=.*%target=centos%' projects.ini
 sed -i -e 's%baseurl=.*%baseurl=http://104.130.230.24/centos70%' projects.ini
 
 # And run delorean again, for the moment we mask failures i.e. report only until we're sure all the specs run
-delorean --config-file projects.ini --head-only --package-name $(./scripts/map-project-name $PROJECT_TO_BUILD) --dev
+delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
 
 # Copy files to be archived
 cp -r data/repos logs/centos
