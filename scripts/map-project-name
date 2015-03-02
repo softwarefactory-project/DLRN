@@ -11,7 +11,8 @@ inforepo = rdoinfo.RdoinfoRepo(".", "https://github.com/redhat-openstack/rdoinfo
 inforepo.init()
 
 for package in inforepo.get_info()["packages"]:
-    if package["name"].endswith(sys.argv[1]):
+    if (package["name"].endswith(sys.argv[1]) or
+        "project" in package and package["project"].endswith(sys.argv[1])):
         print package["name"]
         exit(0)
 exit(1)
