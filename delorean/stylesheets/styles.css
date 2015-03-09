@@ -1,0 +1,38 @@
+@import url(http://openshift.redhat.com/app/assets/overpass.css);
+@import url(http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css);
+@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:400,500);
+
+#delorean {
+    font-family: Overpass, sans-serif;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#delorean td, #delorean th {
+    font-size: 1em;
+    border: 1px dotted #6E0000;
+    padding: 3px 7px 2px 7px;
+}
+
+#delorean th {
+    font-size: 1.1em;
+    text-align: left;
+    padding-top: 5px;
+    padding-bottom: 4px;
+    background-color: #6E0000;
+    color: #ffffff;
+}
+#delorean tr.success td {
+    color: #000000;
+    background-color: #E6E6E6;
+}
+
+h1 {
+    color: #7F0A0C;
+    margin-top: 2.25rem;
+    margin-bottom: 1em;
+}
+
+a { text-decoration: none; }
+
+
