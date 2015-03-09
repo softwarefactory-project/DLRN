@@ -41,7 +41,6 @@ logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("delorean")
 logger.setLevel(logging.INFO)
 
-
 notification_email = """
 A build of the package %(name)s has failed against the current master[1] of
 the upstream project, please see log[2] and update the packaging[3].
@@ -505,10 +504,43 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
 
 def genreports(cp, package_info):
     # Generate report of the last 300 package builds
-    html = ["<html><head/><body><table>"]
-    commits = session.query(Commit).order_by(desc(Commit.dt_build)).limit(300)
+    target = cp.get("DEFAULT", "target")
+    src = cp.get("DEFAULT", "source")
+    reponame = cp.get("DEFAULT", "reponame")
+
+    html_struct = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <title>%s - %s (%s)</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+    """ % (reponame.capitalize(),
+           target.capitalize(),
+           src)
+
+    table_header = """
+    <table id="delorean">
+        <tr>
+            <th>Build Date Time</th>
+            <th>Commit Date Time</th>
+            <th>Project Name</th>
+            <th>Commit Hash</th>
+            <th>Status</th>
+            <th>Repository</th>
+            <th>Spec Delta</th>
+        </tr>
+    """
+    html = list()
+    html.append(html_struct)
+    html.append(table_header)
+    commits = session.query(Commit).order_by(desc(Commit.dt_commit)).limit(300)
     for commit in commits:
-        html.append("<tr>")
+        if commit.status == "SUCCESS":
+            html.append('<tr class="success">')
+        else:
+            html.append('<tr>')
         dt_build = gmtime(commit.dt_build)
         dt_commit = gmtime(commit.dt_commit)
         html.append("<td>%s</td>" % strftime("%Y-%m-%d %H:%M:%S", dt_build))
@@ -521,7 +553,12 @@ def genreports(cp, package_info):
         html.append("<td><a href='%s/distro_delta.diff'>distro delta</a></td>"
                     % commit.getshardedcommitdir())
         html.append("</tr>")
-    html.append("</table></html>")
+    html.append("</table></body></html>")
+
+    stylesheets_path = os.path.dirname(os.path.abspath(__file__))
+    css_file = os.path.join(stylesheets_path, 'stylesheets/styles.css')
+    shutil.copy2(css_file, os.path.join(cp.get("DEFAULT", "datadir"),
+                                        "repos", "styles.css"))
 
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
                                "repos", "report.html")
@@ -530,8 +567,17 @@ def genreports(cp, package_info):
     fp.close()
 
     # Generate report of status for each project
-    html = ["<html><head/><body><table>"]
-    html.append("<tr><td>Name</td><td>Failures</td><td>Last Success</td></tr>")
+    table_header = """
+    <table id="delorean">
+        <tr>
+            <th>Project Name</th>
+            <th>Failures</th>
+            <th>Last Success</th>
+        </tr>
+    """
+    html = list()
+    html.append(html_struct)
+    html.append(table_header)
     packages = [package for package in package_info["packages"]]
     # Find the most recent successfull build
     # then report on failures since then
