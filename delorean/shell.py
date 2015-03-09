@@ -506,10 +506,61 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
 
 def genreports(cp, package_info):
     # Generate report of the last 300 package builds
-    html = ["<html><head/><body><table>"]
-    commits = session.query(Commit).order_by(desc(Commit.dt_build)).limit(300)
+    html_struct = """
+    <html>
+    <head>
+        <title>RDO</title>
+        <style>
+        #delorean {
+            font-family: Arial, Helvetica, sans-serif;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #delorean td, #delorean th {
+            font-size: 1em;
+            border: 1px solid #7F0A0C;
+            padding: 3px 7px 2px 7px;
+        }
+
+        #delorean th {
+            font-size: 1.1em;
+            text-align: left;
+            padding-top: 5px;
+            padding-bottom: 4px;
+            background-color: #7F0A0C;
+            color: #ffffff;
+        }
+        #delorean tr.success td {
+            color: #000000;
+            background-color: #EAF2D3;
+        }
+        </style>
+    </head>
+    <body>
+    """
+    table_header = """
+    <table id="delorean">
+        <tr>
+            <th>Build Date Time</th>
+            <th>Commit Date Time</th>
+            <th>Project Name</th>
+            <th>Commit Hash</th>
+            <th>Status</th>
+            <th>Notes</th>
+            <th>Repository</th>
+            <th>Spec Delta</th>
+        </tr>
+    """
+    html = list()
+    html.append(html_struct)
+    html.append(table_header)
+    commits = session.query(Commit).order_by(desc(Commit.dt_commit)).limit(300)
     for commit in commits:
-        html.append("<tr>")
+        if commit.status == "SUCCESS":
+            html.append('<tr class="success">')
+        else:
+            html.append('<tr>')
         dt_build = gmtime(commit.dt_build)
         dt_commit = gmtime(commit.dt_commit)
         html.append("<td>%s</td>" % strftime("%Y-%m-%d %H:%M:%S", dt_build))
@@ -531,8 +582,17 @@ def genreports(cp, package_info):
     fp.close()
 
     # Generate report of status for each project
-    html = ["<html><head/><body><table>"]
-    html.append("<tr><td>Name</td><td>Failures</td><td>Last Success</td></tr>")
+    table_header = """
+    <table id="delorean">
+        <tr>
+            <th>Project Name</th>
+            <th>Failures</th>
+            <th>Last Success</th>
+        </tr>
+    """
+    html = list()
+    html.append(html_struct)
+    html.append(table_header)
     packages = [package for package in package_info["packages"]]
     # Find the most recent successfull build
     # then report on failures since then
