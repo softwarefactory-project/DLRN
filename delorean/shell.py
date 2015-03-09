@@ -25,6 +25,7 @@ from email.mime.text import MIMEText
 from prettytable import PrettyTable
 import sh
 from six.moves import configparser
+from six.moves.urllib import parse
 
 from sqlalchemy import create_engine, Column, desc, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
@@ -505,23 +506,93 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
 
 def genreports(cp, package_info):
     # Generate report of the last 300 package builds
-    html = ["<html><head/><body><table>"]
+    target = cp.get("DEFAULT", "target")
+    src = cp.get("DEFAULT", "source")
+    reponame = cp.get("DEFAULT", "reponame")
+
+    html_struct = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <title>RDO Packaging By Delorean</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+    <h1><i class='fa fa-chevron-circle-right pull-left'></i>%s - %s (%s)</h1>
+    """ % (reponame.capitalize(),
+           target.capitalize(),
+           src)
+
+    table_header = """
+    <table id="delorean">
+        <tr>
+            <th>Build Date Time</th>
+            <th>Commit Date Time</th>
+            <th>Project Name</th>
+            <th>Commit Hash</th>
+            <th>Status</th>
+            <th>Repository</th>
+            <th>Build Log</th>
+        </tr>
+    """
+    html = list()
+    html.append(html_struct)
+    html.append(table_header)
     commits = session.query(Commit).order_by(desc(Commit.dt_build)).limit(300)
     for commit in commits:
-        html.append("<tr>")
+        if commit.status == "SUCCESS":
+            html.append('<tr class="success">')
+        else:
+            html.append('<tr>')
         dt_build = gmtime(commit.dt_build)
         dt_commit = gmtime(commit.dt_commit)
         html.append("<td>%s</td>" % strftime("%Y-%m-%d %H:%M:%S", dt_build))
         html.append("<td>%s</td>" % strftime("%Y-%m-%d %H:%M:%S", dt_commit))
         html.append("<td>%s</td>" % commit.project_name)
-        html.append("<td>%s</td>" % commit.commit_hash)
-        html.append("<td>%s</td>" % commit.status)
-        html.append("<td><a href=\"%s\">repo</a></td>" %
+
+        for pkg in package_info["packages"]:
+            project = pkg["name"]
+            if project == commit.project_name:
+                upstream_url = parse.urlsplit(pkg["upstream"])
+                if upstream_url.netloc == "git.openstack.org":
+                    commit_url = ("http",
+                                  upstream_url.netloc,
+                                  "/cgit%s/commit/?id=" % upstream_url.path,
+                                  "", "", "")
+                    commit_url = parse.urlunparse(commit_url)
+                if upstream_url.netloc == "github.com":
+                    commit_url = ("https",
+                                  upstream_url.netloc,
+                                  "%s/commit/" % upstream_url.path,
+                                  "", "", "")
+                    commit_url = parse.urlunparse(commit_url)
+                html.append("<td class='commit'>"
+                            "<i class='fa fa-git pull-left'>"
+                            "</i><a href='%s%s'>%s</a></td>" %
+                            (commit_url,
+                             commit.commit_hash,
+                             commit.commit_hash))
+
+        if commit.status == "SUCCESS":
+            html.append("<td><i class='fa fa-thumbs-o-up pull-left' "
+                        "style='color:green'></i>SUCCESS</td>")
+        else:
+            html.append("<td><i class='fa fa-thumbs-o-down pull-left' "
+                        "style='color:red'></i>FAILED</td>")
+        html.append("<td><i class='fa fa-link pull-left' "
+                    "style='color:#004153'></i><a href=\"%s\">repo</a></td>" %
                     commit.getshardedcommitdir())
-        html.append("<td><a href='%s/distro_delta.diff'>distro delta</a></td>"
+        html.append("<td><i class='fa fa-link pull-left' "
+                    "style='color:#004153'></i>"
+                    "<a href='%s/rpmbuild.log'>build log</a></td>"
                     % commit.getshardedcommitdir())
         html.append("</tr>")
     html.append("</table></html>")
+
+    stylesheets_path = os.path.dirname(os.path.abspath(__file__))
+    css_file = os.path.join(stylesheets_path, 'stylesheets/styles.css')
+    shutil.copy2(css_file, os.path.join(cp.get("DEFAULT", "datadir"),
+                                        "repos", "styles.css"))
 
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
                                "repos", "report.html")
@@ -530,8 +601,17 @@ def genreports(cp, package_info):
     fp.close()
 
     # Generate report of status for each project
-    html = ["<html><head/><body><table>"]
-    html.append("<tr><td>Name</td><td>Failures</td><td>Last Success</td></tr>")
+    table_header = """
+    <table id="delorean">
+        <tr>
+            <th>Project Name</th>
+            <th>Failures</th>
+            <th>Last Success</th>
+        </tr>
+    """
+    html = list()
+    html.append(html_struct)
+    html.append(table_header)
     packages = [package for package in package_info["packages"]]
     # Find the most recent successfull build
     # then report on failures since then
@@ -539,7 +619,7 @@ def genreports(cp, package_info):
         name = package["name"]
         commits = session.query(Commit).filter(Commit.project_name == name).\
             filter(Commit.status == "SUCCESS").\
-            order_by(desc(Commit.dt_commit)).limit(1)
+            order_by(desc(Commit.dt_build)).limit(1)
         last_success = commits.first()
         last_success_dt = 0
         if last_success is not None:
