@@ -50,7 +50,7 @@ hack on.
             chcon -t docker_exec_t scripts/*
             scripts/create_build_image.sh
             FLOAT=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
-            sed -i s:209.132.178.33:$FLOAT: ~/delorean/projects.ini
+            sed -i s:trunk.rdoproject.org:$FLOAT: ~/delorean/projects.ini
             sed -i s:./data:/root/delorean/data: ~/delorean/projects.ini
             chmod +x /root
             ln -s /root/delorean/data/repos /var/www/html/

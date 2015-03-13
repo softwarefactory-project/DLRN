@@ -51,7 +51,7 @@ cp -r data/repos logs/fedora
 
 # Switch to a centos target
 sed -i -e 's%target=.*%target=centos%' projects.ini
-sed -i -e 's%baseurl=.*%baseurl=http://104.130.230.24/centos70%' projects.ini
+sed -i -e 's%baseurl=.*%baseurl=http://trunk.rdoproject.org/centos70%' projects.ini
 
 # And run delorean again, for the moment we mask failures i.e. report only until we're sure all the specs run
 delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev

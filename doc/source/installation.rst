@@ -46,7 +46,7 @@ The configuration file looks like this:
 
     [DEFAULT]
     datadir=./data
-    baseurl=http://209.132.178.33/
+    baseurl=http://trunk.rdoproject.org/
     distros=f20-master
     smtpserver=
 
