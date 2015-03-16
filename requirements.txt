@@ -6,3 +6,4 @@ six
 SQLAlchemy
 PyYAML
 rdopkg>=0.25
+PrettyTable
