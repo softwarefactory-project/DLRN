@@ -126,6 +126,8 @@ def main():
                         help="Don't reset packaging git repo, force build "
                              "and add public master repo for dependencies "
                              "(dev mode).")
+    parser.add_argument('--mgt', action="store_true",
+                        help="Add public master repo for dependencies.")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
@@ -191,7 +193,8 @@ def main():
         notes = ""
         try:
             built_rpms, notes = build(cp, package_info,
-                                      commit, options.build_env, options.dev)
+                                      commit, options.build_env, options.dev,
+                                      options.mgt)
         except Exception as e:
             exit_code = 1
             logger.exception("Error while building packages for %s" % project)
@@ -341,7 +344,7 @@ def getinfo(cp, project, repo, spec, since, local, dev_mode, package):
     return project_toprocess
 
 
-def build(cp, package_info, commit, env_vars, dev_mode):
+def build(cp, package_info, commit, env_vars, dev_mode, mgt_mode):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
     target = cp.get("DEFAULT", "target")
@@ -366,7 +369,7 @@ def build(cp, package_info, commit, env_vars, dev_mode):
         for env_var in env_vars:
             docker_run_cmd.append('--env')
             docker_run_cmd.append(env_var)
-    if dev_mode is True:
+    if (dev_mode or mgt_mode):
             docker_run_cmd.append('--env')
             docker_run_cmd.append("DELOREAN_DEV=1")
 
