@@ -128,6 +128,9 @@ def main():
                              "(dev mode).")
     parser.add_argument('--log-commands', action="store_true",
                         help="Log the commands run by delorean.")
+    parser.add_argument('--use-public', action="store_true",
+                        help="Use the public master repo for dependencies "
+                             "when doing install verification.")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
@@ -197,7 +200,8 @@ def main():
         notes = ""
         try:
             built_rpms, notes = build(cp, package_info,
-                                      commit, options.build_env, options.dev)
+                                      commit, options.build_env, options.dev,
+                                      options.use_public)
         except Exception as e:
             exit_code = 1
             logger.exception("Error while building packages for %s" % project)
@@ -348,7 +352,7 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
     return project_toprocess
 
 
-def build(cp, package_info, commit, env_vars, dev_mode):
+def build(cp, package_info, commit, env_vars, dev_mode, use_public):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
     target = cp.get("DEFAULT", "target")
@@ -373,7 +377,7 @@ def build(cp, package_info, commit, env_vars, dev_mode):
         for env_var in env_vars:
             docker_run_cmd.append('--env')
             docker_run_cmd.append(env_var)
-    if dev_mode is True:
+    if (dev_mode or use_public):
             docker_run_cmd.append('--env')
             docker_run_cmd.append("DELOREAN_DEV=1")
 
