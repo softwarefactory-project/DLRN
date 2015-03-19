@@ -27,7 +27,7 @@ class TestRefreshRepo(base.TestCase):
                     mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
-                    mock.call(sh.git, 'rev-parse', 'HEAD')]
+                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
     @mock.patch('os.path.exists', return_value=True)
@@ -36,7 +36,7 @@ class TestRefreshRepo(base.TestCase):
         expected = [mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
-                    mock.call(sh.git, 'rev-parse', 'HEAD')]
+                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
     def test_dont_fetch_if_local(self, sh_mock):
@@ -44,5 +44,5 @@ class TestRefreshRepo(base.TestCase):
         expected = [mock.call(sh.git.clone, 'url', 'path', '-b', 'branch'),
                     mock.call(sh.git.checkout, 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
-                    mock.call(sh.git, 'rev-parse', 'HEAD')]
+                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
         self.assertEqual(sh_mock.call_args_list, expected)

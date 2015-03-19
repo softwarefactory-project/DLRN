@@ -18,7 +18,7 @@ import os
 import shutil
 import smtplib
 import sys
-import time
+from time import time, gmtime, ctime, strftime
 
 from email.mime.text import MIMEText
 
@@ -65,6 +65,8 @@ class Commit(Base):
 
     id = Column(Integer, primary_key=True)
     dt_commit = Column(Integer)
+    dt_distro = Column(Integer)
+    dt_build = Column(Integer)
     project_name = Column(String)
     repo_dir = Column(String)
     commit_hash = Column(String)
@@ -94,13 +96,13 @@ class Project(Base):
     # Returns True if the last email sent for this project
     # was less then 24 hours ago
     def suppress_email(self):
-        ct = time.time()
+        ct = time()
         if ct - self.last_email > 86400:
             return False
         return True
 
     def sent_email(self):
-        self.last_email = int(time.time())
+        self.last_email = int(time())
 
 
 def main():
@@ -335,7 +337,7 @@ def refreshrepo(url, path, branch="master", local=False):
             raise
     git.checkout(branch)
     git.reset("--hard", "origin/%s" % branch)
-    return str(git("rev-parse", "HEAD")).strip()
+    return str(git.log("--pretty=format:%H %ct", "-1")).strip().split(" ")
 
 
 def getdistrobranch(cp, package):
@@ -359,10 +361,11 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
     source_branch = getsourcebranch(cp, package)
 
     if dev_mode is False:
-        distro_hash = refreshrepo(distro, distro_dir, distro_branch,
-                                  local=local)
+        distro_hash, dt_distro = refreshrepo(distro, distro_dir, distro_branch,
+                                             local=local)
     else:
         distro_hash = "dev"
+        dt_distro = 0  # Doesn't get used in dev mode
         if not os.path.isdir(distro_dir):
             refreshrepo(distro, distro_dir, distro_branch, local=local)
 
@@ -385,13 +388,17 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
             dt, commit_hash = str(line).strip().strip("'").split(" ")
             commit = Commit(dt_commit=float(dt), project_name=project,
                             commit_hash=commit_hash, repo_dir=repo_dir,
-                            distro_hash=distro_hash)
+                            distro_hash=distro_hash, dt_distro=dt_distro)
             project_toprocess.append(commit)
     project_toprocess.sort()
     return project_toprocess
 
 
 def build(cp, package_info, commit, env_vars, dev_mode):
+
+    # Set the build timestamp to now
+    commit.dt_build = int(time())
+
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
     target = cp.get("DEFAULT", "target")
@@ -496,14 +503,16 @@ def build(cp, package_info, commit, env_vars, dev_mode):
 def genreports(cp, package_info):
     # Generate report of the last 300 package builds
     html = ["<html><head/><body><table>"]
-    commits = session.query(Commit).order_by(desc(Commit.dt_commit)).limit(300)
+    commits = session.query(Commit).order_by(desc(Commit.dt_build)).limit(300)
     for commit in commits:
         html.append("<tr>")
-        html.append("<td>%s</td>" % time.ctime(commit.dt_commit))
+        dt_build = gmtime(commit.dt_build)
+        dt_commit = gmtime(commit.dt_commit)
+        html.append("<td>%s</td>" % strftime("%Y-%m-%d %H:%M:%S", dt_build))
+        html.append("<td>%s</td>" % strftime("%Y-%m-%d %H:%M:%S", dt_commit))
         html.append("<td>%s</td>" % commit.project_name)
         html.append("<td>%s</td>" % commit.commit_hash)
         html.append("<td>%s</td>" % commit.status)
-        html.append("<td>%s</td>" % commit.notes[:50])
         html.append("<td><a href=\"%s\">repo</a></td>" %
                     commit.getshardedcommitdir())
         html.append("<td><a href='%s/distro_delta.diff'>distro delta</a></td>"
@@ -542,7 +551,7 @@ def genreports(cp, package_info):
         html.append("<tr>")
         html.append("<td>%s</td>" % name)
         html.append("<td>%s</td>" % commits.count())
-        html.append("<td>%s</td>" % time.ctime(last_success_dt))
+        html.append("<td>%s</td>" % ctime(last_success_dt))
         html.append("</tr>")
     html.append("</table></html>")
 
