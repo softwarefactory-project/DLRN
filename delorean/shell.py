@@ -126,11 +126,16 @@ def main():
                         help="Don't reset packaging git repo, force build "
                              "and add public master repo for dependencies "
                              "(dev mode).")
+    parser.add_argument('--log-commands', action="store_true",
+                        help="Log the commands run by delorean.")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
     cp = configparser.RawConfigParser()
     cp.read(options.config_file)
+
+    if options.log_commands is True:
+        logging.getLogger("sh.command").setLevel(logging.INFO)
 
     package_info = getpkginfo(local_info_repo=options.info_repo)
 
