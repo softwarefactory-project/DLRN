@@ -6,13 +6,15 @@ USER_ID=$3 # chown resulting files to this UID
 GROUP_ID=$4 # chown resulting files to this GUID
 
 mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
-yum install -y --nogpg python-pip python-pbr
 
 # So that we don't have to maintain packaging for all dependencies we install RDO
 # Which will contain a lot of the non openstack dependencies
 if ! rpm -q rdo-release-kilo ; then
     yum install -y --nogpg https://rdo.fedorapeople.org/openstack-kilo/rdo-release-kilo.rpm
 fi
+
+# install latest build tools updates from RDO repo
+yum install -y --nogpg python-pip python-pbr python-setuptools
 
 # If in dev mode the user might not be building all of the packages, so we need
 # to add the current upstream repository in order to have access to current dependencies
