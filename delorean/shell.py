@@ -22,6 +22,7 @@ import time
 
 from email.mime.text import MIMEText
 
+from prettytable import PrettyTable
 import sh
 from six.moves import configparser
 
@@ -229,6 +230,48 @@ def main():
         genreports(cp, package_info)
     genreports(cp, package_info)
     return exit_code
+
+
+def compare():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--info-repo',
+                        help="use local rdoinfo repo instead of"
+                             "fetching default one using rdopkg")
+    options, args = parser.parse_known_args(sys.argv[1:])
+
+    package_info = getpkginfo(local_info_repo=options.info_repo)
+    compare_details = {}
+    # Each argument is a ":" seperate filename:title, this filename is the
+    # sqlite db file and the title is whats used in the dable being displayed
+    table_header = ["Name", "Out of Sync"]
+    for dbdetail in args:
+        dbfilename, dbtitle = dbdetail.split(":")
+        table_header.extend((dbtitle + " upstream", dbtitle + " spec"))
+        engine = create_engine('sqlite:///%s' % dbfilename)
+        Base.metadata.create_all(engine)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        for package in package_info["packages"]:
+            package_name = package["name"]
+            compare_details.setdefault(package_name, [package_name, " "])
+            last_success = session.query(Commit).\
+                filter(Commit.project_name == package_name).\
+                filter(Commit.status == "SUCCESS").\
+                order_by(desc(Commit.id)).first()
+            if last_success:
+                compare_details[package_name].extend(
+                    (last_success.commit_hash[:8],
+                     last_success.distro_hash[:8]))
+            else:
+                compare_details[package_name].extend(("None", "None"))
+        session.close()
+
+    table = PrettyTable(table_header)
+    for name, compare_detail in compare_details.items():
+        if len(set(compare_detail)) > 4:
+            compare_detail[1] = "*"
+        table.add_row(compare_detail)
+    print(table)
 
 
 def getpkginfo(local_info_repo=None):
