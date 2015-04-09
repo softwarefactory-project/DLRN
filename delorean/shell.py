@@ -111,6 +111,13 @@ class Project(Base):
         self.last_email = int(time())
 
 
+def getSession(url='sqlite:///commits.sqlite'):
+    engine = create_engine(url)
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    return Session()
+
+
 def main():
     parser = argparse.ArgumentParser()
     # Some of the non-positional arguments are required, so change the text
@@ -151,11 +158,8 @@ def main():
 
     package_info = getpkginfo(local_info_repo=options.info_repo)
 
-    engine = create_engine('sqlite:///commits.sqlite')
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
     global session
-    session = Session()
+    session = getSession()
 
     # Build a list of commits we need to process
     toprocess = []
@@ -267,10 +271,7 @@ def compare():
     for dbdetail in args:
         dbfilename, dbtitle = dbdetail.split(":")
         table_header.extend((dbtitle + " upstream", dbtitle + " spec"))
-        engine = create_engine('sqlite:///%s' % dbfilename)
-        Base.metadata.create_all(engine)
-        Session = sessionmaker(bind=engine)
-        session = Session()
+        session = getSession('sqlite:///%s' % dbfilename)
         for package in package_info["packages"]:
             package_name = package["name"]
             compare_details.setdefault(package_name, [package_name, " "])
@@ -658,6 +659,23 @@ def genreports(cp, package_info):
     fp.close()
 
 
+def rebuild():
+    if len(sys.argv) != 2:
+        print("You must specify a single project name")
+        return 1
+    project = sys.argv[1]
+
+    session = getSession()
+
+    last_build = session.query(Commit).filter(Commit.project_name == project)\
+        .order_by(desc(Commit.id)).limit(1).first()
+    if not last_build:
+        print("Couldn't find a build for \"%s\" to rebuild" % project)
+        return 1
+    last_build.flags |= FLAG_REBUILD
+    session.commit()
+
+
 def purge():
     parser = argparse.ArgumentParser()
     # Some of the non-positional arguments are required, so change the text
@@ -684,10 +702,7 @@ def purge():
         if ans.lower() != "y":
             return
 
-    engine = create_engine('sqlite:///commits.sqlite')
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    session = getSession()
 
     # To remove builds we have to start at a point in time and move backwards
     # builds with no build date are also purged as these are legacy
