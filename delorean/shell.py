@@ -74,6 +74,7 @@ class Commit(Base):
     status = Column(String)
     rpms = Column(String)
     notes = Column(String)
+    flags = Column(Integer, default=0)
 
     def __cmp__(self, b):
         return cmp(self.dt_commit, b.dt_commit)
