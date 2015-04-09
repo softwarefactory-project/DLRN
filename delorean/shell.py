@@ -476,7 +476,7 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
         last_success = session.query(Commit).\
             filter(Commit.project_name == otherproject).\
             filter(Commit.status == "SUCCESS").\
-            order_by(desc(Commit.dt_commit)).first()
+            order_by(desc(Commit.id)).first()
         if not last_success:
             continue
         rpms = last_success.rpms.split(",")
