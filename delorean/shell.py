@@ -650,3 +650,23 @@ def genreports(cp, package_info):
     fp = open(report_file, "w")
     fp.write("".join(html))
     fp.close()
+
+
+def rebuild():
+    if len(sys.argv) != 2:
+        print("You must specify a single project name")
+        return 1
+    project = sys.argv[1]
+
+    engine = create_engine('sqlite:///commits.sqlite')
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    last_build = session.query(Commit).filter(Commit.project_name == project)\
+        .order_by(desc(Commit.id)).limit(1).first()
+    if not last_build:
+        print("Couldn't find a build for \"%s\" to rebuild" % project)
+        return 1
+    last_build.flags |= FLAG_REBUILD
+    session.commit()
