@@ -42,19 +42,27 @@ if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delore
     popd
 fi
 
+function copy_logs(){
+    cp -r data/repos logs/$DISTRO
+}
+
+# If the command below throws an error we still want the logs
+trap copy_logs ERR
 
 # And Run delorean against a project
+DISTRO=fedora
 delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
 
 # Copy files to be archived
-cp -r data/repos logs/fedora
+copy_logs
 
 # Switch to a centos target
 sed -i -e 's%target=.*%target=centos%' projects.ini
 sed -i -e 's%baseurl=.*%baseurl=http://trunk.rdoproject.org/centos70%' projects.ini
 
 # And run delorean again
+DISTRO=centos
 delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
 
 # Copy files to be archived
-cp -r data/repos logs/centos
+copy_logs
