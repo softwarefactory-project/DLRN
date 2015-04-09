@@ -58,6 +58,8 @@ on there and we will add the answer as soon as possible.
 [5] - https://etherpad.openstack.org/p/delorean-packages
 """
 
+FLAG_REBUILD = 0x1
+
 
 class Commit(Base):
     __tablename__ = "commits"
@@ -83,7 +85,8 @@ class Commit(Base):
         if self.distro_hash:
             distro_hash_suffix = "_%s" % self.distro_hash[:8]
         return os.path.join(self.commit_hash[:2], self.commit_hash[2:4],
-                            self.commit_hash + distro_hash_suffix)
+                            self.commit_hash + distro_hash_suffix + "_" +
+                            "%d" % self.dt_build)
 
 
 class Project(Base):
@@ -175,9 +178,10 @@ def main():
 
             # The first entry in the list of commits is a commit we have
             # already processed, we want to process it again only if in dev
-            # mode or distro hash has changed, we can't simply check against
-            # the last commit in the db, as multiple commits can have the same
-            # commit date
+            # mode, distro hash has changed or the rebuild flag is set, we
+            # can't simply check against the last commit in the db, as
+            # multiple commits can have the same commit date
+            build_added = False
             for commit_toprocess in project_toprocess:
                 if (options.dev is True) or \
                    (not session.query(Commit).filter(
@@ -185,6 +189,13 @@ def main():
                         Commit.commit_hash == commit_toprocess.commit_hash,
                         Commit.distro_hash == commit_toprocess.distro_hash)
                         .all()):
+                    build_added = True
+                    toprocess.append(commit_toprocess)
+            if build_added is False:
+                last_build = session.query(Commit).filter(
+                    Commit.project_name == project
+                    ).order_by(desc(Commit.id)).first()
+                if last_build.flags & FLAG_REBUILD:
                     toprocess.append(commit_toprocess)
 
     toprocess.sort()
