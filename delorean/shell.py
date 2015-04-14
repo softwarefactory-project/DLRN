@@ -76,7 +76,7 @@ class Commit(Base):
     notes = Column(String)
 
     def __cmp__(self, b):
-        return cmp(self.dt_commit, b.dt_commit)
+        return cmp(self.id, b.id)
 
     def getshardedcommitdir(self):
         distro_hash_suffix = ""
