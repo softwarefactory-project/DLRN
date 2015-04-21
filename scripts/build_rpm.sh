@@ -7,6 +7,12 @@ GROUP_ID=$4 # chown resulting files to this GUID
 
 mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
 
+# Files produced on the volume need to have their ownership changed from root.
+function finalize(){
+    chown -R $USER_ID:$GROUP_ID /data/$PROJECT_NAME $OUTPUT_DIRECTORY
+}
+trap finalize EXIT
+
 # So that we don't have to maintain packaging for all dependencies we install RDO
 # Which will contain a lot of the non openstack dependencies
 if ! rpm -q rdo-release-kilo ; then
@@ -96,5 +102,3 @@ rpmbuild -ba *.spec  --define="upstream_version $UPSTREAMVERSION"
 find ~/rpmbuild/RPMS ~/rpmbuild/SRPMS -type f | xargs cp -t $OUTPUT_DIRECTORY
 
 yum install -y --nogpg $(find $OUTPUT_DIRECTORY -type f -name "*rpm" | grep -v src.rpm) && touch $OUTPUT_DIRECTORY/installed || true
-
-chown -R $USER_ID:$GROUP_ID $OUTPUT_DIRECTORY
