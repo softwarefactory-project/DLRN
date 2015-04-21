@@ -299,8 +299,7 @@ def sendnotifymail(cp, package_info, commit):
         [package for package in package_info["packages"]
             if package["name"] == commit.project_name][0])
     error_details["logurl"] = "%s/%s" % (cp.get("DEFAULT", "baseurl"),
-                                         os.path.join("repos",
-                                         commit.getshardedcommitdir()))
+                                         commit.getshardedcommitdir())
     error_body = notification_email % error_details
 
     msg = MIMEText(error_body)
