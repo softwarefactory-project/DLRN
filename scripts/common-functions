@@ -1,0 +1,7 @@
+#!/bin/bash -xe
+
+# Function to run at the end of each rpm build (success and failure)
+# Files produced on the volume need to have their ownership changed from root.
+function finalize(){
+    chown -R $USER_ID:$GROUP_ID /data/$PROJECT_NAME /data/${PROJECT_NAME}_distro $OUTPUT_DIRECTORY
+}
