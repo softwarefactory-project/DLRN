@@ -43,7 +43,7 @@ if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delore
 fi
 
 function copy_logs(){
-    cp -r data/repos logs/$DISTRO
+    cp -r data/f20-master logs/$DISTRO
 }
 
 # If the command below throws an error we still want the logs
