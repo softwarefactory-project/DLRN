@@ -145,7 +145,7 @@ def main():
 
     package_info = getpkginfo(local_info_repo=options.info_repo)
 
-    engine = create_engine('sqlite:///commits.sqlite')
+    engine = create_engine('sqlite:///%s.sqlite' % cp.get("DEFAULT","distro"))
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     global session
@@ -215,7 +215,7 @@ def main():
             # If the log file hasn't been created we add what we have
             # This happens if the rpm build script didn't run.
             datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
-            logfile = os.path.join(datadir, "repos",
+            logfile = os.path.join(datadir, cp.get("DEFAULT", "distro"),
                                    commit.getshardedcommitdir(),
                                    "rpmbuild.log")
             if not os.path.exists(logfile):
@@ -405,7 +405,7 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
     target = cp.get("DEFAULT", "target")
-    yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
+    yumrepodir = os.path.join(cp.get("DEFAULT", "distro"), commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
     commit_hash = commit.commit_hash
@@ -496,8 +496,8 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
                                          commit.getshardedcommitdir()))
     fp.close()
 
-    current_repo_dir = os.path.join(datadir, "repos", "current")
-    os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, "repos")),
+    current_repo_dir = os.path.join(datadir, cp.get("DEFAULT", "distro"), "current")
+    os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, cp.get("DEFAULT", "distro"))),
                current_repo_dir + "_")
     os.rename(current_repo_dir + "_", current_repo_dir)
     return built_rpms, notes
@@ -524,7 +524,7 @@ def genreports(cp, package_info):
     html.append("</table></html>")
 
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
-                               "repos", "report.html")
+                               cp.get("DEFAULT", "distro"), "report.html")
     fp = open(report_file, "w")
     fp.write("".join(html))
     fp.close()
@@ -559,7 +559,7 @@ def genreports(cp, package_info):
     html.append("</table></html>")
 
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
-                               "repos", "status_report.html")
+                               cp.get("DEFAULT", "distro"), "status_report.html")
     fp = open(report_file, "w")
     fp.write("".join(html))
     fp.close()
