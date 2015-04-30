@@ -144,7 +144,7 @@ def main():
     cp.read(options.config_file)
 
     if options.log_commands is True:
-        logging.getLogger("sh.command").setLevel(logging.INFO)
+        logging.getLogger("sh.command").setLevel(logging.DEBUG)
 
     package_info = getpkginfo(local_info_repo=options.info_repo)
 
