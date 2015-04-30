@@ -47,7 +47,7 @@ The configuration file looks like this:
     [DEFAULT]
     datadir=./data
     baseurl=http://trunk.rdoproject.org/
-    distro=f20-master
+    distro=rpm-master
     smtpserver=
 
 * ``datadir`` is the directory where the packages and repositories will be created.
