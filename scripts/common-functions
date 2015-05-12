@@ -5,3 +5,8 @@
 function finalize(){
     chown -R $USER_ID:$GROUP_ID /data/$PROJECT_NAME /data/${PROJECT_NAME}_distro $OUTPUT_DIRECTORY
 }
+
+# Implied build dependencies for sdist
+function sdist_build_deps(){
+    echo python-pip python-pbr python-setuptools python-six
+}

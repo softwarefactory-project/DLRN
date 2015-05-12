@@ -18,7 +18,7 @@ if ! rpm -q rdo-release-kilo ; then
 fi
 
 # install latest build tools updates from RDO repo
-yum install -y --nogpg python-pip python-pbr python-setuptools
+yum install -y --nogpg $(sdist_build_deps)
 
 # If in dev mode the user might not be building all of the packages, so we need
 # to add the current upstream repository in order to have access to current dependencies
