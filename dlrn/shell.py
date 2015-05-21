@@ -20,6 +20,10 @@ import re
 import shutil
 import smtplib
 import sys
+
+from datetime import datetime
+from datetime import timedelta
+from time import mktime
 from time import time
 
 from email.mime.text import MIMEText
@@ -66,6 +70,8 @@ feel free to ask questions on the RDO irc channel (#rdo on Freenode).
 [4] - https://github.com/redhat-openstack/rdoinfo/blob/master/rdo.yml
 [5] - https://www.rdoproject.org/packaging/rdo-packaging.html#master-pkg-guide
 """
+
+FLAG_PURGED = 0x2
 
 re_known_errors = re.compile('Error: Nothing to do|'
                              'Error downloading packages|'
@@ -758,3 +764,80 @@ def timesretried(project, commit_hash, distro_hash):
                                         Commit.distro_hash == distro_hash,
                                         Commit.status == "RETRY").\
         count()
+
+
+def purge():
+    parser = argparse.ArgumentParser()
+    # Some of the non-positional arguments are required, so change the text
+    # saying "optional arguments" to just "arguments":
+    parser._optionals.title = 'arguments'
+
+    parser.add_argument('--config-file',
+                        help="Config file (required)", required=True)
+    parser.add_argument('--older-than',
+                        help="How old commits need to be purged "
+                             "(in days).", required=True)
+    parser.add_argument('-y', help="Answer \"yes\" to any questions",
+                        action="store_true")
+
+    options, args = parser.parse_known_args(sys.argv[1:])
+
+    cp = configparser.RawConfigParser()
+    cp.read(options.config_file)
+
+    timeparsed = datetime.now() - timedelta(days=int(options.older_than))
+
+    if options.y is False:
+        ans = raw_input(("Remove all data before %s, correct? [N/y] " %
+                        timeparsed.ctime()))
+        if ans.lower() != "y":
+            return
+
+    session = getSession('sqlite:///commits.sqlite')
+
+    # To remove builds we have to start at a point in time and move backwards
+    # builds with no build date are also purged as these are legacy
+    # All repositories can have the repodata directory and symlinks purged
+    # But we must keep the rpms files of the most recent successful build of
+    # each project as other symlinks not being purged will be pointing to them.
+    topurge = getCommits(session,
+                         limit=0,
+                         before=int(mktime(timeparsed.timetuple()))
+                         ).all()
+
+    fullpurge = []
+    for commit in topurge:
+        if commit.flags & FLAG_PURGED:
+            continue
+        datadir = cp.get("DEFAULT", "datadir")
+        datadir = os.path.join(datadir, "repos", commit.getshardedcommitdir())
+        if commit.project_name not in fullpurge and commit.status == "SUCCESS":
+            # So we have not removed any commit from this project yet, and it
+            # is successful. Is it the newest one?
+            previouscommits = getCommits(session,
+                                         project=commit.project_name,
+                                         since=commit.dt_build,
+                                         with_status='SUCCESS').count()
+
+            if previouscommits == 0:
+                logger.info("Keeping old commit for %s" % commit.project_name)
+                continue  # this is the newest commit for this project, keep it
+
+            try:
+                for entry in os.listdir(datadir):
+                    entry = os.path.join(datadir, entry)
+                    if entry.endswith(".rpm") and not os.path.islink(entry):
+                        continue
+                    if os.path.isdir(entry):
+                        shutil.rmtree(entry)
+                    else:
+                        os.unlink(entry)
+            except OSError:
+                logger.warning("Cannot access directory %s for purge,"
+                               " ignoring." % datadir)
+            fullpurge.append(commit.project_name)
+            commit.flags |= FLAG_PURGED
+        else:
+            shutil.rmtree(datadir)
+            commit.flags |= FLAG_PURGED
+    session.commit()
