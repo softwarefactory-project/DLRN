@@ -18,7 +18,7 @@ import os
 import shutil
 import smtplib
 import sys
-from time import time, gmtime, ctime, strftime
+from time import time, gmtime, strftime, strptime, ctime, mktime
 
 from email.mime.text import MIMEText
 
@@ -27,7 +27,7 @@ import sh
 from six.moves import configparser
 from six.moves.urllib import parse
 
-from sqlalchemy import create_engine, Column, desc, Integer, String
+from sqlalchemy import create_engine, Column, desc, Integer, String, or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -59,6 +59,8 @@ on there and we will add the answer as soon as possible.
 [4] - https://github.com/redhat-openstack/rdoinfo/blob/master/rdo.yml
 [5] - https://etherpad.openstack.org/p/delorean-packages
 """
+
+FLAG_PURGED = 0x2
 
 
 class Commit(Base):
@@ -644,3 +646,65 @@ def genreports(cp, package_info):
     fp = open(report_file, "w")
     fp.write("".join(html))
     fp.close()
+
+
+def purge():
+    parser = argparse.ArgumentParser()
+    # Some of the non-positional arguments are required, so change the text
+    # saying "optional arguments" to just "arguments":
+    parser._optionals.title = 'arguments'
+
+    parser.add_argument('--config-file',
+                        help="Config file (required)", required=True)
+    parser.add_argument('--purge-before',
+                        help="A date before which package builds "
+                             "will be purged(YYYY-MM-DD).", required=True)
+    parser.add_argument('-y', help="Answer \"yes\" to any questions",
+                        action="store_true")
+
+    options, args = parser.parse_known_args(sys.argv[1:])
+
+    cp = configparser.RawConfigParser()
+    cp.read(options.config_file)
+
+    timeparsed = strptime(options.purge_before, "%Y-%m-%d")
+    if options.y is False:
+        ans = raw_input(strftime(
+            "Remove all data before %a the %d of %b, %Y? [N/y] ", timeparsed))
+        if ans.lower() != "y":
+            return
+
+    engine = create_engine('sqlite:///commits.sqlite')
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    # To remove builds we have to start at a point in time and move backwards
+    # builds with no build date are also purged as these are legacy
+    # All repositories can have the repodata directory and symlinks purged
+    # But we must keep the rpms files of the most recent successfull build of
+    # each project as other symlinks not being purged will be pointing to them.
+    topurge = session.query(Commit).filter(
+        or_(Commit.dt_build is None, Commit.dt_build < int(mktime(timeparsed)))
+    ).order_by(desc(Commit.id))
+    canfullpurge = []
+    for commit in topurge:
+        if commit.flags & FLAG_PURGED:
+            continue
+        datadir = cp.get("DEFAULT", "datadir")
+        datadir = os.path.join(datadir, "repos", commit.getshardedcommitdir())
+        if commit.project_name not in canfullpurge or commit.status != "SUCCESS":
+            for entry in os.listdir(datadir):
+                entry = os.path.join(datadir, entry)
+                if entry.endswith(".rpm") and not os.path.islink(entry):
+                    continue
+                if os.path.isdir(entry):
+                    shutil.rmtree(entry)
+                else:
+                    os.unlink(entry)
+            if commit.status == "SUCCESS":
+                canfullpurge.append(commit.project_name)
+        else:
+            shutil.rmtree(datadir)
+            commit.flags |= FLAG_PURGED
+    session.commit()
