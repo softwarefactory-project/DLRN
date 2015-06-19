@@ -32,6 +32,9 @@ PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
 # If this is a CI run for one of the distro repositories then we pre download it
 # into the data directory, delorean wont change it because we are using --dev
 if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delorean" ] ; then
+    if [ $GERRIT_BRANCH == 'rpm-kilo' ] ; then
+        sed -i "s/source=.*/source=stable\/kilo/g" projects.ini
+    fi
     mkdir -p data/repos
     PROJECT_TO_BUILD=${GERRIT_PROJECT#*/}
     PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
