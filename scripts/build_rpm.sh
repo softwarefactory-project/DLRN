@@ -28,6 +28,7 @@ fi
 
 cd /data/$PROJECT_NAME
 rm -f dist/*
+rm -rf {test-,}requirements.txt
 python setup.py sdist
 TARBALL=$(ls dist)
 # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
