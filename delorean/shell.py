@@ -624,11 +624,11 @@ def genreports(cp, package_info):
         last_success = commits.first()
         last_success_dt = 0
         if last_success is not None:
-            last_success_dt = last_success.dt_commit
+            last_success_dt = last_success.dt_build
 
         commits = session.query(Commit).filter(Commit.project_name == name).\
             filter(Commit.status == "FAILED",
-                   Commit.dt_commit > last_success_dt)
+                   Commit.dt_build > last_success_dt)
         if commits.count() == 0:
             continue
 
