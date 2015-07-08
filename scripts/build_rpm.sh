@@ -28,8 +28,16 @@ fi
 
 cd /data/$PROJECT_NAME
 rm -f dist/*
-sed -i "s/;python_version[!=<>]=\?.*//g" {test-,}requirements.txt
-sed -i "s/;sys_platform[!=<>]=\?.*//g" {test-,}requirements.txt
+
+for FILE in {test-,}requirements.txt
+do
+    if [ -f ${FILE} ]
+    then
+        sed -i "s/;python_version[!=<>]=\?.*//g" ${FILE}
+        sed -i "s/;sys_platform[!=<>]=\?.*//g" ${FILE}
+    fi
+done
+
 python setup.py sdist
 TARBALL=$(ls dist)
 # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
