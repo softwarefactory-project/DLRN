@@ -228,6 +228,7 @@ def main():
             if not project_info.suppress_email():
                 sendnotifymail(cp, package_info, commit)
                 project_info.sent_email()
+                session.add(project_info)
         else:
             commit.status = "SUCCESS"
             commit.notes = notes
