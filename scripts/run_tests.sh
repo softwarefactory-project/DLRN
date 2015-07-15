@@ -49,6 +49,14 @@ function copy_logs(){
     cp -r data/repos logs/$DISTRO
 }
 
+# Set selinux to enforcing and return it to the previous state when done
+SELINUXMODE=$(getenforce)
+function onexit(){
+    sudo setenforce $SELINUXMODE
+}
+trap onexit EXIT
+sudo setenforce 1
+
 # If the command below throws an error we still want the logs
 trap copy_logs ERR
 
