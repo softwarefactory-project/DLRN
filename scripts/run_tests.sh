@@ -1,6 +1,8 @@
 #!/usr/bin/bash
 set -eux
 
+export PATH=$PATH:/usr/sbin
+
 # Simple CI test to sanity test commits
 
 # Make sure docker is running
@@ -48,6 +50,21 @@ fi
 function copy_logs(){
     cp -r data/repos logs/$DISTRO
 }
+
+# Set selinux to enforcing and return it to the previous state when done
+SELINUXMODE=$(getenforce)
+function onexit(){
+    sudo setenforce $SELINUXMODE
+    sudo semanage fcontext -d "$PWD/data(/.*)?"
+    sudo semanage fcontext -d "$PWD/scripts(/.*)?"
+}
+trap onexit EXIT
+sudo setenforce 1
+
+# Set contexts for the approiate paths
+sudo semanage fcontext -a -t docker_var_lib_t "$PWD/data(/.*)?"
+sudo semanage fcontext -a -t docker_var_lib_t "$PWD/scripts(/.*)?"
+sudo restorecon -R $PWD
 
 # If the command below throws an error we still want the logs
 trap copy_logs ERR
