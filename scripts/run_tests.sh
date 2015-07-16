@@ -26,7 +26,7 @@ set +u
 set -u
 
 # Build this if not building a specific project
-PROJECT_TO_BUILD=python-glanceclient
+PROJECT_TO_BUILD=openstack-neutron-fwaas
 PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
 
 # If this is a CI run for one of the distro repositories then we pre download it
