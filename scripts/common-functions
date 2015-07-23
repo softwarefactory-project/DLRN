@@ -5,3 +5,40 @@
 function finalize(){
     chown -R $USER_ID:$GROUP_ID /data/$PROJECT_NAME /data/${PROJECT_NAME}_distro $OUTPUT_DIRECTORY
 }
+
+
+function setversionandrelease(){
+    UPSTREAMVERSION=$1
+    # version-release e.g 1.0.0-d7f1b849
+    if [[ "$UPSTREAMVERSION" =~ (.*?)-(.+) ]] ; then
+        VERSION=${BASH_REMATCH[1]}
+        RELEASE=${BASH_REMATCH[2]}
+    # 2014.2.dev50.g99bef1f
+    elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(dev.+) ]] ; then
+        VERSION=${BASH_REMATCH[1]}
+        RELEASE=${BASH_REMATCH[2]}
+    # 0.10.1.11.ga5f0e3c
+    elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(g.+) ]] ; then
+        VERSION=${BASH_REMATCH[1]}
+        RELEASE=${BASH_REMATCH[2]}
+    # Only version e.g. 1.7.3
+    elif [[ "$UPSTREAMVERSION" =~ ^([.0-9]*)$ ]] ; then
+        VERSION=${BASH_REMATCH[1]}
+        # try to follow Fedora guidelines for git snapshots (but include time too)
+        # http://fedoraproject.org/wiki/Packaging:NamingGuidelines#Pre-Release_packages
+        RELEASE=$(date -u +"0.99.%Y%m%d.%H%Mgit")
+        # python-alembic version=0.6.6 but tarball is 0.6.6dev
+        if [[ "${TARBALL-}" =~ dev\.t ]] ; then
+            UPSTREAMVERSION=${UPSTREAMVERSION}dev
+        fi
+    # 2.2.0.0a3
+    elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(.+) ]] ; then
+        VERSION=${BASH_REMATCH[1]}
+        RELEASE=${BASH_REMATCH[2]}
+    else
+        # e.g. eb6dbe2
+        echo  "ERROR : Couldn't parse VERSION, falling back to 0.0.1"
+        VERSION=0.0.1
+        RELEASE=$UPSTREAMVERSION
+    fi
+}
