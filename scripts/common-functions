@@ -10,9 +10,10 @@ function finalize(){
 function setversionandrelease(){
     UPSTREAMVERSION=$1
     # version-release e.g 1.0.0-d7f1b849
-    if [[ "$UPSTREAMVERSION" =~ (.*?)-(.+) ]] ; then
+    if [[ "$UPSTREAMVERSION" =~ ([^-]*)-(.+) ]] ; then
         VERSION=${BASH_REMATCH[1]}
-        RELEASE=${BASH_REMATCH[2]}
+        # opm have a dash between the release number and git hash
+        RELEASE=${BASH_REMATCH[2]/-/.}
     # 2014.2.dev50.g99bef1f
     elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(dev.+) ]] ; then
         VERSION=${BASH_REMATCH[1]}

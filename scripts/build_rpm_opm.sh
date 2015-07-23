@@ -17,6 +17,7 @@ sources_upstream=$(ls -d /data/${PROJECT_NAME}/*/.git|wc -l)
 
 rm -f openstack-puppet-modules-master-patches.tar* Puppetfile
 cd /data/$PROJECT_NAME
+setversionandrelease $(git describe --tags)
 for REPO in */.git ; do
     REPO=${REPO%%/*} # remove the /.git
     NAME=${REPO%%.git} # remove the .git, it may or may not be present
@@ -53,12 +54,6 @@ if git fetch http://pkgs.fedoraproject.org/git/$PROJECT_NAME master ; then
     git diff HEAD..FETCH_HEAD > $OUTPUT_DIRECTORY/distro_delta.diff
 fi
 cd ~/rpmbuild/SPECS/
-
-# The puppet module package isn't based on any single repo so for now we hardcode
-# VERSION and get RELEASE from $OUTPUT_DIRECTORY (contains commit ID of project that triggered the build)
-UPSTREAMVERSION=2015.1
-VERSION=2015.1
-RELEASE=dev.${2##*/}
 
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec

@@ -35,6 +35,7 @@ test_setvr 2015.2.1                2015.2.1                2015.2.1   0.99.20150
 test_setvr 3.0.1a                  3.0.1a                  3.0        1a
 test_setvr 8.0.0.0b2.dev268        8.0.0.0b2.dev268        8.0.0.0b2  dev268
 test_setvr eb6dbe2                 eb6dbe2                 0.0.1      eb6dbe2
+test_setvr 2015.1.9-13-g53b605d    2015.1.9-13-g53b605d    2015.1.9   13.g53b605d
 # This one tests a special case for python-alembic
 TARBALL=0.0.9dev.tar \
 test_setvr 0.0.9                   0.0.9dev                   0.0.9      0.99.20150102.0344git
