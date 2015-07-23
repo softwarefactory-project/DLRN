@@ -51,39 +51,7 @@ python setup.py sdist
 TARBALL=$(ls dist)
 # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
 # so only look at the last line for version
-UPSTREAMVERSION=$(python setup.py --version | tail -n 1)
-# version-release e.g 1.0.0-d7f1b849
-if [[ "$UPSTREAMVERSION" =~ (.*?)-(.+) ]] ; then
-    VERSION=${BASH_REMATCH[1]}
-    RELEASE=${BASH_REMATCH[2]}
-# 2014.2.dev50.g99bef1f
-elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(dev.+) ]] ; then
-    VERSION=${BASH_REMATCH[1]}
-    RELEASE=${BASH_REMATCH[2]}
-# 0.10.1.11.ga5f0e3c
-elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(g.+) ]] ; then
-    VERSION=${BASH_REMATCH[1]}
-    RELEASE=${BASH_REMATCH[2]}
-# Only version e.g. 1.7.3
-elif [[ "$UPSTREAMVERSION" =~ ^([.0-9]*)$ ]] ; then
-    VERSION=${BASH_REMATCH[1]}
-    # try to follow Fedora guidelines for git snapshots (but include time too)
-    # http://fedoraproject.org/wiki/Packaging:NamingGuidelines#Pre-Release_packages
-    RELEASE=$(date -u +"0.99.%Y%m%d.%H%Mgit")
-    # python-alembic version=0.8.2 but tarball is alembic-0.8.2.dev0
-    if [[ "$TARBALL" =~ \.dev[0-9]+\. ]] ; then
-        UPSTREAMVERSION=$(echo ${TARBALL} | sed 's/.*-\(.*\).tar.gz/\1/')
-    fi
-# 2.2.0.0a3
-elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(.+) ]] ; then
-    VERSION=${BASH_REMATCH[1]}
-    RELEASE=${BASH_REMATCH[2]}
-else
-    # e.g. eb6dbe2
-    echo  "ERROR : Couldn't parse VERSION, falling back to 0.0.1"
-    VERSION=0.0.1
-    RELEASE=$UPSTREAMVERSION
-fi
+setversionandrelease $(python setup.py --version | tail -n 1)
 
 # https://bugs.launchpad.net/tripleo/+bug/1351491
 if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then

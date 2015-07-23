@@ -15,6 +15,9 @@ tox -epy27
 # Run pep8 tests
 tox -epep8
 
+# Run bash unit tests
+./scripts/run_sh_tests.sh
+
 # Create build images, this will endup being a noop on hosts where
 # it was already run if the dockerfile hasn't changed
 ./scripts/create_build_image.sh fedora
