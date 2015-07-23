@@ -8,6 +8,7 @@ source $(dirname $0)/common-functions
 sources_spec=$(grep ^Source ${DATA_DIR}/${PROJECT_NAME}_distro/*.spec|wc -l)
 sources_upstream=$(ls -d ${DATA_DIR}/${PROJECT_NAME}/|wc -l)
 
+setversionandrelease $(git describe --tags)
 for REPO in $(ls -d */); do
     NAME=${REPO%%/} # remove the /
     if [ $sources_upstream -le 1 ]; then
@@ -39,13 +40,6 @@ cd ${DATA_DIR}/${PROJECT_NAME}_distro
 cp * ${TOP_DIR}/SOURCES/
 cp *.spec ${TOP_DIR}/SPECS/
 cd ${TOP_DIR}/SPECS/
-
-# The puppet module package isn't based on any single repo so for now
-# we hardcode VERSION and get RELEASE from $OUTPUT_DIRECTORY (contains
-# commit ID of project that triggered the build)
-UPSTREAMVERSION=7.0.0
-VERSION=$UPSTREAMVERSION
-RELEASE=dev.${2##*/}
 
 sed -i -e "1i%define upstream_version $UPSTREAMVERSION\\" *.spec
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
