@@ -498,6 +498,14 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
                                              cp.get("DEFAULT", "baseurl"),
                                              commit.getshardedcommitdir()))
 
+    with open(os.path.join(
+            yumrepodir_abs, "%s-latest.repo" % cp.get("DEFAULT", "reponame")),
+            "w") as fp:
+        fp.write("[%s-latest]\nname=%s-latest\nbaseurl=%s/current\nenabled=1\n"
+                 "gpgcheck=0\npriority=1" % (cp.get("DEFAULT", "reponame"),
+                                             cp.get("DEFAULT", "reponame"),
+                                             cp.get("DEFAULT", "baseurl")))
+
     current_repo_dir = os.path.join(datadir, "repos", "current")
     os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, "repos")),
                current_repo_dir + "_")
