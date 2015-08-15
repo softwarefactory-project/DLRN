@@ -18,7 +18,10 @@ import os
 import shutil
 import smtplib
 import sys
-from time import time, gmtime, ctime, strftime
+from time import ctime
+from time import gmtime
+from time import strftime
+from time import time
 
 from email.mime.text import MIMEText
 
@@ -27,7 +30,12 @@ import sh
 from six.moves import configparser
 from six.moves.urllib import parse
 
-from sqlalchemy import create_engine, Column, desc, Integer, String
+from sqlalchemy import Column
+from sqlalchemy import create_engine
+from sqlalchemy import desc
+from sqlalchemy import Integer
+from sqlalchemy import String
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
