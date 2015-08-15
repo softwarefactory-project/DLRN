@@ -221,9 +221,8 @@ def main():
                                    commit.getshardedcommitdir(),
                                    "rpmbuild.log")
             if not os.path.exists(logfile):
-                fp = open(logfile, "w")
-                fp.write(getattr(e, "message", notes))
-                fp.close()
+                with open(logfile, "w") as fp:
+                    fp.write(getattr(e, "message", notes))
 
             if not project_info.suppress_email():
                 sendnotifymail(cp, package_info, commit)
@@ -489,15 +488,15 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
 
     sh.createrepo(yumrepodir_abs)
 
-    fp = open(os.path.join(yumrepodir_abs,
-                           "%s.repo" % cp.get("DEFAULT", "reponame")), "w")
-    fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
-             "gpgcheck=0\npriority=1" % (cp.get("DEFAULT", "reponame"),
-                                         cp.get("DEFAULT", "reponame"),
-                                         project_name, commit_hash,
-                                         cp.get("DEFAULT", "baseurl"),
-                                         commit.getshardedcommitdir()))
-    fp.close()
+    with open(os.path.join(
+            yumrepodir_abs, "%s.repo" % cp.get("DEFAULT", "reponame")),
+            "w") as fp:
+        fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
+                 "gpgcheck=0\npriority=1" % (cp.get("DEFAULT", "reponame"),
+                                             cp.get("DEFAULT", "reponame"),
+                                             project_name, commit_hash,
+                                             cp.get("DEFAULT", "baseurl"),
+                                             commit.getshardedcommitdir()))
 
     current_repo_dir = os.path.join(datadir, "repos", "current")
     os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, "repos")),
@@ -598,9 +597,8 @@ def genreports(cp, package_info):
 
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
                                "repos", "report.html")
-    fp = open(report_file, "w")
-    fp.write("".join(html))
-    fp.close()
+    with open(report_file, "w") as fp:
+        fp.write("".join(html))
 
     # Generate report of status for each project
     table_header = """
@@ -642,6 +640,5 @@ def genreports(cp, package_info):
 
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
                                "repos", "status_report.html")
-    fp = open(report_file, "w")
-    fp.write("".join(html))
-    fp.close()
+    with open(report_file, "w") as fp:
+        fp.write("".join(html))
