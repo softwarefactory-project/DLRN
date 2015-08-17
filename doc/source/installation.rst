@@ -49,6 +49,7 @@ The configuration file looks like this:
     baseurl=http://trunk.rdoproject.org/
     distro=rpm-master
     smtpserver=
+    maxretries=3
 
 * ``datadir`` is the directory where the packages and repositories will be created.
 
@@ -61,6 +62,10 @@ The configuration file looks like this:
   If this is empty no emails will be sent out. If you are running Delorean locally,
   then do not set an smtpserver.
 
+* ``maxretries`` is the maximum number of retries on known errors before marking the build
+  as failed. If a build fails, Delorean will check the log files for known, transient errors
+  such as network issues. If the build fails for that reason more than maxretries times, it
+  will be marked as failed.
 
 Configuring your httpd
 ----------------------
