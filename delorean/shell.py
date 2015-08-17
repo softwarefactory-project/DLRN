@@ -1,4 +1,4 @@
-# Licensed under the Apache License, Version 2.0 (the "License"); you may
+    # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
 #
@@ -16,6 +16,7 @@ import copy
 from datetime import datetime
 import logging
 import os
+import re
 import shutil
 import smtplib
 import sys
@@ -68,6 +69,13 @@ on there and we will add the answer as soon as possible.
 [4] - https://github.com/redhat-openstack/rdoinfo/blob/master/rdo.yml
 [5] - https://etherpad.openstack.org/p/delorean-packages
 """
+
+re_known_errors = re.compile('Error: Nothing to do|'
+                             'Error downloading packages|'
+                             'No more mirrors to try|'
+                             'Cannot retrieve metalink for repository')
+
+default_options = {'maxretries': '3'}
 
 
 class Commit(Base):
@@ -148,7 +156,7 @@ def main():
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
-    cp = configparser.RawConfigParser()
+    cp = configparser.RawConfigParser(default_options)
     cp.read(options.config_file)
 
     if options.log_commands is True:
@@ -167,9 +175,11 @@ def main():
     for package in package_info["packages"]:
         project = package["name"]
         since = "-1"
-        commit = session.query(Commit).filter(Commit.project_name == project).\
+        commit = session.query(Commit).filter(Commit.project_name == project,
+                                              Commit.status != "RETRY").\
             order_by(desc(Commit.dt_commit)).\
             order_by(desc(Commit.id)).first()
+
         if commit:
             # This will return all commits since the last handled commit
             # including the last handled commit, remove it later if needed.
@@ -194,7 +204,8 @@ def main():
                    (not session.query(Commit).filter(
                         Commit.project_name == project,
                         Commit.commit_hash == commit_toprocess.commit_hash,
-                        Commit.distro_hash == commit_toprocess.distro_hash)
+                        Commit.distro_hash == commit_toprocess.distro_hash,
+                        Commit.status != "RETRY")
                         .all()):
                     toprocess.append(commit_toprocess)
 
@@ -218,25 +229,36 @@ def main():
                                       options.use_public)
         except Exception as e:
             exit_code = 1
-            logger.exception("Error while building packages for %s" % project)
-            commit.status = "FAILED"
-            commit.notes = getattr(e, "message", notes)
-            session.add(commit)
-
-            # If the log file hasn't been created we add what we have
-            # This happens if the rpm build script didn't run.
             datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
             logfile = os.path.join(datadir, "repos",
                                    commit.getshardedcommitdir(),
                                    "rpmbuild.log")
-            if not os.path.exists(logfile):
-                with open(logfile, "w") as fp:
-                    fp.write(getattr(e, "message", notes))
+            max_retries = cp.getint("DEFAULT", "maxretries")
+            if isknownerror(logfile) and \
+               (timesretried(project, commit_hash, commit.distro_hash)
+               < max_retries):
+                logger.exception("Known error building packages for %s,"
+                                 " will retry later" % project)
+                commit.status = "RETRY"
+                commit.notes = getattr(e, "message", notes)
+                session.add(commit)
+            else:
+                logger.exception("Error while building packages for %s"
+                                 % project)
+                commit.status = "FAILED"
+                commit.notes = getattr(e, "message", notes)
+                session.add(commit)
 
-            if not project_info.suppress_email():
-                sendnotifymail(cp, package_info, commit)
-                project_info.sent_email()
-                session.add(project_info)
+                # If the log file hasn't been created we add what we have
+                # This happens if the rpm build script didn't run.
+                if not os.path.exists(logfile):
+                    with open(logfile, "w") as fp:
+                        fp.write(getattr(e, "message", notes))
+
+                if not project_info.suppress_email():
+                    sendnotifymail(cp, package_info, commit)
+                    project_info.sent_email()
+                    session.add(project_info)
         else:
             commit.status = "SUCCESS"
             commit.notes = notes
@@ -593,6 +615,9 @@ def genreports(cp, package_info, options):
         if commit.status == "SUCCESS":
             html.append("<td><i class='fa fa-thumbs-o-up pull-left' "
                         "style='color:green'></i>SUCCESS</td>")
+        elif commit.status == "RETRY":
+            html.append("<td><i class='fa fa-exclamation-triangle pull-left' "
+                        "style='color:yellow'></i>RETRY</td>")
         else:
             html.append("<td><i class='fa fa-thumbs-o-down pull-left' "
                         "style='color:red'></i>FAILED</td>")
@@ -663,12 +688,20 @@ def genreports(cp, package_info, options):
         else:
             html.append("<tr>")
             html.append("<td>%s</td>" % name)
-            html.append("<td><i class='fa fa-thumbs-o-down pull-left' "
-                        "style='color:red'></i>"
-                        "<a href='%s/rpmbuild.log'>FAILED</a></td>"
-                        % commits.first().getshardedcommitdir())
 
-            commits = session.query(Commit).filter(Commit.project_name == name).\
+            if commit.status == "RETRY":
+                html.append("<td><i class='fa fa-warning pull-left' "
+                            "style='color:yellow'></i>"
+                            "<a href='%s/rpmbuild.log'>RETRY</a></td>"
+                            % commits.first().getshardedcommitdir())
+            else:
+                html.append("<td><i class='fa fa-thumbs-o-down pull-left' "
+                            "style='color:red'></i>"
+                            "<a href='%s/rpmbuild.log'>FAILED</a></td>"
+                            % commits.first().getshardedcommitdir())
+
+            commits = session.query(Commit).\
+                filter(Commit.project_name == name).\
                 filter(Commit.status == "SUCCESS").\
                 order_by(desc(Commit.dt_build)).limit(1)
             last_success = commits.first()
@@ -676,12 +709,14 @@ def genreports(cp, package_info, options):
             if last_success is not None:
                 last_success_dt = last_success.dt_build
 
-                commits = session.query(Commit).filter(Commit.project_name == name).\
+                commits = session.query(Commit).\
+                    filter(Commit.project_name == name).\
                     filter(Commit.status == "FAILED",
                            Commit.dt_build > last_success_dt).\
                     order_by(asc(Commit.dt_build))
             else:
-                commits = session.query(Commit).filter(Commit.project_name == name).\
+                commits = session.query(Commit).\
+                    filter(Commit.project_name == name).\
                     filter(Commit.status == "FAILED").\
                     order_by(asc(Commit.dt_build))
             if commits.count() == 0:
@@ -708,3 +743,28 @@ def genreports(cp, package_info, options):
                                "repos", "status_report.html")
     with open(report_file, "w") as fp:
         fp.write("\n".join(html))
+
+
+def isknownerror(logfile):
+    # Check log file against known errors
+    # Return True if known error, False otherwise
+
+    with open(logfile) as fp:
+        for line in fp:
+            line = line.strip()
+            if re_known_errors.search(line):
+                # Found a known issue
+                return True
+
+    return False
+
+
+def timesretried(project, commit_hash, distro_hash):
+    # Return how many times a commit hash / distro had combination has
+    # been retried for a given project
+
+    return session.query(Commit).filter(Commit.project_name == project,
+                                        Commit.commit_hash == commit_hash,
+                                        Commit.distro_hash == distro_hash,
+                                        Commit.status == "RETRY").\
+        count()
