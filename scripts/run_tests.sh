@@ -61,7 +61,7 @@ copy_logs
 
 # Switch to a centos target
 sed -i -e 's%target=.*%target=centos%' projects.ini
-sed -i -e 's%baseurl=.*%baseurl=http://trunk.rdoproject.org/centos70%' projects.ini
+sed -i -e 's%baseurl=.*%baseurl=https://trunk.rdoproject.org/centos70%' projects.ini
 
 # And run delorean again
 DISTRO=centos
