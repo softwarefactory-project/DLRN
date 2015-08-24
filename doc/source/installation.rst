@@ -6,17 +6,21 @@ Installing prerequisites:
 
 .. code-block:: bash
 
-    $ sudo yum install docker-io git git-hg createrepo
-    $ sudo systemctl start httpd
-    $ sudo systemctl start docker
+    $ sudo yum install git createrepo python-virtualenv git-hg mock
 
-Add the user you intend to run as to the docker group:
+Add the user you intend to run as to the mcok group:
 
 .. code-block:: bash
 
-    $ sudo usermod -a -G docker $USER
-    $ newgrp docker
+    $ sudo usermod -a -G mock $USER
+    $ newgrp mock
     $ newgrp $USER
+
+If you want to serv the built packages and the status reports:
+
+.. code-block:: bash
+
+    $ systemctl start httpd
 
 Install Delorean:
 
@@ -50,13 +54,16 @@ The configuration file looks like this:
     distro=rpm-master
     smtpserver=
     maxretries=3
+    target=centos
 
 * ``datadir`` is the directory where the packages and repositories will be created.
 
 * ``baseurl`` is the URL to the data-directory, as hosted by your web-server. Unless you are
   installing Delorean for local use only, this must be a publicly accessible URL.
 
-* ``distro`` is the distribution to use for building the packages.
+* ``distro`` is the branch to use for building the packages.
+
+* ``target`` is the distribution to use for building the packages (``centos`` or ``fedora``).
 
 * ``smtpserver`` is the address of the mail server for sending out notification emails.
   If this is empty no emails will be sent out. If you are running Delorean locally,
