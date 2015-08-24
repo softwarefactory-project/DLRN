@@ -1,7 +1,22 @@
 #!/bin/bash -xe
 
 # Function to run at the end of each rpm build (success and failure)
-# Files produced on the volume need to have their ownership changed from root.
-function finalize(){
-    chown -R $USER_ID:$GROUP_ID /data/$PROJECT_NAME /data/${PROJECT_NAME}_distro $OUTPUT_DIRECTORY
+# Cleanup temp dir where was stored src.rpm files
+function finalize() {
+    rm -rf ${TOP_DIR}
 }
+
+PROJECT_NAME=$1
+OUTPUT_DIRECTORY=$2
+DATA_DIR=$3
+BASEURL=$4
+
+TOP_DIR=$(mktemp -d)
+
+mkdir -p ${TOP_DIR}/SOURCES ${TOP_DIR}/SPECS $OUTPUT_DIRECTORY
+
+trap finalize EXIT
+
+cd ${DATA_DIR}/$PROJECT_NAME
+git clean -dxf
+
