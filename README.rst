@@ -9,10 +9,8 @@ Setup
 
 .. code-block:: bash
 
-    $ yum install docker-io git createrepo python-virtualenv git-hg
-    $ systemctl start httpd
-    $ systemctl start docker
-    $ # Add the user you intend to run as to the docker group and login again
+    $ yum install git createrepo python-virtualenv git-hg mock
+    $ # Add the user you intend to run as to the mock group and login again
     $ git clone https://github.com/openstack-packages/delorean.git
 
 Running
@@ -21,7 +19,6 @@ Running
 .. code-block:: bash
 
     $ cd delorean
-    $ ./scripts/create_build_image.sh
     $ virtualenv ../delorean-venv
     $ . ../delorean-venv/bin/activate
     $ pip install -r requirements.txt
