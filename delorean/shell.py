@@ -189,7 +189,7 @@ def main():
             # the last commit in the db, as multiple commits can have the same
             # commit date
             for commit_toprocess in project_toprocess:
-                if (options.dev is True) or \
+                if (options.dev is True) or options.head_only or \
                    (not session.query(Commit).filter(
                         Commit.project_name == project,
                         Commit.commit_hash == commit_toprocess.commit_hash,
@@ -414,9 +414,9 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
 
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
-    target = cp.get("DEFAULT", "target")
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
+    target = cp.get("DEFAULT", "target")
 
     commit_hash = commit.commit_hash
     project_name = commit.project_name
@@ -430,40 +430,24 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
     sh.git("--git-dir", "%s/.git" % repo_dir,
            "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
 
-    docker_run_cmd = []
+    run_cmd = []
     # expand the env name=value pairs into docker arguments
     if env_vars:
         for env_var in env_vars:
-            docker_run_cmd.append('--env')
-            docker_run_cmd.append(env_var)
+            run_cmd.append(env_var)
     if (dev_mode or use_public):
-            docker_run_cmd.append('--env')
-            docker_run_cmd.append("DELOREAN_DEV=1")
+            run_cmd.append("DELOREAN_DEV=1")
 
-    docker_run_cmd.extend(["-t", "--volume=%s:/data" % datadir,
-                           "--volume=%s:/scripts" % scriptsdir,
-                           "--name", "builder-%s" % target,
-                           "delorean/%s" % target,
-                           "/scripts/build_rpm_wrapper.sh", project_name,
-                           "/data/%s" % yumrepodir, str(os.getuid()),
-                           str(os.getgid())])
+    run_cmd.extend([os.path.join(scriptsdir, "build_rpm_wrapper.sh"),
+                    target, project_name,
+                    os.path.join(datadir, yumrepodir),
+                    datadir])
     try:
-        sh.docker("run", docker_run_cmd)
+        sh.env(run_cmd)
     except Exception as e:
-        logger.error('Docker cmd failed. See logs at: %s/%s/' % (datadir,
-                                                                 yumrepodir))
+        logger.error('cmd failed. See logs at: %s/%s/' % (datadir,
+                                                          yumrepodir))
         raise e
-    finally:
-        # Kill builder-"target" if running and remove if present
-        try:
-            sh.docker("kill", "builder-%s" % target)
-            sh.docker("wait", "builder-%s" % target)
-        except Exception:
-            pass
-        try:
-            sh.docker("rm", "builder-%s" % target)
-        except Exception:
-            pass
 
     built_rpms = []
     for rpm in os.listdir(yumrepodir_abs):
