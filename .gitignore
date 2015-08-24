@@ -54,3 +54,5 @@ ChangeLog
 /data
 commits.sqlite
 commits.sqlite-journal
+scripts/delorean.cfg
+scripts/delorean.cfg.new
