@@ -3,9 +3,6 @@ set -eux
 
 # Simple CI test to sanity test commits
 
-# Make sure docker is running
-sudo systemctl start docker
-
 # Display the current commit
 git log -1
 
@@ -15,15 +12,13 @@ tox -epy27
 # Run pep8 tests
 tox -epep8
 
-# Create build images, this will endup being a noop on hosts where
-# it was already run if the dockerfile hasn't changed
-./scripts/create_build_image.sh fedora
-./scripts/create_build_image.sh centos
-
 # Use the env setup by tox
 set +u
 . .tox/py27/bin/activate
 set -u
+
+# test that the mock command is present
+type -p mock
 
 # Build this if not building a specific project
 PROJECT_TO_BUILD=python-glanceclient
