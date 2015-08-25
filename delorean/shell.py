@@ -13,12 +13,12 @@
 
 import argparse
 import copy
+from datetime import datetime
 import logging
 import os
 import shutil
 import smtplib
 import sys
-from time import ctime
 from time import gmtime
 from time import strftime
 from time import time
@@ -30,6 +30,7 @@ import sh
 from six.moves import configparser
 from six.moves.urllib import parse
 
+from sqlalchemy import asc
 from sqlalchemy import Column
 from sqlalchemy import create_engine
 from sqlalchemy import desc
@@ -513,6 +514,25 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
     return built_rpms, notes
 
 
+def get_commit_url(commit, pkg):
+    upstream_url = parse.urlsplit(pkg["upstream"])
+    if upstream_url.netloc == "git.openstack.org":
+        commit_url = ("http",
+                      upstream_url.netloc,
+                      "/cgit%s/commit/?id=" % upstream_url.path,
+                      "", "", "")
+        commit_url = parse.urlunparse(commit_url)
+    elif upstream_url.netloc == "github.com":
+        commit_url = ("https",
+                      upstream_url.netloc,
+                      "%s/commit/" % upstream_url.path,
+                      "", "", "")
+        commit_url = parse.urlunparse(commit_url)
+    else:
+        commit_url = upstream_url
+    return commit_url
+
+
 def genreports(cp, package_info):
     # Generate report of the last 300 package builds
     target = cp.get("DEFAULT", "target")
@@ -562,19 +582,7 @@ def genreports(cp, package_info):
         for pkg in package_info["packages"]:
             project = pkg["name"]
             if project == commit.project_name:
-                upstream_url = parse.urlsplit(pkg["upstream"])
-                if upstream_url.netloc == "git.openstack.org":
-                    commit_url = ("http",
-                                  upstream_url.netloc,
-                                  "/cgit%s/commit/?id=" % upstream_url.path,
-                                  "", "", "")
-                    commit_url = parse.urlunparse(commit_url)
-                if upstream_url.netloc == "github.com":
-                    commit_url = ("https",
-                                  upstream_url.netloc,
-                                  "%s/commit/" % upstream_url.path,
-                                  "", "", "")
-                    commit_url = parse.urlunparse(commit_url)
+                commit_url = get_commit_url(commit, pkg)
                 html.append("<td class='commit'>"
                             "<i class='fa fa-git pull-left'>"
                             "</i><a href='%s%s'>%s</a></td>" %
@@ -613,8 +621,9 @@ def genreports(cp, package_info):
     <table id="delorean">
         <tr>
             <th>Project Name</th>
-            <th>Failures</th>
-            <th>Last Success</th>
+            <th>Status</th>
+            <th>First failure after success</th>
+            <th>Number of days since last success</th>
         </tr>
     """
     html = list()
@@ -623,30 +632,74 @@ def genreports(cp, package_info):
     packages = [package for package in package_info["packages"]]
     # Find the most recent successfull build
     # then report on failures since then
-    for package in packages:
+    for package in sorted(packages,
+                          cmp=lambda x, y:
+                          cmp(x['name'], y['name'])):
         name = package["name"]
         commits = session.query(Commit).filter(Commit.project_name == name).\
-            filter(Commit.status == "SUCCESS").\
             order_by(desc(Commit.dt_build)).limit(1)
         last_success = commits.first()
         last_success_dt = 0
         if last_success is not None:
             last_success_dt = last_success.dt_build
 
-        commits = session.query(Commit).filter(Commit.project_name == name).\
-            filter(Commit.status == "FAILED",
-                   Commit.dt_build > last_success_dt)
         if commits.count() == 0:
             continue
 
-        html.append("<tr>")
-        html.append("<td>%s</td>" % name)
-        html.append("<td>%s</td>" % commits.count())
-        html.append("<td>%s</td>" % ctime(last_success_dt))
+        if commits.first().status == "SUCCESS":
+            html.append('<tr class="success">')
+            html.append("<td>%s</td>" % name)
+            html.append("<td><i class='fa fa-thumbs-o-up pull-left' "
+                        "style='color:green'></i>"
+                        "<a href='%s/rpmbuild.log'>SUCCESS</a></td>"
+                        % commits.first().getshardedcommitdir())
+            html.append("<td></td>")
+            html.append("<td></td>")
+        else:
+            html.append("<tr>")
+            html.append("<td>%s</td>" % name)
+            html.append("<td><i class='fa fa-thumbs-o-down pull-left' "
+                        "style='color:red'></i>"
+                        "<a href='%s/rpmbuild.log'>FAILED</a></td>"
+                        % commits.first().getshardedcommitdir())
+
+            commits = session.query(Commit).filter(Commit.project_name == name).\
+                filter(Commit.status == "SUCCESS").\
+                order_by(desc(Commit.dt_build)).limit(1)
+            last_success = commits.first()
+            last_success_dt = 0
+            if last_success is not None:
+                last_success_dt = last_success.dt_build
+
+                commits = session.query(Commit).filter(Commit.project_name == name).\
+                    filter(Commit.status == "FAILED",
+                           Commit.dt_build > last_success_dt).\
+                    order_by(asc(Commit.dt_build))
+            else:
+                commits = session.query(Commit).filter(Commit.project_name == name).\
+                    filter(Commit.status == "FAILED").\
+                    order_by(asc(Commit.dt_build))
+            if commits.count() == 0:
+                html.append("<td>??????</td>")
+            else:
+                commit = commits.first()
+                html.append("<td><i class='fa fa-git pull-left'></i>"
+                            "<a href='%s%s'>%s</a>"
+                            " (<a href='%s/rpmbuild.log'>build log</a>)</td>"
+                            % (get_commit_url(commit, package),
+                               commit.commit_hash, commit.commit_hash,
+                               commit.getshardedcommitdir()))
+            if last_success_dt == 0:
+                html.append("<td>Never</td>")
+            else:
+                html.append("<td>%d days</td>" %
+                            (datetime.now() -
+                             datetime.fromtimestamp(last_success_dt)).days)
+
         html.append("</tr>")
     html.append("</table></html>")
 
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
                                "repos", "status_report.html")
     with open(report_file, "w") as fp:
-        fp.write("".join(html))
+        fp.write("\n".join(html))
