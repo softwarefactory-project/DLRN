@@ -68,9 +68,9 @@ elif [[ "$UPSTREAMVERSION" =~ ^([.0-9]*)$ ]] ; then
     # try to follow Fedora guidelines for git snapshots (but include time too)
     # http://fedoraproject.org/wiki/Packaging:NamingGuidelines#Pre-Release_packages
     RELEASE=$(date -u +"0.99.%Y%m%d.%H%Mgit")
-    # python-alembic version=0.6.6 but tarball is 0.6.6dev
-    if [[ "$TARBALL" =~ dev\.t ]] ; then
-        UPSTREAMVERSION=${UPSTREAMVERSION}dev
+    # python-alembic version=0.8.2 but tarball is alembic-0.8.2.dev0
+    if [[ "$TARBALL" =~ \.dev[0-9]+\. ]] ; then
+        UPSTREAMVERSION=$(echo ${TARBALL} | sed 's/.*-\(.*\).tar.gz/\1/')
     fi
 # 2.2.0.0a3
 elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(.+) ]] ; then
