@@ -396,15 +396,17 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
         refreshrepo(repo, repo_dir, source_branch, local=local)
 
         git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
+        # Git gives us commits already sorted in the right order
         lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
-                        "origin/%s" % source_branch)
+                        "--reverse", "origin/%s" % source_branch)
+
         for line in lines:
             dt, commit_hash = str(line).strip().strip("'").split(" ")
             commit = Commit(dt_commit=float(dt), project_name=project,
                             commit_hash=commit_hash, repo_dir=repo_dir,
                             distro_hash=distro_hash, dt_distro=dt_distro)
             project_toprocess.append(commit)
-    project_toprocess.sort()
+
     return project_toprocess
 
 
