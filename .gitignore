@@ -49,3 +49,8 @@ ChangeLog
 # Editors
 *~
 .*.swp
+
+# Generated files
+/data
+commits.sqlite
+commits.sqlite-journal
