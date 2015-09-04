@@ -1,4 +1,4 @@
-FROM fedora:21
+FROM fedora:22
 
 RUN yum clean all && \
   yum update -y --nogpg && \
