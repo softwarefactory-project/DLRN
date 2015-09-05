@@ -47,6 +47,10 @@ function copy_logs(){
 # If the command below throws an error we still want the logs
 trap copy_logs ERR
 
+# Switch to a fedora target
+sed -i -e 's%target=.*%target=delorean-f22-x86_64%' projects.ini
+sed -i -e 's%baseurl=.*%baseurl=http://trunk.rdoproject.org/f22-x86_64%' projects.ini
+
 # And Run delorean against a project
 DISTRO=fedora
 delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
@@ -55,8 +59,8 @@ delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD
 copy_logs
 
 # Switch to a centos target
-sed -i -e 's%target=.*%target=centos%' projects.ini
-sed -i -e 's%baseurl=.*%baseurl=http://trunk.rdoproject.org/centos70%' projects.ini
+sed -i -e 's%target=.*%target=delorean-centos-7-x86_64%' projects.ini
+sed -i -e 's%baseurl=.*%baseurl=http://trunk.rdoproject.org/centos-7-x86_64%%' projects.ini
 
 # And run delorean again
 DISTRO=centos
