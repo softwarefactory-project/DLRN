@@ -652,7 +652,8 @@ def genreports(cp, package_info, options):
                         "<a href='%s/rpmbuild.log'>FAILED</a></td>"
                         % commits.first().getshardedcommitdir())
 
-            commits = session.query(Commit).filter(Commit.project_name == name).\
+            commits = session.query(Commit).\
+                filter(Commit.project_name == name).\
                 filter(Commit.status == "SUCCESS").\
                 order_by(desc(Commit.dt_build)).limit(1)
             last_success = commits.first()
@@ -660,12 +661,14 @@ def genreports(cp, package_info, options):
             if last_success is not None:
                 last_success_dt = last_success.dt_build
 
-                commits = session.query(Commit).filter(Commit.project_name == name).\
+                commits = session.query(Commit).\
+                    filter(Commit.project_name == name).\
                     filter(Commit.status == "FAILED",
                            Commit.dt_build > last_success_dt).\
                     order_by(asc(Commit.dt_build))
             else:
-                commits = session.query(Commit).filter(Commit.project_name == name).\
+                commits = session.query(Commit).\
+                    filter(Commit.project_name == name).\
                     filter(Commit.status == "FAILED").\
                     order_by(asc(Commit.dt_build))
             if commits.count() == 0:
