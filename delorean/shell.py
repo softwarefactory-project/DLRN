@@ -14,7 +14,9 @@
 import argparse
 import copy
 from datetime import datetime
+from functools import partial
 import logging
+from operator import itemgetter
 import os
 import shutil
 import smtplib
@@ -24,6 +26,8 @@ from time import strftime
 from time import time
 
 from email.mime.text import MIMEText
+
+import jinja2
 
 from prettytable import PrettyTable
 import sh
@@ -535,178 +539,111 @@ def get_commit_url(commit, pkg):
     return commit_url
 
 
+def _jinja2_filter_strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
+    gmdate = gmtime(date)
+    return "%s" % strftime(fmt, gmdate)
+
+
+def _jinja2_filter_get_commit_url(commit, package_info):
+    for pkg in package_info["packages"]:
+        project = pkg["name"]
+        if project == commit.project_name:
+            return get_commit_url(commit, pkg)
+        else:
+            return "???"
+
+
+
 def genreports(cp, package_info, options):
     # Generate report of the last 300 package builds
     target = cp.get("DEFAULT", "target")
     src = cp.get("DEFAULT", "source")
     reponame = cp.get("DEFAULT", "reponame")
+    templatedir = cp.get("DEFAULT", "templatedir")
+    datadir = cp.get("DEFAULT", "datadir")
 
-    html_struct = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <title>RDO Packaging By Delorean</title>
-        <link rel="stylesheet" href="styles.css">
-    </head>
-    <body>
-    <h1><i class='fa fa-chevron-circle-right pull-left'></i>%s - %s (%s)</h1>
-    """ % (reponame.capitalize(),
-           target.capitalize(),
-           src)
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    template_path = os.path.join(base_path, templatedir)
+    css_file = os.path.join(template_path, 'stylesheets/styles.css')
 
-    table_header = """
-    <table id="delorean">
-        <tr>
-            <th>Build Date Time</th>
-            <th>Commit Date Time</th>
-            <th>Project Name</th>
-            <th>Commit Hash</th>
-            <th>Status</th>
-            <th>Repository</th>
-            <th>Build Log</th>
-        </tr>
-    """
-    html = list()
-    html.append(html_struct)
-    html.append(table_header)
+    # configure jinja and filters
+    jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader([template_path]))
+    jinja_env.filters["strftime"] = _jinja2_filter_strftime
+    jinja_env.filters["get_commit_url"] = \
+        partial(_jinja2_filter_get_commit_url, package_info=package_info)
+
+    # generate build report
     commits = session.query(Commit).order_by(desc(Commit.dt_build)).limit(300)
-    for commit in commits:
-        if commit.status == "SUCCESS":
-            html.append('<tr class="success">')
-        else:
-            html.append('<tr>')
-        dt_build = gmtime(commit.dt_build)
-        dt_commit = gmtime(commit.dt_commit)
-        html.append("<td>%s</td>" % strftime("%Y-%m-%d %H:%M:%S", dt_build))
-        html.append("<td>%s</td>" % strftime("%Y-%m-%d %H:%M:%S", dt_commit))
-        html.append("<td>%s</td>" % commit.project_name)
-
-        for pkg in package_info["packages"]:
-            project = pkg["name"]
-            if project == commit.project_name:
-                commit_url = get_commit_url(commit, pkg)
-                html.append("<td class='commit'>"
-                            "<i class='fa fa-git pull-left'>"
-                            "</i><a href='%s%s'>%s</a></td>" %
-                            (commit_url,
-                             commit.commit_hash,
-                             commit.commit_hash))
-
-        if commit.status == "SUCCESS":
-            html.append("<td><i class='fa fa-thumbs-o-up pull-left' "
-                        "style='color:green'></i>SUCCESS</td>")
-        else:
-            html.append("<td><i class='fa fa-thumbs-o-down pull-left' "
-                        "style='color:red'></i>FAILED</td>")
-        html.append("<td><i class='fa fa-link pull-left' "
-                    "style='color:#004153'></i><a href=\"%s\">repo</a></td>" %
-                    commit.getshardedcommitdir())
-        html.append("<td><i class='fa fa-link pull-left' "
-                    "style='color:#004153'></i>"
-                    "<a href='%s/rpmbuild.log'>build log</a></td>"
-                    % commit.getshardedcommitdir())
-        html.append("</tr>")
-    html.append("</table></html>")
-
-    stylesheets_path = os.path.dirname(os.path.abspath(__file__))
-    css_file = os.path.join(stylesheets_path, 'stylesheets/styles.css')
-    shutil.copy2(css_file, os.path.join(cp.get("DEFAULT", "datadir"),
-                                        "repos", "styles.css"))
-
+    jinja_template = jinja_env.get_template("report.j2")
+    content = jinja_template.render(reponame=reponame,
+                                    src=src,
+                                    target=target,
+                                    commits=commits)
+    shutil.copy2(css_file, os.path.join(datadir, "repos", "styles.css"))
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
                                "repos", "report.html")
     with open(report_file, "w") as fp:
-        fp.write("".join(html))
+        fp.write(content)
 
+    # Generate status report
     if options.head_only:
-        msg = " (all commit not built)"
+        msg = "(all commit not built)"
     else:
         msg = ""
 
-    # Generate report of status for each project
-    table_header = """
-    <table id="delorean">
-        <tr>
-            <th>Project Name</th>
-            <th>Status</th>
-            <th>First failure after success%s</th>
-            <th>Number of days since last success</th>
-        </tr>
-    """ % msg
-    html = list()
-    html.append(html_struct)
-    html.append(table_header)
-    packages = [package for package in package_info["packages"]]
+    packages = []
     # Find the most recent successfull build
     # then report on failures since then
-    for package in sorted(packages,
-                          cmp=lambda x, y:
-                          cmp(x['name'], y['name'])):
+    for package in package_info["packages"]:
         name = package["name"]
         commits = session.query(Commit).filter(Commit.project_name == name).\
-            order_by(desc(Commit.dt_build)).limit(1)
-        last_success = commits.first()
-        last_success_dt = 0
-        if last_success is not None:
-            last_success_dt = last_success.dt_build
+                  order_by(desc(Commit.dt_build)).limit(1)
 
+        # No builds
         if commits.count() == 0:
             continue
 
-        if commits.first().status == "SUCCESS":
-            html.append('<tr class="success">')
-            html.append("<td>%s</td>" % name)
-            html.append("<td><i class='fa fa-thumbs-o-up pull-left' "
-                        "style='color:green'></i>"
-                        "<a href='%s/rpmbuild.log'>SUCCESS</a></td>"
-                        % commits.first().getshardedcommitdir())
-            html.append("<td></td>")
-            html.append("<td></td>")
-        else:
-            html.append("<tr>")
-            html.append("<td>%s</td>" % name)
-            html.append("<td><i class='fa fa-thumbs-o-down pull-left' "
-                        "style='color:red'></i>"
-                        "<a href='%s/rpmbuild.log'>FAILED</a></td>"
-                        % commits.first().getshardedcommitdir())
+        packages.append(package)
+        last_build = commits.first()
+        package["last_build"] = last_build
 
+        # last build was successul
+        if last_build.status == "SUCCESS":
+            continue
+
+        # Retrieve last successful build
+        commits = session.query(Commit).filter(Commit.project_name == name).\
+                  filter(Commit.status == "SUCCESS").\
+                  order_by(desc(Commit.dt_build)).limit(1)
+
+        # No successful builds
+        if commits.count() == 0:
             commits = session.query(Commit).filter(Commit.project_name == name).\
-                filter(Commit.status == "SUCCESS").\
-                order_by(desc(Commit.dt_build)).limit(1)
-            last_success = commits.first()
-            last_success_dt = 0
-            if last_success is not None:
-                last_success_dt = last_success.dt_build
+                      filter(Commit.status == "FAILED").\
+                      order_by(asc(Commit.dt_build))
+            package["first_failure"] = commits.first()
+            package["days"] = -1
+            continue
 
-                commits = session.query(Commit).filter(Commit.project_name == name).\
-                    filter(Commit.status == "FAILED",
-                           Commit.dt_build > last_success_dt).\
-                    order_by(asc(Commit.dt_build))
-            else:
-                commits = session.query(Commit).filter(Commit.project_name == name).\
-                    filter(Commit.status == "FAILED").\
-                    order_by(asc(Commit.dt_build))
-            if commits.count() == 0:
-                html.append("<td>??????</td>")
-            else:
-                commit = commits.first()
-                html.append("<td><i class='fa fa-git pull-left'></i>"
-                            "<a href='%s%s'>%s</a>"
-                            " (<a href='%s/rpmbuild.log'>build log</a>)</td>"
-                            % (get_commit_url(commit, package),
-                               commit.commit_hash, commit.commit_hash,
-                               commit.getshardedcommitdir()))
-            if last_success_dt == 0:
-                html.append("<td>Never</td>")
-            else:
-                html.append("<td>%d days</td>" %
-                            (datetime.now() -
-                             datetime.fromtimestamp(last_success_dt)).days)
+        last_success = commits.first()
+        last_success_dt = last_success.dt_build
 
-        html.append("</tr>")
-    html.append("</table></html>")
+        commits = session.query(Commit).filter(Commit.project_name == name).\
+                  filter(Commit.status == "FAILED",
+                         Commit.dt_build > last_success_dt).\
+                  order_by(asc(Commit.dt_build))
+        package["first_failure"] = commits.first()
+        package["days"] = (datetime.now() -
+                           datetime.fromtimestamp(last_success_dt)).days
+
+    packages = sorted(packages, key=itemgetter("name"))
+    jinja_template = jinja_env.get_template("status_report.j2")
+    content = jinja_template.render(reponame=reponame,
+                                    src=src,
+                                    target=target,
+                                    packages=packages)
 
     report_file = os.path.join(cp.get("DEFAULT", "datadir"),
                                "repos", "status_report.html")
     with open(report_file, "w") as fp:
-        fp.write("\n".join(html))
+        fp.write(content)
