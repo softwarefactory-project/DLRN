@@ -71,7 +71,11 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'No route to host|'
                              'Could not resolve host')
 
-default_options = {'maxretries': '3', 'tags': None}
+default_options = {'maxretries': '3', 'tags': None,
+                   'templatedir': os.path.join(
+                       os.path.dirname(os.path.realpath(__file__)),
+                       "templates")
+                   }
 
 
 def main():
