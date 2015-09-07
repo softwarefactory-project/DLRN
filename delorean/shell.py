@@ -591,7 +591,9 @@ def genreports(cp, package_info, options):
     html = list()
     html.append(html_struct)
     html.append(table_header)
-    commits = session.query(Commit).order_by(desc(Commit.dt_build)).limit(300)
+    commits = session.query(Commit).filter(Commit.status != "RETRY").\
+        order_by(desc(Commit.dt_build)).limit(300)
+
     for commit in commits:
         if commit.status == "SUCCESS":
             html.append('<tr class="success">')
@@ -617,9 +619,6 @@ def genreports(cp, package_info, options):
         if commit.status == "SUCCESS":
             html.append("<td><i class='fa fa-thumbs-o-up pull-left' "
                         "style='color:green'></i>SUCCESS</td>")
-        elif commit.status == "RETRY":
-            html.append("<td><i class='fa fa-exclamation-triangle pull-left' "
-                        "style='color:yellow'></i>RETRY</td>")
         else:
             html.append("<td><i class='fa fa-thumbs-o-down pull-left' "
                         "style='color:red'></i>FAILED</td>")
