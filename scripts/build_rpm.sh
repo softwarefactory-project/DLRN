@@ -112,7 +112,7 @@ sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
 sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
 cat *.spec
-yum-builddep -y *.spec
+yum-builddep --disablerepo="*source" -y *.spec
 rpmbuild -ba *.spec  --define="upstream_version $UPSTREAMVERSION"
 find ~/rpmbuild/RPMS ~/rpmbuild/SRPMS -type f | xargs cp -t $OUTPUT_DIRECTORY
 
