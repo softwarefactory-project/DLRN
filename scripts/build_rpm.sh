@@ -30,7 +30,7 @@ yum install -y --nogpg python-pip python-setuptools
 # If in dev mode the user might not be building all of the packages, so we need
 # to add the current upstream repository in order to have access to current dependencies
 if [ "$DELOREAN_DEV" == "1" ] ; then
-    curl http://trunk.rdoproject.org/f21/current/delorean.repo > /etc/yum.repos.d/public_current.repo
+    curl https://trunk.rdoproject.org/f21/current/delorean.repo > /etc/yum.repos.d/public_current.repo
 fi
 
 cd /data/$PROJECT_NAME

@@ -46,7 +46,7 @@ The configuration file looks like this:
 
     [DEFAULT]
     datadir=./data
-    baseurl=http://trunk.rdoproject.org/
+    baseurl=https://trunk.rdoproject.org/
     distro=rpm-master
     smtpserver=
     maxretries=3
