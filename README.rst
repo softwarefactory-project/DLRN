@@ -45,4 +45,9 @@ rerun delorean.
     sqlite> delete from commits where status == "FAILED";
 
 
-
+Other requirements
+------------------
+If the git clone operation fails for a package, Delorean will try to remove
+the source directory using sudo. Please make sure the user running Delorean
+can run "rm -rf /path/to/delorean/data/*" without being asked for a password,
+otherwise Delorean will fail to process new commits.
