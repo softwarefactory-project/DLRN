@@ -7,6 +7,23 @@ OUTPUT_DIRECTORY=$2
 USER_ID=$3 # chown resulting files to this UID
 GROUP_ID=$4 # chown resulting files to this GUID
 
+# Retrieve distro $ID
+source /etc/os-release
+
+if [[ $ID == fedora ]]; then
+    PBR_PACKAGES="https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python-pbr-1.6.0-1.fc24.noarch.rpm \
+https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python3-pbr-1.6.0-1.fc24.noarch.rpm"
+    DELOREAN_REPO="https://trunk.rdoproject.org/f21/current/delorean.repo"
+elif [[ $ID == centos ]]; then
+     PBR_PACKAGES="http://cbs.centos.org/kojifiles/packages/python-pbr/1.6.0/1.el7/noarch/python-pbr-1.6.0-1.el7.noarch.rpm"
+     DELOREAN_REPO="https://trunk.rdoproject.org/centos7/current/delorean.repo"
+     # install rdo-rpm-macros
+     yum install -y --nogpg http://cbs.centos.org/kojifiles/packages/rdo-rpm-macros/1/2.el7/noarch/rdo-rpm-macros-1-2.el7.noarch.rpm
+else
+    echo  "ERROR : Couldn't guess DISTRO"
+    exit 1
+fi
+
 mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
 
 trap finalize EXIT
@@ -20,8 +37,7 @@ fi
 # Install a recent version of python-pbr, needed to build some projects and only
 # curently available in koji, remove this one we move onto the openstack-liberty repo above
 if ! rpm -q python-pbr ; then
-    yum-compat install -y --nogpg https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python-pbr-1.6.0-1.fc24.noarch.rpm \
-                           https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python3-pbr-1.6.0-1.fc24.noarch.rpm
+    yum-compat install -y --nogpg $PBR_PACKAGES
 fi
 
 # install latest build tools updates from RDO repo
@@ -30,7 +46,7 @@ yum-compat install -y --nogpg python-pip python-setuptools
 # If in dev mode the user might not be building all of the packages, so we need
 # to add the current upstream repository in order to have access to current dependencies
 if [ "$DELOREAN_DEV" == "1" ] ; then
-    curl https://trunk.rdoproject.org/f21/current/delorean.repo > /etc/yum.repos.d/public_current.repo
+    curl $DELOREAN_REPO > /etc/yum.repos.d/public_current.repo
 fi
 
 cd /data/$PROJECT_NAME
