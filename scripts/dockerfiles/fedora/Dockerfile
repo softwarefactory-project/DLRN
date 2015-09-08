@@ -2,7 +2,7 @@ FROM fedora:22
 
 RUN dnf clean all && \
   dnf update -y --nogpg && \
-  dnf install -y --nogpg rpm-build git python-setuptools yum-utils python2-devel intltool make python-pip gcc yum-plugin-priorities && \
+  dnf install -y --nogpg rpm-build git python-setuptools python2-devel intltool make python-pip gcc 'dnf-command(builddep)' && \
   dnf clean all
 
 

@@ -14,18 +14,18 @@ trap finalize EXIT
 # So that we don't have to maintain packaging for all dependencies we install RDO
 # Which will contain a lot of the non openstack dependencies
 if ! rpm -q rdo-release-kilo ; then
-    yum install -y --nogpg https://rdo.fedorapeople.org/openstack-kilo/rdo-release-kilo.rpm
+    yum-compat install -y --nogpg https://rdo.fedorapeople.org/openstack-kilo/rdo-release-kilo.rpm
 fi
 
 # Install a recent version of python-pbr, needed to build some projects and only
 # curently available in koji, remove this one we move onto the openstack-liberty repo above
 if ! rpm -q python-pbr ; then
-    yum install -y --nogpg https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python-pbr-1.6.0-1.fc24.noarch.rpm \
+    yum-compat install -y --nogpg https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python-pbr-1.6.0-1.fc24.noarch.rpm \
                            https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python3-pbr-1.6.0-1.fc24.noarch.rpm
 fi
 
 # install latest build tools updates from RDO repo
-yum install -y --nogpg python-pip python-setuptools
+yum-compat install -y --nogpg python-pip python-setuptools
 
 # If in dev mode the user might not be building all of the packages, so we need
 # to add the current upstream repository in order to have access to current dependencies
@@ -112,8 +112,9 @@ sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
 sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
 cat *.spec
-yum-builddep --disablerepo="*source" -y *.spec
+# FIXME:
+yum-builddep-compat --disablerepo="*source" -y *.spec
 rpmbuild -ba *.spec  --define="upstream_version $UPSTREAMVERSION"
 find ~/rpmbuild/RPMS ~/rpmbuild/SRPMS -type f | xargs cp -t $OUTPUT_DIRECTORY
 
-yum install -y --nogpg $(find $OUTPUT_DIRECTORY -type f -name "*rpm" | grep -v src.rpm) && touch $OUTPUT_DIRECTORY/installed || true
+yum-compat install -y --nogpg $(find $OUTPUT_DIRECTORY -type f -name "*rpm" | grep -v src.rpm) && touch $OUTPUT_DIRECTORY/installed || true

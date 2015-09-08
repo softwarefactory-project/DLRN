@@ -5,3 +5,24 @@
 function finalize(){
     chown -R $USER_ID:$GROUP_ID /data/$PROJECT_NAME /data/${PROJECT_NAME}_distro $OUTPUT_DIRECTORY
 }
+
+# Function that selects package manager to be used
+function yum-compat(){
+    # check if dnf is default package manager
+    if command -v dnf &>0; then
+        YUM=dnf
+    else
+        YUM=yum
+    fi
+    eval $YUM $@
+}
+
+function yum-builddep-compat(){
+    # check if dnf is default package manager
+    if command -v dnf &>0; then
+        YUMBUILDDEP="dnf builddep"
+    else
+        YUMBUILDDEP=yum-builddep
+    fi
+    eval $YUMBUILDDEP $@
+}
