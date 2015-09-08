@@ -690,7 +690,7 @@ def genreports(cp, package_info, options):
             html.append("<tr>")
             html.append("<td>%s</td>" % name)
 
-            if commit.status == "RETRY":
+            if commits.first().status == "RETRY":
                 html.append("<td><i class='fa fa-warning pull-left' "
                             "style='color:yellow'></i>"
                             "<a href='%s/rpmbuild.log'>RETRY</a></td>"
