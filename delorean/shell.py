@@ -749,13 +749,15 @@ def genreports(cp, package_info, options):
 def isknownerror(logfile):
     # Check log file against known errors
     # Return True if known error, False otherwise
-
-    with open(logfile) as fp:
-        for line in fp:
-            line = line.strip()
-            if re_known_errors.search(line):
-                # Found a known issue
-                return True
+    try:
+        with open(logfile) as fp:
+            for line in fp:
+                line = line.strip()
+                if re_known_errors.search(line):
+                    # Found a known issue
+                    return True
+    except IOError:
+        return False
 
     return False
 
