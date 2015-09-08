@@ -749,6 +749,8 @@ def genreports(cp, package_info, options):
 def isknownerror(logfile):
     # Check log file against known errors
     # Return True if known error, False otherwise
+    if not os.path.exists(logfile):
+        return False
 
     with open(logfile) as fp:
         for line in fp:
