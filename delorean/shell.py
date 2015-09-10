@@ -669,37 +669,34 @@ def genreports(cp, package_info, options):
         name = package["name"]
         commits = session.query(Commit).filter(Commit.project_name == name).\
             order_by(desc(Commit.dt_build)).limit(1)
-        last_success = commits.first()
-        last_success_dt = 0
-        if last_success is not None:
-            last_success_dt = last_success.dt_build
+        first_commit = commits.first()
 
         if commits.count() == 0:
             continue
 
-        if commits.first().status == "SUCCESS":
+        if first_commit.status == "SUCCESS":
             html.append('<tr class="success">')
             html.append("<td>%s</td>" % name)
             html.append("<td><i class='fa fa-thumbs-o-up pull-left' "
                         "style='color:green'></i>"
                         "<a href='%s/rpmbuild.log'>SUCCESS</a></td>"
-                        % commits.first().getshardedcommitdir())
+                        % first_commit.getshardedcommitdir())
             html.append("<td></td>")
             html.append("<td></td>")
         else:
             html.append("<tr>")
             html.append("<td>%s</td>" % name)
 
-            if commit.status == "RETRY":
+            if first_commit.status == "RETRY":
                 html.append("<td><i class='fa fa-warning pull-left' "
                             "style='color:yellow'></i>"
                             "<a href='%s/rpmbuild.log'>RETRY</a></td>"
-                            % commits.first().getshardedcommitdir())
+                            % first_commit.getshardedcommitdir())
             else:
                 html.append("<td><i class='fa fa-thumbs-o-down pull-left' "
                             "style='color:red'></i>"
                             "<a href='%s/rpmbuild.log'>FAILED</a></td>"
-                            % commits.first().getshardedcommitdir())
+                            % first_commit.getshardedcommitdir())
 
             commits = session.query(Commit).\
                 filter(Commit.project_name == name).\
