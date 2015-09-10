@@ -11,26 +11,30 @@ mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
 
 trap finalize EXIT
 
-# So that we don't have to maintain packaging for all dependencies we install RDO
-# Which will contain a lot of the non openstack dependencies
-if ! rpm -q rdo-release-kilo ; then
-    yum install -y --nogpg https://rdo.fedorapeople.org/openstack-kilo/rdo-release-kilo.rpm
-fi
+# So that we don't have to maintain packaging for all dependencies,
+# CentOS CloudSIG repos are enabled
+# which contain the non openstack dependencies.
+cat > /etc/yum.repos.d/cbs-cloud.repo  <<EOF
+[cloud7-common-testing]
+name=CloudSIG Common testing
+baseurl=http://cbs.centos.org/repos/cloud7-openstack-common-testing/x86_64/os/
+enabled=1
+gpgcheck=0
 
-# Install a recent version of python-pbr, needed to build some projects and only
-# curently available in koji, remove this one we move onto the openstack-liberty repo above
-if ! rpm -q python-pbr ; then
-    yum install -y --nogpg https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python-pbr-1.6.0-1.fc24.noarch.rpm \
-                           https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python3-pbr-1.6.0-1.fc24.noarch.rpm
-fi
+[cloud7-liberty-testing]
+name=CloudSIG Liberty testing
+baseurl=http://cbs.centos.org/repos/cloud7-openstack-liberty-testing/x86_64/os/
+enabled=1
+gpgcheck=0
+EOF
 
 # install latest build tools updates from RDO repo
-yum install -y --nogpg python-pip python-setuptools
+yum install -y --nogpg python-pip python-setuptools python-pbr
 
 # If in dev mode the user might not be building all of the packages, so we need
 # to add the current upstream repository in order to have access to current dependencies
 if [ "$DELOREAN_DEV" == "1" ] ; then
-    curl https://trunk.rdoproject.org/f21/current/delorean.repo > /etc/yum.repos.d/public_current.repo
+    curl https://trunk.rdoproject.org/centos7/current/delorean.repo > /etc/yum.repos.d/public_current.repo
 fi
 
 cd /data/$PROJECT_NAME
