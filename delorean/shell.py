@@ -74,7 +74,8 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'Error downloading packages|'
                              'No more mirrors to try|'
                              'Cannot retrieve metalink for repository|'
-                             'Failed to synchronize cache for repo')
+                             'Failed to synchronize cache for repo|'
+                             'Could not resolve host')
 
 default_options = {'maxretries': '3'}
 
