@@ -6,16 +6,14 @@ PROJECT_NAME=$1
 OUTPUT_DIRECTORY=$2
 USER_ID=$3 # chown resulting files to this UID
 GROUP_ID=$4 # chown resulting files to this GUID
+BASEURL=$5
 
 mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
 
 trap finalize EXIT
 
-# So that we don't have to maintain packaging for all dependencies we install RDO
-# Which will contain a lot of the non openstack dependencies
-if ! rpm -q rdo-release-kilo ; then
-    yum install -y --nogpg https://rdo.fedorapeople.org/openstack-kilo/rdo-release-kilo.rpm
-fi
+# Set up the repo for dependencies
+curl ${BASEURL}/delorean-deps.repo > /etc/yum.repos.d/delorean-deps.repo
 
 # Install a recent version of python-pbr, needed to build some projects and only
 # curently available in koji, remove this one we move onto the openstack-liberty repo above
@@ -30,7 +28,7 @@ yum install -y --nogpg python-pip python-setuptools
 # If in dev mode the user might not be building all of the packages, so we need
 # to add the current upstream repository in order to have access to current dependencies
 if [ "$DELOREAN_DEV" == "1" ] ; then
-    curl https://trunk.rdoproject.org/f21/current/delorean.repo > /etc/yum.repos.d/public_current.repo
+    curl ${BASEURL}/current/delorean.repo > /etc/yum.repos.d/public_current.repo
 fi
 
 cd /data/$PROJECT_NAME
