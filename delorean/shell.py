@@ -444,6 +444,7 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
     target = cp.get("DEFAULT", "target")
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
+    baseurl = cp.get("DEFAULT", "baseurl")
 
     commit_hash = commit.commit_hash
     project_name = commit.project_name
@@ -473,7 +474,7 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
                            "delorean/%s" % target,
                            "/scripts/build_rpm_wrapper.sh", project_name,
                            "/data/%s" % yumrepodir, str(os.getuid()),
-                           str(os.getgid())])
+                           str(os.getgid()), baseurl])
     try:
         sh.docker("run", docker_run_cmd)
     except Exception as e:

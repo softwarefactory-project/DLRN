@@ -6,6 +6,7 @@ PROJECT_NAME=$1
 OUTPUT_DIRECTORY=$2
 USER_ID=$3 # chown resulting files to this UID
 GROUP_ID=$4 # chown resulting files to this GUID
+BASEURL=$5
 
 mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS $OUTPUT_DIRECTORY
 
