@@ -15,11 +15,15 @@ trap finalize EXIT
 # Set up the repo for dependencies
 curl ${BASEURL}/delorean-deps.repo > /etc/yum.repos.d/delorean-deps.repo
 
-# Install a recent version of python-pbr, needed to build some projects and only
-# curently available in koji, remove this one we move onto the openstack-liberty repo above
+# Install a recent version of python-pbr
 if ! rpm -q python-pbr ; then
-    yum install -y --nogpg https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python-pbr-1.6.0-1.fc24.noarch.rpm \
-                           https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python3-pbr-1.6.0-1.fc24.noarch.rpm
+    yum install -y python-pbr python3-pbr
+fi
+
+# install rdo-rpm-macros as a quick fix for el7 buildroot
+if [[ ${BASEURL} == *"centos"* ]]
+then
+    yum install -y rdo-rpm-macros
 fi
 
 # install latest build tools updates from RDO repo
