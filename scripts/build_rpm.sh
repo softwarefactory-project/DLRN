@@ -22,6 +22,12 @@ if ! rpm -q python-pbr ; then
                            https://kojipkgs.fedoraproject.org//packages/python-pbr/1.6.0/1.fc24/noarch/python3-pbr-1.6.0-1.fc24.noarch.rpm
 fi
 
+# install rdo-rpm-macros as a quick fix for el7 buildroot
+if [[ ${BASEURL} == *"centos"* ]]
+then
+    yum install -y --nogpg http://cbs.centos.org/kojifiles/packages/rdo-rpm-macros/1/3.el7/noarch/rdo-rpm-macros-1-3.el7.noarch.rpm
+fi
+
 # install latest build tools updates from RDO repo
 yum install -y --nogpg python-pip python-setuptools
 
