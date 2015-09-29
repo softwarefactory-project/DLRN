@@ -23,7 +23,7 @@ class TestRefreshRepo(base.TestCase):
 
     def test_clone_if_not_cloned(self, sh_mock):
         shell.refreshrepo('url', 'path', branch='branch')
-        expected = [mock.call(sh.git.clone, 'url', 'path', '-b', 'branch'),
+        expected = [mock.call(sh.git.clone, 'url', 'path'),
                     mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
@@ -41,7 +41,7 @@ class TestRefreshRepo(base.TestCase):
 
     def test_dont_fetch_if_local(self, sh_mock):
         shell.refreshrepo('url', 'path', branch='branch', local=True)
-        expected = [mock.call(sh.git.clone, 'url', 'path', '-b', 'branch'),
+        expected = [mock.call(sh.git.clone, 'url', 'path'),
                     mock.call(sh.git.checkout, 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
                     mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
