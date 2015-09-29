@@ -15,7 +15,6 @@ import argparse
 import copy
 from datetime import datetime
 import logging
-import operator
 import os
 import re
 import shutil
@@ -46,6 +45,9 @@ import rdopkg.utils.log
 rdopkg.utils.log.set_colors('no')
 from rdopkg.actionmods import rdoinfo
 import rdopkg.conf
+
+from delorean.rpmspecfile import RpmSpecCollection
+from delorean.rpmspecfile import RpmSpecFile
 
 Base = declarative_base()
 
@@ -211,9 +213,20 @@ def main():
                         Commit.status != "RETRY")
                         .all()):
                     toprocess.append(commit_toprocess)
-
-    # heuristic to build python-* packages before openstack-* packages
-    toprocess.sort(reverse=True, key=operator.attrgetter('project_name'))
+    # collect info from spec files
+    specs = RpmSpecCollection([RpmSpecFile(
+        open(os.path.join(cp.get("DEFAULT", "datadir"),
+                          t.project_name + "_distro",
+                          t.project_name + '.spec')).read(-1))
+        for t in toprocess])
+    # compute order according to BuildRequires
+    specs.compute_order()
+    # hack because package name is not coherent with the directory name
+    if 'python-networking_arista' in specs.scores:
+        specs.scores['python-networking-arista'] = \
+            specs.scores['python-networking_arista']
+    # sort the commits according to the score of their project
+    toprocess.sort(reverse=True, key=lambda x: specs.scores[x.project_name])
     exit_code = 0
     for commit in toprocess:
         project = commit.project_name
