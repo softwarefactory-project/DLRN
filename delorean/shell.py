@@ -360,7 +360,7 @@ def sendnotifymail(cp, package_info, commit):
 def refreshrepo(url, path, branch="master", local=False):
     logger.info("Getting %s to %s" % (url, path))
     if not os.path.exists(path):
-        sh.git.clone(url, path, "-b", branch)
+        sh.git.clone(url, path)
 
     git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
     if local is False:
@@ -373,9 +373,25 @@ def refreshrepo(url, path, branch="master", local=False):
             logger.error("Error fetching into %s, deleting." % (path))
             sh.sudo("rm", "-rf", path)
             raise
-    git.checkout(branch)
+    try:
+        git.checkout(branch)
+    except sh.ErrorReturnCode_1:
+        if "master" in branch:
+            # Do not try fallback if already on master branch
+            raise
+        else:
+            # Fallback to master
+            if branch.startswith("rpm-"):
+                # TODO(apevec) general distro branch detection
+                branch = "rpm-master"
+            else:
+                branch = "master"
+            logger.info("Falling back to %s" % branch)
+            git.checkout(branch)
     git.reset("--hard", "origin/%s" % branch)
-    return str(git.log("--pretty=format:%H %ct", "-1")).strip().split(" ")
+    repoinfo = str(git.log("--pretty=format:%H %ct", "-1")).strip().split(" ")
+    repoinfo.insert(0, branch)
+    return repoinfo
 
 
 def getdistrobranch(cp, package):
@@ -399,8 +415,8 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
     source_branch = getsourcebranch(cp, package)
 
     if dev_mode is False:
-        distro_hash, dt_distro = refreshrepo(distro, distro_dir, distro_branch,
-                                             local=local)
+        distro_branch, distro_hash, dt_distro = refreshrepo(
+            distro, distro_dir, distro_branch, local=local)
     else:
         distro_hash = "dev"
         dt_distro = 0  # Doesn't get used in dev mode
@@ -417,7 +433,8 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
         repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
         if len(repos) > 1:
             repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
-        refreshrepo(repo, repo_dir, source_branch, local=local)
+        source_branch, _, _ = refreshrepo(repo, repo_dir, source_branch,
+                                          local=local)
 
         git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
         # Git gives us commits already sorted in the right order
