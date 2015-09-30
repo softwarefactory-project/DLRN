@@ -56,6 +56,10 @@ UPSTREAMVERSION=$(python setup.py --version | tail -n 1)
 if [[ "$UPSTREAMVERSION" =~ (.*?)-(.+) ]] ; then
     VERSION=${BASH_REMATCH[1]}
     RELEASE=${BASH_REMATCH[2]}
+# 7.0.0.0rc2.dev1
+elif [[ "$UPSTREAMVERSION" =~ (.*?)(rc.+) ]] ; then
+    VERSION=${BASH_REMATCH[1]}
+    RELEASE=${BASH_REMATCH[2]}
 # 2014.2.dev50.g99bef1f
 elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(dev.+) ]] ; then
     VERSION=${BASH_REMATCH[1]}
