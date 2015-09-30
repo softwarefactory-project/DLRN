@@ -28,7 +28,7 @@ test_setvr 0.0.9                   0.0.9                   0.0.9      0.99.20150
 test_setvr 0.19.1.dev25            0.19.1.dev25            0.19.1     dev25
 test_setvr 0.6.0                   0.6.0                   0.6.0      0.99.20150102.0344git
 test_setvr 1.0.0.0b2.dev15         1.0.0.0b2.dev15         1.0.0.0b2  dev15
-test_setvr 1.0.0.0rc2.dev128       1.0.0.0rc2.dev128       1.0.0.0rc2 dev128
+test_setvr 1.0.0.0rc2.dev128       1.0.0.0rc2.dev128       1.0.0.0    rc2.dev128
 test_setvr 2015.1.0.dev47          2015.1.0.dev47          2015.1.0   dev47
 test_setvr 2015.1.dev1604.g34cf1e3 2015.1.dev1604.g34cf1e3 2015.1     dev1604.g34cf1e3
 test_setvr 2015.2.1                2015.2.1                2015.2.1   0.99.20150102.0344git
