@@ -136,15 +136,15 @@ def main():
     parser._optionals.title = 'arguments'
 
     parser.add_argument('--config-file',
-                        help="Config file (required)",
+                        help="Config file (required).",
                         required=True)
     parser.add_argument('--info-repo',
-                        help="use local rdoinfo repo instead of"
-                             "fetching default one using rdopkg")
+                        help="use a local rdoinfo repo instead of "
+                             "fetching the default one using rdopkg.")
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
     parser.add_argument('--local', action="store_true",
-                        help="Use local git repos if possible")
+                        help="Use local git repos if possible.")
     parser.add_argument('--head-only', action="store_true",
                         help="Build from the most recent Git commit only.")
     parser.add_argument('--package-name',
