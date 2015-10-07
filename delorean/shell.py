@@ -30,6 +30,7 @@ from prettytable import PrettyTable
 import sh
 from six.moves import configparser
 from six.moves.urllib import parse
+from six.moves.urllib import request
 
 from sqlalchemy import asc
 from sqlalchemy import Column
@@ -565,11 +566,18 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
             yumrepodir_abs, "%s.repo" % cp.get("DEFAULT", "reponame")),
             "w") as fp:
         fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
-                 "gpgcheck=0\npriority=1" % (cp.get("DEFAULT", "reponame"),
-                                             cp.get("DEFAULT", "reponame"),
-                                             project_name, commit_hash,
-                                             cp.get("DEFAULT", "baseurl"),
-                                             commit.getshardedcommitdir()))
+                 "gpgcheck=0\npriority=1\n" % (cp.get("DEFAULT", "reponame"),
+                                               cp.get("DEFAULT", "reponame"),
+                                               project_name, commit_hash,
+                                               cp.get("DEFAULT", "baseurl"),
+                                               commit.getshardedcommitdir()))
+        # Get associated delorean-deps.repo and merge it at the end
+        try:
+            response = request.urlopen("%s/delorean-deps.repo" % baseurl)
+            fp.write(response.read())
+        except Exception as e:
+            logger.error("Error downloading %s/delorean-deps.repo: %s" %
+                         baseurl, e)
 
     current_repo_dir = os.path.join(datadir, "repos", "current")
     os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, "repos")),
