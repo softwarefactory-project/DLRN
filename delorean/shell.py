@@ -32,24 +32,18 @@ from six.moves import configparser
 from six.moves.urllib import parse
 
 from sqlalchemy import asc
-from sqlalchemy import Column
-from sqlalchemy import create_engine
 from sqlalchemy import desc
-from sqlalchemy import Integer
-from sqlalchemy import String
-
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
 import rdopkg.utils.log
 rdopkg.utils.log.set_colors('no')
 from rdopkg.actionmods import rdoinfo
 import rdopkg.conf
 
+from delorean.db import Commit
+from delorean.db import getSession
+from delorean.db import Project
 from delorean.rpmspecfile import RpmSpecCollection
 from delorean.rpmspecfile import RpmSpecFile
-
-Base = declarative_base()
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("delorean")
@@ -81,52 +75,6 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'Could not resolve host')
 
 default_options = {'maxretries': '3'}
-
-
-class Commit(Base):
-    __tablename__ = "commits"
-
-    id = Column(Integer, primary_key=True)
-    dt_commit = Column(Integer)
-    dt_distro = Column(Integer)
-    dt_build = Column(Integer)
-    project_name = Column(String)
-    repo_dir = Column(String)
-    commit_hash = Column(String)
-    distro_hash = Column(String)
-    status = Column(String)
-    rpms = Column(String)
-    notes = Column(String)
-    flags = Column(Integer, default=0)
-
-    def __cmp__(self, b):
-        return cmp(self.dt_commit, b.dt_commit)
-
-    def getshardedcommitdir(self):
-        distro_hash_suffix = ""
-        if self.distro_hash:
-            distro_hash_suffix = "_%s" % self.distro_hash[:8]
-        return os.path.join(self.commit_hash[:2], self.commit_hash[2:4],
-                            self.commit_hash + distro_hash_suffix)
-
-
-class Project(Base):
-    __tablename__ = "projects"
-
-    id = Column(Integer, primary_key=True)
-    project_name = Column(String)
-    last_email = Column(Integer)
-
-    # Returns True if the last email sent for this project
-    # was less then 24 hours ago
-    def suppress_email(self):
-        ct = time()
-        if ct - self.last_email > 86400:
-            return False
-        return True
-
-    def sent_email(self):
-        self.last_email = int(time())
 
 
 def main():
@@ -172,11 +120,8 @@ def main():
 
     package_info = getpkginfo(local_info_repo=options.info_repo)
 
-    engine = create_engine('sqlite:///commits.sqlite')
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
     global session
-    session = Session()
+    session = getSession('sqlite:///commits.sqlite')
 
     # Build a list of commits we need to process
     toprocess = []
@@ -324,10 +269,9 @@ def compare():
     for dbdetail in args:
         dbfilename, dbtitle = dbdetail.split(":")
         table_header.extend((dbtitle + " upstream", dbtitle + " spec"))
-        engine = create_engine('sqlite:///%s' % dbfilename)
-        Base.metadata.create_all(engine)
-        Session = sessionmaker(bind=engine)
-        session = Session()
+
+        session = getSession('sqlite:///%s' % dbfilename)
+
         for package in package_info["packages"]:
             package_name = package["name"]
             compare_details.setdefault(package_name, [package_name, " "])
