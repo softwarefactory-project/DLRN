@@ -16,6 +16,7 @@ import sqlalchemy
 import sqlalchemy.ext.declarative
 
 from sqlalchemy import Column
+from sqlalchemy import desc
 from sqlalchemy import Integer
 from sqlalchemy import String
 
@@ -80,3 +81,13 @@ def getSession(url='sqlite://', new=False):
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     _sessions[url] = Session()
     return _sessions[url]
+
+
+# Get the most recently processed commit for project_name, we ignore commits
+# with a status of "RETRY" as we want to retry these.
+def getLastProcessedCommit(session, project_name):
+    commit = session.query(Commit).filter(Commit.project_name == project_name,
+                                          Commit.status != "RETRY").\
+        order_by(desc(Commit.dt_commit)).\
+        order_by(desc(Commit.id)).first()
+    return commit

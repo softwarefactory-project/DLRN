@@ -46,3 +46,19 @@ class TestGetSessions(base.TestCase):
         expected = [mock.call('sqlite://'),
                     mock.call('sqlite:///test.db')]
         self.assertEqual(ce_mock.call_args_list, expected)
+
+
+class TestGetLastProcessedCommit(TestsWithData):
+    def test_noretry(self):
+        commit = db.getLastProcessedCommit(self.session, 'python-pysaml2')
+        self.assertEqual(commit.dt_build, 1444139517)
+
+    def test_withretry(self):
+        # In our sample data the most recent of these has status == RETRY
+        commit = \
+            db.getLastProcessedCommit(self.session, 'python-tripleoclient')
+        self.assertEqual(commit.dt_build, 1444033941)
+
+    def test_newproject(self):
+        commit = db.getLastProcessedCommit(self.session, 'python-newproject')
+        self.assertEqual(commit, None)
