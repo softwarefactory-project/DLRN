@@ -40,6 +40,7 @@ from rdopkg.actionmods import rdoinfo
 import rdopkg.conf
 
 from delorean.db import Commit
+from delorean.db import getLastProcessedCommit
 from delorean.db import getSession
 from delorean.db import Project
 from delorean.rpmspecfile import RpmSpecCollection
@@ -128,11 +129,7 @@ def main():
     for package in package_info["packages"]:
         project = package["name"]
         since = "-1"
-        commit = session.query(Commit).filter(Commit.project_name == project,
-                                              Commit.status != "RETRY").\
-            order_by(desc(Commit.dt_commit)).\
-            order_by(desc(Commit.id)).first()
-
+        commit = getLastProcessedCommit(session, project)
         if commit:
             # This will return all commits since the last handled commit
             # including the last handled commit, remove it later if needed.
