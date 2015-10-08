@@ -10,7 +10,7 @@ Setup
 
 .. code-block:: shell-session
 
-    # yum install git createrepo python-virtualenv git-hg mock
+    # yum install git createrepo python-virtualenv gcc hg mock rpmdevtools
 
 Add the user you intend to run as to the mock group and login again.
 
