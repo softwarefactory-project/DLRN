@@ -16,6 +16,14 @@ import sqlalchemy
 
 from delorean import db
 from delorean.tests import base
+from delorean import utils
+
+
+class TestsWithData(base.TestCase):
+    def setUp(self):
+        super(TestsWithData, self).setUp()
+        self.session = db.getSession(new=True)
+        utils.loadYAML(self.session, './delorean/tests/samples/commits_1.yaml')
 
 
 @mock.patch.object(sqlalchemy.orm.sessionmaker, '__call__', autospec=True)
