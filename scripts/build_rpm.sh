@@ -13,11 +13,17 @@ do
     fi
 done
 
-python setup.py sdist
+# Cleanup mock directory and copy sources there, so we can run python setup.py
+# inside the buildroot
+/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "rm -rf /tmp/pkgsrc"
+/usr/bin/mock -v -r $(dirname $0)/delorean.cfg --copyin . /tmp/pkgsrc
+/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py sdist"
+/usr/bin/mock -v -r $(dirname $0)/delorean.cfg --copyout /tmp/pkgsrc/dist ./dist
 TARBALL=$(ls dist)
+
 # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
 # so only look at the last line for version
-setversionandrelease $(python setup.py --version | tail -n 1)
+setversionandrelease $(/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1)
 
 # https://bugs.launchpad.net/tripleo/+bug/1351491
 if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
