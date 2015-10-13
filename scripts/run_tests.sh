@@ -30,9 +30,17 @@ PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
 # If this is a CI run for one of the distro repositories then we pre download it
 # into the data directory, delorean wont change it because we are using --dev
 if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delorean" ] ; then
-    if [ $GERRIT_BRANCH == 'rpm-kilo' ] ; then
-        sed -i "s/source=.*/source=stable\/kilo/g" projects.ini
+    # If building against a gerrit branch matching rpm-, pull the package from
+    # that branch and set the baseurl accordingly
+    if [[ "${GERRIT_BRANCH}" =~ rpm- ]]; then
+        branch=$(sed "s/rpm-//" <<< "${GERRIT_BRANCH}")
+        sed -i "s%source=.*%source=stable/${branch}%" projects.ini
+        sed -i "s%baseurl=.*%baseurl=http://trunk.rdoproject.org/${branch}/centos7/%" projects.ini
+    else
+        # Otherwise baseurl is "master"
+        sed -i "s%baseurl=.*%baseurl=http://trunk.rdoproject.org/centos7/%" projects.ini
     fi
+
     mkdir -p data/repos
     PROJECT_TO_BUILD=${GERRIT_PROJECT#*/}
     PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
@@ -59,7 +67,6 @@ copy_logs
 
 # Switch to a centos target
 sed -i -e 's%target=.*%target=centos%' projects.ini
-sed -i -e 's%baseurl=.*%baseurl=https://trunk.rdoproject.org/centos70%' projects.ini
 
 # And run delorean again
 DISTRO=centos
