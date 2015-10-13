@@ -47,7 +47,7 @@ cd ${TOP_DIR}/SPECS/
 # The puppet module package isn't based on any single repo so for now
 # we hardcode VERSION and get RELEASE from $OUTPUT_DIRECTORY (contains
 # commit ID of project that triggered the build)
-UPSTREAMVERSION=2015.2
+UPSTREAMVERSION=7.0.0
 VERSION=$UPSTREAMVERSION
 RELEASE=dev.${2##*/}
 
