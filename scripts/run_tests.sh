@@ -51,26 +51,22 @@ if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delore
     popd
 fi
 
-function copy_logs(){
-    cp -r data/repos logs/$DISTRO
+function copy_logs() {
+    rsync -avzr data/repos logs/$DISTRO
 }
 
-# If the command below throws an error we still want the logs
+function run_delorean() {
+    export DISTRO="${1}"
+    # Ensure we run against the right target
+    sed -i -e "s%target=.*%target=${DISTRO}%" projects.ini
+    # Run delorean
+    delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
+    copy_logs
+}
+
+# If the commands below throws an error we still want the logs
 trap copy_logs ERR
 
-# And Run delorean against a project
-DISTRO=fedora
-delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
-
-# Copy files to be archived
-copy_logs
-
-# Switch to a centos target
-sed -i -e 's%target=.*%target=centos%' projects.ini
-
-# And run delorean again
-DISTRO=centos
-delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
-
-# Copy files to be archived
-copy_logs
+# Packages for fedora are only built for the master branch
+[[ "${GERRIT_BRANCH}" == "master" ]] && run_delorean fedora
+run_delorean centos
