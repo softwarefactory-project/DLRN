@@ -61,7 +61,9 @@ function update_config() {
     esac
 
     # If this is a commit on a specific branch, make sure we're using it
-    if [[ "${target}" == "centos" && "${GERRIT_BRANCH}" =~ rpm- ]]; then
+    if [[ "${target}" == "centos" \
+          && "${GERRIT_BRANCH}" =~ rpm- \
+          && "${GERRIT_BRANCH}" != "rpm-master" ]]; then
       branch=$(sed "s/rpm-//" <<< "${GERRIT_BRANCH}")
       baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
       src="stable/${branch}"
