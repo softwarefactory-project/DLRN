@@ -15,7 +15,8 @@ done
 
 # Cleanup mock directory and copy sources there, so we can run python setup.py
 # inside the buildroot
-/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "rm -rf /tmp/pkgsrc"
+/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --clean
+/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --init
 /usr/bin/mock -v -r $(dirname $0)/delorean.cfg --copyin . /tmp/pkgsrc
 /usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py sdist"
 /usr/bin/mock -v -r $(dirname $0)/delorean.cfg --copyout /tmp/pkgsrc/dist ./dist
