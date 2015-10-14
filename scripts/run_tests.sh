@@ -30,9 +30,6 @@ PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
 # If this is a CI run for one of the distro repositories then we pre download it
 # into the data directory, delorean wont change it because we are using --dev
 if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delorean" ] ; then
-    if [ $GERRIT_BRANCH == 'rpm-kilo' ] ; then
-        sed -i "s/source=.*/source=stable\/kilo/g" projects.ini
-    fi
     mkdir -p data/repos
     PROJECT_TO_BUILD=${GERRIT_PROJECT#*/}
     PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
@@ -43,27 +40,54 @@ if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delore
     popd
 fi
 
-function copy_logs(){
-    cp -r data/repos logs/$DISTRO
+function update_config() {
+    # Ensures configuration is set properly according to distribution and branch
+    case "${1}" in
+        centos)
+          target="centos"
+          baseurl="http://trunk.rdoproject.org/centos7/"
+          src="master"
+          ;;
+        fedora)
+          target="fedora"
+          baseurl="https://trunk.rdoproject.org/f22"
+          src="master"
+          ;;
+        *)
+          target="centos"
+          baseurl="http://trunk.rdoproject.org/centos7/"
+          src="master"
+          ;;
+    esac
+
+    # If this is a commit on a specific branch, make sure we're using it
+    if [[ "${target}" == "centos" && "${GERRIT_BRANCH}" =~ rpm- ]]; then
+      branch=$(sed "s/rpm-//" <<< "${GERRIT_BRANCH}")
+      baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
+      src="stable/${branch}"
+    fi
+
+    # Update the configration
+    sed -i "s%target=.*%target=${DISTRO}%" projects.ini
+    sed -i "s%source=.*%source=${src}%" projects.ini
+    sed -i "s%baseurl=.*%baseurl=${baseurl}%" projects.ini
 }
 
-# If the command below throws an error we still want the logs
-trap copy_logs ERR
+function copy_logs() {
+    rsync -avzr data/repos logs/$DISTRO
+}
 
-# And Run delorean against a project
-DISTRO=fedora
-delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
+function run_delorean() {
+    export DISTRO="${1}"
+    update_config $DISTRO
+    # Run delorean
+    delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
+    copy_logs
+}
 
-# Copy files to be archived
-copy_logs
+# If the commands below throws an error we still want the logs
+trap copy_logs ERR EXIT
 
-# Switch to a centos target
-sed -i -e 's%target=.*%target=centos%' projects.ini
-sed -i -e 's%baseurl=.*%baseurl=https://trunk.rdoproject.org/centos70%' projects.ini
-
-# And run delorean again
-DISTRO=centos
-delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
-
-# Copy files to be archived
-copy_logs
+# Packages for fedora are only built for the master branch
+[[ "${GERRIT_BRANCH}" == "master" ]] && run_delorean fedora
+run_delorean centos
