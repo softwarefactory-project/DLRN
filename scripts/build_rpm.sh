@@ -17,7 +17,10 @@ done
 # inside the buildroot
 /usr/bin/mock -q -r $(dirname $0)/delorean.cfg --clean
 /usr/bin/mock -q -r $(dirname $0)/delorean.cfg --init
-/usr/bin/mock -v -r $(dirname $0)/delorean.cfg --copyin . /tmp/pkgsrc
+# A simple mock --copyin should be enough, but it does not handle symlinks properly
+MOCKDIR=$(/usr/bin/mock -r $(dirname $0)/delorean.cfg -p)
+mkdir ${MOCKDIR}/tmp/pkgsrc
+cp -pr . ${MOCKDIR}/tmp/pkgsrc
 /usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py sdist"
 /usr/bin/mock -v -r $(dirname $0)/delorean.cfg --copyout /tmp/pkgsrc/dist ./dist
 TARBALL=$(ls dist)
