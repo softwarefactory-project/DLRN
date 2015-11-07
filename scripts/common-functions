@@ -40,7 +40,7 @@ function setversionandrelease(){
         RELEASE=${BASH_REMATCH[2]}
     else
         # e.g. eb6dbe2
-        echo  "ERROR : Couldn't parse VERSION, falling back to 0.0.1"
+        echo  "WARNING: Couldn't parse VERSION, falling back to 0.0.1"
         VERSION=0.0.1
         RELEASE=$UPSTREAMVERSION
     fi
