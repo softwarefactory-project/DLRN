@@ -31,7 +31,8 @@ TARBALL=$(ls dist)
 
 # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
 # so only look at the last line for version
-setversionandrelease $(/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1)
+setversionandrelease $(/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
+                     $(/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
 
 # https://bugs.launchpad.net/tripleo/+bug/1351491
 if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
