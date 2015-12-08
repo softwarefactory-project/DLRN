@@ -44,6 +44,7 @@ function setversionandrelease(){
         VERSION=0.0.1
         RELEASE=$UPSTREAMVERSION
     fi
+    VERSION=$(date "+%Y%m%d%H%M%S").$VERSION
 }
 
 if [ $# = 4 ]; then

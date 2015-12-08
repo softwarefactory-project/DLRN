@@ -48,7 +48,7 @@ cd ${TOP_DIR}/SPECS/
 # we hardcode VERSION and get RELEASE from $OUTPUT_DIRECTORY (contains
 # commit ID of project that triggered the build)
 UPSTREAMVERSION=7.0.0
-VERSION=$UPSTREAMVERSION
+VERSION=$(date "+%Y%m%d%H%M%S").$UPSTREAMVERSION
 RELEASE=dev.${2##*/}
 
 sed -i -e "1i%define upstream_version $UPSTREAMVERSION\\" *.spec
