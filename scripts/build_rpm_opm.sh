@@ -38,10 +38,6 @@ mv *.tar.gz ${TOP_DIR}/SOURCES/
 cd ${DATA_DIR}/${PROJECT_NAME}_distro
 cp * ${TOP_DIR}/SOURCES/
 cp *.spec ${TOP_DIR}/SPECS/
-# Generate a diff of this distro repo when compared to Fedora Rawhide
-if git fetch http://pkgs.fedoraproject.org/git/$PROJECT_NAME master; then
-    git diff HEAD..FETCH_HEAD > $OUTPUT_DIRECTORY/distro_delta.diff
-fi
 cd ${TOP_DIR}/SPECS/
 
 # The puppet module package isn't based on any single repo so for now
