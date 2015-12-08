@@ -8,7 +8,7 @@ source $(dirname $0)/common-functions
 sources_spec=$(grep ^Source ${DATA_DIR}/${PROJECT_NAME}_distro/*.spec|wc -l)
 sources_upstream=$(ls -d ${DATA_DIR}/${PROJECT_NAME}/|wc -l)
 
-setversionandrelease $(git describe --tags)
+setversionandrelease $(git describe --tags) $(git log -n1 --format=format:%h)
 for REPO in $(ls -d */); do
     NAME=${REPO%%/} # remove the /
     if [ $sources_upstream -le 1 ]; then
