@@ -50,6 +50,12 @@ your repository.
 
     $ delorean --config-file projects.ini --order
 
+Be sure to put your user in the mock group.
+
+.. code-block:: shell-session
+
+    # usermod -a -G mock <user>
+
 Running
 -------
 
