@@ -60,6 +60,21 @@ the packages in the order of the timestamps of the commits.
 
     $ delorean --config-file projects.ini
 
+Troubleshooting
+---------------
+
+If you interrupt delorean during mock build you might get an error
+
+.. code-block:: shell-session
+
+    OSError: [Errno 16] Device or resource busy: '/var/lib/mock/delorean-fedora-x86_64/root/var/cache/yum'
+
+Solution is to clear left-over bind mount as root:
+
+.. code-block:: shell-session
+
+    # umount /var/lib/mock/delorean-fedora-x86_64/root/var/cache/yum
+
 Other requirements
 ------------------
 
