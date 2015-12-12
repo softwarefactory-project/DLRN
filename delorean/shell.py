@@ -45,6 +45,7 @@ from delorean.db import getSession
 from delorean.db import Project
 from delorean.rpmspecfile import RpmSpecCollection
 from delorean.rpmspecfile import RpmSpecFile
+from delorean.utils import dumpshas2file
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("delorean")
@@ -484,12 +485,18 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
                                                             yumrepodir))
         raise Exception("Error installing %s" % project_name)
 
-    packages = [package["name"] for package in package_info["packages"]]
-    for otherproject in packages:
-        if otherproject == project_name:
+    shafile = open(os.path.join(yumrepodir_abs, "versions.csv"), "w")
+    shafile.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,Status\n")
+
+    for otherproject in package_info["packages"]:
+        otherprojectname = otherproject["name"]
+        if otherprojectname == project_name:
+            # Output sha's this project
+            dumpshas2file(shafile, commit, otherproject["upstream"],
+                          otherproject["master-distgit"], "SUCCESS")
             continue
         last_success = session.query(Commit).\
-            filter(Commit.project_name == otherproject).\
+            filter(Commit.project_name == otherprojectname).\
             filter(Commit.status == "SUCCESS").\
             order_by(desc(Commit.id)).first()
         if not last_success:
@@ -499,6 +506,11 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
             rpm_link_src = os.path.join(yumrepodir_abs, os.path.split(rpm)[1])
             os.symlink(os.path.relpath(os.path.join(datadir, rpm),
                        yumrepodir_abs), rpm_link_src)
+        # Output sha's of all other projects represented in this repo
+        last_processed = getLastProcessedCommit(session, otherprojectname)
+        dumpshas2file(shafile, last_success, otherproject["upstream"],
+                      otherproject["master-distgit"], last_processed.status)
+    shafile.close()
 
     sh.createrepo(yumrepodir_abs)
 

@@ -52,6 +52,12 @@ def saveYAML(session, yamlfile):
     fp.close()
 
 
+def dumpshas2file(shafile, commit, source_repo, distgit_repo, status):
+    shafile.write("%s,%s,%s,%s,%s,%s\n" % (commit.project_name, source_repo,
+                  commit.commit_hash, distgit_repo, commit.distro_hash, status)
+                  )
+
+
 if __name__ == '__main__':
     s = getSession('sqlite:///%s' % sys.argv[1])
     saveYAML(s, sys.argv[1] + ".yaml")
