@@ -31,15 +31,13 @@ import sh
 from six.moves import configparser
 from six.moves.urllib import parse
 
-from sqlalchemy import asc
-from sqlalchemy import desc
-
 import rdopkg.utils.log
 rdopkg.utils.log.set_colors('no')
 from rdopkg.actionmods import rdoinfo
 import rdopkg.conf
 
 from delorean.db import Commit
+from delorean.db import getCommits
 from delorean.db import getLastProcessedCommit
 from delorean.db import getSession
 from delorean.db import Project
@@ -273,10 +271,8 @@ def compare():
         for package in package_info["packages"]:
             package_name = package["name"]
             compare_details.setdefault(package_name, [package_name, " "])
-            last_success = session.query(Commit).\
-                filter(Commit.project_name == package_name).\
-                filter(Commit.status == "SUCCESS").\
-                order_by(desc(Commit.id)).first()
+            last_success = getCommits(session, project=package_name,
+                                      with_status="SUCCESS").first()
             if last_success:
                 compare_details[package_name].extend(
                     (last_success.commit_hash[:8],
@@ -495,10 +491,8 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
             dumpshas2file(shafile, commit, otherproject["upstream"],
                           otherproject["master-distgit"], "SUCCESS")
             continue
-        last_success = session.query(Commit).\
-            filter(Commit.project_name == otherprojectname).\
-            filter(Commit.status == "SUCCESS").\
-            order_by(desc(Commit.id)).first()
+        last_success = getCommits(session, project=otherprojectname,
+                                  with_status="SUCCESS").first()
         if not last_success:
             continue
         rpms = last_success.rpms.split(",")
@@ -584,8 +578,7 @@ def genreports(cp, package_info, options):
     html = list()
     html.append(html_struct)
     html.append(table_header)
-    commits = session.query(Commit).filter(Commit.status != "RETRY").\
-        order_by(desc(Commit.dt_build)).limit(300)
+    commits = getCommits(session, without_status="RETRY", limit=300)
 
     for commit in commits:
         if commit.status == "SUCCESS":
@@ -663,8 +656,7 @@ def genreports(cp, package_info, options):
                           cmp=lambda x, y:
                           cmp(x['name'], y['name'])):
         name = package["name"]
-        commits = session.query(Commit).filter(Commit.project_name == name).\
-            order_by(desc(Commit.dt_build)).limit(1)
+        commits = getCommits(session, project=name)
         first_commit = commits.first()
 
         if commits.count() == 0:
@@ -694,25 +686,19 @@ def genreports(cp, package_info, options):
                             "<a href='%s/rpmbuild.log'>FAILED</a></td>"
                             % first_commit.getshardedcommitdir())
 
-            commits = session.query(Commit).\
-                filter(Commit.project_name == name).\
-                filter(Commit.status == "SUCCESS").\
-                order_by(desc(Commit.dt_build)).limit(1)
+            commits = getCommits(session, project=name, with_status="SUCCESS")
             last_success = commits.first()
+
             last_success_dt = 0
             if last_success is not None:
                 last_success_dt = last_success.dt_build
 
-                commits = session.query(Commit).\
-                    filter(Commit.project_name == name).\
-                    filter(Commit.status == "FAILED",
-                           Commit.dt_build > last_success_dt).\
-                    order_by(asc(Commit.dt_build))
+                commits = getCommits(session, project=name,
+                                     with_status="FAILED", order="asc",
+                                     since=last_success_dt)
             else:
-                commits = session.query(Commit).\
-                    filter(Commit.project_name == name).\
-                    filter(Commit.status == "FAILED").\
-                    order_by(asc(Commit.dt_build))
+                commits = getCommits(session, project=name,
+                                     with_status="FAILED", order="asc")
             if commits.count() == 0:
                 html.append("<td>??????</td>")
             else:

@@ -15,6 +15,7 @@ import time
 import sqlalchemy
 import sqlalchemy.ext.declarative
 
+from sqlalchemy import asc
 from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Integer
@@ -91,3 +92,20 @@ def getLastProcessedCommit(session, project_name):
         order_by(desc(Commit.dt_commit)).\
         order_by(desc(Commit.id)).first()
     return commit
+
+
+def getCommits(session, project=None, with_status=None, without_status=None,
+               limit=1, order="desc", since=None):
+    commits = session.query(Commit)
+    if project is not None:
+        commits = commits.filter(Commit.project_name == project)
+    if with_status is not None:
+        commits = commits.filter(Commit.status == with_status)
+    if without_status is not None:
+        commits = commits.filter(Commit.status != without_status)
+    if since is not None:
+        commits = commits.filter(Commit.dt_build > since)
+    order_by = desc
+    if order == "asc":
+        order_by = asc
+    return commits.order_by(order_by(Commit.id)).limit(limit)

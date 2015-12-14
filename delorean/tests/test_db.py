@@ -62,3 +62,46 @@ class TestGetLastProcessedCommit(TestsWithData):
     def test_newproject(self):
         commit = db.getLastProcessedCommit(self.session, 'python-newproject')
         self.assertEqual(commit, None)
+
+
+class TestGetCommits(TestsWithData):
+    def test_defaults(self):
+        commits = db.getCommits(self.session)
+        self.assertEqual(commits.count(), 1)
+        self.assertEqual(commits.first().id, 7873)
+
+    def test_no_results(self):
+        commits = db.getCommits(self.session, project="dummy")
+        self.assertEqual(commits.count(), 0)
+        self.assertEqual(commits.first(), None)
+
+    def test_last_success(self):
+        commits = db.getCommits(self.session, project="python-tripleoclient",
+                                with_status="SUCCESS")
+        self.assertEqual(commits.count(), 1)
+        self.assertEqual(commits.first().id, 7696)
+
+    def test_last_without_retry(self):
+        commits = db.getCommits(self.session, project="python-tripleoclient",
+                                without_status="RETRY")
+        self.assertEqual(commits.count(), 1)
+        self.assertEqual(commits.first().id, 7696)
+
+    def test_last_two(self):
+        commits = db.getCommits(self.session, project="python-pysaml2",
+                                limit=2)
+        self.assertEqual(commits.count(), 2)
+        self.assertEqual([c.id for c in commits], [7835, 7834])
+
+    def test_first_failed(self):
+        commits = db.getCommits(self.session, project="python-pysaml2",
+                                with_status="FAILED", order="asc")
+        self.assertEqual(commits.count(), 1)
+        self.assertEqual(commits.first().id, 5874)
+
+    def test_first_failed_since(self):
+        commits = db.getCommits(self.session, project="python-alembic",
+                                with_status="FAILED", order="asc",
+                                since="1442487440")
+        self.assertEqual(commits.count(), 1)
+        self.assertEqual(commits.first().id, 6230)
