@@ -34,9 +34,15 @@ if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delore
     PROJECT_TO_BUILD=${GERRIT_PROJECT#*/}
     PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
     PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
-    git clone https://review.gerrithub.io/"$GERRIT_PROJECT" data/$PROJECT_DISTRO_DIR
-    pushd data/$PROJECT_DISTRO_DIR
-    git fetch https://review.gerrithub.io/$GERRIT_PROJECT $GERRIT_REFSPEC && git checkout FETCH_HEAD
+    # Use different cloning directory for regular and packaging repositories
+    if [ "${GERRIT_PROJECT/openstack-packages\/*/packages}" == "packages" ] ; then
+        PROJECT_CLONE_DIR=$PROJECT_DISTRO_DIR
+    else
+        PROJECT_CLONE_DIR=$PROJECT_TO_BUILD_MAPPED
+    fi
+    git clone https://$GERRIT_HOST/"$GERRIT_PROJECT" data/$PROJECT_CLONE_DIR
+    pushd data/$PROJECT_CLONE_DIR
+    git fetch https://$GERRIT_HOST/$GERRIT_PROJECT $GERRIT_REFSPEC && git checkout FETCH_HEAD
     popd
 fi
 
