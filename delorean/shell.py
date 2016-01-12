@@ -674,6 +674,9 @@ def genreports(cp, package_info, options):
 
     stylesheets_path = os.path.dirname(os.path.abspath(__file__))
     css_file = os.path.join(stylesheets_path, 'stylesheets/styles.css')
+    if not os.path.exists(os.path.join(cp.get("DEFAULT", "datadir"), "repos")):
+        os.mkdir(os.path.join(cp.get("DEFAULT", "datadir"), "repos"))
+
     shutil.copy2(css_file, os.path.join(cp.get("DEFAULT", "datadir"),
                                         "repos", "styles.css"))
 
