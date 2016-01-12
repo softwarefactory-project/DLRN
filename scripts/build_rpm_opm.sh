@@ -13,14 +13,14 @@ for REPO in $(ls -d */); do
     if [ $sources_upstream -le 1 ]; then
         # Special case for github.com/redhat-openstack/openstack-puppet-modules
         # as the only source repo listed as "upstream" in rdoinfo
-        tar --transform="s#^#openstack-puppet-modules-master-patches/#" --exclude=.git -czf openstack-puppet-modules-master-patches.tar.gz *
+        tar --transform="s#^#openstack-puppet-modules/#" --exclude=.git -czf openstack-puppet-modules.tar.gz *
         break
     fi
     NAME=$(echo $NAME | sed -r 's/_/-/') # Some puppet modules names are not compliant (Ex: puppet_aviator)
     SNAME=${NAME#*-} # remove the puppetlabs-
     if [ $sources_spec = 1 ]; then
         # new OPM spec: combine all modules into one tarball
-        tar --append --transform="s#$REPO#openstack-puppet-modules-master-patches/$SNAME#" --exclude=.git -f openstack-puppet-modules-master-patches.tar $REPO
+        tar --append --transform="s#$REPO#openstack-puppet-modules/$SNAME#" --exclude=.git -f openstack-puppet-modules.tar $REPO
         # fake Puppetfile for new OPM spec
         printf "mod '$SNAME'\n\n" >> Puppetfile
     else
@@ -29,9 +29,9 @@ for REPO in $(ls -d */); do
     fi
 done
 
-if [ -f openstack-puppet-modules-master-patches.tar ]; then
-    tar --append --transform="s#Puppetfile#openstack-puppet-modules-master-patches/Puppetfile#" -f openstack-puppet-modules-master-patches.tar Puppetfile
-    gzip openstack-puppet-modules-master-patches.tar
+if [ -f openstack-puppet-modules.tar ]; then
+    tar --append --transform="s#Puppetfile#openstack-puppet-modules/Puppetfile#" -f openstack-puppet-modules.tar Puppetfile
+    gzip openstack-puppet-modules.tar
 fi
 mv *.tar.gz ${TOP_DIR}/SOURCES/
 
