@@ -485,6 +485,8 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
     shafile = open(os.path.join(yumrepodir_abs, "versions.csv"), "w")
     shafile.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,Status\n")
 
+    failures = 0
+
     for otherproject in package_info["packages"]:
         otherprojectname = otherproject["name"]
         if otherprojectname == project_name:
@@ -492,19 +494,27 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
             dumpshas2file(shafile, commit, otherproject["upstream"],
                           otherproject["master-distgit"], "SUCCESS")
             continue
+        # Output sha's of all other projects represented in this repo
         last_success = getCommits(session, project=otherprojectname,
                                   with_status="SUCCESS").first()
-        if not last_success:
-            continue
-        rpms = last_success.rpms.split(",")
-        for rpm in rpms:
-            rpm_link_src = os.path.join(yumrepodir_abs, os.path.split(rpm)[1])
-            os.symlink(os.path.relpath(os.path.join(datadir, rpm),
-                       yumrepodir_abs), rpm_link_src)
-        # Output sha's of all other projects represented in this repo
         last_processed = getLastProcessedCommit(session, otherprojectname)
-        dumpshas2file(shafile, last_success, otherproject["upstream"],
-                      otherproject["master-distgit"], last_processed.status)
+        if last_success:
+            for rpm in last_success.rpms.split(","):
+                rpm_link_src = os.path.join(yumrepodir_abs,
+                                            os.path.split(rpm)[1])
+                os.symlink(os.path.relpath(os.path.join(datadir, rpm),
+                                           yumrepodir_abs), rpm_link_src)
+            last = last_success
+        else:
+            last = last_processed
+        if last:
+            dumpshas2file(shafile, last, otherproject["upstream"],
+                          otherproject["master-distgit"],
+                          last_processed.status)
+            if last_processed.status == 'FAILED':
+                failures += 1
+        else:
+            failures += 1
     shafile.close()
 
     sh.createrepo(yumrepodir_abs)
@@ -519,10 +529,18 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
                                              cp.get("DEFAULT", "baseurl"),
                                              commit.getshardedcommitdir()))
 
-    current_repo_dir = os.path.join(datadir, "repos", "current")
-    os.symlink(os.path.relpath(yumrepodir_abs, os.path.join(datadir, "repos")),
-               current_repo_dir + "_")
-    os.rename(current_repo_dir + "_", current_repo_dir)
+    dirnames = ['current']
+    if failures == 0:
+        dirnames.append('coherent')
+    else:
+        logger.info('%d packages not built correctly: not updating the '
+                    'coherent symlink' % failures)
+    for dirname in dirnames:
+        target_repo_dir = os.path.join(datadir, "repos", dirname)
+        os.symlink(os.path.relpath(yumrepodir_abs,
+                                   os.path.join(datadir, "repos")),
+                   target_repo_dir + "_")
+        os.rename(target_repo_dir + "_", target_repo_dir)
     return built_rpms, notes
 
 
