@@ -33,9 +33,8 @@ import sh
 from six.moves import configparser
 from six.moves.urllib import parse
 
-import rdopkg.utils.log
-rdopkg.utils.log.set_colors('no')
 from rdopkg.actionmods import rdoinfo
+import rdopkg.utils.log
 
 from delorean.db import Commit
 from delorean.db import getCommits
@@ -46,6 +45,7 @@ from delorean.rpmspecfile import RpmSpecCollection
 from delorean.rpmspecfile import RpmSpecFile
 from delorean.utils import dumpshas2file
 
+rdopkg.utils.log.set_colors('no')
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("delorean")
 logger.setLevel(logging.INFO)
@@ -76,7 +76,7 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'No route to host|'
                              'Could not resolve host')
 
-default_options = {'maxretries': '3', 'tags': None}
+default_options = {'maxretries': '3', 'tags': None, 'gerrit': None}
 
 
 def main():
@@ -221,6 +221,7 @@ def main():
         # sort according to the timestamp of the commits
         toprocess.sort()
     exit_code = 0
+    gerrit = cp.get("DEFAULT", "gerrit")
     for commit in toprocess:
         project = commit.project_name
 
@@ -231,11 +232,39 @@ def main():
 
         commit_hash = commit.commit_hash
 
+        # allow to submit a gerrit review only if the last build was
+        # successful or non existent to avoid creating a gerrit review
+        # for the same problem multiple times.
+        if gerrit is not None:
+            if options.build_env:
+                env_vars = list(options.build_env)
+            else:
+                env_vars = []
+            last_build = getLastProcessedCommit(session, project)
+            if not last_build or last_build.status == 'SUCCESS':
+                for pkg in packages:
+                    if project == pkg['name']:
+                        break
+                else:
+                    pkg = None
+                if pkg:
+                    url = get_commit_url(commit, pkg) + commit.commit_hash
+                    env_vars.append('GERRIT=%s' % url)
+                    env_vars.append('GERRIT_LOG=%s/%s' %
+                                    (cp.get("DEFAULT", "baseurl"),
+                                     commit.getshardedcommitdir()))
+                    logger.info('Passing GERRIT=%s to the build phase' % url)
+                else:
+                    logger.error('Unable to find info for project %s' %
+                                 project)
+        else:
+            env_vars = options.build_env
+
         logger.info("Processing %s %s" % (project, commit_hash))
         notes = ""
         try:
             built_rpms, notes = build(cp, packages,
-                                      commit, options.build_env, options.dev,
+                                      commit, env_vars, options.dev,
                                       options.use_public)
         except Exception as e:
             exit_code = 1
@@ -244,9 +273,9 @@ def main():
                                    commit.getshardedcommitdir(),
                                    "rpmbuild.log")
             max_retries = cp.getint("DEFAULT", "maxretries")
-            if isknownerror(logfile) and \
-               (timesretried(project, commit_hash, commit.distro_hash)
-               < max_retries):
+            if (isknownerror(logfile) and
+                (timesretried(project, commit_hash, commit.distro_hash) <
+                 max_retries)):
                 logger.exception("Known error building packages for %s,"
                                  " will retry later" % project)
                 commit.status = "RETRY"
