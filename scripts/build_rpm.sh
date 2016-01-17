@@ -4,6 +4,31 @@ set -o pipefail
 
 source $(dirname $0)/common-functions
 
+function build_failure() {
+    if [ -n "$GERRIT_URL" -a -n "$GERRIT_LOG" -a -n "$GERRIT_MAINTAINERS" ]; then
+        echo "Creating a gerrit review"
+        cd ${DATA_DIR}/${PROJECT_NAME}_distro
+        CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
+        git checkout -b branch-$SHORTSHA1
+        git review -s
+        # we need to inject a pseudo-modification to the spec file to have a
+        # change to commit
+        sed -i -e "\$a\\# REMOVEME: error caused by commit $GERRIT\\" *.spec
+        echo -e "${PROJECT_NAME}: failed to build ${SHORTSHA1}\n\nNeed to fix build error caused by ${GERRIT_URL}\nSee log at ${GERRIT_LOG}"|git commit -F- *.spec
+        CHID=$(git log -1|grep -F Change-Id: |cut -d':' -f2)
+        MAINTAINERS="${GERRIT_MAINTAINERS//,/ -a }"
+        REMOTE=$(git remote show -n gerrit|grep -F 'Fetch URL'|sed 's/.*: //')
+        REMOTE_HOST=$(echo $REMOTE|cut -d/ -f3)
+        PROJECT=$(echo $REMOTE|sed 's@.*://@@'|sed 's@[^/]*/\(.*\)$@\1@')
+        git review -t rdo-FTBFS < /dev/null
+        ssh $REMOTE_HOST gerrit set-reviewers --project $PROJECT -a $MAINTAINERS -- $CHID
+        git checkout ${CURBRANCH:-master}
+    else
+        echo "No gerrit review to create"
+    fi
+    exit 1
+}
+
 for FILE in {test-,}requirements.txt
 do
     if [ -f ${FILE} ]
@@ -38,10 +63,12 @@ setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd
 if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
     if [ "$VERSION" == "0.0.1" ] ; then
         VERSION=$(git tag | sort -V | tail -n 1)
-   fi
+    fi
 fi
 
 mv dist/$TARBALL ${TOP_DIR}/SOURCES/
+LONGSHA1=$(git rev-parse HEAD)
+SHORTSHA1=$(git rev-parse --short HEAD)
 
 cd ${DATA_DIR}/${PROJECT_NAME}_distro
 cp * ${TOP_DIR}/SOURCES/
@@ -56,8 +83,13 @@ sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
 sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
-/usr/bin/mock $MOCKOPTS --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
 
-if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
-    touch $OUTPUT_DIRECTORY/installed
+if /usr/bin/mock $MOCKOPTS --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log; then
+    if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
+        touch $OUTPUT_DIRECTORY/installed
+    else
+        build_failure
+    fi
+else
+    build_failure
 fi

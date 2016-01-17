@@ -55,6 +55,7 @@ The configuration file looks like this:
     smtpserver=
     maxretries=3
     target=centos
+    gerrit=yes
 
 * ``datadir`` is the directory where the packages and repositories will be created.
 
@@ -73,6 +74,9 @@ The configuration file looks like this:
   as failed. If a build fails, Delorean will check the log files for known, transient errors
   such as network issues. If the build fails for that reason more than maxretries times, it
   will be marked as failed.
+
+* ``gerrit`` if set to anything, instructs delorean to create a gerrit
+  review when a build fails.
 
 Configuring your httpd
 ----------------------
