@@ -6,17 +6,22 @@ set -eux
 # Display the current commit
 git log -1
 
-# Run unit tests
-tox -epy27
+set +u
+if [ -z "$GERRIT_PROJECT" -o "$GERRIT_PROJECT" = "openstack-packages/delorean" ] ; then
+    # Run unit tests
+    tox -epy27
 
-# Run pep8 tests
-tox -epep8
+    # Run pep8 tests
+    tox -epep8
 
-# Run bash unit tests
-./scripts/run_sh_tests.sh
+    # Run bash unit tests
+    ./scripts/run_sh_tests.sh
+else
+    # Only prepare virtualenv
+    tox -epy27 --notest
+fi
 
 # Use the env setup by tox
-set +u
 . .tox/py27/bin/activate
 set -u
 
