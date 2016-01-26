@@ -13,6 +13,8 @@ do
     fi
 done
 
+cleanup_sdist
+
 # Cleanup mock directory and copy sources there, so we can run python setup.py
 # inside the buildroot
 /usr/bin/mock -q -r $(dirname $0)/delorean.cfg --clean
