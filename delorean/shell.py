@@ -173,7 +173,7 @@ def main():
         # compute order according to BuildRequires
         logger.info("Computing build order")
         specs.compute_order()
-        # hack because the package name is not coherent with the directory
+        # hack because the package name is not consistent with the directory
         # name and the spec file name
         if 'python-networking_arista' in specs.scores:
             specs.scores['python-networking-arista'] = \
@@ -531,10 +531,10 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
 
     dirnames = ['current']
     if failures == 0:
-        dirnames.append('coherent')
+        dirnames.append('consistent')
     else:
         logger.info('%d packages not built correctly: not updating the '
-                    'coherent symlink' % failures)
+                    'consistent symlink' % failures)
     for dirname in dirnames:
         target_repo_dir = os.path.join(datadir, "repos", dirname)
         os.symlink(os.path.relpath(yumrepodir_abs,
