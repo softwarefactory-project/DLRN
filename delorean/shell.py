@@ -11,6 +11,7 @@
 # under the License.
 
 
+from __future__ import print_function
 import argparse
 import copy
 from datetime import datetime
@@ -110,6 +111,11 @@ def main():
     parser.add_argument('--order', action="store_true",
                         help="Compute the build order according to the spec "
                              "files instead of the dates of the commits.")
+    parser.add_argument('--status', action="store_true",
+                        help="Get the status of packages.")
+    parser.add_argument('--recheck', action="store_true",
+                        help="Force a rebuild for a particular package. "
+                        "Imply --package-name")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
@@ -123,6 +129,30 @@ def main():
 
     global session
     session = getSession('sqlite:///commits.sqlite')
+
+    if options.status is True:
+        if options.package_name:
+            names = (options.package_name, )
+        else:
+            names = [p['name'] for p in package_info["packages"]]
+        for name in names:
+            commit = getLastProcessedCommit(session, name, 'invalid status')
+            if commit:
+                print(name, commit.status)
+            else:
+                print(name, 'NO_BUILD')
+        sys.exit(0)
+
+    if options.recheck is True:
+        if not options.package_name:
+            sys.stderr.write('Please use --package-name with --recheck.\n')
+            sys.exit(1)
+        commit = getLastProcessedCommit(session, options.package_name)
+        if commit:
+            commit.status = 'RETRY'
+            session.add(commit)
+            session.commit()
+        sys.exit(0)
 
     # Build a list of commits we need to process
     toprocess = []

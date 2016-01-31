@@ -86,9 +86,9 @@ def getSession(url='sqlite://', new=False):
 
 # Get the most recently processed commit for project_name, we ignore commits
 # with a status of "RETRY" as we want to retry these.
-def getLastProcessedCommit(session, project_name):
+def getLastProcessedCommit(session, project_name, not_status="RETRY"):
     commit = session.query(Commit).filter(Commit.project_name == project_name,
-                                          Commit.status != "RETRY").\
+                                          Commit.status != not_status).\
         order_by(desc(Commit.dt_commit)).\
         order_by(desc(Commit.id)).first()
     return commit
