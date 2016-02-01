@@ -51,7 +51,9 @@ function cleanup_sdist() {
     # FIXME: gnocchi regenerates config files at sdist time
     # requiring all BR installed at that time
     # http://git.openstack.org/cgit/openstack/gnocchi/commit/?id=f34777f1a88536ec3c76a3d4c760a75ecf4a3d5c
-    sed -i 's/pre-hook.build_config = .*//' setup.cfg
+    if [ -f setup.cfg ]; then
+        sed -i 's/pre-hook.build_config = .*//' setup.cfg
+    fi
 }
 
 if [ $# = 4 ]; then
