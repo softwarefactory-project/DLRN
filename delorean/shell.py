@@ -25,6 +25,7 @@ from time import strftime
 from time import time
 
 from email.mime.text import MIMEText
+from pbr.version import SemanticVersion
 
 from prettytable import PrettyTable
 import sh
@@ -466,7 +467,12 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public):
                     os.path.join(datadir, yumrepodir),
                     datadir, baseurl])
     try:
-        sh.env(run_cmd)
+        sh_version = SemanticVersion.from_pip_string(sh.__version__)
+        min_sh_version = SemanticVersion.from_pip_string('1.09')
+        if sh_version > min_sh_version:
+            sh.env(run_cmd)
+        else:
+            sh.env_(run_cmd)
     except Exception as e:
         logger.error('cmd failed. See logs at: %s/%s/' % (datadir,
                                                           yumrepodir))
