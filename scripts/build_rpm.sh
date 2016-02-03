@@ -50,6 +50,15 @@ sed -i -e "s/UPSTREAMVERSION/$UPSTREAMVERSION/g" *.spec
 VERSION=${VERSION/-/.}
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
+EPOCH=$(date --utc "+%y%m%d%H%M")
+# Handle the case where Epoch is not already set on a package
+# by inserting Epoch after the Version
+if grep -q Epoch *.spec; then
+    sed -i -e "s/Epoch:.*/Epoch: $EPOCH/g" *.spec
+else
+    sed -i -e "/Version:.*/a Epoch: $EPOCH" *.spec
+    sed -i 's/ %{version}-%{release}/ %{epoch}:%{version}-%{release}/g' *.spec
+fi
 sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
