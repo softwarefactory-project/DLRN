@@ -44,6 +44,14 @@ cd ${TOP_DIR}/SPECS/
 sed -i -e "1i%define upstream_version $UPSTREAMVERSION\\" *.spec
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
+EPOCH=$(date "+%y%m%d%H%M")
+# Handle the case where Epoch is not already set on a package
+# by inserting Epoch after the Release
+if grep -q Epoch *.spec; then
+    sed -i -e "s/Epoch:.*/Epoch: $EPOCH/g" *.spec
+else
+    sed -i -e "/Release:.*/a Epoch: $EPOCH" *.spec
+fi
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs *.spec
 /usr/bin/mock -v -r $(dirname $0)/delorean.cfg --postinstall --resultdir $OUTPUT_DIRECTORY --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
