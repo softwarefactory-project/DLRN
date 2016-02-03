@@ -30,6 +30,7 @@ from prettytable import PrettyTable
 import sh
 from six.moves import configparser
 from six.moves.urllib import parse
+from pbr.version import SemanticVersion
 
 import rdopkg.utils.log
 rdopkg.utils.log.set_colors('no')
@@ -463,7 +464,12 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
                     os.path.join(datadir, yumrepodir),
                     datadir, baseurl])
     try:
-        sh.env(run_cmd)
+        sh_version = SemanticVersion.from_pip_string(sh.__version__)
+        min_sh_version = SemanticVersion.from_pip_string('1.09')
+        if sh_version > min_sh_version:
+            sh.env(run_cmd)
+        else:
+            sh.env_(run_cmd)
     except Exception as e:
         logger.error('cmd failed. See logs at: %s/%s/' % (datadir,
                                                           yumrepodir))
