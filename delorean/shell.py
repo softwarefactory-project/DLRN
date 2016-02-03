@@ -463,7 +463,10 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
                     os.path.join(datadir, yumrepodir),
                     datadir, baseurl])
     try:
-        sh.env(run_cmd)
+        if sh.__version__ > '1.09':
+            sh.env(run_cmd)
+        else:
+            sh.env_(run_cmd)
     except Exception as e:
         logger.error('cmd failed. See logs at: %s/%s/' % (datadir,
                                                           yumrepodir))
