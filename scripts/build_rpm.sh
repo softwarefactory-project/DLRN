@@ -15,14 +15,14 @@ done
 
 cleanup_sdist
 
-MOCKOPTS="-v -r $(dirname $0)/delorean.cfg --resultdir $OUTPUT_DIRECTORY"
+MOCKOPTS="-v -r ${DATA_DIR}/delorean.cfg --resultdir $OUTPUT_DIRECTORY"
 
 # Cleanup mock directory and copy sources there, so we can run python setup.py
 # inside the buildroot
 /usr/bin/mock $MOCKOPTS --clean
 /usr/bin/mock $MOCKOPTS --init
 # A simple mock --copyin should be enough, but it does not handle symlinks properly
-MOCKDIR=$(/usr/bin/mock -r $(dirname $0)/delorean.cfg -p)
+MOCKDIR=$(/usr/bin/mock -r ${DATA_DIR}/delorean.cfg -p)
 mkdir ${MOCKDIR}/tmp/pkgsrc
 cp -pr . ${MOCKDIR}/tmp/pkgsrc
 /usr/bin/mock $MOCKOPTS --chroot "cd /tmp/pkgsrc && python setup.py sdist"
@@ -31,7 +31,7 @@ TARBALL=$(ls dist)
 
 # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
 # so only look at the last line for version
-setversionandrelease $(/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1)
+setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1)
 
 # https://bugs.launchpad.net/tripleo/+bug/1351491
 if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
