@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Red Hat, Inc.
+# Copyright (C) 2015-2016 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -18,7 +18,6 @@ the dependencies.
 '''
 
 from __future__ import print_function
-import operator
 import os
 import re
 import sys
@@ -100,64 +99,69 @@ class RpmSpecCollection(object):
         else:
             self.specs = []
         self.debug = debug
-        self.scores = {}
-
-    def add_rpm_spec(self, spec):
-        self.specs.append(spec)
 
     def compute_order(self):
-        # compute scores for all packages, sub-packages and provides
-        names = []
-        for spec in self.specs:
-            self.increase_score(spec)
-            names.append(spec.name)
-        # sum the scores by spec
-        scores = {}
-        for spec in self.specs:
-            scores[spec.name] = 0
-            for pkg_name in spec.packages():
-                try:
-                    scores[spec.name] += self.scores[pkg_name]
-                except KeyError:
-                    continue
-            # get the final score for all the sub-packages and provides
-            for pkg_name in spec.packages():
-                self.scores[pkg_name] = scores[spec.name]
-        ret = scores.items()
-        if self.debug:
-            sys.stderr.write(str(ret) + '\n')
-        return [elt[0] for elt in sorted(ret,
-                                         key=operator.itemgetter(1),
-                                         reverse=True)
-                if elt[0] in names]
+        # sub-package to package associative array
+        self.pkg = {}
+        # list to return the computed order
+        self.order = []
+        # keep status of the progress by
+        # package: 0 not processed, 1
+        # processing dependencies, 2 already
+        # processed
+        self.color = {}
 
-    def increase_score(self, spec):
-        if spec:
-            if spec.name not in self.scores:
-                self.scores[spec.name] = 0
+        for spec in sorted(self.specs):
+            self.pkg[spec.name] = spec
+            self.color[spec.name] = 0
+            for pkg_name in spec.packages():
+                self.pkg[spec.name] = spec
+        for spec in self.specs:
+            if self.color[spec.name] == 0:
+                self._visit(spec)
+        return self.order
+
+    def _visit(self, spec):
+        if self.color[spec.name] == 1:
+            sys.stderr.write('cycle detected on %s\n' %
+                             ', '.join([k for k in self.color
+                                        if self.color[k] == 1]))
+        elif self.color[spec.name] == 2:
+            return
+        else:
+            self.color[spec.name] = 1
             for breq in spec.build_requires():
                 if breq in spec.packages():
                     continue
-                try:
-                    self.scores[breq] += 1
-                except KeyError:
-                    self.scores[breq] = 1
-                self.increase_score(self._lookup_spec(breq))
-
-    def _lookup_spec(self, pkg_name):
-        for spec in self.specs:
-            if pkg_name in spec.packages():
-                return spec
-        return None
+                if breq in self.pkg:
+                    self._visit(self.pkg[breq])
+        self.color[spec.name] = 2
+        self.order.append(spec.name)
 
 
 def _main():
     if len(sys.argv) > 2:
-        specs = RpmSpecCollection([RpmSpecFile(open(arg).read(-1))
-                                   for arg in sys.argv[1:]],
-                                  debug=os.getenv('DEBUG'))
-        print('Build order:')
-        print('\n'.join(specs.compute_order()))
+        # output the graph in a graphviz compliant format if -g is passed
+        if sys.argv[1] == '-g':
+            specs = RpmSpecCollection([RpmSpecFile(open(arg).read(-1))
+                                       for arg in sys.argv[2:]],
+                                      debug=os.getenv('DEBUG'))
+            specnames = specs.compute_order()
+            print('digraph G {')
+            for spec in specs.specs:
+                if spec.name not in specnames:
+                    continue
+                for breq in spec.build_requires():
+                    if breq not in spec.packages() and breq in specs.pkg:
+                        print('  "%s" -> "%s";' %
+                              (spec.name, specs.pkg[breq].name))
+            print('}')
+        else:
+            specs = RpmSpecCollection([RpmSpecFile(open(arg).read(-1))
+                                       for arg in sys.argv[1:]],
+                                      debug=os.getenv('DEBUG'))
+            print('Build order:')
+            print('\n'.join(specs.compute_order()))
     else:
         spec = RpmSpecFile(open(sys.argv[1]).read(-1))
         print('Packages:', ', '.join(spec.packages()))

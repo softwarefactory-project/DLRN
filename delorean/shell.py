@@ -163,7 +163,7 @@ def main():
     if options.order is True and not options.package_name:
         # collect info from all spec files
         logger.info("Reading rpm spec files")
-        projects = [p['name'] for p in packages]
+        projects = sorted([p['name'] for p in packages])
         specs = RpmSpecCollection([RpmSpecFile(
             open(os.path.join(cp.get("DEFAULT", "datadir"),
                               project_name + "_distro",
@@ -171,20 +171,20 @@ def main():
             for project_name in projects])
         # compute order according to BuildRequires
         logger.info("Computing build order")
-        specs.compute_order()
+        orders = specs.compute_order()
         # hack because the package name is not consistent with the directory
         # name and the spec file name
-        if 'python-networking_arista' in specs.scores:
-            specs.scores['python-networking-arista'] = \
-                specs.scores['python-networking_arista']
+        if 'python-networking_arista' in orders:
+            orders.insert(orders.index('python-networking_arista'),
+                          'python-networking-arista')
 
         # sort the commits according to the score of their project and
         # then use the timestamp of the commits as a secondary key
         def my_cmp(a, b):
             if a.project_name == b.project_name:
                 return cmp(a.dt_commit, b.dt_commit)
-            return cmp(specs.scores[b.project_name],
-                       specs.scores[a.project_name])
+            return cmp(orders.index(a.project_name),
+                       orders.index(b.project_name))
         toprocess.sort(cmp=my_cmp)
     else:
         # sort according to the timestamp of the commits
