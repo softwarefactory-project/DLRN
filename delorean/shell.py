@@ -34,7 +34,6 @@ from six.moves.urllib import parse
 import rdopkg.utils.log
 rdopkg.utils.log.set_colors('no')
 from rdopkg.actionmods import rdoinfo
-import rdopkg.conf
 
 from delorean.db import Commit
 from delorean.db import getCommits
@@ -75,7 +74,7 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'No route to host|'
                              'Could not resolve host')
 
-default_options = {'maxretries': '3'}
+default_options = {'maxretries': '3', 'tags': None}
 
 
 def main():
@@ -119,14 +118,14 @@ def main():
     if options.log_commands is True:
         logging.getLogger("sh.command").setLevel(logging.INFO)
 
-    package_info = getpkginfo(local_info_repo=options.info_repo)
-
     global session
     session = getSession('sqlite:///commits.sqlite')
+    packages = getpackages(local_info_repo=options.info_repo,
+                           tags=cp.get("DEFAULT", "tags"))
 
     # Build a list of commits we need to process
     toprocess = []
-    for package in package_info["packages"]:
+    for package in packages:
         project = package["name"]
         since = "-1"
         commit = getLastProcessedCommit(session, project)
@@ -164,7 +163,7 @@ def main():
     if options.order is True and not options.package_name:
         # collect info from all spec files
         logger.info("Reading rpm spec files")
-        projects = [p['name'] for p in package_info["packages"]]
+        projects = [p['name'] for p in packages]
         specs = RpmSpecCollection([RpmSpecFile(
             open(os.path.join(cp.get("DEFAULT", "datadir"),
                               project_name + "_distro",
@@ -204,7 +203,7 @@ def main():
         logger.info("Processing %s %s" % (project, commit_hash))
         notes = ""
         try:
-            built_rpms, notes = build(cp, package_info,
+            built_rpms, notes = build(cp, packages,
                                       commit, options.build_env, options.dev,
                                       options.use_public)
         except Exception as e:
@@ -236,7 +235,7 @@ def main():
                         fp.write(getattr(e, "message", notes))
 
                 if not project_info.suppress_email():
-                    sendnotifymail(cp, package_info, commit)
+                    sendnotifymail(cp, packages, commit)
                     project_info.sent_email()
                     session.add(project_info)
         else:
@@ -246,8 +245,8 @@ def main():
             session.add(commit)
         if options.dev is False:
             session.commit()
-        genreports(cp, package_info, options)
-    genreports(cp, package_info, options)
+        genreports(cp, packages, options)
+    genreports(cp, packages, options)
     return exit_code
 
 
@@ -258,7 +257,8 @@ def compare():
                              "fetching default one using rdopkg")
     options, args = parser.parse_known_args(sys.argv[1:])
 
-    package_info = getpkginfo(local_info_repo=options.info_repo)
+    packages = getpackages(local_info_repo=options.info_repo,
+                           tags=cp.get("DEFAULT", "tags"))
     compare_details = {}
     # Each argument is a ":" seperate filename:title, this filename is the
     # sqlite db file and the title is whats used in the dable being displayed
@@ -269,7 +269,7 @@ def compare():
 
         session = getSession('sqlite:///%s' % dbfilename)
 
-        for package in package_info["packages"]:
+        for package in packages:
             package_name = package["name"]
             compare_details.setdefault(package_name, [package_name, " "])
             last_success = getCommits(session, project=package_name,
@@ -290,23 +290,26 @@ def compare():
     print(table)
 
 
-def getpkginfo(local_info_repo=None):
+def getpackages(local_info_repo=None, tags=None):
     inforepo = None
     if local_info_repo:
         inforepo = rdoinfo.RdoinfoRepo(local_repo_path=local_info_repo,
-                                       verbose=False)
+                                       apply_tag=tags)
     else:
-        inforepo = rdoinfo.RdoinfoRepo(rdopkg.conf.cfg['HOME_DIR'],
-                                       rdopkg.conf.cfg['RDOINFO_REPO'],
-                                       verbose=False)
+        inforepo = rdoinfo.get_default_inforepo(apply_tag=tags)
         # rdopkg will clone/pull rdoinfo repo as needed (~/.rdopkg/rdoinfo)
         inforepo.init()
-    return inforepo.get_info()
+    pkginfo = inforepo.get_info()
+    packages = pkginfo["packages"]
+    if tags:
+        # FIXME allow list of tags?
+        packages = rdoinfo.filter_pkgs(packages, {'tags': tags})
+    return packages
 
 
-def sendnotifymail(cp, package_info, commit):
+def sendnotifymail(cp, packages, commit):
     error_details = copy.copy(
-        [package for package in package_info["packages"]
+        [package for package in packages
             if package["name"] == commit.project_name][0])
     error_details["logurl"] = "%s/%s" % (cp.get("DEFAULT", "baseurl"),
                                          commit.getshardedcommitdir())
@@ -426,7 +429,7 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
     return project_toprocess
 
 
-def build(cp, package_info, commit, env_vars, dev_mode, use_public):
+def build(cp, packages, commit, env_vars, dev_mode, use_public):
 
     # Set the build timestamp to now
     commit.dt_build = int(time())
@@ -487,7 +490,7 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
 
     failures = 0
 
-    for otherproject in package_info["packages"]:
+    for otherproject in packages:
         otherprojectname = otherproject["name"]
         if otherprojectname == project_name:
             # Output sha's this project
@@ -563,7 +566,7 @@ def get_commit_url(commit, pkg):
     return commit_url
 
 
-def genreports(cp, package_info, options):
+def genreports(cp, packages, options):
     # Generate report of the last 300 package builds
     target = cp.get("DEFAULT", "target")
     src = cp.get("DEFAULT", "source")
@@ -610,7 +613,7 @@ def genreports(cp, package_info, options):
         html.append("<td>%s</td>" % strftime("%Y-%m-%d %H:%M:%S", dt_commit))
         html.append("<td>%s</td>" % commit.project_name)
 
-        for pkg in package_info["packages"]:
+        for pkg in packages:
             project = pkg["name"]
             if project == commit.project_name:
                 commit_url = get_commit_url(commit, pkg)
@@ -668,7 +671,6 @@ def genreports(cp, package_info, options):
     html = list()
     html.append(html_struct)
     html.append(table_header)
-    packages = [package for package in package_info["packages"]]
     # Find the most recent successfull build
     # then report on failures since then
     for package in sorted(packages,
