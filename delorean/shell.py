@@ -497,7 +497,8 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
         # Output sha's of all other projects represented in this repo
         last_success = getCommits(session, project=otherprojectname,
                                   with_status="SUCCESS").first()
-        last_processed = getLastProcessedCommit(session, otherprojectname)
+        last_processed = getLastProcessedCommit(session, otherprojectname,
+                                                'INVALID STATE')
         if last_success:
             for rpm in last_success.rpms.split(","):
                 rpm_link_src = os.path.join(yumrepodir_abs,
@@ -511,7 +512,7 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
             dumpshas2file(shafile, last, otherproject["upstream"],
                           otherproject["master-distgit"],
                           last_processed.status)
-            if last_processed.status == 'FAILED':
+            if last_processed.status != 'SUCCESS':
                 failures += 1
         else:
             failures += 1
