@@ -56,7 +56,7 @@ function update_config() {
           ;;
         fedora)
           target="fedora"
-          baseurl="https://trunk.rdoproject.org/f22"
+          baseurl="https://trunk.rdoproject.org/f24"
           src="master"
           ;;
         *)
