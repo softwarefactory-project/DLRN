@@ -15,16 +15,18 @@ done
 
 cleanup_sdist
 
+MOCKOPTS="-v -r $(dirname $0)/delorean.cfg --resultdir $OUTPUT_DIRECTORY"
+
 # Cleanup mock directory and copy sources there, so we can run python setup.py
 # inside the buildroot
-/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --clean
-/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --init
+/usr/bin/mock $MOCKOPTS --clean
+/usr/bin/mock $MOCKOPTS --init
 # A simple mock --copyin should be enough, but it does not handle symlinks properly
 MOCKDIR=$(/usr/bin/mock -r $(dirname $0)/delorean.cfg -p)
 mkdir ${MOCKDIR}/tmp/pkgsrc
 cp -pr . ${MOCKDIR}/tmp/pkgsrc
-/usr/bin/mock -q -r $(dirname $0)/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py sdist"
-/usr/bin/mock -v -r $(dirname $0)/delorean.cfg --copyout /tmp/pkgsrc/dist ./dist
+/usr/bin/mock $MOCKOPTS --chroot "cd /tmp/pkgsrc && python setup.py sdist"
+/usr/bin/mock $MOCKOPTS --copyout /tmp/pkgsrc/dist ./dist
 TARBALL=$(ls dist)
 
 # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
@@ -53,7 +55,7 @@ sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
 sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
-/usr/bin/mock -v -r $(dirname $0)/delorean.cfg --postinstall --resultdir $OUTPUT_DIRECTORY --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+/usr/bin/mock $MOCKOPTS --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
 
 if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
     touch $OUTPUT_DIRECTORY/installed
