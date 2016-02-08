@@ -96,6 +96,4 @@ function run_delorean() {
 # If the commands below throws an error we still want the logs
 trap copy_logs ERR EXIT
 
-# Packages for fedora are only built for the master branch
-[[ "${GERRIT_BRANCH}" == "master" ]] && run_delorean fedora
 run_delorean centos
