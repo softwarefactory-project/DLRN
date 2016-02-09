@@ -165,11 +165,18 @@ def main():
         # collect info from all spec files
         logger.info("Reading rpm spec files")
         projects = [p['name'] for p in package_info["packages"]]
-        specs = RpmSpecCollection([RpmSpecFile(
-            open(os.path.join(cp.get("DEFAULT", "datadir"),
-                              project_name + "_distro",
-                              project_name + '.spec')).read(-1))
-            for project_name in projects])
+
+        speclist = []
+        for project_name in projects:
+            specpath = os.path.join(cp.get("DEFAULT", "datadir"),
+                                    project_name + "_distro",
+                                    project_name + '.spec')
+            speclist.append(sh.rpmspec('-D', 'delorean_bootstrap 1',
+                                       '-P', specpath))
+
+        specs = RpmSpecCollection([RpmSpecFile(spec)
+                                  for spec in speclist])
+
         # compute order according to BuildRequires
         logger.info("Computing build order")
         specs.compute_order()
@@ -206,7 +213,7 @@ def main():
         try:
             built_rpms, notes = build(cp, package_info,
                                       commit, options.build_env, options.dev,
-                                      options.use_public)
+                                      options.use_public, options.order)
         except Exception as e:
             exit_code = 1
             datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
@@ -426,7 +433,7 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
     return project_toprocess
 
 
-def build(cp, package_info, commit, env_vars, dev_mode, use_public):
+def build(cp, package_info, commit, env_vars, dev_mode, use_public, bootstrap):
 
     # Set the build timestamp to now
     commit.dt_build = int(time())
@@ -457,6 +464,8 @@ def build(cp, package_info, commit, env_vars, dev_mode, use_public):
             run_cmd.append(env_var)
     if (dev_mode or use_public):
             run_cmd.append("DELOREAN_DEV=1")
+    if bootstrap is True:
+            run_cmd.append("DELOREAN_BOOTSTRAP=1")
 
     run_cmd.extend([os.path.join(scriptsdir, "build_rpm_wrapper.sh"),
                     target, project_name,

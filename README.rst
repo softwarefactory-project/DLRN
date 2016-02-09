@@ -50,6 +50,16 @@ your repository.
 
     $ delorean --config-file projects.ini --order
 
+When using this special option, a special variable ``delorean_bootstrap``
+is defined in the specs, with a value of 1. You can use this variable if
+needed, to break dependency loops between packages. For example:
+
+.. code-block:: spec
+
+    %if 0%{?delorean_bootstrap} == 0
+    BuildRequires: package-with-circular-dependency
+    %endif
+
 Running
 -------
 
