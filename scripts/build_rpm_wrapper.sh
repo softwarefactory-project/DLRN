@@ -41,6 +41,11 @@ if [ ! -f ${DATA_DIR}/delorean.cfg ] || ! cmp ${DATA_DIR}/delorean.cfg ${DATA_DI
     cp ${DATA_DIR}/delorean.cfg.new ${DATA_DIR}/delorean.cfg
 fi
 
+# if bootstraping, set the appropriate mock config option
+if [ "REPO_BOOTSTRAP" = 1 ]; then
+    ADDITIONAL_MOCK_OPTIONS="-D 'repo_bootstrap 1'"
+fi
+
 if [ "$1" != "openstack-puppet-modules" ] ; then
     $DIR/build_rpm.sh "$@"
 else
