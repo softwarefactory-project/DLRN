@@ -13,32 +13,32 @@ exec > ${OUTPUT_DIRECTORY}/rpmbuild.log 2>&1
 
 set -x
 
-cp  $(dirname $0)/${TARGET}.cfg $(dirname $0)/delorean.cfg.new
+cp  $(dirname $0)/${TARGET}.cfg ${DATA_DIR}/delorean.cfg.new
 
 # Add the mostcurrent repo, we may have dependencies in it
 if [ -e ${DATA_DIR}/repos/current/repodata ] ; then
     # delete the last line which must be """
-    sed -i -e '$d' $(dirname $0)/delorean.cfg.new
-    echo -e "\n[local]\nname=local\nbaseurl=file://${DATA_DIR}/repos/current\nenabled=1\ngpgcheck=0\npriority=1\n\"\"\"" >> $(dirname $0)/delorean.cfg.new
+    sed -i -e '$d' ${DATA_DIR}/delorean.cfg.new
+    echo -e "\n[local]\nname=local\nbaseurl=file://${DATA_DIR}/repos/current\nenabled=1\ngpgcheck=0\npriority=1\n\"\"\"" >> ${DATA_DIR}/delorean.cfg.new
 fi
 
 # delete the last line which must be """
-sed -i -e '$d' $(dirname $0)/delorean.cfg.new
-curl ${BASEURL}/delorean-deps.repo >> $(dirname $0)/delorean.cfg.new
-echo -e "\"\"\"" >> $(dirname $0)/delorean.cfg.new
+sed -i -e '$d' ${DATA_DIR}/delorean.cfg.new
+curl ${BASEURL}/delorean-deps.repo >> ${DATA_DIR}/delorean.cfg.new
+echo -e "\"\"\"" >> ${DATA_DIR}/delorean.cfg.new
 
 if [ "$DELOREAN_DEV" = 1 ]; then
     # delete the last line which must be """
-    sed -i -e '$d' $(dirname $0)/delorean.cfg.new
-    curl ${BASEURL}/current/delorean.repo >> $(dirname $0)/delorean.cfg.new
-    echo -e "\"\"\"" >> $(dirname $0)/delorean.cfg.new
+    sed -i -e '$d' ${DATA_DIR}/delorean.cfg.new
+    curl ${BASEURL}/current/delorean.repo >> ${DATA_DIR}/delorean.cfg.new
+    echo -e "\"\"\"" >> ${DATA_DIR}/delorean.cfg.new
 fi
 
 # don't change delorean.cfg if the content hasn't changed to prevent
 # mock from rebuilding its cache.
-if [ ! -f $(dirname $0)/delorean.cfg ] || ! cmp $(dirname $0)/delorean.cfg $(dirname $0)/delorean.cfg.new; then
-    diff -u $(dirname $0)/delorean.cfg.new $(dirname $0)/delorean.cfg || :
-    cp $(dirname $0)/delorean.cfg.new $(dirname $0)/delorean.cfg
+if [ ! -f ${DATA_DIR}/delorean.cfg ] || ! cmp ${DATA_DIR}/delorean.cfg ${DATA_DIR}/delorean.cfg.new; then
+    diff -u ${DATA_DIR}/delorean.cfg.new ${DATA_DIR}/delorean.cfg || :
+    cp ${DATA_DIR}/delorean.cfg.new ${DATA_DIR}/delorean.cfg
 fi
 
 if [ "$1" != "openstack-puppet-modules" ] ; then
