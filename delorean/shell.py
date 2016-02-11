@@ -56,14 +56,14 @@ the upstream project, please see log[2] and update the packaging[3].
 You are receiving this email because you are listed as one of the
 maintainers for the %(name)s package[4].
 
-If you have any questions please see the FAQ[5], feel free to ask new questions
-on there and we will add the answer as soon as possible.
+If you have any questions please see the RDO master packaging guide[5] and
+feel free to ask questions on the RDO irc channel (#rdo on Freenode).
 
 [1] - %(upstream)s
 [2] - %(logurl)s
 [3] - %(master-distgit)s
 [4] - https://github.com/redhat-openstack/rdoinfo/blob/master/rdo.yml
-[5] - https://etherpad.openstack.org/p/delorean-packages
+[5] - https://www.rdoproject.org/packaging/rdo-packaging.html#master-pkg-guide
 """
 
 re_known_errors = re.compile('Error: Nothing to do|'
