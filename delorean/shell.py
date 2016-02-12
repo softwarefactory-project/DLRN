@@ -144,14 +144,31 @@ def main():
 
     if options.recheck is True:
         if not options.package_name:
-            sys.stderr.write('Please use --package-name with --recheck.\n')
+            logger.error('Please use --package-name with --recheck.')
             sys.exit(1)
         commit = getLastProcessedCommit(session, options.package_name)
         if commit:
-            commit.status = 'RETRY'
-            session.add(commit)
-            session.commit()
-        sys.exit(0)
+            if commit.status == 'SUCCESS':
+                logger.error("Trying to recheck an already successful commit,"
+                             " ignoring.")
+                sys.exit(1)
+            elif commit.status == 'RETRY':
+                # In this case, we are going to retry anyway, so
+                # do nothing and exit
+                logger.warning("Trying to recheck a commit in RETRY state,"
+                               " ignoring.")
+                sys.exit(0)
+            else:
+                # We could set the status to RETRY here, but if we have gone
+                # beyond max_retries it wouldn't work as expected. Thus, our
+                # only chance is to remove the commit
+                session.delete(commit)
+                session.commit()
+                sys.exit(0)
+        else:
+                logger.error("There are no existing commits for package %s"
+                             % options.package_name)
+                sys.exit(1)
 
     # Build a list of commits we need to process
     toprocess = []
