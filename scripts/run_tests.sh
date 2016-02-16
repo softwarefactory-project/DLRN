@@ -71,16 +71,19 @@ function update_config() {
           target="centos"
           baseurl="http://trunk.rdoproject.org/centos7/"
           src="master"
+          branch=""
           ;;
         fedora)
           target="fedora"
           baseurl="https://trunk.rdoproject.org/f23"
           src="master"
+          branch=""
           ;;
         *)
           target="centos"
           baseurl="http://trunk.rdoproject.org/centos7/"
           src="master"
+          branch=""
           ;;
     esac
 
@@ -99,6 +102,7 @@ function update_config() {
     sed -i "s%target=.*%target=${DISTRO}%" projects.ini
     sed -i "s%source=.*%source=${src}%" projects.ini
     sed -i "s%baseurl=.*%baseurl=${baseurl}%" projects.ini
+    sed -i "s%tags=.*%tags=${branch}%" projects.ini
 }
 
 function copy_logs() {
