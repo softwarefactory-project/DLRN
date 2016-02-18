@@ -8,6 +8,7 @@ Contents:
 
    intro
    installation
+   repositories
    usage
    contributing
 
