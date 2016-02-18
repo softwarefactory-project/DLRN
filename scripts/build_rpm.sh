@@ -34,6 +34,8 @@ TARBALL=$(ls dist)
 setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
                      $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
 
+RPM_CHANGELOG=$(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && git log -n 25 --oneline")
+
 # https://bugs.launchpad.net/tripleo/+bug/1351491
 if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
     if [ "$VERSION" == "0.0.1" ] ; then
@@ -54,6 +56,9 @@ VERSION=${VERSION/-/.}
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
 sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
+RPM_DATE=$(LC_TIME=C date -u +"%a %b %d %Y")
+echo "* ${RPM_DATE} delorean <delorean@rdoproject.org> ${VERSION}-${RELEASE}" >> *.spec
+printf "%s" "${RPM_CHANGELOG%x}" >> *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
 /usr/bin/mock $MOCKOPTS --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
