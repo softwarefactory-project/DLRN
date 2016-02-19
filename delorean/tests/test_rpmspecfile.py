@@ -65,16 +65,14 @@ class TestRpmSpecCollection(unittest.TestCase):
         self.assertEqual(specs.compute_order(), ['package'])
 
     def test_dep(self):
-        specs = RpmSpecCollection()
-        specs.add_rpm_spec(RpmSpecFile(BASIC_SPEC_CONTENT))
-        specs.add_rpm_spec(RpmSpecFile(BASIC2_SPEC_CONTENT))
+        specs = RpmSpecCollection([RpmSpecFile(BASIC_SPEC_CONTENT),
+                                   RpmSpecFile(BASIC2_SPEC_CONTENT)])
         self.assertEqual(specs.compute_order(), ['package', 'packageC'])
 
     def test_dep2(self):
-        specs = RpmSpecCollection()
-        specs.add_rpm_spec(RpmSpecFile(BASIC_SPEC_CONTENT))
-        specs.add_rpm_spec(RpmSpecFile(BASIC2_SPEC_CONTENT))
-        specs.add_rpm_spec(RpmSpecFile(BASIC3_SPEC_CONTENT))
+        specs = RpmSpecCollection([RpmSpecFile(BASIC_SPEC_CONTENT),
+                                  RpmSpecFile(BASIC2_SPEC_CONTENT),
+                                   RpmSpecFile(BASIC3_SPEC_CONTENT)])
         self.assertEqual(specs.compute_order(), ['package',
                                                  'packageC',
                                                  'packageB'])
