@@ -5,6 +5,9 @@ Delorean
 Delorean builds and maintains yum repositories following OpenStack
 uptream commit streams.
 
+Documentation is available at
+http://fluzo.readthedocs.org/en/latest/
+
 Setup
 -----
 
