@@ -45,6 +45,7 @@ from delorean.db import Project
 from delorean.rpmspecfile import RpmSpecCollection
 from delorean.rpmspecfile import RpmSpecFile
 from delorean.utils import dumpshas2file
+from delorean import version
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("delorean")
@@ -117,6 +118,9 @@ def main():
     parser.add_argument('--recheck', action="store_true",
                         help="Force a rebuild for a particular package. "
                         "Imply --package-name")
+    parser.add_argument('--version',
+                        action='version',
+                        version=version.version_info.version_string())
 
     options, args = parser.parse_known_args(sys.argv[1:])
 

@@ -11,7 +11,6 @@ Parameters
                     [--build-env BUILD_ENV] [--local] [--head-only]
                     [--package-name PACKAGE_NAME] [--dev] [--log-commands]
                     [--use-public] [--order]
-    
     arguments:
       -h, --help            show this help message and exit
       --config-file CONFIG_FILE
@@ -32,6 +31,7 @@ Parameters
                             install verification.
       --order               Compute the build order according to the spec files
                             instead of the dates of the commits.
+      --version             show program's version number and exit
 
 
 Initial build
