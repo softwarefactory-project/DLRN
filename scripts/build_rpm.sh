@@ -41,7 +41,8 @@ if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-ima
    fi
 fi
 
-mv dist/$TARBALL ${TOP_DIR}/SOURCES/
+TARBALLREL=$(basename $TARBALL .tar.gz)-$RELEASE.tar.gz
+mv dist/$TARBALL ${TOP_DIR}/SOURCES/$TARBALLREL
 
 cd ${DATA_DIR}/${PROJECT_NAME}_distro
 cp * ${TOP_DIR}/SOURCES/
@@ -53,7 +54,7 @@ sed -i -e "s/UPSTREAMVERSION/$UPSTREAMVERSION/g" *.spec
 VERSION=${VERSION/-/.}
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
-sed -i -e "s/Source0:.*/Source0: $TARBALL/g" *.spec
+sed -i -e "s/Source0:.*/Source0: $TARBALLREL/g" *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
 /usr/bin/mock $MOCKOPTS --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
