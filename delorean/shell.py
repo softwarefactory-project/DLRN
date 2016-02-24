@@ -14,6 +14,8 @@
 from __future__ import print_function
 import argparse
 import copy
+import datetime
+import json
 import logging
 import os
 import re
@@ -579,6 +581,16 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public):
         else:
             failures += 1
     shafile.close()
+
+    build_info = {'failures': failures,
+                  'project': project_name,
+                  'commit_sha1': commit.commit_hash,
+                  'distro_sha1': commit.distro_hash,
+                  'status': commit.status,
+                  'date': datetime.datetime.utcnow().isoformat()}
+    build_file = open(os.path.join(yumrepodir_abs, "build.json"), "w")
+    build_file.write(json.dumps(build_info))
+    build_file.close()
 
     sh.createrepo(yumrepodir_abs)
 
