@@ -29,9 +29,8 @@ from prettytable import PrettyTable
 import sh
 from six.moves import configparser
 
-import rdopkg.utils.log
-rdopkg.utils.log.set_colors('no')
 from rdopkg.actionmods import rdoinfo
+import rdopkg.utils.log
 
 from delorean.db import Commit
 from delorean.db import getCommits
@@ -39,11 +38,13 @@ from delorean.db import getLastProcessedCommit
 from delorean.db import getSession
 from delorean.db import Project
 from delorean.reporting import genreports
+from delorean.reporting import get_commit_url
 from delorean.rpmspecfile import RpmSpecCollection
 from delorean.rpmspecfile import RpmSpecFile
 from delorean.utils import dumpshas2file
 from delorean import version
 
+rdopkg.utils.log.set_colors('no')
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("delorean")
 logger.setLevel(logging.INFO)
@@ -75,7 +76,7 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'Device or resource busy|'
                              'Could not resolve host')
 
-default_options = {'maxretries': '3', 'tags': None,
+default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'templatedir': os.path.join(
                        os.path.dirname(os.path.realpath(__file__)),
                        "templates")
@@ -244,6 +245,7 @@ def main():
         # sort according to the timestamp of the commits
         toprocess.sort()
     exit_code = 0
+    gerrit = cp.get("DEFAULT", "gerrit")
     for commit in toprocess:
         project = commit.project_name
 
@@ -267,21 +269,15 @@ def main():
                                    commit.getshardedcommitdir(),
                                    "rpmbuild.log")
             max_retries = cp.getint("DEFAULT", "maxretries")
-            if isknownerror(logfile) and \
-               (timesretried(project, commit_hash, commit.distro_hash)
-               < max_retries):
+            if (isknownerror(logfile) and
+                (timesretried(project, commit_hash, commit.distro_hash) <
+                 max_retries)):
                 logger.exception("Known error building packages for %s,"
                                  " will retry later" % project)
                 commit.status = "RETRY"
                 commit.notes = getattr(e, "message", notes)
                 session.add(commit)
             else:
-                logger.exception("Error while building packages for %s"
-                                 % project)
-                commit.status = "FAILED"
-                commit.notes = getattr(e, "message", notes)
-                session.add(commit)
-
                 # If the log file hasn't been created we add what we have
                 # This happens if the rpm build script didn't run.
                 if not os.path.exists(logfile):
@@ -292,6 +288,51 @@ def main():
                     sendnotifymail(cp, packages, commit)
                     project_info.sent_email()
                     session.add(project_info)
+
+                # allow to submit a gerrit review only if the last build was
+                # successful or non existent to avoid creating a gerrit review
+                # for the same problem multiple times.
+                if gerrit is not None:
+                    if options.build_env:
+                        env_vars = list(options.build_env)
+                    else:
+                        env_vars = []
+                    last_build = getLastProcessedCommit(session, project)
+                    if not last_build or last_build.status == 'SUCCESS':
+                        for pkg in packages:
+                            if project == pkg['name']:
+                                break
+                        else:
+                            pkg = None
+                        if pkg:
+                            url = (get_commit_url(commit, pkg) +
+                                   commit.commit_hash)
+                            env_vars.append('GERRIT_URL=%s' % url)
+                            env_vars.append('GERRIT_LOG=%s/%s' %
+                                            (cp.get("DEFAULT", "baseurl"),
+                                             commit.getshardedcommitdir()))
+                            maintainers = ','.join(pkg['maintainers'])
+                            env_vars.append('GERRIT_MAINTAINERS=%s' %
+                                            maintainers)
+                            logger.info('Creating a gerrit review using '
+                                        'GERRIT_URL=%s '
+                                        'GERRIT_MAINTAINERS=%s ' %
+                                        (url, maintainers))
+                            try:
+                                submit_review(cp, commit, env_vars)
+                            except Exception:
+                                logger.error('Unable to create review '
+                                             'see review.log')
+                        else:
+                            logger.error('Unable to find info for project %s' %
+                                         project)
+                    else:
+                        logger.info('last build no successful '
+                                    'for %s' % project)
+                commit.status = "FAILED"
+                commit.notes = getattr(e, "message", notes)
+                session.add(commit)
+
         else:
             commit.status = "SUCCESS"
             commit.notes = notes
@@ -508,7 +549,6 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public):
            "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
 
     run_cmd = []
-    # expand the env name=value pairs into docker arguments
     if env_vars:
         for env_var in env_vars:
             run_cmd.append(env_var)
@@ -527,8 +567,8 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public):
         else:
             sh.env_(run_cmd)
     except Exception as e:
-        logger.error('cmd failed. See logs at: %s/%s/' % (datadir,
-                                                          yumrepodir))
+        logger.info('cmd failed. See logs at: %s/%s/' % (datadir,
+                                                         yumrepodir))
         raise e
 
     built_rpms = []
@@ -606,6 +646,25 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public):
                    target_repo_dir + "_")
         os.rename(target_repo_dir + "_", target_repo_dir)
     return built_rpms, notes
+
+
+def submit_review(cp, commit, env_vars):
+    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
+    scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
+    baseurl = cp.get("DEFAULT", "baseurl")
+    yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
+
+    project_name = commit.project_name
+
+    run_cmd = []
+    if env_vars:
+        for env_var in env_vars:
+            run_cmd.append(env_var)
+
+    run_cmd.extend([os.path.join(scriptsdir, "submit_review.sh"),
+                    project_name, os.path.join(datadir, yumrepodir),
+                    datadir, baseurl])
+    sh.env(run_cmd)
 
 
 def isknownerror(logfile):
