@@ -25,10 +25,10 @@ _TRUE_VALUES = ('True', 'true', '1', 'yes')
 
 class TestCase(testtools.TestCase):
 
-    """Test case base class for all unit tests."""
+    "Test case base class for all unit tests."
 
     def setUp(self):
-        """Run before each test method to initialize test environment."""
+        "Run before each test method to initialize test environment."
 
         super(TestCase, self).setUp()
         test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)

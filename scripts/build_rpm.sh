@@ -38,7 +38,7 @@ setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd
 if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
     if [ "$VERSION" == "0.0.1" ] ; then
         VERSION=$(git tag | sort -V | tail -n 1)
-   fi
+    fi
 fi
 
 TARBALLREL=$(basename $TARBALL .tar.gz)-$RELEASE.tar.gz
@@ -57,8 +57,14 @@ sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
 sed -i -e "s/Source0:.*/Source0: $TARBALLREL/g" *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
-/usr/bin/mock $MOCKOPTS --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
 
-if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
-    touch $OUTPUT_DIRECTORY/installed
+if /usr/bin/mock $MOCKOPTS --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log; then
+    if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
+        touch $OUTPUT_DIRECTORY/installed
+        exit 0
+    else
+        exit 1
+    fi
+else
+    exit 1
 fi
