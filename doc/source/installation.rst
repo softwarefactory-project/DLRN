@@ -55,6 +55,7 @@ The configuration file looks like this:
     smtpserver=
     maxretries=3
     target=centos
+    gerrit=yes
 
 * ``datadir`` is the directory where the packages and repositories will be created.
 
@@ -73,6 +74,23 @@ The configuration file looks like this:
   as failed. If a build fails, Delorean will check the log files for known, transient errors
   such as network issues. If the build fails for that reason more than maxretries times, it
   will be marked as failed.
+
+* ``gerrit`` if set to anything, instructs delorean to create a gerrit
+  review when a build fails. See next section for details on how to
+  configure gerrit to work.
+
+Configuring for gerrit
+++++++++++++++++++++++
+
+You first need ``git-review`` installed. You can use a package or install
+it using pip.
+
+Then the username for the user creating the gerrit reviews when a
+build will fail needs to be configured like this::
+  
+  $ git config --global --add gitreview.username "myaccount"
+  
+and authorized to connect to gerrit without password.
 
 Configuring your httpd
 ----------------------
