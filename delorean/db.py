@@ -108,4 +108,7 @@ def getCommits(session, project=None, with_status=None, without_status=None,
     order_by = desc
     if order == "asc":
         order_by = asc
-    return commits.order_by(order_by(Commit.id)).limit(limit)
+    commits = commits.order_by(order_by(Commit.id))
+    if limit:
+        commits = commits.limit(limit)
+    return commits
