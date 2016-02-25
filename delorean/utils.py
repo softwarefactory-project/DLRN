@@ -52,9 +52,12 @@ def saveYAML(session, yamlfile):
     fp.close()
 
 
-def dumpshas2file(shafile, commit, source_repo, distgit_repo, status):
-    shafile.write("%s,%s,%s,%s,%s,%s\n" % (commit.project_name, source_repo,
-                  commit.commit_hash, distgit_repo, commit.distro_hash, status)
+def dumpshas2file(shafile, commit, source_repo, distgit_repo,
+                  status, timestamp):
+    shafile.write("%s,%s,%s,%s,%s,%s,%d\n" % (commit.project_name, source_repo,
+                                              commit.commit_hash, distgit_repo,
+                                              commit.distro_hash, status,
+                                              timestamp)
                   )
 
 

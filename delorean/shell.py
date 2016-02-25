@@ -545,8 +545,8 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public):
         raise Exception("Error installing %s" % project_name)
 
     shafile = open(os.path.join(yumrepodir_abs, "versions.csv"), "w")
-    shafile.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,Status\n")
-
+    shafile.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,"
+                  "Status,Last Success Timestamp\n")
     failures = 0
 
     for otherproject in packages:
@@ -554,7 +554,8 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public):
         if otherprojectname == project_name:
             # Output sha's this project
             dumpshas2file(shafile, commit, otherproject["upstream"],
-                          otherproject["master-distgit"], "SUCCESS")
+                          otherproject["master-distgit"], "SUCCESS",
+                          commit.dt_build)
             continue
         # Output sha's of all other projects represented in this repo
         last_success = getCommits(session, project=otherprojectname,
@@ -573,7 +574,7 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public):
         if last:
             dumpshas2file(shafile, last, otherproject["upstream"],
                           otherproject["master-distgit"],
-                          last_processed.status)
+                          last_processed.status, last.dt_build)
             if last_processed.status != 'SUCCESS':
                 failures += 1
         else:
