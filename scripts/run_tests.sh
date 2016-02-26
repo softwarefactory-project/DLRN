@@ -116,6 +116,8 @@ function run_delorean() {
     # Run delorean
     delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
     copy_logs
+    # Clean up mock cache, just in case there is a change for the next run
+    mock -r data/delorean.cfg --scrub=all
 }
 
 # If the commands below throws an error we still want the logs
