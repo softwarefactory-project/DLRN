@@ -1,7 +1,9 @@
-#!/usr/bin/bash
-set -eux
+#!/bin/bash
+set -ex
 
 # Simple CI test to sanity test commits
+
+RDOINFO="$1"
 
 # Display the current commit
 git log -1
@@ -30,7 +32,7 @@ type -p mock
 
 # Build this if not building a specific project
 PROJECT_TO_BUILD=python-glanceclient
-PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
+PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
 
 # If this is a CI run for one of the distro repositories then we pre download it
 # into the data directory, delorean wont change it because we are using --dev
@@ -39,7 +41,7 @@ PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
 if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delorean" ] ; then
     mkdir -p data/repos
     PROJECT_TO_BUILD=${GERRIT_PROJECT#*/}
-    PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD)
+    PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
     PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
     # Use different cloning directory for regular and packaging repositories
     if [ "${GERRIT_PROJECT/openstack-packages\/*/packages}" == "packages" ] ; then

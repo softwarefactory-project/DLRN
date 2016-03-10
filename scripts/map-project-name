@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 # Maps repository names to rdoinfo package names
 # package names are all either exact matches or prefixed with either
 # "python-" or "openstack-", so we just check that the ends match
@@ -7,7 +7,12 @@ import sys
 
 from rdopkg.actionmods import rdoinfo
 
-inforepo = rdoinfo.RdoinfoRepo(".", "https://github.com/redhat-openstack/rdoinfo.git")
+if len(sys.argv) == 3:
+    rdoinfo_url = sys.argv[2]
+else:
+    rdoinfo_url = "https://github.com/redhat-openstack/rdoinfo.git"
+
+inforepo = rdoinfo.RdoinfoRepo(".", rdoinfo_url)
 inforepo.init()
 
 for package in inforepo.get_info()["packages"]:
