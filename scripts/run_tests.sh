@@ -9,7 +9,7 @@ RDOINFO="$1"
 git log -1
 
 set +u
-if [ -z "$GERRIT_PROJECT" -o "$GERRIT_PROJECT" = "openstack-packages/delorean" ] ; then
+if [ -z "${GERRIT_PROJECT-}" -a -z "${ZUUL_PROJECT-}" -o "$GERRIT_PROJECT" = "openstack-packages/delorean" -o "$ZUUL_PROJECT" = "openstack-packages/delorean" ]; then
     # Run unit tests
     tox -epy27
 
@@ -60,6 +60,7 @@ elif [ -n "$ZUUL_PROJECT" ] ; then
     type -p zuul-cloner
     mkdir -p data/repos
     PROJECT_TO_BUILD=${ZUUL_PROJECT%-distgit}
+    PROJECT_TO_BUILD=${PROJECT_TO_BUILD#*/}
     PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
     PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
     zuul-cloner --workspace data/ $GERRIT_CLONE_URL $ZUUL_PROJECT
