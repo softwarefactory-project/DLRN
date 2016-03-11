@@ -23,16 +23,24 @@ MOCKOPTS="-v -r ${DATA_DIR}/delorean.cfg --resultdir $OUTPUT_DIRECTORY"
 /usr/bin/mock $MOCKOPTS --init
 # A simple mock --copyin should be enough, but it does not handle symlinks properly
 MOCKDIR=$(/usr/bin/mock -r ${DATA_DIR}/delorean.cfg -p)
-mkdir ${MOCKDIR}/tmp/pkgsrc
-cp -pr . ${MOCKDIR}/tmp/pkgsrc
-/usr/bin/mock $MOCKOPTS --chroot "cd /tmp/pkgsrc && python setup.py sdist"
-/usr/bin/mock $MOCKOPTS --copyout /tmp/pkgsrc/dist ./dist
-TARBALL=$(ls dist)
 
-# setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
-# so only look at the last line for version
-setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
-                     $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
+# handle python packages
+if [ -r setup.py ]; then
+    mkdir ${MOCKDIR}/tmp/pkgsrc
+    cp -pr . ${MOCKDIR}/tmp/pkgsrc
+    /usr/bin/mock $MOCKOPTS --chroot "cd /tmp/pkgsrc && python setup.py sdist"
+    /usr/bin/mock $MOCKOPTS --copyout /tmp/pkgsrc/dist ./dist
+
+    # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
+    # so only look at the last line for version
+    setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
+                         $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
+else
+    setversionandrelease $(git describe --abbrev=0 --tags) $(git log -n1 --format=format:%h)
+    tar zcvf ../$UPSTREAMVERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@$UPSTREAMVERSION@" --show-transformed-names $PWD
+    mkdir -p dist
+    mv ../$UPSTREAMVERSION.tar.gz dist/
+fi
 
 # https://bugs.launchpad.net/tripleo/+bug/1351491
 if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-image-elements)$ ]] ; then
@@ -40,6 +48,8 @@ if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-ima
         VERSION=$(git tag | sort -V | tail -n 1)
     fi
 fi
+
+TARBALL=$(ls dist)
 
 TARBALLREL=$(basename $TARBALL .tar.gz)-$RELEASE.tar.gz
 mv dist/$TARBALL ${TOP_DIR}/SOURCES/$TARBALLREL
