@@ -37,9 +37,9 @@ if [ -r setup.py ]; then
                          $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
 else
     setversionandrelease $(git describe --abbrev=0 --tags) $(git log -n1 --format=format:%h)
-    tar zcvf ../$UPSTREAMVERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@$UPSTREAMVERSION@" --show-transformed-names $PWD
+    tar zcvf ../$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${PROJECT_NAME}-${VERSION}@" --show-transformed-names $PWD
     mkdir -p dist
-    mv ../$UPSTREAMVERSION.tar.gz dist/
+    mv ../$VERSION.tar.gz dist/
 fi
 
 # https://bugs.launchpad.net/tripleo/+bug/1351491
