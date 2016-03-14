@@ -15,9 +15,19 @@ else:
 inforepo = rdoinfo.RdoinfoRepo(".", rdoinfo_url)
 inforepo.init()
 
+# Attempt a strict mapping with project name
 for package in inforepo.get_info()["packages"]:
-    if (package["name"].endswith(sys.argv[1]) or
-        "project" in package and package["project"].endswith(sys.argv[1])):
+    if "project" in package and sys.argv[1] == package["project"]:
         print package["name"]
         exit(0)
+
+# If nothing has been found then attempt a speculative mapping
+# looking if sys.argv[1] is found as package["name"] or package["project"]
+# suffix
+for package in inforepo.get_info()["packages"]:
+    if (package["name"].endswith(sys.argv[1]) or
+       "project" in package and package["project"].endswith(sys.argv[1])):
+        print package["name"]
+        exit(0)
+
 exit(1)
