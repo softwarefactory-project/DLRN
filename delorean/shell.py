@@ -219,11 +219,26 @@ def main():
         # collect info from all spec files
         logger.info("Reading rpm spec files")
         projects = sorted([p['name'] for p in packages])
-        specs = RpmSpecCollection([RpmSpecFile(
-            open(os.path.join(cp.get("DEFAULT", "datadir"),
-                              project_name + "_distro",
-                              project_name + '.spec')).read(-1))
-            for project_name in projects])
+
+        speclist = []
+        bootstraplist = []
+        for project_name in projects:
+            specpath = os.path.join(cp.get("DEFAULT", "datadir"),
+                                    project_name + "_distro",
+                                    project_name + '.spec')
+            speclist.append(sh.rpmspec('-D', 'repo_bootstrap 1',
+                                       '-P', specpath))
+
+            # Check if repo_bootstrap is defined in the package.
+            # If so, we'll need to rebuild after the whole bootstrap exercise
+            rawspec = open(specpath).read(-1)
+            if 'repo_bootstrap' in rawspec:
+                bootstraplist.append(project_name)
+
+        logger.debug("Packages to rebuild: %s" % bootstraplist)
+
+        specs = RpmSpecCollection([RpmSpecFile(spec)
+                                  for spec in speclist])
         # compute order according to BuildRequires
         logger.info("Computing build order")
         orders = specs.compute_order()
@@ -261,7 +276,7 @@ def main():
         try:
             built_rpms, notes = build(cp, packages,
                                       commit, options.build_env, options.dev,
-                                      options.use_public)
+                                      options.use_public, options.order)
         except Exception as e:
             exit_code = 1
             datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
@@ -341,6 +356,15 @@ def main():
         if options.dev is False:
             session.commit()
         genreports(cp, packages, options)
+
+    # If we were bootstrapping, set the packages that required it to RETRY
+    if options.order is True and not options.package_name:
+        for bpackage in bootstraplist:
+            commit = getLastProcessedCommit(session, bpackage)
+            commit.status = 'RETRY'
+            session.add(commit)
+            session.commit()
+
     genreports(cp, packages, options)
     return exit_code
 
@@ -524,7 +548,7 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
     return project_toprocess
 
 
-def build(cp, packages, commit, env_vars, dev_mode, use_public):
+def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
 
     # Set the build timestamp to now
     commit.dt_build = int(time())
@@ -554,6 +578,8 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public):
             run_cmd.append(env_var)
     if (dev_mode or use_public):
             run_cmd.append("DELOREAN_DEV=1")
+    if bootstrap is True:
+            run_cmd.append("REPO_BOOTSTRAP=1")
 
     run_cmd.extend([os.path.join(scriptsdir, "build_rpm_wrapper.sh"),
                     target, project_name,
