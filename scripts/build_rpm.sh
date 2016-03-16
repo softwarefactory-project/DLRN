@@ -24,8 +24,8 @@ MOCKOPTS="-v -r ${DATA_DIR}/delorean.cfg --resultdir $OUTPUT_DIRECTORY"
 # A simple mock --copyin should be enough, but it does not handle symlinks properly
 MOCKDIR=$(/usr/bin/mock -r ${DATA_DIR}/delorean.cfg -p)
 
-# handle python packages
-if [ -r setup.py ]; then
+# handle python packages (some puppet modules are carrying a setup.py too)
+if [ -r setup.py -a ! -r metadata.json ]; then
     mkdir ${MOCKDIR}/tmp/pkgsrc
     cp -pr . ${MOCKDIR}/tmp/pkgsrc
     /usr/bin/mock $MOCKOPTS --chroot "cd /tmp/pkgsrc && python setup.py sdist"
