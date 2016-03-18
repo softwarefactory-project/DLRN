@@ -123,6 +123,11 @@ def main():
     parser.add_argument('--version',
                         action='version',
                         version=version.version_info.version_string())
+    parser.add_argument('--run',
+                        help="Run a program instead of trying to build. "
+                             "Imply --head-only")
+    parser.add_argument('--stop', action="store_true",
+                        help="Stop on error.")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
@@ -177,7 +182,10 @@ def main():
                 logger.error("There are no existing commits for package %s"
                              % options.package_name)
                 sys.exit(1)
-
+    # when we run a program instead of building we don't care about
+    # the commits, we just want to run once per package
+    if options.run:
+        options.head_only = True
     # Build a list of commits we need to process
     toprocess = []
     for package in packages:
@@ -204,13 +212,14 @@ def main():
             # the last commit in the db, as multiple commits can have the same
             # commit date
             for commit_toprocess in project_toprocess:
-                if (options.dev is True) or \
-                   (not session.query(Commit).filter(
+                if ((options.dev is True) or
+                    options.run or
+                    (not session.query(Commit).filter(
                         Commit.project_name == project,
                         Commit.commit_hash == commit_toprocess.commit_hash,
                         Commit.distro_hash == commit_toprocess.distro_hash,
                         Commit.status != "RETRY")
-                        .all()):
+                        .all())):
                     toprocess.append(commit_toprocess)
 
     # if requested do a sort according to build and install
@@ -271,7 +280,20 @@ def main():
 
         commit_hash = commit.commit_hash
 
+        if options.run:
+            try:
+                run(options.run, cp, commit, options.build_env,
+                    options.dev, options.use_public, options.order,
+                    do_build=False)
+            except Exception as e:
+                exit_code = 1
+                if options.stop:
+                    return exit_code
+                pass
+            continue
+
         logger.info("Processing %s %s" % (project, commit_hash))
+
         notes = ""
         try:
             built_rpms, notes = build(cp, packages,
@@ -347,7 +369,8 @@ def main():
                 commit.status = "FAILED"
                 commit.notes = getattr(e, "message", notes)
                 session.add(commit)
-
+            if options.stop:
+                return exit_code
         else:
             commit.status = "SUCCESS"
             commit.notes = notes
@@ -548,13 +571,10 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
     return project_toprocess
 
 
-def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
-
-    # Set the build timestamp to now
-    commit.dt_build = int(time())
+def run(program, cp, commit, env_vars, dev_mode, use_public, bootstrap,
+        do_build=True):
 
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
-    scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
     target = cp.get("DEFAULT", "target")
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
@@ -564,10 +584,11 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
     project_name = commit.project_name
     repo_dir = commit.repo_dir
 
-    # If yum repo already exists remove it and assume we're starting fresh
-    if os.path.exists(yumrepodir_abs):
-        shutil.rmtree(yumrepodir_abs)
-    os.makedirs(yumrepodir_abs)
+    if do_build:
+        # If yum repo already exists remove it and assume we're starting fresh
+        if os.path.exists(yumrepodir_abs):
+            shutil.rmtree(yumrepodir_abs)
+        os.makedirs(yumrepodir_abs)
 
     sh.git("--git-dir", "%s/.git" % repo_dir,
            "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
@@ -581,10 +602,13 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
     if bootstrap is True:
             run_cmd.append("REPO_BOOTSTRAP=1")
 
-    run_cmd.extend([os.path.join(scriptsdir, "build_rpm_wrapper.sh"),
+    run_cmd.extend([program,
                     target, project_name,
                     os.path.join(datadir, yumrepodir),
                     datadir, baseurl])
+    if not do_build:
+        logger.info('Running %s' % ' '.join(run_cmd))
+
     try:
         sh_version = SemanticVersion.from_pip_string(sh.__version__)
         min_sh_version = SemanticVersion.from_pip_string('1.09')
@@ -596,6 +620,22 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
         logger.error('cmd failed. See logs at: %s/%s/' % (datadir,
                                                           yumrepodir))
         raise e
+
+
+def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
+
+    # Set the build timestamp to now
+    commit.dt_build = int(time())
+
+    scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
+    run(os.path.join(scriptsdir, "build_rpm_wrapper.sh"), cp, commit, env_vars,
+        dev_mode, use_public, bootstrap)
+
+    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
+    yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
+    yumrepodir_abs = os.path.join(datadir, yumrepodir)
+    commit_hash = commit.commit_hash
+    project_name = commit.project_name
 
     built_rpms = []
     for rpm in os.listdir(yumrepodir_abs):
