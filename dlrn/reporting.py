@@ -22,9 +22,9 @@ from six.moves.urllib import parse
 
 import jinja2
 
-from delorean.db import Commit
-from delorean.db import getCommits
-from delorean.db import getSession
+from dlrn.db import Commit
+from dlrn.db import getCommits
+from dlrn.db import getSession
 
 
 def get_commit_url(commit, pkg):

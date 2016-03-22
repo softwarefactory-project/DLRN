@@ -112,17 +112,17 @@ function copy_logs() {
     rsync -avzr data/repos logs/$DISTRO
 }
 
-function run_delorean() {
+function run_dlrn() {
     export DISTRO="${1}"
     update_config $DISTRO
     # Run delorean
     delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
     copy_logs
     # Clean up mock cache, just in case there is a change for the next run
-    mock -r data/delorean.cfg --scrub=all
+    mock -r data/dlrn.cfg --scrub=all
 }
 
 # If the commands below throws an error we still want the logs
 trap copy_logs ERR EXIT
 
-run_delorean centos
+run_dlrn centos
