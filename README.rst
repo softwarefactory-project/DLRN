@@ -1,8 +1,8 @@
-========
-Delorean
-========
+====
+DLRN
+====
 
-Delorean builds and maintains yum repositories following OpenStack
+DLRN builds and maintains yum repositories following OpenStack
 uptream commit streams.
 
 Documentation is available at
@@ -19,7 +19,7 @@ Add the user you intend to run as to the mock group and login again.
 
 .. code-block:: shell-session
 
-    $ git clone https://github.com/openstack-packages/delorean.git
+    $ git clone https://github.com/openstack-packages/DLRN.git
 
 If you want to serv the built packages and the status reports:
 
@@ -32,9 +32,9 @@ Preparing
 
 .. code-block:: shell-session
 
-    $ cd delorean
-    $ virtualenv ../delorean-venv
-    $ . ../delorean-venv/bin/activate
+    $ cd DLRN
+    $ virtualenv ../dlrn-venv
+    $ . ../dlrn-venv/bin/activate
     $ pip install -r requirements.txt
     $ python setup.py develop
 
@@ -80,13 +80,13 @@ If you interrupt delorean during mock build you might get an error
 
 .. code-block:: shell-session
 
-    OSError: [Errno 16] Device or resource busy: '/var/lib/mock/delorean-fedora-x86_64/root/var/cache/yum'
+    OSError: [Errno 16] Device or resource busy: '/var/lib/mock/dlrn-fedora-x86_64/root/var/cache/yum'
 
 Solution is to clear left-over bind mount as root:
 
 .. code-block:: shell-session
 
-    # umount /var/lib/mock/delorean-fedora-x86_64/root/var/cache/yum
+    # umount /var/lib/mock/dlrn-fedora-x86_64/root/var/cache/yum
 
 Other requirements
 ------------------

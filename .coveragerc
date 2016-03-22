@@ -1,7 +1,12 @@
 [run]
 branch = True
-source = delorean
-omit = delorean/tests/*,delorean/openstack/*
+source = dlrn
+omit =
+ dlrn/tests/*
+
+[paths]
+source = sahara_tests
 
 [report]
 ignore_errors = True
+precision = 3

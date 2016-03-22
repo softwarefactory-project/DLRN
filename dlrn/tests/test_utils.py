@@ -14,9 +14,9 @@
 from mock import call
 from mock import MagicMock
 
-from delorean import db
-from delorean.tests.test_db import TestsWithData
-from delorean import utils
+from dlrn import db
+from dlrn.tests.test_db import TestsWithData
+from dlrn import utils
 
 
 class Testdumpshas2file(TestsWithData):

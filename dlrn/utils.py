@@ -14,8 +14,8 @@ import yaml
 
 import sqlalchemy
 
-from delorean.db import Commit
-from delorean.db import getSession
+from dlrn.db import Commit
+from dlrn.db import getSession
 
 
 # Load a yaml file into a db session, used to populate a in memory database
