@@ -1,7 +1,7 @@
 [run]
 branch = True
 source = delorean
-omit = delorean/tests/*,delorean/openstack/*
+omit = dlrn/tests/*,dlrn/openstack/*
 
 [report]
 ignore_errors = True
