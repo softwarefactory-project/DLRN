@@ -14,8 +14,8 @@
 import mock
 import sh
 
-from delorean import shell
-from delorean.tests import base
+from dlrn import shell
+from dlrn.tests import base
 
 
 @mock.patch.object(sh.Command, '__call__', autospec=True)

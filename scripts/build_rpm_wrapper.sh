@@ -13,32 +13,32 @@ exec > ${OUTPUT_DIRECTORY}/rpmbuild.log 2>&1
 
 set -x
 
-cp  $(dirname $0)/${TARGET}.cfg ${DATA_DIR}/delorean.cfg.new
+cp  $(dirname $0)/${TARGET}.cfg ${DATA_DIR}/dlrn.cfg.new
 
 # Add the mostcurrent repo, we may have dependencies in it
 if [ -e ${DATA_DIR}/repos/current/repodata ] ; then
     # delete the last line which must be """
-    sed -i -e '$d' ${DATA_DIR}/delorean.cfg.new
-    echo -e "\n[local]\nname=local\nbaseurl=file://${DATA_DIR}/repos/current\nenabled=1\ngpgcheck=0\npriority=1\n\"\"\"" >> ${DATA_DIR}/delorean.cfg.new
+    sed -i -e '$d' ${DATA_DIR}/dlrn.cfg.new
+    echo -e "\n[local]\nname=local\nbaseurl=file://${DATA_DIR}/repos/current\nenabled=1\ngpgcheck=0\npriority=1\n\"\"\"" >> ${DATA_DIR}/dlrn.cfg.new
 fi
 
 # delete the last line which must be """
-sed -i -e '$d' ${DATA_DIR}/delorean.cfg.new
-curl ${BASEURL}/delorean-deps.repo >> ${DATA_DIR}/delorean.cfg.new
-echo -e "\"\"\"" >> ${DATA_DIR}/delorean.cfg.new
+sed -i -e '$d' ${DATA_DIR}/dlrn.cfg.new
+curl ${BASEURL}/delorean-deps.repo >> ${DATA_DIR}/dlrn.cfg.new
+echo -e "\"\"\"" >> ${DATA_DIR}/dlrn.cfg.new
 
 if [ "$DELOREAN_DEV" = 1 ]; then
     # delete the last line which must be """
-    sed -i -e '$d' ${DATA_DIR}/delorean.cfg.new
-    curl ${BASEURL}/current/delorean.repo >> ${DATA_DIR}/delorean.cfg.new
-    echo -e "\"\"\"" >> ${DATA_DIR}/delorean.cfg.new
+    sed -i -e '$d' ${DATA_DIR}/dlrn.cfg.new
+    curl ${BASEURL}/current/delorean.repo >> ${DATA_DIR}/dlrn.cfg.new
+    echo -e "\"\"\"" >> ${DATA_DIR}/dlrn.cfg.new
 fi
 
-# don't change delorean.cfg if the content hasn't changed to prevent
+# don't change dlrn.cfg if the content hasn't changed to prevent
 # mock from rebuilding its cache.
-if [ ! -f ${DATA_DIR}/delorean.cfg ] || ! cmp ${DATA_DIR}/delorean.cfg ${DATA_DIR}/delorean.cfg.new; then
-    diff -u ${DATA_DIR}/delorean.cfg.new ${DATA_DIR}/delorean.cfg || :
-    cp ${DATA_DIR}/delorean.cfg.new ${DATA_DIR}/delorean.cfg
+if [ ! -f ${DATA_DIR}/dlrn.cfg ] || ! cmp ${DATA_DIR}/dlrn.cfg ${DATA_DIR}/dlrn.cfg.new; then
+    diff -u ${DATA_DIR}/dlrn.cfg.new ${DATA_DIR}/dlrn.cfg || :
+    cp ${DATA_DIR}/dlrn.cfg.new ${DATA_DIR}/dlrn.cfg
 fi
 
 # if bootstraping, set the appropriate mock config option
