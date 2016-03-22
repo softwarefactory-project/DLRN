@@ -15,8 +15,8 @@
 
 import unittest
 
-from delorean.rpmspecfile import RpmSpecCollection
-from delorean.rpmspecfile import RpmSpecFile
+from dlrn.rpmspecfile import RpmSpecCollection
+from dlrn.rpmspecfile import RpmSpecFile
 
 
 class TestRpmSpecFile(unittest.TestCase):

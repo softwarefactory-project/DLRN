@@ -46,7 +46,7 @@ sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs *.spec
-/usr/bin/mock -v -r ${DATA_DIR}/delorean.cfg --postinstall --resultdir $OUTPUT_DIRECTORY --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+/usr/bin/mock -v -r ${DATA_DIR}/dlrn.cfg --postinstall --resultdir $OUTPUT_DIRECTORY --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
 
 if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
     touch $OUTPUT_DIRECTORY/installed

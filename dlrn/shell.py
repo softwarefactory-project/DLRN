@@ -32,21 +32,21 @@ from six.moves import configparser
 from rdopkg.actionmods import rdoinfo
 import rdopkg.utils.log
 
-from delorean.db import Commit
-from delorean.db import getCommits
-from delorean.db import getLastProcessedCommit
-from delorean.db import getSession
-from delorean.db import Project
-from delorean.reporting import genreports
-from delorean.reporting import get_commit_url
-from delorean.rpmspecfile import RpmSpecCollection
-from delorean.rpmspecfile import RpmSpecFile
-from delorean.utils import dumpshas2file
-from delorean import version
+from dlrn.db import Commit
+from dlrn.db import getCommits
+from dlrn.db import getLastProcessedCommit
+from dlrn.db import getSession
+from dlrn.db import Project
+from dlrn.reporting import genreports
+from dlrn.reporting import get_commit_url
+from dlrn.rpmspecfile import RpmSpecCollection
+from dlrn.rpmspecfile import RpmSpecFile
+from dlrn.utils import dumpshas2file
+from dlrn import version
 
 rdopkg.utils.log.set_colors('no')
 logging.basicConfig(level=logging.ERROR)
-logger = logging.getLogger("delorean")
+logger = logging.getLogger("dlrn")
 logger.setLevel(logging.INFO)
 
 
@@ -108,7 +108,7 @@ def main():
                              "and add public master repo for dependencies "
                              "(dev mode).")
     parser.add_argument('--log-commands', action="store_true",
-                        help="Log the commands run by delorean.")
+                        help="Log the commands run by dlrn.")
     parser.add_argument('--use-public', action="store_true",
                         help="Use the public master repo for dependencies "
                              "when doing install verification.")
@@ -458,7 +458,7 @@ def sendnotifymail(cp, packages, commit):
     error_body = notification_email % error_details
 
     msg = MIMEText(error_body)
-    msg['Subject'] = '[delorean] %s master package build failed' % \
+    msg['Subject'] = '[dlrn] %s master package build failed' % \
                      commit.project_name
 
     email_from = 'no-reply@delorean.com'
@@ -598,7 +598,7 @@ def run(program, cp, commit, env_vars, dev_mode, use_public, bootstrap,
         for env_var in env_vars:
             run_cmd.append(env_var)
     if (dev_mode or use_public):
-            run_cmd.append("DELOREAN_DEV=1")
+            run_cmd.append("DLRN_DEV=1")
     if bootstrap is True:
             run_cmd.append("REPO_BOOTSTRAP=1")
 
