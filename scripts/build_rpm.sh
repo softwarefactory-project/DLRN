@@ -36,8 +36,18 @@ if [ -r setup.py -a ! -r metadata.json ]; then
     setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
                          $(/usr/bin/mock -q -r ${DATA_DIR}/delorean.cfg --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
 else
-    setversionandrelease $(git describe --abbrev=0 --tags) $(git log -n1 --format=format:%h)
-    tar zcvf ../$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${PROJECT_NAME}-${VERSION}@" --show-transformed-names $PWD
+    version="$(git describe --abbrev=0 --tags || :)"
+    # fallback to the version in metadata.json
+    if [ -z "$version" -a -r metadata.json ]; then
+	version=$(python -c "import json; print json.loads(open('metadata.json').read(-1))['version']")
+    fi
+    setversionandrelease $version $(git log -n1 --format=format:%h)
+    if [ -r metadata.json ]; then
+	TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@')
+    else
+	TARNAME=${PROJECT_NAME}
+    fi
+    tar zcvf ../$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${TARNAME}-${VERSION}@" --show-transformed-names $PWD
     mkdir -p dist
     mv ../$VERSION.tar.gz dist/
 fi
