@@ -1,4 +1,4 @@
-Welcome to Delorean's documentation!
+Welcome to DLRN's documentation!
 ====================================
 
 Contents:
@@ -10,6 +10,7 @@ Contents:
    installation
    repositories
    usage
+   troubleshooting
    contributing
 
 Indices and tables

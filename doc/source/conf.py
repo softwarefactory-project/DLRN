@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# delorean documentation build configuration file
+# DLRN documentation build configuration file
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Delorean'
+project = 'DLRN'
 copyright = '2016, RDO Project'
 author = 'RDO Community'
 
@@ -200,7 +200,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Delorean'
+htmlhelp_basename = 'DLRN'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -222,7 +222,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'delorean.tex', 'Delorean Documentation',
+  (master_doc, 'dlrn.tex', 'DLRN Documentation',
    'RDO Community', 'manual'),
 ]
 
@@ -252,7 +252,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'Delorean', 'Delorean Documentation',
+    (master_doc, 'DLRN', 'DLRN Documentation',
      [author], 1)
 ]
 
@@ -266,8 +266,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'Delorean', 'Delorean Documentation',
-   author, 'Delorean', '',
+  (master_doc, 'DLRN', 'DLRN Documentation',
+   author, 'DLRN', '',
    'Miscellaneous'),
 ]
 
