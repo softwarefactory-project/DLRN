@@ -1,27 +1,27 @@
-========
-Delorean
-========
+====
+DLRN
+====
 
-Delorean builds and maintains yum repositories following OpenStack
+DLRN builds and maintains yum repositories following OpenStack
 uptream commit streams.
 
 Documentation is available at
-http://fluzo.readthedocs.org/en/latest/
+http://dlrn.readthedocs.org/en/latest/
 
 Setup
 -----
 
 .. code-block:: shell-session
 
-    # yum install git createrepo python-virtualenv git-remote-hg mock
+    # yum install git createrepo python-virtualenv mock gcc redhat-rpm-config rpmdevtools httpd
 
 Add the user you intend to run as to the mock group and login again.
 
 .. code-block:: shell-session
 
-    $ git clone https://github.com/openstack-packages/delorean.git
+    $ git clone https://github.com/openstack-packages/DLRN.git
 
-If you want to serv the built packages and the status reports:
+If you want to serve the built packages and the status reports:
 
 .. code-block:: shell-session
 
@@ -32,7 +32,7 @@ Preparing
 
 .. code-block:: shell-session
 
-    $ cd delorean
+    $ cd DLRN
     $ virtualenv ../delorean-venv
     $ . ../delorean-venv/bin/activate
     $ pip install -r requirements.txt
@@ -76,22 +76,22 @@ the packages in the order of the timestamps of the commits.
 Troubleshooting
 ---------------
 
-If you interrupt delorean during mock build you might get an error
+If you interrupt dlrn during mock build you might get an error
 
 .. code-block:: shell-session
 
-    OSError: [Errno 16] Device or resource busy: '/var/lib/mock/delorean-fedora-x86_64/root/var/cache/yum'
+    OSError: [Errno 16] Device or resource busy: '/var/lib/mock/dlrn-fedora-x86_64/root/var/cache/yum'
 
 Solution is to clear left-over bind mount as root:
 
 .. code-block:: shell-session
 
-    # umount /var/lib/mock/delorean-fedora-x86_64/root/var/cache/yum
+    # umount /var/lib/mock/dlrn-fedora-x86_64/root/var/cache/yum
 
 Other requirements
 ------------------
 
-If the git clone operation fails for a package, Delorean will try to remove
-the source directory using sudo. Please make sure the user running Delorean
-can run ``rm -rf /path/to/delorean/data/*`` without being asked for a password,
-otherwise Delorean will fail to process new commits.
+If the git clone operation fails for a package, DLRN will try to remove
+the source directory using sudo. Please make sure the user running DLRN
+can run ``rm -rf /path/to/dlrn/data/*`` without being asked for a password,
+otherwise DLRN will fail to process new commits.
