@@ -57,6 +57,8 @@ The configuration file looks like this:
     maxretries=3
     target=centos
     gerrit=yes
+    rsyncdest=
+    rsyncport=22
 
 * ``datadir`` is the directory where the packages and repositories will be created.
 
@@ -79,6 +81,14 @@ The configuration file looks like this:
 * ``gerrit`` if set to anything, instructs dlrn to create a gerrit
   review when a build fails. See next section for details on how to
   configure gerrit to work.
+
+* ``rsyncdest`` if set, specifies a destination path where the hashed repository
+  directories created by DLRN will be synchronized using ``rsync``, after each commit build.
+  An example would be ``root@backupserver.example.com:/backupdir``.
+  Make sure the user running DLRN has access to the destination server using passswordless SSH.
+
+* ``rsyncport`` is the SSH port to be used when synchronizing the hashed repository. If
+  ``rsyncdest`` is not defined, this option will be ignored.
 
 Configuring for gerrit
 ++++++++++++++++++++++
