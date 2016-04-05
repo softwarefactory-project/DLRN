@@ -79,7 +79,8 @@ re_known_errors = re.compile('Error: Nothing to do|'
 default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'templatedir': os.path.join(
                        os.path.dirname(os.path.realpath(__file__)),
-                       "templates")
+                       "templates"),
+                   'rsyncdest': '', 'rsyncport': '22'
                    }
 
 
@@ -623,7 +624,6 @@ def run(program, cp, commit, env_vars, dev_mode, use_public, bootstrap,
 
 
 def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
-
     # Set the build timestamp to now
     commit.dt_build = int(time())
 
@@ -711,6 +711,32 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
                                    os.path.join(datadir, "repos")),
                    target_repo_dir + "_")
         os.rename(target_repo_dir + "_", target_repo_dir)
+
+    rsyncdest = cp.get("DEFAULT", "rsyncdest")
+    rsyncport = cp.getint("DEFAULT", "rsyncport")
+    if rsyncdest != '':
+        # We are only rsyncing the current repo dir to rsyncdest
+        rsyncpaths = []
+        # We are inserting a dot in the path after repos, this is used by
+        # rsync -R (see man rsync)
+        commitdir_abs = os.path.join(datadir, "repos", ".",
+                                     commit.getshardedcommitdir())
+        rsyncpaths.append(commitdir_abs)
+        # We also need report.html, status_report.html and styles.css
+        for filename in ['report.html', 'status_report.html', 'styles.css']:
+            filepath = os.path.join(datadir, "repos", ".", filename)
+            rsyncpaths.append(filepath)
+
+        rsh_command = '-e ssh -p %s' % rsyncport
+        for dirname in rsyncpaths:
+            try:
+                sh.rsync('-avzR', '--delete',
+                         rsh_command,
+                         dirname, rsyncdest)
+            except Exception as e:
+                logger.warn('Failed to sync directory %s to %s ,'
+                            'got error %s' % (dirname, rsyncdest, e))
+
     return built_rpms, notes
 
 
