@@ -16,4 +16,4 @@ import pbr.version
 
 
 __version__ = pbr.version.VersionInfo(
-    'delorean').version_string()
+    'dlrn').version_string()
