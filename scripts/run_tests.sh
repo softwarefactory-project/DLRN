@@ -60,6 +60,7 @@ elif [ -n "$ZUUL_PROJECT" ] ; then
     type -p zuul-cloner
     mkdir -p data/repos
     PROJECT_TO_BUILD=${ZUUL_PROJECT%-distgit}
+    PROJECT_TO_BUILD=${PROJECT_TO_BUILD#*/}
     PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
     PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
     zuul-cloner --workspace data/ $GERRIT_CLONE_URL $ZUUL_PROJECT
