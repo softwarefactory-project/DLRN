@@ -19,6 +19,7 @@ from sqlalchemy import asc
 from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Integer
+from sqlalchemy import or_
 from sqlalchemy import String
 
 
@@ -95,7 +96,7 @@ def getLastProcessedCommit(session, project_name, not_status="RETRY"):
 
 
 def getCommits(session, project=None, with_status=None, without_status=None,
-               limit=1, order="desc", since=None):
+               limit=1, order="desc", since=None, before=None):
     commits = session.query(Commit)
     if project is not None:
         commits = commits.filter(Commit.project_name == project)
@@ -105,6 +106,9 @@ def getCommits(session, project=None, with_status=None, without_status=None,
         commits = commits.filter(Commit.status != without_status)
     if since is not None:
         commits = commits.filter(Commit.dt_build > since)
+    if before is not None:
+        commits = commits.filter(or_(Commit.dt_build is None,
+                                 Commit.dt_build < before))
     order_by = desc
     if order == "asc":
         order_by = asc
