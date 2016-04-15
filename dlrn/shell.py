@@ -869,7 +869,19 @@ def purge():
                                " ignoring." % datadir)
             fullpurge.append(commit.project_name)
             commit.flags |= FLAG_PURGED
-        else:
             shutil.rmtree(datadir)
+        else:
+            # If the commit was not successful, we need to be careful not to
+            # remove the directory if there was a successful build
+            if commit.status != "SUCCESS":
+                othercommits = session.query(Commit).filter(
+                    Commit.project_name == commit.project_name,
+                    Commit.commit_hash == commit.commit_hash,
+                    Commit.status == 'SUCCESS').count()
+
+                if othercommits == 0:
+                    shutil.rmtree(datadir)
+            else:
+                shutil.rmtree(datadir)
             commit.flags |= FLAG_PURGED
     session.commit()
