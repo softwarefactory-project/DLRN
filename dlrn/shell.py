@@ -734,11 +734,11 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
             filepath = os.path.join(datadir, "repos", ".", filename)
             rsyncpaths.append(filepath)
 
-        rsh_command = '-e ssh -p %s' % rsyncport
+        rsh_command = 'ssh -p %s -o StrictHostKeyChecking=no' % rsyncport
         for dirname in rsyncpaths:
             try:
                 sh.rsync('-avzR', '--delete',
-                         rsh_command,
+                         '-e', rsh_command,
                          dirname, rsyncdest)
             except Exception as e:
                 logger.warn('Failed to sync directory %s to %s ,'
