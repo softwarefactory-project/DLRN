@@ -387,6 +387,7 @@ def main():
         if options.dev is False:
             session.commit()
         genreports(cp, packages, options)
+        sync_repo(cp, commit)
 
     # If we were bootstrapping, set the packages that required it to RETRY
     if options.order is True and not options.package_name:
@@ -719,8 +720,14 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
                    target_repo_dir + "_")
         os.rename(target_repo_dir + "_", target_repo_dir)
 
+    return built_rpms, notes
+
+
+def sync_repo(cp, commit):
     rsyncdest = cp.get("DEFAULT", "rsyncdest")
     rsyncport = cp.getint("DEFAULT", "rsyncport")
+    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
+
     if rsyncdest != '':
         # We are only rsyncing the current repo dir to rsyncdest
         rsyncpaths = []
@@ -734,17 +741,15 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
             filepath = os.path.join(datadir, "repos", ".", filename)
             rsyncpaths.append(filepath)
 
-        rsh_command = '-e ssh -p %s' % rsyncport
+        rsh_command = 'ssh -p %s -o StrictHostKeyChecking=no' % rsyncport
         for dirname in rsyncpaths:
             try:
                 sh.rsync('-avzR', '--delete',
-                         rsh_command,
+                         '-e', rsh_command,
                          dirname, rsyncdest)
             except Exception as e:
                 logger.warn('Failed to sync directory %s to %s ,'
                             'got error %s' % (dirname, rsyncdest, e))
-
-    return built_rpms, notes
 
 
 def submit_review(cp, commit, env_vars):
