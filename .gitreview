@@ -1,4 +1,4 @@
 [gerrit]
-host=review.gerrithub.io
+host=review.rdoproject.org
 port=29418
-project=openstack-packages/delorean
+project=DLRN
