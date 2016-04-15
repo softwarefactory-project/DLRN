@@ -14,8 +14,18 @@
 import mock
 import sh
 
-from dlrn import shell
 from dlrn.tests import base
+
+from dlrn import db
+from dlrn import shell
+from dlrn import utils
+
+
+class TestsWithData(base.TestCase):
+    def setUp(self):
+        super(TestsWithData, self).setUp()
+        self.session = db.getSession(new=True)
+        utils.loadYAML(self.session, './dlrn/tests/samples/commits_1.yaml')
 
 
 @mock.patch.object(sh.Command, '__call__', autospec=True)
