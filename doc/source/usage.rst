@@ -79,3 +79,29 @@ The output of DLRN is generated in the ``<datadir>/repos`` directory. It consist
 of the finished ``.rpm`` files for download, located in ``/repos/current``, and reports
 of the failures in ``/repos/status_report.html``, and a report of all builds in
 ``/repos/report.html``.
+
+
+Purging old commits
+-------------------
+
+Over time, the disk space consumed by DLRN will grow, as older commits and their repositories
+are never removed. It is possible to use the ``dlrn-purge`` command to purge commits built before
+a certain date.
+
+.. code-block:: console
+
+    usage: dlrn-purge [-h] --config-file CONFIG_FILE --older-than OLDER_THAN [-y] [--dry-run]
+    arguments:
+      -h, --help            show this help message and exit
+      --config-file CONFIG_FILE
+                            Config file (required)
+      --older-than  OLDER_THAN
+                            how old a build needs to be, in order to be considered
+                            for removal (required). It is measured in days.
+      -y                    Assume yes for all questions.
+      --dry-run             If specified, do not apply any changes. Instead, show what would
+                            be removed from the filesystem.
+
+Old commits will remain in the database, although their flag will be set to purged, and their
+associated repo directory will be removed. There is one exception to this rule, when an old
+commit is the newest one that was successfully built. In that case, it will be preserved.
