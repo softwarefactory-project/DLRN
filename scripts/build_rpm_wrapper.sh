@@ -46,7 +46,10 @@ if [ "REPO_BOOTSTRAP" = 1 ]; then
     ADDITIONAL_MOCK_OPTIONS="-D 'repo_bootstrap 1'"
 fi
 
-if [ "$1" != "openstack-puppet-modules" ] ; then
+# Support virtual packages. The new opm starting at Newton will be
+# virtual and we also need to keep support for the previous releases
+# of the opm packages.
+if egrep -qv '^Source0:' ${DATA_DIR}/${PROJECT_NAME}_distro/*.spec || [ "$1" != "openstack-puppet-modules" ] ; then
     $DIR/build_rpm.sh "$@"
 else
     # Special case of the puppet modules as they don't
