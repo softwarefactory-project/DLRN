@@ -657,6 +657,12 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
         logger.error('Build failed. See logs at: %s/%s/' % (datadir,
                                                             yumrepodir))
         raise Exception("Error installing %s" % project_name)
+    else:
+        # Overwrite installed file, adding the repo reference
+        with open(os.path.join(yumrepodir_abs, "installed"), "w") as fp:
+            fp.write("%s %s %s" % (commit.project_name,
+                                   commit.commit_hash,
+                                   commit.distro_hash))
 
     shafile = open(os.path.join(yumrepodir_abs, "versions.csv"), "w")
     shafile.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,"
