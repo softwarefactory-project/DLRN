@@ -9,7 +9,7 @@ RDOINFO="$1"
 git log -1
 
 set +u
-if [ -z "${GERRIT_PROJECT-}" -a -z "${ZUUL_PROJECT-}" -o "$GERRIT_PROJECT" = "openstack-packages/delorean" -o "$ZUUL_PROJECT" = "openstack-packages/delorean" ]; then
+if [ -z "${GERRIT_PROJECT-}" -a -z "${ZUUL_PROJECT-}" -o "$ZUUL_PROJECT" = "DLRN" ]; then
     # Run unit tests
     tox -epy27
 
