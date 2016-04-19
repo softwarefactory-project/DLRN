@@ -1,15 +1,15 @@
 #!/bin/bash
 set -ex
 
-# Simple CI test to sanity test commits
-
-RDOINFO="$1"
+# Simple CI test to sanity test commits within a gerrit/zuul ecosystem
+RDOINFO="${1}"
+GIT_BASE_URL="https://review.rdoproject.org/r"
 
 # Display the current commit
 git log -1
 
 set +u
-if [ -z "${GERRIT_PROJECT-}" -a -z "${ZUUL_PROJECT-}" -o "$GERRIT_PROJECT" = "openstack-packages/delorean" -o "$ZUUL_PROJECT" = "openstack-packages/delorean" ]; then
+if [ -z "${GERRIT_PROJECT}" -a -z "${ZUUL_PROJECT}" -o "${ZUUL_PROJECT}" = "DLRN" ]; then
     # Run unit tests
     tox -epy27
 
@@ -25,46 +25,42 @@ fi
 
 # Use the env setup by tox
 . .tox/py27/bin/activate
-set -u
 
 # test that the mock command is present
 type -p mock
 
-# Build this if not building a specific project
-PROJECT_TO_BUILD=python-glanceclient
-PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
+# If we're building for a gerrit or zuul project, build that unless it's DLRN
+[[ ! -z "${GERRIT_PROJECT}" && "${GERRIT_PROJECT}" != "DLRN" ]] && PROJECT="${GERRIT_PROJECT}"
+[[ ! -z "${ZUUL_PROJECT}" && "${ZUUL_PROJECT}" != "DLRN" ]] && PROJECT="${ZUUL_PROJECT%-distgit}"
 
-# If this is a CI run for one of the distro repositories then we pre download it
-# into the data directory, delorean wont change it because we are using --dev
-[ -z "${GERRIT_PROJECT-}" ] && GERRIT_PROJECT=""
-[ -z "${ZUUL_PROJECT-}" ] && ZUUL_PROJECT=""
-if [ -n "$GERRIT_PROJECT" ] && [ "$GERRIT_PROJECT" != "openstack-packages/delorean" ] ; then
-    mkdir -p data/repos
-    PROJECT_TO_BUILD=${GERRIT_PROJECT#*/}
-    PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
-    PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
+# Set project to build and parameters, defaults to python-glanceclient
+PROJECT_TO_BUILD=${PROJECT:-openstack/glanceclient}
+PROJECT_TO_BUILD=${PROJECT_TO_BUILD#*/}
+PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
+PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
+
+mkdir -p data/repos
+# Prepare directories if it's a gerrit project
+if [[ ! -z "${GERRIT_PROJECT}" ]]; then
     # Use different cloning directory for regular and packaging repositories
-    if [ "${GERRIT_PROJECT/openstack-packages\/*/packages}" == "packages" ] ; then
+    if [ "${GERRIT_PROJECT/openstack-packages\/*/packages}" == "packages" ]; then
         PROJECT_CLONE_DIR=$PROJECT_DISTRO_DIR
     else
         PROJECT_CLONE_DIR=$PROJECT_TO_BUILD_MAPPED
     fi
-    git clone https://$GERRIT_HOST/"$GERRIT_PROJECT" data/$PROJECT_CLONE_DIR
+
+    git clone "${GIT_BASE_URL}/${GERRIT_PROJECT}" data/$PROJECT_CLONE_DIR
     pushd data/$PROJECT_CLONE_DIR
-    git fetch https://$GERRIT_HOST/$GERRIT_PROJECT $GERRIT_REFSPEC && git checkout FETCH_HEAD
+    git fetch "${GIT_BASE_URL}/${GERRIT_PROJECT}" $GERRIT_REFSPEC && git checkout FETCH_HEAD
     popd
-# If this a CI run triggered by Zuul. Use zuul-cloner to fetch the project at the right
-# revision.
-elif [ -n "$ZUUL_PROJECT" ] ; then
-    # test that the zuul-cloner command is present
+fi
+
+# Prepare directories if it's a zuul project
+if [[ ! -z "${ZUUL_PROJECT}" ]]; then
+    # Ensure zuul-cloner is present
     type -p zuul-cloner
-    mkdir -p data/repos
-    PROJECT_TO_BUILD=${ZUUL_PROJECT%-distgit}
-    PROJECT_TO_BUILD=${PROJECT_TO_BUILD#*/}
-    PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
-    PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
-    zuul-cloner --workspace data/ $GERRIT_CLONE_URL $ZUUL_PROJECT
-    mv data/$ZUUL_PROJECT data/$PROJECT_DISTRO_DIR
+    zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_TO_BUILD
+    mv data/$PROJECT_TO_BUILD data/$PROJECT_DISTRO_DIR
 fi
 
 function update_config() {
