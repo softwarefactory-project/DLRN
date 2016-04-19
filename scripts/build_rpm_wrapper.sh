@@ -27,7 +27,7 @@ sed -i -e '$d' ${DATA_DIR}/dlrn.cfg.new
 curl ${BASEURL}/delorean-deps.repo >> ${DATA_DIR}/dlrn.cfg.new
 echo -e "\"\"\"" >> ${DATA_DIR}/dlrn.cfg.new
 
-if [ "$DELOREAN_DEV" = 1 ]; then
+if [ "$DLRN_DEV" = 1 ]; then
     # delete the last line which must be """
     sed -i -e '$d' ${DATA_DIR}/dlrn.cfg.new
     curl ${BASEURL}/current/delorean.repo >> ${DATA_DIR}/dlrn.cfg.new
