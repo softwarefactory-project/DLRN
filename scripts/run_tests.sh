@@ -9,7 +9,7 @@ RDOINFO="$1"
 git log -1
 
 set +u
-if [ -z "${GERRIT_PROJECT-}" -a -z "${ZUUL_PROJECT-}" -o "$GERRIT_PROJECT" = "openstack-packages/delorean" -o "$ZUUL_PROJECT" = "openstack-packages/delorean" ]; then
+if [ -z "${GERRIT_PROJECT-}" -a -z "${ZUUL_PROJECT-}" -o "$ZUUL_PROJECT" = "DLRN" ]; then
     # Run unit tests
     tox -epy27
 
@@ -31,7 +31,9 @@ set -u
 type -p mock
 
 # Build this if not building a specific project
-PROJECT_TO_BUILD=python-glanceclient
+if [ "$ZUUL_PROJECT" = "DLRN" ]; then
+    PROJECT_TO_BUILD=python-glanceclient
+fi
 PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
 
 # If this is a CI run for one of the distro repositories then we pre download it
