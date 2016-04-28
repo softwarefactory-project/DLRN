@@ -20,6 +20,7 @@ import re
 import shutil
 import smtplib
 import sys
+import urllib2
 
 from datetime import datetime
 from datetime import timedelta
@@ -635,10 +636,13 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
     # Set the build timestamp to now
     commit.dt_build = int(time())
 
-    scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
-    run(os.path.join(scriptsdir, "build_rpm_wrapper.sh"), cp, commit, env_vars,
-        dev_mode, use_public, bootstrap)
+    project_name = commit.project_name
+    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
+    yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
 
+    build_rpm_wrapper(cp, commit, dev_mode, use_public, bootstrap, env_vars)
+
+    yumrepodir_abs = os.path.join(datadir, yumrepodir)
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
@@ -879,3 +883,90 @@ def purge():
             shutil.rmtree(datadir)
             commit.flags |= FLAG_PURGED
     session.commit()
+
+
+def build_rpm_wrapper(cp, commit, dev_mode, use_public, bootstrap, env_vars):
+
+    scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
+    target = cp.get("DEFAULT", "target")
+    project_name = commit.project_name
+    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
+    baseurl = cp.get("DEFAULT", "baseurl")
+    templatecfg = os.path.join(scriptsdir, target + ".cfg")
+    newcfg = os.path.join(datadir, "dlrn.cfg.new")
+    oldcfg = os.path.join(datadir, "dlrn.cfg")
+    shutil.copyfile(templatecfg, newcfg)
+
+    # Add the most current repo, we may have dependencies in it
+    if os.path.exists(os.path.join(datadir, "repos", "current", "repodata")):
+        fp = open(newcfg)
+        contents = fp.readlines()
+        fp.close()
+        # delete the last line which must be """
+        contents = contents[:-1]
+        contents = contents + ["[local]\n", "name=local\n",
+                               "baseurl=file://${DATA_DIR}/repos/current\n",
+                               "enabled=1\n", "gpgcheck=0\n", "priority=1\n",
+                               "\"\"\""]
+        with open(newcfg, "w") as fp:
+            fp.writelines(contents)
+
+    # delete the last line which must be """
+    fp = open(newcfg)
+    contents = fp.readlines()
+    fp.close()
+    contents = contents[:-1]
+
+    r = urllib2.urlopen(baseurl + "/delorean-deps.repo")
+    contents = contents + r.readlines()
+    contents = contents + ["\n\"\"\""]
+    with open(newcfg, "w") as fp:
+        fp.writelines(contents)
+
+    if dev_mode or use_public:
+        fp = open(newcfg)
+        contents = fp.readlines()
+        fp.close()
+        # delete the last line which must be """
+        contents = contents[:-1]
+
+        r = urllib2.urlopen(baseurl + "/current/delorean.repo")
+        contents = contents + r.readlines()
+        contents = contents + ["\n\"\"\""]
+        with open(newcfg, "w") as fp:
+            fp.writelines(contents)
+
+    # don't change dlrn.cfg if the content hasn't changed to prevent
+    # mock from rebuilding its cache.
+
+    if os.path.exists(oldcfg):
+        newcontents = open(newcfg).read(-1)
+        oldcontents = open(oldcfg).read(-1)
+        if newcontents != oldcontents:
+            shutil.copyfile(newcfg, oldcfg)
+    else:
+        shutil.copyfile(newcfg, oldcfg)
+
+    # if bootstraping, set the appropriate mock config option
+    if bootstrap is True:
+        os.environ['ADDITIONAL_MOCK_OPTIONS'] = "-D 'repo_bootstrap 1'"
+
+    # Support virtual packages. The new opm starting at Newton will be
+    # virtual and we also need to keep support for the previous releases
+    # of the opm packages
+    distgit_dir = os.path.join(datadir, project_name + "_distro")
+    specless = True
+    for distfile in os.listdir(distgit_dir):
+        if distfile.endswith(".spec"):
+            spec = open(os.path.join(distgit_dir, distfile))
+            for line in spec:
+                if re.search('^Source0:', line):
+                    specless = False
+                    break
+
+    if specless or (project_name != 'openstack-puppet-modules'):
+        run(os.path.join(scriptsdir, "build_rpm.sh"), cp, commit, env_vars,
+            dev_mode, use_public, bootstrap)
+    else:
+        run(os.path.join(scriptsdir, "build_rpm_opm.sh"), cp, commit, env_vars,
+            dev_mode, use_public, bootstrap)
