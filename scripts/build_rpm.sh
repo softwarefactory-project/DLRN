@@ -2,7 +2,12 @@
 
 set -o pipefail
 
+shift   # First parameter is TARGET, not needed here
+
 source $(dirname $0)/common-functions
+
+exec > ${OUTPUT_DIRECTORY}/rpmbuild.log 2>&1
+set -x 
 
 for FILE in {test-,}requirements.txt
 do
