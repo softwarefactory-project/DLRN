@@ -879,3 +879,4 @@ def purge():
             shutil.rmtree(datadir)
             commit.flags |= FLAG_PURGED
     session.commit()
+    session.commit()
