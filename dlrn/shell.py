@@ -890,7 +890,6 @@ def build_rpm_wrapper(cp, commit, dev_mode, use_public, bootstrap, env_vars):
 
     scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
     target = cp.get("DEFAULT", "target")
-    project_name = commit.project_name
     datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
     baseurl = cp.get("DEFAULT", "baseurl")
     templatecfg = os.path.join(scriptsdir, target + ".cfg")
@@ -948,22 +947,5 @@ def build_rpm_wrapper(cp, commit, dev_mode, use_public, bootstrap, env_vars):
     if bootstrap is True:
         os.environ['ADDITIONAL_MOCK_OPTIONS'] = "-D 'repo_bootstrap 1'"
 
-    # Support virtual packages. The new opm starting at Newton will be
-    # virtual and we also need to keep support for the previous releases
-    # of the opm packages
-    distgit_dir = os.path.join(datadir, project_name + "_distro")
-    specless = True
-    for distfile in os.listdir(distgit_dir):
-        if distfile.endswith(".spec"):
-            spec = open(os.path.join(distgit_dir, distfile))
-            for line in spec:
-                if re.search('^Source0:', line):
-                    specless = False
-                    break
-
-    if specless or (project_name != 'openstack-puppet-modules'):
-        run(os.path.join(scriptsdir, "build_rpm.sh"), cp, commit, env_vars,
-            dev_mode, use_public, bootstrap)
-    else:
-        run(os.path.join(scriptsdir, "build_rpm_opm.sh"), cp, commit, env_vars,
-            dev_mode, use_public, bootstrap)
+    run(os.path.join(scriptsdir, "build_rpm.sh"), cp, commit, env_vars,
+        dev_mode, use_public, bootstrap)
