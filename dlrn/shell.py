@@ -37,6 +37,8 @@ from six.moves import configparser
 from rdopkg.actionmods import rdoinfo
 import rdopkg.utils.log
 
+from dlrn.config import ConfigOptions
+
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getLastProcessedCommit
@@ -148,8 +150,10 @@ def main():
 
     global session
     session = getSession('sqlite:///commits.sqlite')
+    global config_options
+    config_options = ConfigOptions(cp)
     packages = getpackages(local_info_repo=options.info_repo,
-                           tags=cp.get("DEFAULT", "tags"))
+                           tags=config_options.tags)
 
     if options.status is True:
         if options.package_name:
@@ -208,7 +212,7 @@ def main():
         repo = package["upstream"]
         distro = package["master-distgit"]
         if not options.package_name or package["name"] == options.package_name:
-            project_toprocess = getinfo(cp, project, repo, distro, since,
+            project_toprocess = getinfo(project, repo, distro, since,
                                         options.local, options.dev, package)
             # If since == -1, then we only want to trigger a build for the
             # most recent change
@@ -241,7 +245,7 @@ def main():
         speclist = []
         bootstraplist = []
         for project_name in projects:
-            specpath = os.path.join(cp.get("DEFAULT", "datadir"),
+            specpath = os.path.join(config_options.datadir,
                                     project_name + "_distro",
                                     project_name + '.spec')
             speclist.append(sh.rpmspec('-D', 'repo_bootstrap 1',
@@ -278,7 +282,6 @@ def main():
         # sort according to the timestamp of the commits
         toprocess.sort()
     exit_code = 0
-    gerrit = cp.get("DEFAULT", "gerrit")
     for commit in toprocess:
         project = commit.project_name
 
@@ -291,7 +294,7 @@ def main():
 
         if options.run:
             try:
-                run(options.run, cp, commit, options.build_env,
+                run(options.run, commit, options.build_env,
                     options.dev, options.use_public, options.order,
                     do_build=False)
             except Exception as e:
@@ -305,19 +308,18 @@ def main():
 
         notes = ""
         try:
-            built_rpms, notes = build(cp, packages,
+            built_rpms, notes = build(packages,
                                       commit, options.build_env, options.dev,
                                       options.use_public, options.order)
         except Exception as e:
+            datadir = os.path.realpath(config_options.datadir)
             exit_code = 1
-            datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
             logfile = os.path.join(datadir, "repos",
                                    commit.getshardedcommitdir(),
                                    "rpmbuild.log")
-            max_retries = cp.getint("DEFAULT", "maxretries")
             if (isknownerror(logfile) and
                 (timesretried(project, commit_hash, commit.distro_hash) <
-                 max_retries)):
+                 config_options.max_retries)):
                 logger.exception("Known error building packages for %s,"
                                  " will retry later" % project)
                 commit.status = "RETRY"
@@ -331,14 +333,14 @@ def main():
                         fp.write(getattr(e, "message", notes))
 
                 if not project_info.suppress_email():
-                    sendnotifymail(cp, packages, commit)
+                    sendnotifymail(packages, commit)
                     project_info.sent_email()
                     session.add(project_info)
 
                 # allow to submit a gerrit review only if the last build was
                 # successful or non existent to avoid creating a gerrit review
                 # for the same problem multiple times.
-                if gerrit is not None:
+                if config_options.gerrit is not None:
                     if options.build_env:
                         env_vars = list(options.build_env)
                     else:
@@ -355,7 +357,7 @@ def main():
                                    commit.commit_hash)
                             env_vars.append('GERRIT_URL=%s' % url)
                             env_vars.append('GERRIT_LOG=%s/%s' %
-                                            (cp.get("DEFAULT", "baseurl"),
+                                            (config_options.baseurl,
                                              commit.getshardedcommitdir()))
                             maintainers = ','.join(pkg['maintainers'])
                             env_vars.append('GERRIT_MAINTAINERS=%s' %
@@ -365,7 +367,7 @@ def main():
                                         'GERRIT_MAINTAINERS=%s ' %
                                         (url, maintainers))
                             try:
-                                submit_review(cp, commit, env_vars)
+                                submit_review(commit, env_vars)
                             except Exception:
                                 logger.error('Unable to create review '
                                              'see review.log')
@@ -387,8 +389,8 @@ def main():
             session.add(commit)
         if options.dev is False:
             session.commit()
-        genreports(cp, packages, options)
-        sync_repo(cp, commit)
+        genreports(packages, options, config_options)
+        sync_repo(commit)
 
     # If we were bootstrapping, set the packages that required it to RETRY
     if options.order is True and not options.package_name:
@@ -398,7 +400,7 @@ def main():
             session.add(commit)
             session.commit()
 
-    genreports(cp, packages, options)
+    genreports(packages, options, config_options)
     return exit_code
 
 
@@ -410,7 +412,7 @@ def compare():
     options, args = parser.parse_known_args(sys.argv[1:])
 
     packages = getpackages(local_info_repo=options.info_repo,
-                           tags=cp.get("DEFAULT", "tags"))
+                           tags=config_options.tags)
     compare_details = {}
     # Each argument is a ":" seperate filename:title, this filename is the
     # sqlite db file and the title is whats used in the dable being displayed
@@ -459,11 +461,11 @@ def getpackages(local_info_repo=None, tags=None):
     return packages
 
 
-def sendnotifymail(cp, packages, commit):
+def sendnotifymail(packages, commit):
     error_details = copy.copy(
         [package for package in packages
             if package["name"] == commit.project_name][0])
-    error_details["logurl"] = "%s/%s" % (cp.get("DEFAULT", "baseurl"),
+    error_details["logurl"] = "%s/%s" % (config_options.baseurl,
                                          commit.getshardedcommitdir())
     error_body = notification_email % error_details
 
@@ -477,10 +479,9 @@ def sendnotifymail(cp, packages, commit):
     email_to = error_details['maintainers']
     msg['To'] = "packagers"
 
-    smtpserver = cp.get("DEFAULT", "smtpserver")
-    if smtpserver:
+    if config_options.smtpserver:
         logger.info("Sending notify email to %r" % email_to)
-        s = smtplib.SMTP(cp.get("DEFAULT", "smtpserver"))
+        s = smtplib.SMTP(config_options.smtpserver)
         s.sendmail(email_from, email_to, msg.as_string())
         s.quit()
     else:
@@ -524,25 +525,25 @@ def refreshrepo(url, path, branch="master", local=False):
     return repoinfo
 
 
-def getdistrobranch(cp, package):
+def getdistrobranch(package):
     if 'distro-branch' in package:
         return package['distro-branch']
     else:
-        return cp.get("DEFAULT", "distro")
+        return config_options.distro
 
 
-def getsourcebranch(cp, package):
+def getsourcebranch(package):
     if 'source-branch' in package:
         return package['source-branch']
     else:
-        return cp.get("DEFAULT", "source")
+        return config_options.source
 
 
-def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
-    distro_dir = os.path.join(cp.get("DEFAULT", "datadir"),
+def getinfo(project, repo, distro, since, local, dev_mode, package):
+    distro_dir = os.path.join(config_options.datadir,
                               project + "_distro")
-    distro_branch = getdistrobranch(cp, package)
-    source_branch = getsourcebranch(cp, package)
+    distro_branch = getdistrobranch(package)
+    source_branch = getsourcebranch(package)
 
     if dev_mode is False:
         distro_branch, distro_hash, dt_distro = refreshrepo(
@@ -560,7 +561,7 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
         repos = repo
     project_toprocess = []
     for repo in repos:
-        repo_dir = os.path.join(cp.get("DEFAULT", "datadir"), project)
+        repo_dir = os.path.join(config_options.datadir, project)
         if len(repos) > 1:
             repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
         source_branch, _, _ = refreshrepo(repo, repo_dir, source_branch,
@@ -581,14 +582,12 @@ def getinfo(cp, project, repo, distro, since, local, dev_mode, package):
     return project_toprocess
 
 
-def run(program, cp, commit, env_vars, dev_mode, use_public, bootstrap,
+def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         do_build=True):
 
-    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
-    target = cp.get("DEFAULT", "target")
+    datadir = os.path.realpath(config_options.datadir)
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
-    baseurl = cp.get("DEFAULT", "baseurl")
 
     commit_hash = commit.commit_hash
     project_name = commit.project_name
@@ -613,9 +612,9 @@ def run(program, cp, commit, env_vars, dev_mode, use_public, bootstrap,
             run_cmd.append("REPO_BOOTSTRAP=1")
 
     run_cmd.extend([program,
-                    target, project_name,
+                    config_options.target, project_name,
                     os.path.join(datadir, yumrepodir),
-                    datadir, baseurl])
+                    datadir, config_options.baseurl])
     if not do_build:
         logger.info('Running %s' % ' '.join(run_cmd))
 
@@ -632,22 +631,17 @@ def run(program, cp, commit, env_vars, dev_mode, use_public, bootstrap,
         raise e
 
 
-def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
+def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
     # Set the build timestamp to now
     commit.dt_build = int(time())
 
     project_name = commit.project_name
-    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
-    yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
-
-    build_rpm_wrapper(cp, commit, dev_mode, use_public, bootstrap, env_vars)
-
-    yumrepodir_abs = os.path.join(datadir, yumrepodir)
-    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
+    datadir = os.path.realpath(config_options.datadir)
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
     commit_hash = commit.commit_hash
-    project_name = commit.project_name
+
+    build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars)
 
     built_rpms = []
     for rpm in os.listdir(yumrepodir_abs):
@@ -708,13 +702,13 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
     sh.createrepo(yumrepodir_abs)
 
     with open(os.path.join(
-            yumrepodir_abs, "%s.repo" % cp.get("DEFAULT", "reponame")),
+            yumrepodir_abs, "%s.repo" % config_options.reponame),
             "w") as fp:
         fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
-                 "gpgcheck=0\npriority=1" % (cp.get("DEFAULT", "reponame"),
-                                             cp.get("DEFAULT", "reponame"),
+                 "gpgcheck=0\npriority=1" % (config_options.reponame,
+                                             config_options.reponame,
                                              project_name, commit_hash,
-                                             cp.get("DEFAULT", "baseurl"),
+                                             config_options.baseurl,
                                              commit.getshardedcommitdir()))
 
     dirnames = ['current']
@@ -733,10 +727,10 @@ def build(cp, packages, commit, env_vars, dev_mode, use_public, bootstrap):
     return built_rpms, notes
 
 
-def sync_repo(cp, commit):
-    rsyncdest = cp.get("DEFAULT", "rsyncdest")
-    rsyncport = cp.getint("DEFAULT", "rsyncport")
-    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
+def sync_repo(commit):
+    rsyncdest = config_options.rsyncdest
+    rsyncport = config_options.rsyncport
+    datadir = os.path.realpath(config_options.datadir)
 
     if rsyncdest != '':
         # We are only rsyncing the current repo dir to rsyncdest
@@ -762,10 +756,9 @@ def sync_repo(cp, commit):
                             'got error %s' % (dirname, rsyncdest, e))
 
 
-def submit_review(cp, commit, env_vars):
-    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
-    scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
-    baseurl = cp.get("DEFAULT", "baseurl")
+def submit_review(commit, env_vars):
+    datadir = os.path.realpath(config_options.datadir)
+    scriptsdir = os.path.realpath(config_options.scriptsdir)
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
 
     project_name = commit.project_name
@@ -777,7 +770,7 @@ def submit_review(cp, commit, env_vars):
 
     run_cmd.extend([os.path.join(scriptsdir, "submit_review.sh"),
                     project_name, os.path.join(datadir, yumrepodir),
-                    datadir, baseurl])
+                    datadir, config_options.baseurl])
     sh.env(run_cmd)
 
 
@@ -826,6 +819,7 @@ def purge():
 
     cp = configparser.RawConfigParser()
     cp.read(options.config_file)
+    config_options = ConfigOptions(cp)
 
     timeparsed = datetime.now() - timedelta(days=int(options.older_than))
 
@@ -851,8 +845,8 @@ def purge():
     for commit in topurge:
         if commit.flags & FLAG_PURGED:
             continue
-        datadir = cp.get("DEFAULT", "datadir")
-        datadir = os.path.join(datadir, "repos", commit.getshardedcommitdir())
+        datadir = os.path.join(config_options.datadir, "repos",
+                               commit.getshardedcommitdir())
         if commit.project_name not in fullpurge and commit.status == "SUCCESS":
             # So we have not removed any commit from this project yet, and it
             # is successful. Is it the newest one?
@@ -885,14 +879,13 @@ def purge():
     session.commit()
 
 
-def build_rpm_wrapper(cp, commit, dev_mode, use_public, bootstrap, env_vars):
+def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars):
 
-    scriptsdir = os.path.realpath(cp.get("DEFAULT", "scriptsdir"))
-    target = cp.get("DEFAULT", "target")
+    scriptsdir = os.path.realpath(config_options.scriptsdir)
     project_name = commit.project_name
-    datadir = os.path.realpath(cp.get("DEFAULT", "datadir"))
-    baseurl = cp.get("DEFAULT", "baseurl")
-    templatecfg = os.path.join(scriptsdir, target + ".cfg")
+    datadir = os.path.realpath(config_options.datadir)
+    baseurl = config_options.baseurl
+    templatecfg = os.path.join(scriptsdir, config_options.target + ".cfg")
     newcfg = os.path.join(datadir, "dlrn.cfg.new")
     oldcfg = os.path.join(datadir, "dlrn.cfg")
     shutil.copyfile(templatecfg, newcfg)
@@ -965,8 +958,8 @@ def build_rpm_wrapper(cp, commit, dev_mode, use_public, bootstrap, env_vars):
                     break
 
     if specless or (project_name != 'openstack-puppet-modules'):
-        run(os.path.join(scriptsdir, "build_rpm.sh"), cp, commit, env_vars,
+        run(os.path.join(scriptsdir, "build_rpm.sh"), commit, env_vars,
             dev_mode, use_public, bootstrap)
     else:
-        run(os.path.join(scriptsdir, "build_rpm_opm.sh"), cp, commit, env_vars,
+        run(os.path.join(scriptsdir, "build_rpm_opm.sh"), commit, env_vars,
             dev_mode, use_public, bootstrap)

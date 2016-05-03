@@ -59,16 +59,16 @@ def _jinja2_filter_get_commit_url(commit, packages):
     return "???"
 
 
-def genreports(cp, packages, options):
+def genreports(packages, options, config_options):
     global session
     session = getSession('sqlite:///commits.sqlite')
 
     # Generate report of the last 300 package builds
-    target = cp.get("DEFAULT", "target")
-    src = cp.get("DEFAULT", "source")
-    reponame = cp.get("DEFAULT", "reponame")
-    templatedir = cp.get("DEFAULT", "templatedir")
-    datadir = cp.get("DEFAULT", "datadir")
+    target = config_options.target
+    src = config_options.source
+    reponame = config_options.reponame
+    templatedir = config_options.templatedir
+    datadir = config_options.datadir
 
     css_file = os.path.join(templatedir, 'stylesheets/styles.css')
 
@@ -87,8 +87,7 @@ def genreports(cp, packages, options):
                                     target=target,
                                     commits=commits)
     shutil.copy2(css_file, os.path.join(datadir, "repos", "styles.css"))
-    report_file = os.path.join(cp.get("DEFAULT", "datadir"),
-                               "repos", "report.html")
+    report_file = os.path.join(datadir, "repos", "report.html")
     with open(report_file, "w") as fp:
         fp.write(content)
 
@@ -147,7 +146,6 @@ def genreports(cp, packages, options):
                                     target=target,
                                     pkgs=pkgs)
 
-    report_file = os.path.join(cp.get("DEFAULT", "datadir"),
-                               "repos", "status_report.html")
+    report_file = os.path.join(datadir, "repos", "status_report.html")
     with open(report_file, "w") as fp:
         fp.write(content)
