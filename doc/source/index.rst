@@ -1,3 +1,9 @@
+.. image:: _images/DLRN.png
+    :width: 794px
+    :align: center
+    :height: 187px
+    :alt: DLRN Logo
+
 Welcome to DLRN's documentation!
 ====================================
 
