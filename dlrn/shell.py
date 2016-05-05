@@ -904,7 +904,7 @@ def build_rpm_wrapper(cp, commit, dev_mode, use_public, bootstrap, env_vars):
         # delete the last line which must be """
         contents = contents[:-1]
         contents = contents + ["[local]\n", "name=local\n",
-                               "baseurl=file://${DATA_DIR}/repos/current\n",
+                               "baseurl=file://%s/repos/current\n" % datadir,
                                "enabled=1\n", "gpgcheck=0\n", "priority=1\n",
                                "\"\"\""]
         with open(newcfg, "w") as fp:
