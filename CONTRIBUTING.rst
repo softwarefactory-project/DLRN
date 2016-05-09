@@ -59,6 +59,7 @@ Checkout the Source code and install a virtualenv:
     $ cd DLRN
     $ virtualenv .venv
     $ source .venv/bin/activate
+    $ pip install --upgrade pip
     $ pip install -r requirements.txt
     $ pip install -r test-requirements.txt
     $ python setup.py develop

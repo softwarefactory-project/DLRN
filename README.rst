@@ -35,6 +35,7 @@ Preparing
     $ cd DLRN
     $ virtualenv ../dlrn-venv
     $ . ../dlrn-venv/bin/activate
+    $ pip install --upgrade pip
     $ pip install -r requirements.txt
     $ python setup.py develop
 
