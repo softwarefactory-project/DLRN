@@ -38,30 +38,7 @@ hack on.
 Setting up a development environment manually
 ---------------------------------------------
 
-Installing prerequisites:
-
-.. code-block:: bash
-
-    $ sudo yum install mock rpm-build git createrepo python-virtualenv git-hg python-pip
-    $ sudo systemctl start httpd
-
-Add the user you intend to run as to the mock group:
-
-.. code-block:: bash
-
-    $ sudo usermod -a -G mock $USER
-
-Checkout the Source code and install a virtualenv:
-
-.. code-block:: bash
-
-    $ git clone https://github.com/openstack-packages/DLRN.git
-    $ cd DLRN
-    $ virtualenv .venv
-    $ source .venv/bin/activate
-    $ pip install -r requirements.txt
-    $ pip install -r test-requirements.txt
-    $ python setup.py develop
+Follow the instructions from the `Setup section <https://github.com/openstack-packages/DLRN/blob/master/README.rst#setup>`_ of `README.rst <https://github.com/openstack-packages/DLRN/blob/master/README.rst>`_ to manually setup a development environment.
 
 Submitting pull requests
 ------------------------
