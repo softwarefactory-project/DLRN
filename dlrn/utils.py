@@ -18,6 +18,17 @@ from dlrn.db import Commit
 from dlrn.db import getSession
 
 
+# Import a Python object
+def import_object(import_str, *args, **kwargs):
+    mod_str, _sep, class_str = import_str.rpartition('.')
+    __import__(mod_str)
+    try:
+        myclass = getattr(sys.modules[mod_str], class_str)
+        return myclass(*args, **kwargs)
+    except AttributeError:
+        raise ImportError('Cannot find class %s' % class_str)
+
+
 # Load a yaml file into a db session, used to populate a in memory database
 # during tests
 def loadYAML(session, yamlfile):

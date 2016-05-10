@@ -35,8 +35,6 @@ from prettytable import PrettyTable
 import sh
 from six.moves import configparser
 
-from rdopkg.actionmods import rdoinfo
-import rdopkg.utils.log
 
 from dlrn.config import ConfigOptions
 
@@ -50,9 +48,9 @@ from dlrn.reporting import get_commit_url
 from dlrn.rpmspecfile import RpmSpecCollection
 from dlrn.rpmspecfile import RpmSpecFile
 from dlrn.utils import dumpshas2file
+from dlrn.utils import import_object
 from dlrn import version
 
-rdopkg.utils.log.set_colors('no')
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn")
 logger.setLevel(logging.INFO)
@@ -106,7 +104,9 @@ def main():
                         required=True)
     parser.add_argument('--info-repo',
                         help="use a local rdoinfo repo instead of "
-                             "fetching the default one using rdopkg.")
+                             "fetching the default one using rdopkg. Only"
+                             "applies when pkginfo_driver is rdoinfo in"
+                             "projects.ini")
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
     parser.add_argument('--local', action="store_true",
@@ -153,8 +153,10 @@ def main():
     session = getSession('sqlite:///commits.sqlite')
     global config_options
     config_options = ConfigOptions(cp)
-    packages = getpackages(local_info_repo=options.info_repo,
-                           tags=config_options.tags)
+    pkginfo_driver = config_options.pkginfo_driver
+    pkginfo_object = import_object(pkginfo_driver)
+    packages = pkginfo_object.getpackages(local_info_repo=options.info_repo,
+                                          tags=config_options.tags)
 
     if options.status is True:
         if options.package_name:
@@ -408,12 +410,17 @@ def main():
 def compare():
     parser = argparse.ArgumentParser()
     parser.add_argument('--info-repo',
-                        help="use local rdoinfo repo instead of"
-                             "fetching default one using rdopkg")
-    options, args = parser.parse_known_args(sys.argv[1:])
+                        help="use a local rdoinfo repo instead of "
+                             "fetching the default one using rdopkg. Only"
+                             "applies when pkginfo_driver is rdoinfo in"
+                             "projects.ini")
 
-    packages = getpackages(local_info_repo=options.info_repo,
-                           tags=config_options.tags)
+    options, args = parser.parse_known_args(sys.argv[1:])
+    pkginfo_driver = config_options.pkginfo_driver
+    pkginfo_object = import_object(pkginfo_driver)
+    packages = pkginfo_object.getpackages(local_info_repo=options.info_repo,
+                                          tags=config_options.tags)
+
     compare_details = {}
     # Each argument is a ":" seperate filename:title, this filename is the
     # sqlite db file and the title is whats used in the dable being displayed
@@ -443,23 +450,6 @@ def compare():
             compare_detail[1] = "*"
         table.add_row(compare_detail)
     print(table)
-
-
-def getpackages(local_info_repo=None, tags=None):
-    inforepo = None
-    if local_info_repo:
-        inforepo = rdoinfo.RdoinfoRepo(local_repo_path=local_info_repo,
-                                       apply_tag=tags)
-    else:
-        inforepo = rdoinfo.get_default_inforepo(apply_tag=tags)
-        # rdopkg will clone/pull rdoinfo repo as needed (~/.rdopkg/rdoinfo)
-        inforepo.init()
-    pkginfo = inforepo.get_info()
-    packages = pkginfo["packages"]
-    if tags:
-        # FIXME allow list of tags?
-        packages = rdoinfo.filter_pkgs(packages, {'tags': tags})
-    return packages
 
 
 def sendnotifymail(packages, commit):
