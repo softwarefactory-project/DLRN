@@ -30,6 +30,7 @@ class ConfigOptions(object):
         self.rsyncport = cp.get('DEFAULT', 'rsyncport')
         self.scriptsdir = cp.get('DEFAULT', 'scriptsdir')
         self.templatedir = cp.get('DEFAULT', 'templatedir')
+        self.pkginfo_driver = cp.get('DEFAULT', 'pkginfo_driver')
 
         global _config_options
         _config_options = self
