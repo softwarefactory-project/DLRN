@@ -13,8 +13,8 @@ for FILE in {test-,}requirements.txt
 do
     if [ -f ${FILE} ]
     then
-        sed -i "s/;python_version[!=<>]=\?.*//g" ${FILE}
-        sed -i "s/;sys_platform[!=<>]=\?.*//g" ${FILE}
+        sed -i "s/; *python_version.*[!=<>]=\?.*//g" ${FILE}
+        sed -i "s/; *sys_platform.*[!=<>]=\?.*//g" ${FILE}
     fi
 done
 
