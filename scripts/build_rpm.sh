@@ -77,7 +77,7 @@ TARBALL=$(ls dist)
 TARBALLREL=$(basename $TARBALL .tar.gz)-$RELEASE.tar.gz
 mv dist/$TARBALL ${TOP_DIR}/SOURCES/$TARBALLREL
 
-cd ${DATA_DIR}/${PROJECT_NAME}_distro
+cd ${DISTGIT_DIR}
 cp * ${TOP_DIR}/SOURCES/
 cp *.spec ${TOP_DIR}/SPECS/
 cd ${TOP_DIR}/SPECS/

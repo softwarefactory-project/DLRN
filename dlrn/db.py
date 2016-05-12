@@ -36,6 +36,7 @@ class Commit(Base):
     dt_build = Column(Integer)
     project_name = Column(String)
     repo_dir = Column(String)
+    distgit_dir = Column(String)
     commit_hash = Column(String)
     distro_hash = Column(String)
     status = Column(String)
