@@ -320,7 +320,7 @@ def main():
                                    "rpmbuild.log")
             if (isknownerror(logfile) and
                 (timesretried(project, commit_hash, commit.distro_hash) <
-                 config_options.max_retries)):
+                 config_options.maxretries)):
                 logger.exception("Known error building packages for %s,"
                                  " will retry later" % project)
                 commit.status = "RETRY"
