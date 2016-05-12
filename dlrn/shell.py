@@ -154,9 +154,10 @@ def main():
     global config_options
     config_options = ConfigOptions(cp)
     pkginfo_driver = config_options.pkginfo_driver
-    pkginfo_object = import_object(pkginfo_driver)
-    packages = pkginfo_object.getpackages(local_info_repo=options.info_repo,
-                                          tags=config_options.tags)
+    global pkginfo
+    pkginfo = import_object(pkginfo_driver)
+    packages = pkginfo.getpackages(local_info_repo=options.info_repo,
+                                   tags=config_options.tags)
 
     if options.status is True:
         if options.package_name:
@@ -212,11 +213,12 @@ def main():
             # This will return all commits since the last handled commit
             # including the last handled commit, remove it later if needed.
             since = "--after=%d" % (commit.dt_commit)
-        repo = package["upstream"]
-        distro = package["master-distgit"]
         if not options.package_name or package["name"] == options.package_name:
-            project_toprocess = getinfo(project, repo, distro, since,
-                                        options.local, options.dev, package)
+            project_toprocess = pkginfo.getinfo(project=project,
+                                                package=package,
+                                                since=since,
+                                                local=options.local,
+                                                dev_mode=options.dev)
             # If since == -1, then we only want to trigger a build for the
             # most recent change
             if since == "-1" or options.head_only:
@@ -248,8 +250,10 @@ def main():
         speclist = []
         bootstraplist = []
         for project_name in projects:
-            specpath = os.path.join(config_options.datadir,
-                                    project_name + "_distro",
+            # Preprocess spec if needed
+            pkginfo.preprocess(package_name=project_name)
+
+            specpath = os.path.join(pkginfo.distgit_dir(project_name),
                                     project_name + '.spec')
             speclist.append(sh.rpmspec('-D', 'repo_bootstrap 1',
                                        '-P', specpath))
@@ -530,49 +534,6 @@ def getsourcebranch(package):
         return config_options.source
 
 
-def getinfo(project, repo, distro, since, local, dev_mode, package):
-    distro_dir = os.path.join(config_options.datadir,
-                              project + "_distro")
-    distro_branch = getdistrobranch(package)
-    source_branch = getsourcebranch(package)
-
-    if dev_mode is False:
-        distro_branch, distro_hash, dt_distro = refreshrepo(
-            distro, distro_dir, distro_branch, local=local)
-    else:
-        distro_hash = "dev"
-        dt_distro = 0  # Doesn't get used in dev mode
-        if not os.path.isdir(distro_dir):
-            refreshrepo(distro, distro_dir, distro_branch, local=local)
-
-    # repo is usually a string, but if it contains more then one entry we
-    # git clone into a project subdirectory
-    repos = [repo]
-    if isinstance(repo, list):
-        repos = repo
-    project_toprocess = []
-    for repo in repos:
-        repo_dir = os.path.join(config_options.datadir, project)
-        if len(repos) > 1:
-            repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
-        source_branch, _, _ = refreshrepo(repo, repo_dir, source_branch,
-                                          local=local)
-
-        git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
-        # Git gives us commits already sorted in the right order
-        lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
-                        "--reverse", "origin/%s" % source_branch)
-
-        for line in lines:
-            dt, commit_hash = str(line).strip().strip("'").split(" ")
-            commit = Commit(dt_commit=float(dt), project_name=project,
-                            commit_hash=commit_hash, repo_dir=repo_dir,
-                            distro_hash=distro_hash, dt_distro=dt_distro)
-            project_toprocess.append(commit)
-
-    return project_toprocess
-
-
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         do_build=True):
 
@@ -605,7 +566,8 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
     run_cmd.extend([program,
                     config_options.target, project_name,
                     os.path.join(datadir, yumrepodir),
-                    datadir, config_options.baseurl])
+                    datadir, config_options.baseurl,
+                    os.path.realpath(commit.distgit_dir)])
     if not do_build:
         logger.info('Running %s' % ' '.join(run_cmd))
 
@@ -932,6 +894,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars):
     # if bootstraping, set the appropriate mock config option
     if bootstrap is True:
         os.environ['ADDITIONAL_MOCK_OPTIONS'] = "-D 'repo_bootstrap 1'"
+
+    pkginfo.preprocess(package_name=commit.project_name)
 
     run(os.path.join(scriptsdir, "build_rpm.sh"), commit, env_vars,
         dev_mode, use_public, bootstrap)
