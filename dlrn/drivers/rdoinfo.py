@@ -10,7 +10,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from dlrn.drivers.pkginfodriver import PkgInfoDriver
+# The RdoInfoDriver provides the following:
+#
+# 1- A getpackages function based on output provided by rdoinfo
+#    (https://github.com/redhat-openstack/rdoinfo)
+#
+# 2- A getinfo function based on a multi-distgit repo paradigm
+#
+# 3- A no-op preprocess function
+
+from dlrn.db import Commit
+from dlrn.drivers.pkginfo import PkgInfoDriver
+from dlrn.shell import config_options
+from dlrn.shell import getdistrobranch
+from dlrn.shell import getsourcebranch
+from dlrn.shell import refreshrepo
+
+import os
+import sh
 
 from rdopkg.actionmods import rdoinfo
 import rdopkg.utils.log
@@ -46,3 +63,60 @@ class RdoInfoDriver(PkgInfoDriver):
             # FIXME allow list of tags?
             self.packages = rdoinfo.filter_pkgs(self.packages, {'tags': tags})
         return self.packages
+
+
+    def getinfo(self, **kwargs):
+        project = kwargs.get('project')
+        package = kwargs.get('package')
+        since = kwargs.get('since')
+        local = kwargs.get('local')
+        dev_mode = kwargs.get('dev_mode')
+        datadir = config_options.datadir
+        repo = package['upstream']
+        distro = package['master-distgit']
+
+        distro_dir = os.path.join(datadir,
+                                  project + "_distro")
+        distro_branch = getdistrobranch(package)
+        source_branch = getsourcebranch(package)
+
+        if dev_mode is False:
+            distro_branch, distro_hash, dt_distro = refreshrepo(
+                distro, distro_dir, distro_branch, local=local)
+        else:
+            distro_hash = "dev"
+            dt_distro = 0  # Doesn't get used in dev mode
+            if not os.path.isdir(distro_dir):
+                refreshrepo(distro, distro_dir, distro_branch, local=local)
+
+        # repo is usually a string, but if it contains more then one entry we
+        # git clone into a project subdirectory
+        repos = [repo]
+        if isinstance(repo, list):
+            repos = repo
+        project_toprocess = []
+        for repo in repos:
+            repo_dir = os.path.join(datadir, project)
+            if len(repos) > 1:
+                repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
+            source_branch, _, _ = refreshrepo(repo, repo_dir, source_branch,
+                                              local=local)
+
+            git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
+            # Git gives us commits already sorted in the right order
+            lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
+                            "--reverse", "origin/%s" % source_branch)
+
+            for line in lines:
+                dt, commit_hash = str(line).strip().strip("'").split(" ")
+                commit = Commit(dt_commit=float(dt), project_name=project,
+                                commit_hash=commit_hash, repo_dir=repo_dir,
+                                distro_hash=distro_hash, dt_distro=dt_distro,
+                                distgit_dir=distro_dir)
+                project_toprocess.append(commit)
+
+        return project_toprocess
+
+    def preprocess(self, **kwargs):
+        # No pre-processing required here
+        return
