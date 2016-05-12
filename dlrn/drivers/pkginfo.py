@@ -10,13 +10,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-# PkgInfoDriver derived classes only need to expose one function:
+# PkgInfoDriver derived classes expose the following functions:
+
 # getpackages(). This function will return an array of hashes. Each individual
 # hash must contain the following mandatory parameters (others are optional):
 # - 'name' : package name
 # - 'upstream': URL for upstream repo
 # - 'master-distgit': URL for distgit repo
 # - 'maintainers': list of e-mail addresses for package maintainers
+
+# getinfo(). This function will return a list of commits to be processed for a
+#            specific package.
 
 
 class PkgInfoDriver(object):
@@ -25,3 +29,6 @@ class PkgInfoDriver(object):
 
     def getpackages(self):
         return self.packages
+
+    def getinfo(self):
+        return None
