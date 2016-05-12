@@ -10,58 +10,55 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-# The RdoInfoDriver provides the following:
+# The GitRepoDriver provides the following:
 #
-# 1- A getpackages function based on output provided by rdoinfo
-#    (https://github.com/redhat-openstack/rdoinfo)
+# 1- A getpackages function based on finding all directories inside a specific
+#    git repo, where each directory represents a package
 #
-# 2- A getinfo function based on a multi-distgit repo paradigm
-
-from dlrn.db import Commit
-from dlrn.drivers.pkginfo import PkgInfoDriver
-from dlrn.shell import config_options
-from dlrn.shell import getdistrobranch
-from dlrn.shell import getsourcebranch
-from dlrn.shell import refreshrepo
+# 2- A getinfo function based on a single-distgit repo paradigm
 
 import os
 import sh
 
-from rdopkg.actionmods import rdoinfo
-import rdopkg.utils.log
+from dlrn.db import Commit
+from dlrn.drivers.pkginfo import PkgInfoDriver
+from dlrn.shell import config_options
+from dlrn.shell import getsourcebranch
+from dlrn.shell import refreshrepo
 
-rdopkg.utils.log.set_colors('no')
 
-
-class RdoInfoDriver(PkgInfoDriver):
+class GitRepoDriver(PkgInfoDriver):
 
     def __init__(self, *args, **kwargs):
-        super(RdoInfoDriver, self).__init__(*args, **kwargs)
+        super(GitRepoDriver, self).__init__(*args, **kwargs)
 
     def getpackages(self, **kwargs):
-        """ Valid parameters:
-        :param local_info_repo: local rdoinfo repo to use instead of fetching
-                                the default one using rdopkg.
-        :param tags: OpenStack release tags to use (mitaka, newton, etc).
-        """
-        local_info_repo = kwargs.get('local_info_repo')
-        tags = kwargs.get('tags')
-        inforepo = None
+        repo = config_options.gitrepo_repo
+        path = config_options.gitrepo_dir.strip('/')
+        datadir = config_options.datadir
+        packages = []
 
-        if local_info_repo:
-            inforepo = rdoinfo.RdoinfoRepo(local_repo_path=local_info_repo,
-                                           apply_tag=tags)
-        else:
-            inforepo = rdoinfo.get_default_inforepo(apply_tag=tags)
-            # rdopkg will clone/pull rdoinfo repo as needed (~/.rdopkg/rdoinfo)
-            inforepo.init()
-        pkginfo = inforepo.get_info()
-        self.packages = pkginfo["packages"]
-        if tags:
-            # FIXME allow list of tags?
-            self.packages = rdoinfo.filter_pkgs(self.packages, {'tags': tags})
-        return self.packages
+        gitpath = os.path.join(datadir, 'package_info')
+        if not os.path.exists(gitpath):
+            sh.git.clone(repo, gitpath)
 
+        git = sh.git.bake(_cwd=gitpath, _tty_out=False, _timeout=3600)
+        git.fetch("origin")
+        # TODO(jpena): allow passing a branch as argument
+        git.reset("--hard", "origin/master")
+
+        packagepath = os.path.join(gitpath, path)
+
+        for package in os.listdir(packagepath):
+            if os.path.isdir(os.path.join(packagepath, package)):
+                upstream = 'https://github.com/openstack/' + package
+                maintainers = ['test@example.com']
+                master_distgit = repo + '/' + path + '/' + package
+                packages.append({'name': package,
+                                 'upstream': upstream,
+                                 'maintainers': maintainers,
+                                 'master-distgit': master_distgit})
+        return packages
 
     def getinfo(self, **kwargs):
         project = kwargs.get('project')
@@ -71,21 +68,23 @@ class RdoInfoDriver(PkgInfoDriver):
         dev_mode = kwargs.get('dev_mode')
         datadir = config_options.datadir
         repo = package['upstream']
-        distro = package['master-distgit']
 
-        distro_dir = os.path.join(datadir,
-                                  project + "_distro")
-        distro_branch = getdistrobranch(package)
+        path = config_options.gitrepo_dir.strip('/')
+
+        distro_dir = os.path.join(datadir, 'package_info',
+                                  path, package['name'])
         source_branch = getsourcebranch(package)
 
-        if dev_mode is False:
-            distro_branch, distro_hash, dt_distro = refreshrepo(
-                distro, distro_dir, distro_branch, local=local)
-        else:
+        if dev_mode is True:
             distro_hash = "dev"
             dt_distro = 0  # Doesn't get used in dev mode
-            if not os.path.isdir(distro_dir):
-                refreshrepo(distro, distro_dir, distro_branch, local=local)
+        else:
+            # Get distro_hash from last commit in distgit directory
+            git = sh.git.bake(_cwd=distro_dir, _tty_out=False)
+            repoinfo = str(git.log("--pretty=format:%H %ct", "-1", ".")
+                           ).strip().split(" ")
+            distro_hash = repoinfo[0]
+            dt_distro = repoinfo[1]
 
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory
@@ -102,8 +101,9 @@ class RdoInfoDriver(PkgInfoDriver):
 
             git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
             # Git gives us commits already sorted in the right order
-            lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
-                            "--reverse", "origin/%s" % source_branch)
+            lines = git.log("--pretty=format:'%ct %H'", since,
+                            "--first-parent", "--reverse",
+                            "origin/%s" % source_branch)
 
             for line in lines:
                 dt, commit_hash = str(line).strip().strip("'").split(" ")
