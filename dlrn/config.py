@@ -32,6 +32,17 @@ class ConfigOptions(object):
         self.templatedir = cp.get('DEFAULT', 'templatedir')
         self.pkginfo_driver = cp.get('DEFAULT', 'pkginfo_driver')
 
+        # Handling for optional sections, driver-based
+        if cp.has_section('gitrepo_driver'):
+            if cp.has_option('gitrepo_driver', 'repo'):
+                self.gitrepo_repo = cp.get('gitrepo_driver', 'repo')
+            else:
+                self.gitrepo_repo = None
+            if cp.has_option('gitrepo_driver', 'directory'):
+                self.gitrepo_dir = cp.get('gitrepo_driver', 'directory')
+            else:
+                self.gitrepo_dir = None
+
         global _config_options
         _config_options = self
 
