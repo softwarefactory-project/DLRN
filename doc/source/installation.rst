@@ -59,6 +59,7 @@ The configuration file looks like this:
     gerrit=yes
     rsyncdest=
     rsyncport=22
+    pkginfo_driver=dlrn.drivers.rdoinfo.RdoInfoDriver
 
 * ``datadir`` is the directory where the packages and repositories will be created.
 
@@ -89,6 +90,32 @@ The configuration file looks like this:
 
 * ``rsyncport`` is the SSH port to be used when synchronizing the hashed repository. If
   ``rsyncdest`` is not defined, this option will be ignored.
+
+* ``pkginfo_driver`` defines the driver to be used to manage the distgit
+  repositories. There are currently two drivers:
+
+  * ``dlrn.drivers.rdoinfo.RdoInfoDriver``, which uses information provided by
+    `rdoinfo <https://github.com/redhat-openstack/rdoinfo>`_ to determine the
+    distgit repo location and information.
+  * ``dlrn.drivers.gitrepo.GitRepoDriver``, which uses a single Git repository
+    with per-distgit directories, following the same schema used by the
+    `RPM Packaging for OpenStack <https://github.com/openstack/rpm-packaging>`_ 
+    project. This driver requires setting some optional configuration options
+    in the ``[gitrepo_driver]`` section
+
+The optional ``[gitrepo_driver]`` section has the following configuration
+options:
+
+.. code-block:: ini
+
+    [gitrepo_driver]
+    repo=http://github.com/openstack/rpm-packaging
+    directory=/openstack
+
+* ``repo`` is the single Git repository where all distgits are located.
+* ``directory`` is a directory inside the repo. DLRN will expect each
+  directory inside it to include the spec file for a single project, using
+  a Jinja2 template like in the RPM Packaging for OpenStack project.
 
 Configuring for gerrit
 ++++++++++++++++++++++
