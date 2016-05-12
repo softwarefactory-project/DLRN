@@ -26,7 +26,7 @@ if [ -n "$GERRIT_URL" -a -n "$GERRIT_LOG" -a -n "$GERRIT_MAINTAINERS" ]; then
     cd ${DATA_DIR}/${PROJECT_NAME}
     LONGSHA1=$(git rev-parse HEAD)
     SHORTSHA1=$(git rev-parse --short HEAD)
-    cd ${DATA_DIR}/${PROJECT_NAME}_distro
+    cd ${DISTGIT_DIR}
     CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
     git checkout -b branch-$SHORTSHA1
     git review -s

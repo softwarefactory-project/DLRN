@@ -50,11 +50,12 @@ function cleanup_sdist() {
     fi
 }
 
-if [ $# = 4 ]; then
+if [ $# = 5 ]; then
     PROJECT_NAME=$1
     OUTPUT_DIRECTORY=$2
     DATA_DIR=$3
     BASEURL=$4
+    DISTGIT_DIR=$5
 
     TOP_DIR=$(mktemp -d)
 
