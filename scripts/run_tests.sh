@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ex
 
-# Simple script to test that delorean works either locally or in a zuul environment
+# Simple script to test that DLRN works either locally or in a zuul environment
 GIT_BASE_URL="https://review.rdoproject.org/r/p"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
 
@@ -73,8 +73,8 @@ function copy_logs() {
 }
 trap copy_logs ERR EXIT
 
-# Run delorean
-delorean --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
+# Run DLRN
+dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
 copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn.cfg --scrub=all
