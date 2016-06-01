@@ -28,7 +28,6 @@ from time import time
 from email.mime.text import MIMEText
 from pbr.version import SemanticVersion
 
-from prettytable import PrettyTable
 import sh
 from six.moves import configparser
 
@@ -89,6 +88,12 @@ default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'rsyncdest': '', 'rsyncport': '22',
                    'pkginfo_driver': 'dlrn.drivers.rdoinfo.RdoInfoDriver'
                    }
+
+def deprecation():
+    # We will still call main, but will indicate that this way of calling
+    # the application will be deprecated.
+    print("Using the 'delorean' command has been deprecated. Please use 'dlrn' instead.")
+    main()
 
 
 def main():
@@ -451,51 +456,6 @@ def main():
 
     genreports(packages, options)
     return exit_code
-
-
-def compare():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--info-repo',
-                        help="use a local rdoinfo repo instead of "
-                             "fetching the default one using rdopkg. Only"
-                             "applies when pkginfo_driver is rdoinfo in"
-                             "projects.ini")
-
-    options, args = parser.parse_known_args(sys.argv[1:])
-    pkginfo_driver = config_options.pkginfo_driver
-    pkginfo_object = import_object(pkginfo_driver)
-    packages = pkginfo_object.getpackages(local_info_repo=options.info_repo,
-                                          tags=config_options.tags)
-
-    compare_details = {}
-    # Each argument is a ":" seperate filename:title, this filename is the
-    # sqlite db file and the title is whats used in the dable being displayed
-    table_header = ["Name", "Out of Sync"]
-    for dbdetail in args:
-        dbfilename, dbtitle = dbdetail.split(":")
-        table_header.extend((dbtitle + " upstream", dbtitle + " spec"))
-
-        session = getSession('sqlite:///%s' % dbfilename)
-
-        for package in packages:
-            package_name = package["name"]
-            compare_details.setdefault(package_name, [package_name, " "])
-            last_success = getCommits(session, project=package_name,
-                                      with_status="SUCCESS").first()
-            if last_success:
-                compare_details[package_name].extend(
-                    (last_success.commit_hash[:8],
-                     last_success.distro_hash[:8]))
-            else:
-                compare_details[package_name].extend(("None", "None"))
-        session.close()
-
-    table = PrettyTable(table_header)
-    for name, compare_detail in compare_details.items():
-        if len(set(compare_detail)) > 4:
-            compare_detail[1] = "*"
-        table.add_row(compare_detail)
-    print(table)
 
 
 def sendnotifymail(packages, commit):
