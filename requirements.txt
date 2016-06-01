@@ -8,7 +8,6 @@ SQLAlchemy
 PyYAML
 pycparser==2.14
 rdopkg>=0.34
-PrettyTable
 alembic
 renderspec
 pymod2pkg>=0.5.5
