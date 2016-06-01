@@ -1,0 +1,9 @@
+#!/bin/bash 
+# This script redirects to dlrn. It's a shell script to avoid python2/3
+# conflicts.
+
+executable="dlrn"
+msg="delorean command has been deprecated, redirecting to '$executable $@'.\n"\
+
+echo -e $msg >&2
+exec $executable "$@"
