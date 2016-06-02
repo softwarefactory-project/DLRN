@@ -75,6 +75,13 @@ trap copy_logs ERR EXIT
 
 # Run DLRN
 dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
+
+# checks requirements with rdopkg reqcheck
+pushd data/$PROJECT_DISTRO_DIR
+yum -y install python-urlgrabber
+rdopkg reqcheck
+popd
+
 copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn.cfg --scrub=all
