@@ -705,6 +705,12 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
             failures += 1
     shafile.close()
 
+    # Use createrepo_c when available
+    try:
+        from sh import createrepo_c
+        sh.createrepo = createrepo_c
+    except ImportError:
+        pass
     sh.createrepo(yumrepodir_abs)
 
     with open(os.path.join(
