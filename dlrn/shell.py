@@ -231,7 +231,6 @@ def main():
                 if ((options.dev is True) or
                     options.run or
                     (not session.query(Commit).filter(
-                        Commit.project_name == project,
                         Commit.commit_hash == commit_toprocess.commit_hash,
                         Commit.distro_hash == commit_toprocess.distro_hash,
                         Commit.status != "RETRY")
