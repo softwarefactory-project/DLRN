@@ -51,44 +51,69 @@ The configuration file looks like this:
 
     [DEFAULT]
     datadir=./data
-    baseurl=https://trunk.rdoproject.org/
+    scriptsdir=./scripts
+    baseurl=http://trunk.rdoproject.org/centos7/
     distro=rpm-master
-    smtpserver=
-    maxretries=3
+    source=master
     target=centos
-    gerrit=yes
+    smtpserver=
+    reponame=delorean
+    templatedir=./dlrn/templates
+    maxretries=3
+    pkginfo_driver=dlrn.drivers.rdoinfo.RdoInfoDriver
+    tags=
     rsyncdest=
     rsyncport=22
 
-* ``datadir`` is the directory where the packages and repositories will be created.
 
-* ``baseurl`` is the URL to the data-directory, as hosted by your web-server. Unless you are
-  installing DLRN for local use only, this must be a publicly accessible URL.
+* ``datadir`` is the directory where the packages and repositories will be
+  created.
+
+* ``scriptsdir`` is the directory where scripts utilized during the build and
+  test process are located.
+
+* ``baseurl`` is the URL to the data-directory, as hosted by your web-server.
+  Unless you are installing DLRN for local use only, this must be a publicly
+  accessible URL.
 
 * ``distro`` is the branch to use for building the packages.
 
-* ``target`` is the distribution to use for building the packages (``centos`` or ``fedora``).
+* ``source`` is the branch to use from the upstream repository.
 
-* ``smtpserver`` is the address of the mail server for sending out notification emails.
-  If this is empty no emails will be sent out. If you are running DLRN locally,
-  then do not set an smtpserver.
+* ``target`` is the distribution to use for building the packages (``centos``
+  or ``fedora``).
 
-* ``maxretries`` is the maximum number of retries on known errors before marking the build
-  as failed. If a build fails, DLRN will check the log files for known, transient errors
-  such as network issues. If the build fails for that reason more than maxretries times, it
-  will be marked as failed.
+* ``smtpserver`` is the address of the mail server for sending out notification
+  emails.  If this is empty no emails will be sent out. If you are running DLRN
+  locally, then do not set an smtpserver.
 
-* ``gerrit`` if set to anything, instructs dlrn to create a gerrit
-  review when a build fails. See next section for details on how to
-  configure gerrit to work.
+* ``reponame`` name of the directory that contains the generated repository.
 
-* ``rsyncdest`` if set, specifies a destination path where the hashed repository
-  directories created by DLRN will be synchronized using ``rsync``, after each commit build.
-  An example would be ``root@backupserver.example.com:/backupdir``.
-  Make sure the user running DLRN has access to the destination server using passswordless SSH.
+* ``templatedir`` path to the directory that contains the report templates and
+  stylesheets.
 
-* ``rsyncport`` is the SSH port to be used when synchronizing the hashed repository. If
-  ``rsyncdest`` is not defined, this option will be ignored.
+* ``maxretries`` is the maximum number of retries on known errors before
+  marking the build as failed. If a build fails, DLRN will check the log files
+  for known, transient errors such as network issues. If the build fails for
+  that reason more than maxretries times, it will be marked as failed.
+
+* ``pkginfo_driver`` is the driver to use for generating the list of packages
+  that will be built.
+
+* ``gerrit`` if set to anything, instructs dlrn to create a gerrit review when
+  a build fails. See next section for details on how to configure gerrit to
+  work.
+
+* ``tags`` contains a list of additional repository tags to build for.
+
+* ``rsyncdest`` if set, specifies a destination path where the hashed
+  repository directories created by DLRN will be synchronized using ``rsync``,
+  after each commit build.  An example would be
+  ``root@backupserver.example.com:/backupdir``.  Make sure the user running
+  DLRN has access to the destination server using passswordless SSH.
+
+* ``rsyncport`` is the SSH port to be used when synchronizing the hashed
+  repository. If ``rsyncdest`` is not defined, this option will be ignored.
 
 Configuring for gerrit
 ++++++++++++++++++++++
