@@ -169,3 +169,18 @@ data directories, or just make a symbolic link:
     $ cd /var/www/html
     $ sudo ln -s <datadir>/repos .
 
+
+Database migration
+++++++++++++++++++
+
+during DLRN upgrades, you may need to upgrade the database schemas,
+in order to keep your old history.
+To migrate database to the latest revision, you need the alembic command-line
+and to run the ``alembic upgrade head`` command.
+
+.. code-block:: bash
+
+    $ sudo yum install -y python-alembic
+    $ alembic upgrade head
+
+If the database doesn't exist, ``alembic upgrade head`` will create it from scratch.
