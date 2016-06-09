@@ -39,6 +39,7 @@ class GitRepoDriver(PkgInfoDriver):
         repo = config_options.gitrepo_repo
         path = config_options.gitrepo_dir.strip('/')
         datadir = config_options.datadir
+        skip_dirs = config_options.skip_dirs
         packages = []
 
         gitpath = os.path.join(datadir, 'package_info')
@@ -53,7 +54,8 @@ class GitRepoDriver(PkgInfoDriver):
         packagepath = os.path.join(gitpath, path)
 
         for package in os.listdir(packagepath):
-            if os.path.isdir(os.path.join(packagepath, package)):
+            if (os.path.isdir(os.path.join(packagepath, package)) and
+               package not in skip_dirs):
                 upstream = 'https://github.com/openstack/' + package
                 maintainers = ['test@example.com']
                 master_distgit = repo + '/' + path + '/' + package

@@ -42,7 +42,10 @@ class ConfigOptions(object):
                 self.gitrepo_dir = cp.get('gitrepo_driver', 'directory')
             else:
                 self.gitrepo_dir = None
-
+            if cp.has_option('gitrepo_driver', 'skip'):
+                self.skip_dirs = cp.get('gitrepo_driver', 'skip').split(',')
+            else:
+                self.gitrepo_dir = None
         global _config_options
         _config_options = self
 
