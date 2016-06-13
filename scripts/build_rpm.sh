@@ -91,7 +91,15 @@ sed -i -e "s/Source0:.*/Source0: $TARBALLREL/g" *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
 
-if /usr/bin/mock $MOCKOPTS ${ADDITIONAL_MOCK_OPTIONS} --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log; then
+if [ "${ADDITIONAL_MOCK_OPTIONS}" != "" ]
+then
+    /usr/bin/mock ${MOCKOPTS} "${ADDITIONAL_MOCK_OPTIONS}" --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+else
+    /usr/bin/mock ${MOCKOPTS} --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+fi
+
+if [ $? -eq 0 ]
+then
     if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
         touch $OUTPUT_DIRECTORY/installed
         exit 0
