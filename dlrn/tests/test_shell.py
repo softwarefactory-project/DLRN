@@ -33,7 +33,8 @@ class TestRefreshRepo(base.TestCase):
     @mock.patch('os.path.exists', return_value=True)
     def test_dont_clone_if_cloned(self, path_mock, sh_mock):
         shell.refreshrepo('url', 'path', branch='branch')
-        expected = [mock.call(sh.git.fetch, 'origin'),
+        expected = [mock.call(sh.git, 'remote', '-v'),
+                    mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
                     mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]

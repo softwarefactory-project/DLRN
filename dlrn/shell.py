@@ -487,6 +487,30 @@ def refreshrepo(url, path, branch="master", local=False):
     logger.info("Getting %s to %s" % (url, path))
     if not os.path.exists(path):
         sh.git.clone(url, path)
+    else:
+        # We need to cover a corner case here, where the repo URL has changed
+        # since the last execution
+        git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
+        try:
+            remotes = git("remote", "-v").splitlines()
+            for remote in remotes:
+                if '(fetch)' in remote:
+                    line = remote.split()
+                    if line[1] != url:
+                        # URL changed, so remove directory
+                        logger.warning("URL for %s changed from %s to %s, "
+                                       "cleanning directory and cloning again"
+                                       % (path, line[1], url))
+                        shutil.rmtree(path)
+                        sh.git.clone(url, path)
+                    break
+        except Exception:
+            # Something failed here, maybe this is a failed repo clone
+            # Let's warn, remove directory and clone again
+            logger.warning("Directory %s does not contain a valid Git repo, "
+                           "cleaning directory and cloning again" % path)
+            shutil.rmtree(path)
+            sh.git.clone(url, path)
 
     git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
     if local is False:
