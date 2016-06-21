@@ -641,7 +641,7 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
 
     shafile = open(os.path.join(yumrepodir_abs, "versions.csv"), "w")
     shafile.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,"
-                  "Status,Last Success Timestamp\n")
+                  "Status,Last Success Timestamp,Pkg NVRs\n")
     failures = 0
 
     for otherproject in packages:
@@ -650,7 +650,7 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
             # Output sha's this project
             dumpshas2file(shafile, commit, otherproject["upstream"],
                           otherproject["master-distgit"], "SUCCESS",
-                          commit.dt_build)
+                          commit.dt_build, built_rpms)
             continue
         # Output sha's of all other projects represented in this repo
         last_success = getCommits(session, project=otherprojectname,
@@ -669,7 +669,7 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
         if last:
             dumpshas2file(shafile, last, otherproject["upstream"],
                           otherproject["master-distgit"],
-                          last_processed.status, last.dt_build)
+                          last_processed.status, last.dt_build, built_rpms)
             if last_processed.status != 'SUCCESS':
                 failures += 1
         else:
