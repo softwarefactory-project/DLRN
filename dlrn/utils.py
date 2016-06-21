@@ -64,12 +64,24 @@ def saveYAML(session, yamlfile):
 
 
 def dumpshas2file(shafile, commit, source_repo, distgit_repo,
-                  status, timestamp):
-    shafile.write("%s,%s,%s,%s,%s,%s,%d\n" % (commit.project_name, source_repo,
-                                              commit.commit_hash, distgit_repo,
-                                              commit.distro_hash, status,
-                                              timestamp)
+                  status, timestamp, rpmlist):
+    shafile.write("%s,%s,%s,%s,%s,%s,%d,%s\n" % (commit.project_name,
+                                                 source_repo,
+                                                 commit.commit_hash,
+                                                 distgit_repo,
+                                                 commit.distro_hash,
+                                                 status,
+                                                 timestamp,
+                                                 getNVRfromlist(rpmlist))
                   )
+
+
+def getNVRfromlist(rpmlist):
+    # Return a string with the source package NVR
+    for pkg in rpmlist:
+        if pkg.endswith(".src.rpm"):
+            return pkg.split('/')[-1].split('.src.rpm')[0]
+    return ""
 
 
 if __name__ == '__main__':
