@@ -494,7 +494,7 @@ def refreshrepo(url, path, branch="master", local=False):
                     if line[1] != url:
                         # URL changed, so remove directory
                         logger.warning("URL for %s changed from %s to %s, "
-                                       "cleanning directory and cloning again"
+                                       "cleaning directory and cloning again"
                                        % (path, line[1], url))
                         shutil.rmtree(path)
                         sh.git.clone(url, path)
