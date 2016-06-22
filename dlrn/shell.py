@@ -482,7 +482,7 @@ def refreshrepo(url, path, branch="master", local=False):
     logger.info("Getting %s to %s" % (url, path))
     if not os.path.exists(path):
         sh.git.clone(url, path)
-    else:
+    elif local is False:
         # We need to cover a corner case here, where the repo URL has changed
         # since the last execution
         git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
@@ -518,22 +518,22 @@ def refreshrepo(url, path, branch="master", local=False):
             logger.error("Error fetching into %s, deleting." % (path))
             sh.sudo("rm", "-rf", path)
             raise
-    try:
-        git.checkout(branch)
-    except sh.ErrorReturnCode_1:
-        if "master" in branch:
-            # Do not try fallback if already on master branch
-            raise
-        else:
-            # Fallback to master
-            if branch.startswith("rpm-"):
-                # TODO(apevec) general distro branch detection
-                branch = "rpm-master"
-            else:
-                branch = "master"
-            logger.info("Falling back to %s" % branch)
+        try:
             git.checkout(branch)
-    git.reset("--hard", "origin/%s" % branch)
+        except sh.ErrorReturnCode_1:
+            if "master" in branch:
+                # Do not try fallback if already on master branch
+                raise
+            else:
+                # Fallback to master
+                if branch.startswith("rpm-"):
+                    # TODO(apevec) general distro branch detection
+                    branch = "rpm-master"
+                else:
+                    branch = "master"
+                logger.info("Falling back to %s" % branch)
+                git.checkout(branch)
+        git.reset("--hard", "origin/%s" % branch)
     repoinfo = str(git.log("--pretty=format:%H %ct", "-1")).strip().split(" ")
     repoinfo.insert(0, branch)
     return repoinfo
