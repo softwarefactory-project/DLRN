@@ -46,7 +46,7 @@ def purge():
     parser.add_argument('-y', help="Answer \"yes\" to any questions",
                         action="store_true")
     parser.add_argument('--dry-run', help="Do not change anything, show"
-                        "what changes would be made",
+                        " what changes would be made",
                         action="store_true")
 
     options, args = parser.parse_known_args(sys.argv[1:])
@@ -98,24 +98,21 @@ def purge():
                     if entry.endswith(".rpm") and not os.path.islink(entry):
                         continue
                     if os.path.isdir(entry):
+                        logger.info("Remove %s" % entry)
                         if options.dry_run is False:
                             shutil.rmtree(entry)
-                        else:
-                            logger.info("Remove %s" % entry)
                     else:
+                        logger.info("Delete %s" % entry)
                         if options.dry_run is False:
                             os.unlink(entry)
-                        else:
-                            logger.info("Delete %s" % entry)
             except OSError:
                 logger.warning("Cannot access directory %s for purge,"
                                " ignoring." % datadir)
             fullpurge.append(commit.project_name)
             commit.flags |= FLAG_PURGED
+            logger.info("Remove %s" % datadir)
             if options.dry_run is False:
                 shutil.rmtree(datadir)
-            else:
-                logger.info("Remove %s" % datadir)
         else:
             # If the commit was not successful, we need to be careful not to
             # remove the directory if there was a successful build
@@ -126,15 +123,13 @@ def purge():
                     Commit.status == 'SUCCESS').count()
 
                 if othercommits == 0:
+                    logger.info("Remove %s" % datadir)
                     if options.dry_run is False:
                         shutil.rmtree(datadir)
-                    else:
-                        logger.info("Remove %s" % datadir)
             else:
+                    logger.info("Remove %s" % datadir)
                     if options.dry_run is False:
                         shutil.rmtree(datadir)
-                    else:
-                        logger.info("Remove %s" % datadir)
             commit.flags |= FLAG_PURGED
     if options.dry_run is False:
         session.commit()
