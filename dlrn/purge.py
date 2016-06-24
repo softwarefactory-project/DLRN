@@ -112,7 +112,11 @@ def purge():
             commit.flags |= FLAG_PURGED
             logger.info("Remove %s" % datadir)
             if options.dry_run is False:
-                shutil.rmtree(datadir)
+                try:
+                    shutil.rmtree(datadir)
+                except OSError:
+                    logger.warning("Cannot access directory %s for purge,"
+                                   " ignoring." % datadir)
         else:
             # If the commit was not successful, we need to be careful not to
             # remove the directory if there was a successful build
@@ -125,11 +129,19 @@ def purge():
                 if othercommits == 0:
                     logger.info("Remove %s" % datadir)
                     if options.dry_run is False:
-                        shutil.rmtree(datadir)
+                        try:
+                            shutil.rmtree(datadir)
+                        except OSError:
+                            logger.warning("Cannot access directory %s for "
+                                           "purge, ignoring." % datadir)
             else:
                     logger.info("Remove %s" % datadir)
                     if options.dry_run is False:
-                        shutil.rmtree(datadir)
+                        try:
+                            shutil.rmtree(datadir)
+                        except OSError:
+                            logger.warning("Cannot access directory %s for "
+                                           "purge, ignoring." % datadir)
             commit.flags |= FLAG_PURGED
     if options.dry_run is False:
         session.commit()
