@@ -689,11 +689,15 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
             yumrepodir_abs, "%s.repo" % config_options.reponame),
             "w") as fp:
         fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
-                 "gpgcheck=0\npriority=1" % (config_options.reponame,
-                                             config_options.reponame,
-                                             project_name, commit_hash,
-                                             config_options.baseurl,
-                                             commit.getshardedcommitdir()))
+                 "gpgcheck=0\npriority=1\n\n" % (config_options.reponame,
+                                                 config_options.reponame,
+                                                 project_name, commit_hash,
+                                                 config_options.baseurl,
+                                                 commit.getshardedcommitdir()))
+        # Add delorean-deps.repo contents to the repo
+        r = urllib2.urlopen(config_options.baseurl + "/delorean-deps.repo")
+        contents = r.readlines()
+        fp.writelines(contents)
 
     dirnames = ['current']
     if failures == 0:
