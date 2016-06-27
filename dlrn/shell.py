@@ -577,10 +577,6 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
     if env_vars:
         for env_var in env_vars:
             run_cmd.append(env_var)
-    if (dev_mode or use_public):
-            run_cmd.append("DLRN_DEV=1")
-    if bootstrap is True:
-            run_cmd.append("REPO_BOOTSTRAP=1")
 
     run_cmd.extend([program,
                     config_options.target, project_name,
