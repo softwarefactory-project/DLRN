@@ -32,6 +32,21 @@ logger = logging.getLogger("dlrn-purge")
 logger.setLevel(logging.INFO)
 
 
+def is_commit_in_dirs(commit, dirlist):
+    if dirlist is None:
+        return False
+    directories = dirlist.split(',')
+    rpms = []
+    for rpm in commit.rpms.split(','):
+        rpms.append(rpm.split('/')[-1])
+
+    for directory in directories:
+        if os.path.exists(directory + '/' + rpm):
+            return True
+
+    return False
+
+
 def purge():
     parser = argparse.ArgumentParser()
     # Some of the non-positional arguments are required, so change the text
@@ -48,6 +63,9 @@ def purge():
     parser.add_argument('--dry-run', help="Do not change anything, show"
                         " what changes would be made",
                         action="store_true")
+    parser.add_argument('--exclude-dirs', help="Do not remove commits whose"
+                        " packages are included in one of the specifided"
+                        " directories (comma-separated list).")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
@@ -67,7 +85,7 @@ def purge():
     # To remove builds we have to start at a point in time and move backwards
     # builds with no build date are also purged as these are legacy
     # All repositories can have the repodata directory and symlinks purged
-    # But we must keep the rpms files of the most recent successful build of
+    # But we must keep the rpm files of the most recent successful build of
     # each project as other symlinks not being purged will be pointing to them.
     topurge = getCommits(session,
                          limit=0,
@@ -78,6 +96,15 @@ def purge():
     for commit in topurge:
         if commit.flags & FLAG_PURGED:
             continue
+
+        if is_commit_in_dirs(commit, options.exclude_dirs):
+            # The commit RPMs are in one of the directories
+            # that should not be touched.
+            logger.info("Ignoring commit %s for %s, it is in one of the"
+                        " excluded directories" % (commit.id,
+                                                   commit.project_name))
+            continue
+
         datadir = os.path.join(cp.get('DEFAULT', 'datadir'), "repos",
                                commit.getshardedcommitdir())
         if commit.project_name not in fullpurge and commit.status == "SUCCESS":
