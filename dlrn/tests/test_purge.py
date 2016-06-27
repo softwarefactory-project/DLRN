@@ -23,7 +23,6 @@ from dlrn import purge
 from dlrn import utils
 
 expected_repos = [
-    './data/repos/6a/bf/6abf557aa1d8fff0aa21f8eba6cd18302c2c86ff_0b1ce934',
     './data/repos/ae/9d/ae9d27e5100f002f55ad6eb2b252a0aa5f16a336_024e24f0',
     './data/repos/45/95/459549c9ab7fef91b2dc8986bc0643bb2f6ec0c8_885e8077',
     './data/repos/e4/f7/e4f71ada86ee4a42287cf401b77d48c9f98ca5aa_354991d9',
@@ -46,14 +45,23 @@ def mocked_islink(path):
     return False
 
 
+def mocked_is_commit_in_dirs(commit, dirlist):
+    # We are making one of the commit hashes be in the excluded dir list
+    if commit.commit_hash == '6abf557aa1d8fff0aa21f8eba6cd18302c2c86ff':
+        return True
+    return False
+
+
 @mock.patch('os.path.islink', side_effect=mocked_islink)
 @mock.patch('os.listdir', side_effect=mocked_listdir)
 @mock.patch('dlrn.purge.getSession', side_effect=mocked_session)
 @mock.patch('shutil.rmtree')
+@mock.patch('dlrn.purge.is_commit_in_dirs',
+            side_effect=mocked_is_commit_in_dirs)
 class TestPurge(base.TestCase):
-
     @mock.patch('dlrn.purge.datetime')
-    def test_purge(self, dt_mock, sh_mock, db_mock, lst_mock, il_mock):
+    def test_purge(self, dt_mock, icid_mock, sh_mock, db_mock, lst_mock,
+                   il_mock):
         testargs = ["dlrn-purge", "--config-file",
                     "projects.ini", "--older-than",
                     "1", "-y"]
