@@ -138,11 +138,16 @@ options:
     [gitrepo_driver]
     repo=http://github.com/openstack/rpm-packaging
     directory=/openstack
+    skip=openstack-macros,keystoneauth1
 
 * ``repo`` is the single Git repository where all distgits are located.
 * ``directory`` is a directory inside the repo. DLRN will expect each
   directory inside it to include the spec file for a single project, using
   a Jinja2 template like in the RPM Packaging for OpenStack project.
+* ``skip`` is a comma-separated list of directories to skip from ``directory``
+  when creating the list of packages to build. This can be of use when the
+  Git repo contains one or more directories without a spec file in it, or
+  the package should not be built for any other reason.
 
 Configuring for gerrit
 ++++++++++++++++++++++
