@@ -755,7 +755,8 @@ def submit_review(commit, env_vars):
 
     run_cmd.extend([os.path.join(scriptsdir, "submit_review.sh"),
                     project_name, os.path.join(datadir, yumrepodir),
-                    datadir, config_options.baseurl])
+                    datadir, config_options.baseurl,
+                    os.path.realpath(commit.distgit_dir)])
     sh.env(run_cmd)
 
 
