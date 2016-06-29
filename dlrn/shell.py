@@ -667,10 +667,14 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
         else:
             last = last_processed
         if last:
+            if last.rpms:
+                rpmlist = last.rpms.split(",")
+            else:
+                rpmlist = []
             dumpshas2file(shafile, last, otherproject["upstream"],
                           otherproject["master-distgit"],
                           last_processed.status, last.dt_build,
-                          last.rpms.split(","))
+                          rpmlist)
             if last_processed.status != 'SUCCESS':
                 failures += 1
         else:
