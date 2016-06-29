@@ -125,6 +125,17 @@ class GitRepoDriver(PkgInfoDriver):
         preprocess = sh.renderspec.bake(_cwd=distgit_dir,
                                         _tty_out=False, _timeout=3600)
         preprocess('--spec-style', 'fedora')
+        # Test: replace %{version} with %{upstream_version} in spec
+        for specfile in os.listdir(distgit_dir):
+            if specfile.endswith(".spec"):
+                filename = os.path.join(distgit_dir, specfile)
+                oldfile = open(filename)
+                spec = oldfile.readlines()
+                oldfile.close()
+                with open(filename, "w") as fp:
+                    for specline in spec:
+                        fp.write(specline.replace('%{version}',
+                                                  '%{upstream_version}'))
 
     def distgit_dir(self, package_name):
         datadir = config_options.datadir
