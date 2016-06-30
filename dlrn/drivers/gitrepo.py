@@ -40,16 +40,18 @@ class GitRepoDriver(PkgInfoDriver):
         path = config_options.gitrepo_dir.strip('/')
         datadir = config_options.datadir
         skip_dirs = config_options.skip_dirs
+        dev_mode = kwargs.get('dev_mode')
         packages = []
 
         gitpath = os.path.join(datadir, 'package_info')
         if not os.path.exists(gitpath):
             sh.git.clone(repo, gitpath)
 
-        git = sh.git.bake(_cwd=gitpath, _tty_out=False, _timeout=3600)
-        git.fetch("origin")
-        # TODO(jpena): allow passing a branch as argument
-        git.reset("--hard", "origin/master")
+        if not dev_mode:
+            git = sh.git.bake(_cwd=gitpath, _tty_out=False, _timeout=3600)
+            git.fetch("origin")
+            # TODO(jpena): allow passing a branch as argument
+            git.reset("--hard", "origin/master")
 
         packagepath = os.path.join(gitpath, path)
 

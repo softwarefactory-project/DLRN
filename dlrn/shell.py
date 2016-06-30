@@ -153,7 +153,8 @@ def main():
     global pkginfo
     pkginfo = import_object(pkginfo_driver)
     packages = pkginfo.getpackages(local_info_repo=options.info_repo,
-                                   tags=config_options.tags)
+                                   tags=config_options.tags,
+                                   dev_mode=options.dev)
 
     if options.status is True:
         if options.package_name:
