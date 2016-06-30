@@ -107,7 +107,7 @@ class GitRepoDriver(PkgInfoDriver):
             # Git gives us commits already sorted in the right order
             lines = git.log("--pretty=format:'%ct %H'", since,
                             "--first-parent", "--reverse",
-                            "origin/%s" % source_branch)
+                            "%s" % source_branch)
 
             for line in lines:
                 dt, commit_hash = str(line).strip().strip("'").split(" ")
