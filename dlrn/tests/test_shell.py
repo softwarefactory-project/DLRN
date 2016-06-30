@@ -35,7 +35,7 @@ class TestRefreshRepo(base.TestCase):
         shell.refreshrepo('url', 'path', branch='branch')
         expected = [mock.call(sh.git.clone, 'url', 'path'),
                     mock.call(sh.git.fetch, 'origin'),
-                    mock.call(sh.git.checkout, 'branch'),
+                    mock.call(sh.git.checkout, '-f', 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
                     mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
         self.assertEqual(sh_mock.call_args_list, expected)
@@ -45,7 +45,7 @@ class TestRefreshRepo(base.TestCase):
         shell.refreshrepo('url', 'path', branch='branch')
         expected = [mock.call(sh.git, 'remote', '-v'),
                     mock.call(sh.git.fetch, 'origin'),
-                    mock.call(sh.git.checkout, 'branch'),
+                    mock.call(sh.git.checkout, '-f', 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
                     mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
         self.assertEqual(sh_mock.call_args_list, expected)
