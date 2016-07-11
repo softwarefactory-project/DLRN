@@ -520,7 +520,7 @@ def refreshrepo(url, path, branch="master", local=False):
             sh.sudo("rm", "-rf", path)
             raise
         try:
-            git.checkout(branch)
+            git.checkout('-f', branch)
         except sh.ErrorReturnCode_1:
             if "master" in branch:
                 # Do not try fallback if already on master branch
@@ -534,7 +534,12 @@ def refreshrepo(url, path, branch="master", local=False):
                     branch = "master"
                 logger.info("Falling back to %s" % branch)
                 git.checkout(branch)
-        git.reset("--hard", "origin/%s" % branch)
+        try:
+            git.reset("--hard", "origin/%s" % branch)
+        except Exception:
+            # Maybe it was a tag, not a branch
+            git.reset("--hard", "%s" % branch)
+
     repoinfo = str(git.log("--pretty=format:%H %ct", "-1")).strip().split(" ")
     repoinfo.insert(0, branch)
     return repoinfo

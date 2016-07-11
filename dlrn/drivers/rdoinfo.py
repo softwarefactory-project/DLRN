@@ -104,7 +104,7 @@ class RdoInfoDriver(PkgInfoDriver):
             git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
             # Git gives us commits already sorted in the right order
             lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
-                            "--reverse", "origin/%s" % source_branch)
+                            "--reverse", "%s" % source_branch)
 
             for line in lines:
                 dt, commit_hash = str(line).strip().strip("'").split(" ")
