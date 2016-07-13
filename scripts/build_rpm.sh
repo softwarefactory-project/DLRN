@@ -56,7 +56,7 @@ else
     fi
     setversionandrelease "$version" $(git log -n1 --format=format:%h)
     if [ -r metadata.json ]; then
-        TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@')
+        TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@;s@\.git$@@')
     else
         TARNAME=${PROJECT_NAME}
     fi
