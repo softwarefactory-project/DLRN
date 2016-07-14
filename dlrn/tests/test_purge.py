@@ -62,5 +62,5 @@ class TestPurge(base.TestCase):
             purge.purge()
             expected = []
             for repo in expected_repos:
-                expected.append(mock.call(repo))
+                expected.append(mock.call(repo, ignore_errors=True))
             self.assertEqual(sh_mock.call_args_list, expected)
