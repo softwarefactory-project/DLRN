@@ -120,3 +120,8 @@ def getsourcebranch(package):
     else:
         config_options = getConfigOptions()
         return config_options.source
+
+
+def buildtagsonly(package):
+    return ('tags' in package and package['tags'] is not None and
+            'build-tags-only' in package['tags'])
