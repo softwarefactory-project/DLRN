@@ -23,6 +23,7 @@ from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
 from dlrn.repositories import getdistrobranch
 from dlrn.repositories import getsourcebranch
+from dlrn.repositories import logger
 from dlrn.repositories import refreshrepo
 
 import os
@@ -63,7 +64,6 @@ class RdoInfoDriver(PkgInfoDriver):
             self.packages = rdoinfo.filter_pkgs(self.packages, {'tags': tags})
         return self.packages
 
-
     def getinfo(self, **kwargs):
         project = kwargs.get('project')
         package = kwargs.get('package')
@@ -73,6 +73,7 @@ class RdoInfoDriver(PkgInfoDriver):
         datadir = self.config_options.datadir
         repo = package['upstream']
         distro = package['master-distgit']
+        tags_only = package.get('tags_only', False)
 
         distro_dir = self.distgit_dir(package['name'])
         distro_branch = getdistrobranch(package)
@@ -109,11 +110,24 @@ class RdoInfoDriver(PkgInfoDriver):
 
             git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
             # Git gives us commits already sorted in the right order
-            lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
-                            "--reverse")
+            if tags_only is True:
+                logger.info('Building tags only for %s' % project)
+                if since == '-1':
+                    # we need 2 entries as HEAD will be listed too
+                    since = '-2'
+                lines = filter(
+                    lambda x: x.find(' (tag: ') >= 0,
+                    git.log('--simplify-by-decoration',
+                            "--pretty=format:'%ct %H %d'",
+                            since, "--first-parent",
+                            "--reverse", "%s" % source_branch))
+            else:
+                lines = git.log("--pretty=format:'%ct %H'",
+                                since, "--first-parent",
+                                "--reverse")
 
             for line in lines:
-                dt, commit_hash = str(line).strip().strip("'").split(" ")
+                dt, commit_hash = str(line).strip().strip("'").split(" ")[:2]
                 commit = Commit(dt_commit=float(dt), project_name=project,
                                 commit_hash=commit_hash, repo_dir=repo_dir,
                                 distro_hash=distro_hash, dt_distro=dt_distro,
