@@ -114,9 +114,22 @@ def getdistrobranch(package):
         return config_options.distro
 
 
-def getsourcebranch(package):
+def getsourcebranchraw(package):
     if 'source-branch' in package:
         return package['source-branch']
     else:
         config_options = getConfigOptions()
         return config_options.source
+
+
+def getsourcebranch(package):
+    branch = getsourcebranchraw(package)
+    # remove the :* at the end that means all the tags
+    if len(branch) > 2 and branch[-2:] == ':*':
+        branch = branch[:-2]
+    return branch
+
+
+def istagsonly(package):
+    branch = getsourcebranchraw(package)
+    return (len(branch) > 2 and branch[-2:] == ':*')
