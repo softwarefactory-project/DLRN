@@ -315,7 +315,6 @@ def main():
                                       options.use_public, options.order)
         except Exception as e:
             datadir = os.path.realpath(config_options.datadir)
-            exit_code = 1
             logfile = os.path.join(datadir, "repos",
                                    commit.getshardedcommitdir(),
                                    "rpmbuild.log")
@@ -327,7 +326,12 @@ def main():
                 commit.status = "RETRY"
                 commit.notes = getattr(e, "message", notes)
                 session.add(commit)
+                # do not switch from an error exit code to a retry
+                # exit code
+                if exit_code != 1:
+                    exit_code = 2
             else:
+                exit_code = 1
                 # If the log file hasn't been created we add what we have
                 # This happens if the rpm build script didn't run.
                 if not os.path.exists(logfile):
