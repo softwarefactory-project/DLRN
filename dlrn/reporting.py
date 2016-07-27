@@ -71,8 +71,13 @@ def genreports(packages, options):
     reponame = config_options.reponame
     templatedir = config_options.templatedir
     datadir = config_options.datadir
+    repodir = os.path.join(datadir, "repos")
 
     css_file = os.path.join(templatedir, 'stylesheets/styles.css')
+
+    # create directories
+    if not os.path.exists(repodir):
+        os.makedirs(repodir)
 
     # configure jinja and filters
     jinja_env = jinja2.Environment(
@@ -88,8 +93,8 @@ def genreports(packages, options):
                                     src=src,
                                     target=target,
                                     commits=commits)
-    shutil.copy2(css_file, os.path.join(datadir, "repos", "styles.css"))
-    report_file = os.path.join(datadir, "repos", "report.html")
+    shutil.copy2(css_file, os.path.join(repodir, "styles.css"))
+    report_file = os.path.join(repodir, "report.html")
     with open(report_file, "w") as fp:
         fp.write(content)
 
@@ -148,6 +153,6 @@ def genreports(packages, options):
                                     target=target,
                                     pkgs=pkgs)
 
-    report_file = os.path.join(datadir, "repos", "status_report.html")
+    report_file = os.path.join(repodir, "status_report.html")
     with open(report_file, "w") as fp:
         fp.write(content)
