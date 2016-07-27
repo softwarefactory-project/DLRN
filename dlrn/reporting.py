@@ -74,6 +74,9 @@ def genreports(packages, options):
 
     css_file = os.path.join(templatedir, 'stylesheets/styles.css')
 
+    # create directories
+    os.makedirs(os.path.join(datadir, "repos"))
+
     # configure jinja and filters
     jinja_env = jinja2.Environment(
         loader=jinja2.FileSystemLoader([templatedir]))
