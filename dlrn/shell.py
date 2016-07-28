@@ -155,7 +155,6 @@ def main():
     packages = pkginfo.getpackages(local_info_repo=options.info_repo,
                                    tags=config_options.tags,
                                    dev_mode=options.dev)
-
     if options.status is True:
         if options.package_name:
             names = (options.package_name, )
@@ -480,7 +479,7 @@ def sendnotifymail(packages, commit):
 
 
 def refreshrepo(url, path, branch="master", local=False):
-    logger.info("Getting %s to %s" % (url, path))
+    logger.info("Getting %s to %s (%s)" % (url, path, branch))
     if not os.path.exists(path):
         sh.git.clone(url, path)
     elif local is False:
