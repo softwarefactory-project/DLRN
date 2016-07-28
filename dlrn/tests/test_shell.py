@@ -50,8 +50,17 @@ class TestRefreshRepo(base.TestCase):
                     mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
-    def test_dont_fetch_if_local(self, sh_mock):
+    @mock.patch('os.path.exists', return_value=True)
+    def test_dont_fetch_if_local_not_cloned(self, path_mock, sh_mock):
+        shell.refreshrepo('url', 'path', branch='branch', local=True)
+        expected = [mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
+        self.assertEqual(sh_mock.call_args_list, expected)
+
+    def test_clone_if_local_and_not_cloned(self, sh_mock):
         shell.refreshrepo('url', 'path', branch='branch', local=True)
         expected = [mock.call(sh.git.clone, 'url', 'path'),
+                    mock.call(sh.git.fetch, 'origin'),
+                    mock.call(sh.git.checkout, '-f', 'branch'),
+                    mock.call(sh.git.reset, '--hard', 'origin/branch'),
                     mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
         self.assertEqual(sh_mock.call_args_list, expected)
