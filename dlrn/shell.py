@@ -500,7 +500,8 @@ def sendnotifymail(packages, commit):
 
 def refreshrepo(url, path, branch="master", local=False):
     logger.info("Getting %s to %s (%s)" % (url, path, branch))
-    if not os.path.exists(path):
+    checkout_not_present = not os.path.exists(path)
+    if checkout_not_present is True:
         sh.git.clone(url, path)
     elif local is False:
         # We need to cover a corner case here, where the repo URL has changed
@@ -528,7 +529,7 @@ def refreshrepo(url, path, branch="master", local=False):
             sh.git.clone(url, path)
 
     git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
-    if local is False:
+    if local is False or checkout_not_present is True:
         try:
             git.fetch("origin")
         except Exception:
