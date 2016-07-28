@@ -109,8 +109,11 @@ def main():
                         help="Use local git repos if possible.")
     parser.add_argument('--head-only', action="store_true",
                         help="Build from the most recent Git commit only.")
-    parser.add_argument('--package-name',
-                        help="Build a specific package name only.")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--project-name',
+                       help="Build a specific project name only.")
+    group.add_argument('--package-name',
+                       help="Build a specific package name only.")
     parser.add_argument('--dev', action="store_true",
                         help="Don't reset packaging git repo, force build "
                              "and add public master repo for dependencies "
@@ -155,12 +158,19 @@ def main():
     packages = pkginfo.getpackages(local_info_repo=options.info_repo,
                                    tags=config_options.tags,
                                    dev_mode=options.dev)
+
+    if options.project_name:
+        pkg_names = [p['name'] for p in packages
+                     if p['project'] == options.project_name]
+    elif options.package_name:
+        pkg_names = (options.package_name, )
+    else:
+        pkg_names = None
+
     if options.status is True:
-        if options.package_name:
-            names = (options.package_name, )
-        else:
-            names = [p['name'] for p in packages]
-        for name in names:
+        if not pkg_names:
+            pkg_names = [p['name'] for p in packages]
+        for name in pkg_names:
             commit = getLastProcessedCommit(session, name, 'invalid status')
             if commit:
                 print(name, commit.status)
@@ -168,11 +178,17 @@ def main():
                 print(name, 'NO_BUILD')
         sys.exit(0)
 
+    if pkg_names:
+        pkg_name = pkg_names[0]
+    else:
+        pkg_name = None
+
     if options.recheck is True:
-        if not options.package_name:
-            logger.error('Please use --package-name with --recheck.')
+        if not pkg_name:
+            logger.error('Please use --package-name or --project-name '
+                         'with --recheck.')
             sys.exit(1)
-        commit = getLastProcessedCommit(session, options.package_name)
+        commit = getLastProcessedCommit(session, pkg_name)
         if commit:
             if commit.status == 'SUCCESS':
                 logger.error("Trying to recheck an already successful commit,"
@@ -193,7 +209,7 @@ def main():
                 sys.exit(0)
         else:
                 logger.error("There are no existing commits for package %s"
-                             % options.package_name)
+                             % pkg_name)
                 sys.exit(1)
     # when we run a program instead of building we don't care about
     # the commits, we just want to run once per package
@@ -209,7 +225,7 @@ def main():
             # This will return all commits since the last handled commit
             # including the last handled commit, remove it later if needed.
             since = "--after=%d" % (commit.dt_commit)
-        if not options.package_name or package["name"] == options.package_name:
+        if not pkg_name or package["name"] == pkg_name:
             project_toprocess = pkginfo.getinfo(project=project,
                                                 package=package,
                                                 since=since,
@@ -237,7 +253,7 @@ def main():
 
     # if requested do a sort according to build and install
     # dependencies
-    if options.order is True and not options.package_name:
+    if options.order is True and not pkg_name:
         # collect info from all spec files
         logger.info("Reading rpm spec files")
         projects = sorted([p['name'] for p in packages])
@@ -399,7 +415,7 @@ def main():
         sync_repo(commit)
 
     # If we were bootstrapping, set the packages that required it to RETRY
-    if options.order is True and not options.package_name:
+    if options.order is True and not pkg_name:
         for bpackage in bootstraplist:
             commit = getLastProcessedCommit(session, bpackage)
             commit.status = 'RETRY'
