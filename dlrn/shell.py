@@ -762,14 +762,13 @@ def sync_repo(commit):
             rsyncpaths.append(filepath)
 
         rsh_command = 'ssh -p %s -o StrictHostKeyChecking=no' % rsyncport
-        for dirname in rsyncpaths:
-            try:
-                sh.rsync('-avzR', '--delete',
-                         '-e', rsh_command,
-                         dirname, rsyncdest)
-            except Exception as e:
-                logger.warn('Failed to sync directory %s to %s ,'
-                            'got error %s' % (dirname, rsyncdest, e))
+        try:
+            sh.rsync('-avzR', '--delete-delay',
+                     '-e', rsh_command,
+                     rsyncpaths, rsyncdest)
+        except Exception as e:
+            logger.warn('Failed to rsync content to %s ,'
+                        'got error %s' % (rsyncdest, e))
 
 
 def submit_review(commit, env_vars):
