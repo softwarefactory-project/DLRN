@@ -35,6 +35,8 @@ logger.setLevel(logging.INFO)
 def is_commit_in_dirs(commit, dirlist):
     if dirlist is None:
         return False
+    if commit.rpms is None:
+        return False
     directories = dirlist.split(',')
     rpms = []
     for rpm in commit.rpms.split(','):
