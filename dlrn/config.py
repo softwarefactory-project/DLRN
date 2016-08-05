@@ -31,6 +31,7 @@ class ConfigOptions(object):
         self.scriptsdir = cp.get('DEFAULT', 'scriptsdir')
         self.templatedir = cp.get('DEFAULT', 'templatedir')
         self.pkginfo_driver = cp.get('DEFAULT', 'pkginfo_driver')
+        self.workers = cp.getint('DEFAULT', 'workers')
 
         # Handling for optional sections, driver-based
         if cp.has_section('gitrepo_driver'):
