@@ -64,6 +64,7 @@ The configuration file looks like this:
     tags=
     rsyncdest=
     rsyncport=22
+    workers=1
     pkginfo_driver=dlrn.drivers.rdoinfo.RdoInfoDriver
 
 
@@ -117,6 +118,10 @@ The configuration file looks like this:
 
 * ``rsyncport`` is the SSH port to be used when synchronizing the hashed
   repository. If ``rsyncdest`` is not defined, this option will be ignored.
+
+* ``workers`` is the number of parallel build processes to launch. When using
+  multiple workers, the mock build part will be handled by a pool of processes,
+  while the repo creation and synchronization will still be sequential.
 
 * ``pkginfo_driver`` defines the driver to be used to manage the distgit
   repositories. There are currently two drivers:
