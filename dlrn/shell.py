@@ -16,6 +16,7 @@ import argparse
 import copy
 import filecmp
 import logging
+import multiprocessing
 import os
 import re
 import shutil
@@ -86,7 +87,8 @@ default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                        os.path.dirname(os.path.realpath(__file__)),
                        "templates"),
                    'rsyncdest': '', 'rsyncport': '22',
-                   'pkginfo_driver': 'dlrn.drivers.rdoinfo.RdoInfoDriver'
+                   'pkginfo_driver': 'dlrn.drivers.rdoinfo.RdoInfoDriver',
+                   'workers': '1',
                    }
 
 
@@ -126,7 +128,11 @@ def main():
                              "when doing install verification.")
     parser.add_argument('--order', action="store_true",
                         help="Compute the build order according to the spec "
-                             "files instead of the dates of the commits.")
+                             "files instead of the dates of the commits. "
+                             "Implies --sequential.")
+    parser.add_argument('--sequential', action="store_true",
+                        help="Run all actions sequentially, regardless of the"
+                             " number of workers specified in projects.ini.")
     parser.add_argument('--status', action="store_true",
                         help="Get the status of packages.")
     parser.add_argument('--recheck', action="store_true",
@@ -141,6 +147,7 @@ def main():
     parser.add_argument('--stop', action="store_true",
                         help="Stop on error.")
 
+    global options
     options, args = parser.parse_known_args(sys.argv[1:])
 
     cp = configparser.RawConfigParser(default_options)
@@ -148,6 +155,8 @@ def main():
 
     if options.log_commands is True:
         logging.getLogger("sh.command").setLevel(logging.INFO)
+    if options.order is True:
+        options.sequential = True
 
     global session
     session = getSession('sqlite:///commits.sqlite')
@@ -156,6 +165,7 @@ def main():
     pkginfo_driver = config_options.pkginfo_driver
     global pkginfo
     pkginfo = import_object(pkginfo_driver)
+    global packages
     packages = pkginfo.getpackages(local_info_repo=options.info_repo,
                                    tags=config_options.tags,
                                    dev_mode=options.dev)
@@ -300,123 +310,34 @@ def main():
     else:
         # sort according to the timestamp of the commits
         toprocess.sort()
-    exit_code = 0
-    for commit in toprocess:
-        project = commit.project_name
 
-        project_info = session.query(Project).filter(
-            Project.project_name == project).first()
-        if not project_info:
-            project_info = Project(project_name=project, last_email=0)
+    if options.sequential is True:
+        for commit in toprocess:
+            status = build_worker(commit)
+            exception = status[3]
+            if exception is not None:
+                logger.error("Received exception %s" % exception)
 
-        commit_hash = commit.commit_hash
-
-        if options.run:
-            try:
-                run(options.run, commit, options.build_env,
-                    options.dev, options.use_public, options.order,
-                    do_build=False)
-            except Exception as e:
-                exit_code = 1
-                if options.stop:
-                    return exit_code
-                pass
-            continue
-
-        logger.info("Processing %s %s" % (project, commit_hash))
-
-        notes = ""
-        try:
-            built_rpms, notes = build(packages,
-                                      commit, options.build_env, options.dev,
-                                      options.use_public, options.order)
-        except Exception as e:
-            datadir = os.path.realpath(config_options.datadir)
-            yumrepodir = os.path.join(datadir, "repos",
-                                      commit.getshardedcommitdir())
-            logfile = os.path.join(yumrepodir,
-                                   "rpmbuild.log")
-            if (isknownerror(logfile) and
-                (timesretried(project, commit_hash, commit.distro_hash) <
-                 config_options.maxretries)):
-                logger.exception("Known error building packages for %s,"
-                                 " will retry later" % project)
-                commit.status = "RETRY"
-                commit.notes = getattr(e, "message", notes)
-                session.add(commit)
-                # do not switch from an error exit code to a retry
-                # exit code
-                if exit_code != 1:
-                    exit_code = 2
-            else:
-                exit_code = 1
-                # If the log file hasn't been created we add what we have
-                # This happens if the rpm build script didn't run.
-                if not os.path.exists(yumrepodir):
-                    os.makedirs(yumrepodir)
-                if not os.path.exists(logfile):
-                    with open(logfile, "w") as fp:
-                        fp.write(getattr(e, "message", notes))
-
-                if not project_info.suppress_email():
-                    sendnotifymail(packages, commit)
-                    project_info.sent_email()
-                    session.add(project_info)
-
-                # allow to submit a gerrit review only if the last build was
-                # successful or non existent to avoid creating a gerrit review
-                # for the same problem multiple times.
-                if config_options.gerrit is not None:
-                    if options.build_env:
-                        env_vars = list(options.build_env)
-                    else:
-                        env_vars = []
-                    last_build = getLastProcessedCommit(session, project)
-                    if not last_build or last_build.status == 'SUCCESS':
-                        for pkg in packages:
-                            if project == pkg['name']:
-                                break
-                        else:
-                            pkg = None
-                        if pkg:
-                            url = (get_commit_url(commit, pkg) +
-                                   commit.commit_hash)
-                            env_vars.append('GERRIT_URL=%s' % url)
-                            env_vars.append('GERRIT_LOG=%s/%s' %
-                                            (config_options.baseurl,
-                                             commit.getshardedcommitdir()))
-                            maintainers = ','.join(pkg['maintainers'])
-                            env_vars.append('GERRIT_MAINTAINERS=%s' %
-                                            maintainers)
-                            logger.info('Creating a gerrit review using '
-                                        'GERRIT_URL=%s '
-                                        'GERRIT_MAINTAINERS=%s ' %
-                                        (url, maintainers))
-                            try:
-                                submit_review(commit, env_vars)
-                            except Exception:
-                                logger.error('Unable to create review '
-                                             'see review.log')
-                        else:
-                            logger.error('Unable to find info for project %s' %
-                                         project)
-                    else:
-                        logger.info('Last build not successful '
-                                    'for %s' % project)
-                commit.status = "FAILED"
-                commit.notes = getattr(e, "message", notes)
-                session.add(commit)
-            if options.stop:
+            post_build(status)
+            exit_code = process_build_result(status)
+            if options.stop and exit_code != 0:
                 return exit_code
-        else:
-            commit.status = "SUCCESS"
-            commit.notes = notes
-            commit.rpms = ",".join(built_rpms)
-            session.add(commit)
-        if options.dev is False:
-            session.commit()
-        genreports(packages, options)
-        sync_repo(commit)
+    else:
+        # Setup multiprocessing pool
+        pool = multiprocessing.Pool(config_options.workers)
+        iterator = pool.imap(build_worker, toprocess)
+
+        while True:
+            try:
+                status = iterator.next()
+                # Create repo, build versions.csv file.
+                # This needs to be sequential
+                post_build(status)
+                exit_code = process_build_result(status)
+                if options.stop and exit_code != 0:
+                    return exit_code
+            except StopIteration:
+                break
 
     # If we were bootstrapping, set the packages that required it to RETRY
     if options.order is True and not pkg_name:
@@ -425,9 +346,143 @@ def main():
             commit.status = 'RETRY'
             session.add(commit)
             session.commit()
-
     genreports(packages, options)
     return exit_code
+
+
+def process_build_result(status):
+    commit = status[0]
+    built_rpms = status[1]
+    notes = status[2]
+    exception = status[3]
+    commit_hash = commit.commit_hash
+    project = commit.project_name
+    project_info = session.query(Project).filter(
+        Project.project_name == project).first()
+    if not project_info:
+        project_info = Project(project_name=project, last_email=0)
+    exit_code = 0
+
+    if options.run is True:
+        if exception is not None:
+            exit_code = 1
+            if options.stop:
+                return exit_code
+        return exit_code
+
+    if exception is not None:
+        logger.error("Received exception %s" % exception)
+
+        datadir = os.path.realpath(config_options.datadir)
+        yumrepodir = os.path.join(datadir, "repos",
+                                  commit.getshardedcommitdir())
+        logfile = os.path.join(yumrepodir,
+                               "rpmbuild.log")
+        if (isknownerror(logfile) and
+            (timesretried(project, commit_hash, commit.distro_hash) <
+             config_options.maxretries)):
+            logger.exception("Known error building packages for %s,"
+                             " will retry later" % project)
+            commit.status = "RETRY"
+            commit.notes = getattr(exception, "message", notes)
+            session.add(commit)
+            # do not switch from an error exit code to a retry
+            # exit code
+            if exit_code != 1:
+                exit_code = 2
+        else:
+            exit_code = 1
+            # If the log file hasn't been created we add what we have
+            # This happens if the rpm build script didn't run.
+            if not os.path.exists(yumrepodir):
+                os.makedirs(yumrepodir)
+            if not os.path.exists(logfile):
+                with open(logfile, "w") as fp:
+                    fp.write(getattr(exception, "message", notes))
+
+            if not project_info.suppress_email():
+                sendnotifymail(packages, commit)
+                project_info.sent_email()
+                session.add(project_info)
+
+            # allow to submit a gerrit review only if the last build
+            # was successful or non existent to avoid creating a gerrit
+            # review for the same problem multiple times.
+            if config_options.gerrit is not None:
+                if options.build_env:
+                    env_vars = list(options.build_env)
+                else:
+                    env_vars = []
+                last_build = getLastProcessedCommit(session, project)
+                if not last_build or last_build.status == 'SUCCESS':
+                    for pkg in packages:
+                        if project == pkg['name']:
+                            break
+                    else:
+                        pkg = None
+                    if pkg:
+                        url = (get_commit_url(commit, pkg) +
+                               commit.commit_hash)
+                        env_vars.append('GERRIT_URL=%s' % url)
+                        env_vars.append('GERRIT_LOG=%s/%s' %
+                                        (config_options.baseurl,
+                                         commit.getshardedcommitdir()))
+                        maintainers = ','.join(pkg['maintainers'])
+                        env_vars.append('GERRIT_MAINTAINERS=%s' %
+                                        maintainers)
+                        logger.info('Creating a gerrit review using '
+                                    'GERRIT_URL=%s '
+                                    'GERRIT_MAINTAINERS=%s ' %
+                                    (url, maintainers))
+                        try:
+                            submit_review(commit, env_vars)
+                        except Exception:
+                            logger.error('Unable to create review '
+                                         'see review.log')
+                    else:
+                        logger.error('Unable to find info for project'
+                                     ' %s' % project)
+                else:
+                    logger.info('Last build not successful '
+                                'for %s' % project)
+            commit.status = "FAILED"
+            commit.notes = getattr(exception, "message", notes)
+            session.add(commit)
+        if options.stop:
+            return exit_code
+    else:
+        commit.status = "SUCCESS"
+        commit.notes = notes
+        commit.rpms = ",".join(built_rpms)
+        session.add(commit)
+    if options.dev is False:
+        session.commit()
+    genreports(packages, options)
+    # TODO(jpena): could we launch this asynchronously?
+    sync_repo(commit)
+    return exit_code
+
+
+def build_worker(commit):
+    if options.run:
+        try:
+            run(options.run, commit, options.build_env,
+                options.dev, options.use_public, options.order,
+                do_build=False)
+            return [commit, '', '', None]
+        except Exception as e:
+            return [commit, '', '', e]
+
+    logger.info("Processing %s %s" % (commit.project_name, commit.commit_hash))
+
+    notes = ""
+    try:
+        built_rpms, notes = build(packages, commit, options.build_env,
+                                  options.dev, options.use_public,
+                                  options.order)
+        return [commit, built_rpms, notes, None]
+    except Exception as e:
+        return [commit, '', '', e]
 
 
 def compare():
@@ -629,41 +684,14 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         raise e
 
 
-def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
-    # Set the build timestamp to now
-    commit.dt_build = int(time())
-
+def post_build(status):
+    commit = status[0]
+    built_rpms = status[1]
     project_name = commit.project_name
+    commit_hash = commit.commit_hash
     datadir = os.path.realpath(config_options.datadir)
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
-    commit_hash = commit.commit_hash
-
-    try:
-        build_rpm_wrapper(commit, dev_mode, use_public, bootstrap,
-                          env_vars)
-    except Exception as e:
-        raise Exception("Error in build_rpm_wrapper for %s: %s" %
-                        (project_name, e))
-
-    built_rpms = []
-    for rpm in os.listdir(yumrepodir_abs):
-        if rpm.endswith(".rpm"):
-            built_rpms.append(os.path.join(yumrepodir, rpm))
-    if not built_rpms:
-        raise Exception("No rpms built for %s" % project_name)
-
-    notes = "OK"
-    if not os.path.isfile(os.path.join(yumrepodir_abs, "installed")):
-        logger.error('Build failed. See logs at: %s/%s/' % (datadir,
-                                                            yumrepodir))
-        raise Exception("Error installing %s" % project_name)
-    else:
-        # Overwrite installed file, adding the repo reference
-        with open(os.path.join(yumrepodir_abs, "installed"), "w") as fp:
-            fp.write("%s %s %s" % (commit.project_name,
-                                   commit.commit_hash,
-                                   commit.distro_hash))
 
     shafile = open(os.path.join(yumrepodir_abs, "versions.csv"), "w")
     shafile.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,"
@@ -726,11 +754,12 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
                                              commit.getshardedcommitdir()))
 
     dirnames = ['current']
+
     if failures == 0:
         dirnames.append('consistent')
     else:
-        logger.info('%d packages not built correctly: not updating the '
-                    'consistent symlink' % failures)
+        logger.info('%d packages not built correctly: not updating'
+                    ' the consistent symlink' % failures)
     for dirname in dirnames:
         target_repo_dir = os.path.join(datadir, "repos", dirname)
         os.symlink(os.path.relpath(yumrepodir_abs,
@@ -738,6 +767,42 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
                    target_repo_dir + "_")
         os.rename(target_repo_dir + "_", target_repo_dir)
 
+
+def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
+    # Set the build timestamp to now
+    commit.dt_build = int(time())
+
+    project_name = commit.project_name
+    datadir = os.path.realpath(config_options.datadir)
+    yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
+    yumrepodir_abs = os.path.join(datadir, yumrepodir)
+
+    try:
+        build_rpm_wrapper(commit, dev_mode, use_public, bootstrap,
+                          env_vars)
+    except Exception as e:
+        raise Exception("Error in build_rpm_wrapper for %s: %s" %
+                        (project_name, e))
+
+    built_rpms = []
+    for rpm in os.listdir(yumrepodir_abs):
+        if rpm.endswith(".rpm"):
+            built_rpms.append(os.path.join(yumrepodir, rpm))
+    if not built_rpms:
+        raise Exception("No rpms built for %s" % project_name)
+
+    notes = "OK"
+
+    if not os.path.isfile(os.path.join(yumrepodir_abs, "installed")):
+        logger.error('Build failed. See logs at: %s/%s/' % (datadir,
+                                                            yumrepodir))
+        raise Exception("Error installing %s" % project_name)
+    else:
+        # Overwrite installed file, adding the repo reference
+        with open(os.path.join(yumrepodir_abs, "installed"), "w") as fp:
+            fp.write("%s %s %s" % (commit.project_name,
+                                   commit.commit_hash,
+                                   commit.distro_hash))
     return built_rpms, notes
 
 
@@ -818,12 +883,19 @@ def timesretried(project, commit_hash, distro_hash):
 
 
 def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars):
+    # Get the worker id
+    if options.sequential is True:
+        worker_id = 1
+    else:
+        worker_id = multiprocessing.current_process()._identity[0]
+
+    mock_config = "dlrn-" + str(worker_id) + ".cfg"
     scriptsdir = os.path.realpath(config_options.scriptsdir)
     datadir = os.path.realpath(config_options.datadir)
     baseurl = config_options.baseurl
     templatecfg = os.path.join(scriptsdir, config_options.target + ".cfg")
-    newcfg = os.path.join(datadir, "dlrn.cfg.new")
-    oldcfg = os.path.join(datadir, "dlrn.cfg")
+    newcfg = os.path.join(datadir, mock_config + ".new")
+    oldcfg = os.path.join(datadir, mock_config)
     shutil.copyfile(templatecfg, newcfg)
 
     # Add the most current repo, we may have dependencies in it
@@ -836,8 +908,16 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars):
                                "baseurl=file://%s/repos/current\n" % datadir,
                                "enabled=1\n", "gpgcheck=0\n", "priority=1\n",
                                "\"\"\""]
-        with open(newcfg, "w") as fp:
-            fp.writelines(contents)
+
+    # Set the worker id in the mock configuration, to allow multiple workers
+    # for the same config
+    with open(newcfg, "r") as fp:
+        contents = fp.readlines()
+    with open(newcfg, "w") as fp:
+        for line in contents:
+            if line.startswith("config_opts['root']"):
+                line = line[:-2] + "-" + str(worker_id) + "'\n"
+            fp.write(line)
 
     # delete the last line which must be """
     with open(newcfg, "r") as fp:
@@ -870,6 +950,9 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars):
             shutil.copyfile(newcfg, oldcfg)
     except OSError:
         shutil.copyfile(newcfg, oldcfg)
+
+    # Set env variable for mock configuration
+    os.environ['MOCK_CONFIG'] = mock_config
 
     # if bootstraping, set the appropriate mock config option
     if bootstrap is True:
