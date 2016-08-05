@@ -10,8 +10,8 @@ Parameters
     usage: dlrn [-h] --config-file CONFIG_FILE [--info-repo INFO_REPO]
                 [--build-env BUILD_ENV] [--local] [--head-only]
                 [--package-name PACKAGE_NAME] [--dev] [--log-commands]
-                [--use-public] [--order] [--status] [--recheck] [--version]
-                [--run RUN] [--stop]
+                [--use-public] [--order] [--sequential] [--status]
+                [--recheck] [--version] [--run RUN] [--stop]
     arguments:
       -h, --help            show this help message and exit
       --config-file CONFIG_FILE
@@ -35,7 +35,9 @@ Parameters
       --use-public          Use the public master repo for dependencies when doing
                             install verification.
       --order               Compute the build order according to the spec files
-                            instead of the dates of the commits.
+                            instead of the dates of the commits. Imply --sequental
+      --sequential          Run all actions sequentially, regardless of the number
+                            of workers specified in projects.ini
       --version             show program's version number and exit
       --run RUN             Run a program instead of trying to build. Imply
                             --head-only
