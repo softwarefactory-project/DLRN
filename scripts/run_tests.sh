@@ -85,4 +85,4 @@ trap copy_logs ERR EXIT
 dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev --info-repo /tmp/rdoinfo
 copy_logs
 # Clean up mock cache, just in case there is a change for the next run
-mock -r data/dlrn.cfg --scrub=all
+mock -r data/dlrn-1.cfg --scrub=all
