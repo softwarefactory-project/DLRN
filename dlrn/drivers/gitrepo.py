@@ -58,13 +58,27 @@ class GitRepoDriver(PkgInfoDriver):
         for package in os.listdir(packagepath):
             if (os.path.isdir(os.path.join(packagepath, package)) and
                package not in skip_dirs):
-                upstream = 'https://github.com/openstack/' + package
-                maintainers = ['test@example.com']
-                master_distgit = repo + '/' + path + '/' + package
-                packages.append({'name': package,
-                                 'upstream': upstream,
-                                 'maintainers': maintainers,
-                                 'master-distgit': master_distgit})
+                pkg_hash = {}
+                pkg_hash['name'] = package
+                pkg_hash['upstream'] = ('https://github.com/openstack/' +
+                                        package)
+                pkg_hash['maintainers'] = 'test@example.com'
+                pkg_hash['master-distgit'] = (repo + '/' + path + '/' +
+                                              package)
+                if config_options.use_version_from_spec is True:
+                    version = None
+                    # Try to deduce version from spec template
+                    pkgdir = os.path.join(packagepath, package)
+                    for pkgfile in os.listdir(pkgdir):
+                        if pkgfile.endswith('.j2'):
+                            with open(os.path.join(pkgdir, pkgfile)) as fp:
+                                j2content = fp.readlines()
+                            for line in j2content:
+                                if line.startswith('Version:'):
+                                    version = line.split(':')[1].strip()
+                    if version is not None:
+                        pkg_hash['source-branch'] = version
+                packages.append(pkg_hash)
         return packages
 
     def getinfo(self, **kwargs):
