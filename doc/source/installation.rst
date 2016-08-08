@@ -139,6 +139,7 @@ options:
     repo=http://github.com/openstack/rpm-packaging
     directory=/openstack
     skip=openstack-macros,keystoneauth1
+    use_version_from_spec=0
 
 * ``repo`` is the single Git repository where all distgits are located.
 * ``directory`` is a directory inside the repo. DLRN will expect each
@@ -148,6 +149,8 @@ options:
   when creating the list of packages to build. This can be of use when the
   Git repo contains one or more directories without a spec file in it, or
   the package should not be built for any other reason.
+* ``use_version_from_spec`` If set to 1, the driver will parse the template
+  spec file and set the source branch to the Version: tag in the spec.
 
 Configuring for gerrit
 ++++++++++++++++++++++
