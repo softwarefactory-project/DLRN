@@ -36,7 +36,7 @@ Parameters
       --run RUN             Run a program instead of trying to build. Imply
                             --head-only
       --stop                Stop on error.
-
+      --verbose-mock        Show verbose mock output during build.
 
 
 Initial build
