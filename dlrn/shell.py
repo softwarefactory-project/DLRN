@@ -140,7 +140,10 @@ def main():
                              "Imply --head-only")
     parser.add_argument('--stop', action="store_true",
                         help="Stop on error.")
+    parser.add_argument('--verbose-mock', action="store_true",
+                        help="Show verbose mock output during build.")
 
+    global options
     options, args = parser.parse_known_args(sys.argv[1:])
 
     cp = configparser.RawConfigParser(default_options)
@@ -583,6 +586,11 @@ def getsourcebranch(package):
         return config_options.source
 
 
+def process_mock_output(line):
+    if options.verbose_mock:
+        logger.info(line[:-1])
+
+
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         do_build=True):
 
@@ -620,9 +628,10 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         sh_version = SemanticVersion.from_pip_string(sh.__version__)
         min_sh_version = SemanticVersion.from_pip_string('1.09')
         if sh_version > min_sh_version:
-            sh.env(run_cmd)
+            sh.env(run_cmd, _err=process_mock_output, _out=process_mock_output)
         else:
-            sh.env_(run_cmd)
+            sh.env_(run_cmd, _err=process_mock_output,
+                    _out=process_mock_output)
     except Exception as e:
         logger.error('cmd failed. See logs at: %s/%s/' % (datadir,
                                                           yumrepodir))
