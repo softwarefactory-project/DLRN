@@ -48,7 +48,7 @@ from dlrn.utils import dumpshas2file
 from dlrn.utils import import_object
 from dlrn import version
 
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(message)s')
 logger = logging.getLogger("dlrn")
 logger.setLevel(logging.INFO)
 
