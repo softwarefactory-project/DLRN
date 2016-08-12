@@ -58,10 +58,15 @@ class GitRepoDriver(PkgInfoDriver):
         for package in os.listdir(packagepath):
             if (os.path.isdir(os.path.join(packagepath, package)) and
                package not in skip_dirs):
-                pkg_hash = {}
+                pkg_hash = {}                
+                if package in config_options.subst_hash:
+                    pkg_name = config_options.subst_hash[package]
+                else:
+                    pkg_name = package
+
                 pkg_hash['name'] = package
                 pkg_hash['upstream'] = ('https://github.com/openstack/' +
-                                        package)
+                                        pkg_name)
                 pkg_hash['maintainers'] = 'test@example.com'
                 pkg_hash['master-distgit'] = (repo + '/' + path + '/' +
                                               package)

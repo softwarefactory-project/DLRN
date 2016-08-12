@@ -51,6 +51,14 @@ class ConfigOptions(object):
                 self.use_version_from_spec = bool(use_spec)
             else:
                 self.use_version_from_spec = False
+            self.subst_hash = {}
+            if cp.has_option('gitrepo_driver', 'substitutions'):
+                substitutions = cp.get('gitrepo_driver', 'substitutions')
+                for pair in substitutions.split(','):
+                    key = pair.split(':')[0].strip()
+                    value = pair.split(':')[1].strip()
+                    self.subst_hash[key] = value
+
         global _config_options
         _config_options = self
 
