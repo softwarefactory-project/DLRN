@@ -8,17 +8,20 @@ import sys
 from rdopkg.actionmods import rdoinfo
 
 if len(sys.argv) == 3:
-    rdoinfo_url = sys.argv[2]
+    rdoinfo_location = sys.argv[2]
 else:
-    rdoinfo_url = "https://github.com/redhat-openstack/rdoinfo.git"
+    rdoinfo_location = "https://github.com/redhat-openstack/rdoinfo.git"
 
-inforepo = rdoinfo.RdoinfoRepo(".", rdoinfo_url)
-inforepo.init()
+if rdoinfo_location.startswith('http'):
+    inforepo = rdoinfo.RdoinfoRepo(".", rdoinfo_location)
+    inforepo.init()
+else:
+    inforepo = rdoinfo.RdoinfoRepo(local_repo_path=rdoinfo_location)
 
 # Attempt a strict mapping with project name
 for package in inforepo.get_info()["packages"]:
     if "project" in package and sys.argv[1] == package["project"]:
-        print package["name"]
+        print(package["name"])
         exit(0)
 
 # If nothing has been found then attempt a speculative mapping
@@ -27,7 +30,7 @@ for package in inforepo.get_info()["packages"]:
 for package in inforepo.get_info()["packages"]:
     if (package["name"].endswith(sys.argv[1]) or
        "project" in package and package["project"].endswith(sys.argv[1])):
-        print package["name"]
+        print(package["name"])
         exit(0)
 
 exit(1)

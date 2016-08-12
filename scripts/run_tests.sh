@@ -26,8 +26,16 @@ PROJECT_DISTRO_BRANCH="rpm-master"
 PROJECT_TO_BUILD=${PROJECT_DISTRO#*/}
 PROJECT_TO_BUILD=$(sed "s/-distgit//" <<< "${PROJECT_TO_BUILD}")
 
+# Fetch rdoinfo using zuul_cloner, if available
+if [ -e /usr/bin/zuul-cloner ] ; then
+    zuul-cloner --workspace /tmp ${GIT_BASE_URL} rdoinfo
+else
+    rm -rf /tmp/rdoinfo
+    git clone ${RDOINFO} /tmp/rdoinfo
+fi
+
 # Map to rdoinfo
-PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD $RDOINFO)
+PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD /tmp/rdoinfo)
 PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
 
 # Prepare config
@@ -74,7 +82,7 @@ function copy_logs() {
 trap copy_logs ERR EXIT
 
 # Run DLRN
-dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev
+dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev --info-repo /tmp/rdoinfo
 copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn.cfg --scrub=all
