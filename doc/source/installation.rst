@@ -140,6 +140,7 @@ options:
     directory=/openstack
     skip=openstack-macros,keystoneauth1
     use_version_from_spec=0
+    substitutions=openstacksdk:python-openstacksdk,keystoneauth1:keystoneauth
 
 * ``repo`` is the single Git repository where all distgits are located.
 * ``directory`` is a directory inside the repo. DLRN will expect each
@@ -151,6 +152,11 @@ options:
   the package should not be built for any other reason.
 * ``use_version_from_spec`` If set to 1, the driver will parse the template
   spec file and set the source branch to the Version: tag in the spec.
+* ``substitutions`` allows the user to specify alternate names for certain
+  projects. It is a comma-separated list of pairs, where the item before the
+  colon is the directory name, and the second item is the OpenStack project
+  name. In the above example, DLRN will assume the ``openstacksdk`` project has
+  a url using ``python-openstacksdk``.
 
 Configuring for gerrit
 ++++++++++++++++++++++
