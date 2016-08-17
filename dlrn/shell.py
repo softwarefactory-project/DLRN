@@ -37,6 +37,7 @@ from dlrn.config import ConfigOptions
 
 from dlrn.db import Commit
 from dlrn.db import getCommits
+from dlrn.db import getLastBuiltCommit
 from dlrn.db import getLastProcessedCommit
 from dlrn.db import getSession
 from dlrn.db import Project
@@ -226,9 +227,24 @@ def main():
         since = "-1"
         commit = getLastProcessedCommit(session, project)
         if commit:
-            # This will return all commits since the last handled commit
-            # including the last handled commit, remove it later if needed.
-            since = "--after=%d" % (commit.dt_commit)
+            # If we have switched source branches, we want to behave
+            # as if no previous commits had been built, and only build
+            # the last one
+            if commit.commit_branch == getsourcebranch(package):
+                # This will return all commits since the last handled commit
+                # including the last handled commit, remove it later if needed.
+                since = "--after=%d" % (commit.dt_commit)
+            else:
+                # The last processed commit belongs to a different branch. Just
+                # in case, let's check if we built a previous commit from the
+                # current branch
+                commit = getLastBuiltCommit(session, project,
+                                            getsourcebranch(package))
+                if commit:
+                    logger.info("Last commit belongs to another branch, but"
+                                " we're ok with that")
+                    since = "--after=%d" % (commit.dt_commit)
+
         if not pkg_name or package["name"] == pkg_name:
             project_toprocess = pkginfo.getinfo(project=project,
                                                 package=package,
