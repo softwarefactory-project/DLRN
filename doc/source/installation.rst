@@ -33,7 +33,7 @@ Or, if you have virtualenv installed:
 .. code-block:: bash
 
     $ virtualenv dlrn-venv
-    $ source drln-venv/bin/activate
+    $ source dlrn-venv/bin/activate
     $ pip install dlrn
 
 The httpd module is not strictly required, DLRN does not use it. However, it will output
