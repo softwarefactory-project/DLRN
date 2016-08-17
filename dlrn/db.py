@@ -39,6 +39,7 @@ class Commit(Base):
     distgit_dir = Column(String)
     commit_hash = Column(String)
     distro_hash = Column(String)
+    commit_branch = Column(String)
     status = Column(String)
     rpms = Column(String)
     notes = Column(String)
@@ -92,6 +93,18 @@ def getLastProcessedCommit(session, project_name, not_status="RETRY"):
     commit = session.query(Commit).filter(Commit.project_name == project_name,
                                           Commit.status != not_status).\
         order_by(desc(Commit.dt_commit)).\
+        order_by(desc(Commit.id)).first()
+    return commit
+
+
+# Get the most recently built commit for project_name and commit_branch, we
+# ignore commits with a status of "RETRY" as we want to retry these.
+def getLastBuiltCommit(session, project_name, commit_branch,
+                       not_status="RETRY"):
+    commit = session.query(Commit).filter(Commit.project_name == project_name,
+                                          Commit.status != not_status,
+                                          Commit.commit_branch == commit_branch).\
+        order_by(desc(Commit.dt_build)).\
         order_by(desc(Commit.id)).first()
     return commit
 
