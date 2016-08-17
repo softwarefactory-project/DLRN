@@ -111,7 +111,8 @@ class RdoInfoDriver(PkgInfoDriver):
                 commit = Commit(dt_commit=float(dt), project_name=project,
                                 commit_hash=commit_hash, repo_dir=repo_dir,
                                 distro_hash=distro_hash, dt_distro=dt_distro,
-                                distgit_dir=distro_dir)
+                                distgit_dir=distro_dir,
+                                commit_branch=source_branch)
                 project_toprocess.append(commit)
 
         return project_toprocess
