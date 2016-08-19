@@ -332,8 +332,9 @@ def main():
                                       options.use_public, options.order)
         except Exception as e:
             datadir = os.path.realpath(config_options.datadir)
-            logfile = os.path.join(datadir, "repos",
-                                   commit.getshardedcommitdir(),
+            yumrepodir = os.path.join(datadir, "repos",
+                                      commit.getshardedcommitdir())
+            logfile = os.path.join(yumrepodir,
                                    "rpmbuild.log")
             if (isknownerror(logfile) and
                 (timesretried(project, commit_hash, commit.distro_hash) <
@@ -351,6 +352,8 @@ def main():
                 exit_code = 1
                 # If the log file hasn't been created we add what we have
                 # This happens if the rpm build script didn't run.
+                if not os.path.exists(yumrepodir):
+                    os.makedirs(yumrepodir)
                 if not os.path.exists(logfile):
                     with open(logfile, "w") as fp:
                         fp.write(getattr(e, "message", notes))
