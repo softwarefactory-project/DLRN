@@ -80,7 +80,9 @@ class GitRepoDriver(PkgInfoDriver):
                                 j2content = fp.readlines()
                             for line in j2content:
                                 if line.startswith('Version:'):
-                                    version = line.split(':')[1].strip()
+                                    version = line.split(':')[1].strip().\
+                                        replace('~', '')
+
                     if version is not None:
                         pkg_hash['source-branch'] = version
                 packages.append(pkg_hash)
