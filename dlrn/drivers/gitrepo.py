@@ -80,7 +80,9 @@ class GitRepoDriver(PkgInfoDriver):
                                 j2content = fp.readlines()
                             for line in j2content:
                                 if line.startswith('Version:'):
-                                    version = line.split(':')[1].strip()
+                                    version = line.split(':')[1].strip().\
+                                        replace('~', '')
+
                     if version is not None:
                         pkg_hash['source-branch'] = version
                 packages.append(pkg_hash)
@@ -152,8 +154,8 @@ class GitRepoDriver(PkgInfoDriver):
                 oldfile.close()
                 with open(filename, "w") as fp:
                     for specline in spec:
-                        fp.write(specline.replace('%{version}',
-                                                  '%{upstream_version}'))
+                        fp.write(specline.replace('-%{version}',
+                                                  '-%{upstream_version}'))
 
     def distgit_dir(self, package_name):
         datadir = config_options.datadir
