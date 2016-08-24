@@ -72,7 +72,7 @@ if [[ "$PROJECT_NAME" =~  ^(diskimage-builder|tripleo-heat-templates|tripleo-ima
     fi
 fi
 
-TARBALL=$(ls dist)
+TARBALL=$(ls dist|grep '.tar.gz')
 
 TARBALLREL=$(basename $TARBALL .tar.gz)-$RELEASE.tar.gz
 mv dist/$TARBALL ${TOP_DIR}/SOURCES/$TARBALLREL
