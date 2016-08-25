@@ -111,10 +111,14 @@ def main():
     parser.add_argument('--head-only', action="store_true",
                         help="Build from the most recent Git commit only.")
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--project-name',
-                       help="Build a specific project name only.")
-    group.add_argument('--package-name',
-                       help="Build a specific package name only.")
+    group.add_argument('--project-name', action='append',
+                       help="Build a specific project name only."
+                            "Use multiple times to build more than one "
+                            "project in a run.")
+    group.add_argument('--package-name', action='append',
+                       help="Build a specific package name only."
+                            "Use multiple times to build more than one "
+                            "package in a run.")
     parser.add_argument('--dev', action="store_true",
                         help="Don't reset packaging git repo, force build "
                              "and add public master repo for dependencies "
@@ -165,9 +169,9 @@ def main():
 
     if options.project_name:
         pkg_names = [p['name'] for p in packages
-                     if p['project'] == options.project_name]
+                     if p['project'] in options.project_name]
     elif options.package_name:
-        pkg_names = (options.package_name, )
+        pkg_names = options.package_name
     else:
         pkg_names = None
 
@@ -229,7 +233,7 @@ def main():
             # This will return all commits since the last handled commit
             # including the last handled commit, remove it later if needed.
             since = "--after=%d" % (commit.dt_commit)
-        if not pkg_name or package["name"] == pkg_name:
+        if not pkg_name or package["name"] in pkg_names:
             project_toprocess = pkginfo.getinfo(project=project,
                                                 package=package,
                                                 since=since,
