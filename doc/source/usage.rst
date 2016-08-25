@@ -24,7 +24,8 @@ Parameters
       --local               Use local git repos if possible
       --head-only           Build from the most recent Git commit only.
       --package-name PACKAGE_NAME
-                            Build a specific package name only.
+                            Build a specific package name only. Use multiple times
+                            to build more than one package in a run.
       --dev                 Don't reset packaging git repo, force build and add
                             public master repo for dependencies (dev mode).
       --log-commands        Log the commands run by DLRN.
