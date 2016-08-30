@@ -80,7 +80,8 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'Failed to synchronize cache for repo|'
                              'No route to host|'
                              'Device or resource busy|'
-                             'Could not resolve host')
+                             'Could not resolve host|'
+                             'Temporary failure in name resolution')
 
 default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'templatedir': os.path.join(
