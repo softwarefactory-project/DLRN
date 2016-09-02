@@ -334,14 +334,15 @@ def main():
         # sort according to the timestamp of the commits
         toprocess.sort()
 
+    exit_code = 0
     if options.sequential is True:
         for commit in toprocess:
             status = build_worker(commit)
             exception = status[3]
             if exception is not None:
                 logger.error("Received exception %s" % exception)
-
-            post_build(status)
+            else:
+                post_build(status)
             exit_code = process_build_result(status)
             if options.stop and exit_code != 0:
                 return exit_code
@@ -353,9 +354,11 @@ def main():
         while True:
             try:
                 status = iterator.next()
-                # Create repo, build versions.csv file.
-                # This needs to be sequential
-                post_build(status)
+                exception = status[3]
+                if exception is None:
+                    # Create repo, build versions.csv file.
+                    # This needs to be sequential
+                    post_build(status)
                 exit_code = process_build_result(status)
                 if options.stop and exit_code != 0:
                     return exit_code
