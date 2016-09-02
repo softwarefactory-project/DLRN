@@ -630,7 +630,9 @@ def refreshrepo(url, path, branch="master", local=False):
             else:
                 # Fallback to master
                 if branch.startswith("rpm-"):
-                    # TODO(apevec) general distro branch detection
+                    branch = "rpm-master"
+                elif branch.endswith("-rdo"):
+                    # Distgit branches can start with rpm- or end with -rdo
                     branch = "rpm-master"
                 else:
                     branch = "master"
