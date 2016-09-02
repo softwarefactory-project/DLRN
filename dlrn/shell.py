@@ -937,6 +937,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars):
                                "baseurl=file://%s/repos/current\n" % datadir,
                                "enabled=1\n", "gpgcheck=0\n", "priority=1\n",
                                "\"\"\""]
+        with open(newcfg, "w") as fp:
+            fp.writelines(contents)
 
     # Set the worker id in the mock configuration, to allow multiple workers
     # for the same config
