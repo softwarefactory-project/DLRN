@@ -43,12 +43,14 @@ target="centos"
 baseurl="http://trunk.rdoproject.org/centos7/"
 src="master"
 branch=""
+tags="newton-uc"
 
 # If we're testing a commit on a specific branch, make sure we're using it
 if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
     branch=$(sed "s/rpm-//" <<< "${ZUUL_BRANCH}")
     baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
     src="stable/${branch}"
+    tags="${branch}"
     PROJECT_DISTRO_BRANCH=$ZUUL_BRANCH
 fi
 
@@ -56,7 +58,7 @@ fi
 sed -i "s%target=.*%target=${target}%" projects.ini
 sed -i "s%source=.*%source=${src}%" projects.ini
 sed -i "s%baseurl=.*%baseurl=${baseurl}%" projects.ini
-sed -i "s%tags=.*%tags=${branch}%" projects.ini
+sed -i "s%tags=.*%tags=${tags}%" projects.ini
 
 # Prepare directories
 mkdir -p data/repos
