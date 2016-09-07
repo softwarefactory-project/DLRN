@@ -49,8 +49,9 @@ class ConfigOptions(object):
             else:
                 self.skip_dirs = None
             if cp.has_option('gitrepo_driver', 'use_version_from_spec'):
-                use_spec = cp.getint('gitrepo_driver', 'use_version_from_spec')
-                self.use_version_from_spec = bool(use_spec)
+                use_spec = cp.getboolean('gitrepo_driver',
+                                         'use_version_from_spec')
+                self.use_version_from_spec = use_spec
             else:
                 self.use_version_from_spec = False
         global _config_options
