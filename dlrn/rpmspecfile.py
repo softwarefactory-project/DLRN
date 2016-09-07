@@ -115,7 +115,7 @@ class RpmSpecCollection(object):
             self.pkg[spec.name] = spec
             self.color[spec.name] = 0
             for pkg_name in spec.packages():
-                self.pkg[spec.name] = spec
+                self.pkg[pkg_name] = spec
         for spec in self.specs:
             if self.color[spec.name] == 0:
                 self._visit(spec)
