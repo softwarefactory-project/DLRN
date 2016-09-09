@@ -32,7 +32,7 @@ if [ -n "$GERRIT_URL" -a -n "$GERRIT_LOG" -a -n "$GERRIT_MAINTAINERS" ]; then
     git review -s
     # we need to inject a pseudo-modification to the spec file to have a
     # change to commit
-    sed -i -e "\$a\\# REMOVEME: error caused by commit $GERRIT\\" *.spec
+    sed -i -e "\$a\\# REMOVEME: error caused by commit ${GERRIT_URL}\\" *.spec
     echo -e "${PROJECT_NAME}: failed to build ${SHORTSHA1}\n\nNeed to fix build error caused by ${GERRIT_URL}\nSee log at ${GERRIT_LOG}"|git commit -F- *.spec
     CHID=$(git log -1|grep -F Change-Id: |cut -d':' -f2)
     MAINTAINERS="${GERRIT_MAINTAINERS//,/ -a }"
@@ -42,7 +42,17 @@ if [ -n "$GERRIT_URL" -a -n "$GERRIT_LOG" -a -n "$GERRIT_MAINTAINERS" ]; then
     REMOTE_HOST=$(echo $REMOTE|cut -d/ -f3|cut -d: -f1)
     REMOTE_PORT=$(echo $REMOTE|cut -d/ -f3|cut -d: -f2)
     PROJECT=$(echo $REMOTE|sed 's@.*://@@'|sed 's@[^/]*/\(.*\)$@\1@')
-    git review -t rdo-FTBFS < /dev/null
+    # We want different review topics for master and non-master
+    SUFFIX=$(echo $BASEURL|awk -F '-' '{print $NF}')
+    if [ "$SUFFIX" = "master" ]; then
+        TOPIC=rdo-FTBFS
+    elif ! [[ $BASEURL =~ .*-.* ]]; then
+        # Another case, when the URL ends with no branch name (e.g. centos7)
+        TOPIC=rdo-FTBFS
+    else
+        TOPIC=rdo-FTBFS-${SUFFIX}
+    fi
+    git review -t ${TOPIC} < /dev/null
     ssh -p $REMOTE_PORT $REMOTE_HOST gerrit set-reviewers --project $PROJECT -a $MAINTAINERS -- $CHID
     git checkout ${CURBRANCH:-master}
 else
