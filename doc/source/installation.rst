@@ -65,7 +65,7 @@ The configuration file looks like this:
     rsyncdest=
     rsyncport=22
     workers=1
-    pkginfo_driver=dlrn.drivers.rdoinfo.RdoInfoDriver
+    gerrit_topic=rdo-FTBFS
 
 
 * ``datadir`` is the directory where the packages and repositories will be
@@ -105,6 +105,9 @@ The configuration file looks like this:
 * ``gerrit`` if set to anything, instructs dlrn to create a gerrit review when
   a build fails. See next section for details on how to configure gerrit to
   work.
+
+* If ``gerrit`` is set, then ``gerrit_topic`` will define the Gerrit topic to
+  use when a review is opened.
 
 * ``tags`` is used to filter information received to decide what packages are
   built. Should be set to a release name (e.g. mitaka) to instruct the builder

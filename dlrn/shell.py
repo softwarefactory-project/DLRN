@@ -91,6 +91,7 @@ default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'rsyncdest': '', 'rsyncport': '22',
                    'pkginfo_driver': 'dlrn.drivers.rdoinfo.RdoInfoDriver',
                    'workers': '1',
+                   'gerrit_topic': 'rdo-FTBFS',
                    }
 
 
@@ -456,6 +457,8 @@ def process_build_result(status):
                         maintainers = ','.join(pkg['maintainers'])
                         env_vars.append('GERRIT_MAINTAINERS=%s' %
                                         maintainers)
+                        env_vars.append('GERRIT_TOPIC=%s' %
+                                        config_options.gerrit_topic)
                         logger.info('Creating a gerrit review using '
                                     'GERRIT_URL=%s '
                                     'GERRIT_MAINTAINERS=%s ' %
