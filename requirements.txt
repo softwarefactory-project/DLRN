@@ -10,3 +10,4 @@ rdopkg>=0.34
 PrettyTable
 alembic
 renderspec
+pymod2pkg>=0.55
