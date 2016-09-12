@@ -27,6 +27,7 @@ from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
 from dlrn.shell import getsourcebranch
 from dlrn.shell import refreshrepo
+from pymod2pkg import module2upstream
 
 
 class GitRepoDriver(PkgInfoDriver):
@@ -60,7 +61,7 @@ class GitRepoDriver(PkgInfoDriver):
                 pkg_hash = {}
                 pkg_hash['name'] = package
                 pkg_hash['upstream'] = ('https://github.com/openstack/' +
-                                        package)
+                                        module2upstream(package))
                 pkg_hash['maintainers'] = 'test@example.com'
                 pkg_hash['master-distgit'] = (repo + '/' + path + '/' +
                                               package)
