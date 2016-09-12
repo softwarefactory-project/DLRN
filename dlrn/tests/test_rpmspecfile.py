@@ -77,6 +77,12 @@ class TestRpmSpecCollection(unittest.TestCase):
                                                  'packageC',
                                                  'packageB'])
 
+    def test_dep_sub(self):
+        specs = RpmSpecCollection([RpmSpecFile(DEP_SUB_PKG_CONTENT),
+                                  RpmSpecFile(SUB_PKG_CONTENT)])
+        self.assertEqual(specs.compute_order(), ['package',
+                                                 'packageD'])
+
 BASIC_SPEC_CONTENT = '''
 Name: package
 '''
@@ -139,6 +145,11 @@ Name: package
 NAME_PKG_CONTENT = '''
 Name: package
 %package %{name}-toto
+'''
+
+DEP_SUB_PKG_CONTENT = '''
+Name: packageD
+BuildRequires: package-subpkg-toto
 '''
 
 if __name__ == "__main__":
