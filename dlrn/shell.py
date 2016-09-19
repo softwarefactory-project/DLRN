@@ -46,6 +46,7 @@ from dlrn.rsync import sync_repo
 from dlrn.utils import dumpshas2file
 from dlrn.utils import import_object
 from dlrn.utils import isknownerror
+from dlrn.utils import saveYAML_commit
 from dlrn.utils import timesretried
 from dlrn import version
 
@@ -326,6 +327,9 @@ def main():
                                               head_only=options.head_only)
             if exit_value != 0:
                 exit_code = exit_value
+
+            # Export YAML file containing commit metadata
+            export_commit_yaml(status[0])
             if options.stop and exit_code != 0:
                 return exit_code
     else:
@@ -361,6 +365,9 @@ def main():
                                                   head_only=options.head_only)
                 if exit_value != 0:
                     exit_code = exit_value
+
+                # Export YAML file containing commit metadata
+                export_commit_yaml(status[0])
                 if options.stop and exit_code != 0:
                     return exit_code
             except StopIteration:
@@ -538,6 +545,15 @@ def compare():
             compare_detail[1] = "*"
         table.add_row(compare_detail)
     print(table)
+
+
+def export_commit_yaml(commit):
+    config_options = getConfigOptions()
+    # Export YAML file containing commit metadata
+    datadir = os.path.realpath(config_options.datadir)
+    yumrepodir = os.path.join(datadir, "repos",
+                              commit.getshardedcommitdir())
+    saveYAML_commit(commit, os.path.join(yumrepodir, 'commit.yaml'))
 
 
 def post_build(status, packages, session):
