@@ -42,6 +42,20 @@ def loadYAML(session, yamlfile):
     session.commit()
 
 
+# Load a yaml file into a list of commits
+def loadYAML_list(yamlfile):
+    fp = open(yamlfile)
+    data = yaml.load(fp)
+    fp.close()
+
+    commit_list = []
+    for commit in data['commits']:
+        c = Commit(**commit)
+        commit_list.append(c)
+
+    return commit_list
+
+
 # Save a database to yaml, this is a helper function to assist in creating
 # yaml files for unit tests.
 def saveYAML(session, yamlfile):
@@ -58,9 +72,26 @@ def saveYAML(session, yamlfile):
         for a in attrs:
             d[a] = str(getattr(commit, a))
         data['commits'].append(d)
-    fp = open(yamlfile, "w")
-    fp.write(yaml.dump(data, default_flow_style=False))
-    fp.close()
+    with open(yamlfile, 'w') as fp:
+        fp.write(yaml.dump(data, default_flow_style=False))
+
+
+# Save a single commit to yaml
+def saveYAML_commit(commit, yamlfile):
+    data = {}
+    attrs = []
+    for a in dir(Commit):
+        if type(getattr(Commit, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['commits'] = []
+    # Add commit
+    d = {}
+    for a in attrs:
+        d[a] = str(getattr(commit, a))
+    data['commits'].append(d)
+    with open(yamlfile, 'w') as fp:
+        fp.write(yaml.dump(data, default_flow_style=False))
 
 
 def dumpshas2file(shafile, commit, source_repo, distgit_repo,

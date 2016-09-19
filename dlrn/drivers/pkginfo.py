@@ -32,6 +32,7 @@
 class PkgInfoDriver(object):
     def __init__(self, *args, **kwargs):
         self.packages = []
+        self.config_options = kwargs.get('cfg_options')
 
     def getpackages(self):
         return self.packages

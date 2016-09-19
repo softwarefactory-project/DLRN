@@ -25,7 +25,6 @@ import sh
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
-from dlrn.shell import config_options
 from dlrn.shell import getsourcebranch
 from dlrn.shell import refreshrepo
 
@@ -36,10 +35,10 @@ class GitRepoDriver(PkgInfoDriver):
         super(GitRepoDriver, self).__init__(*args, **kwargs)
 
     def getpackages(self, **kwargs):
-        repo = config_options.gitrepo_repo
-        path = config_options.gitrepo_dir.strip('/')
-        datadir = config_options.datadir
-        skip_dirs = config_options.skip_dirs
+        repo = self.config_options.gitrepo_repo
+        path = self.config_options.gitrepo_dir.strip('/')
+        datadir = self.config_options.datadir
+        skip_dirs = self.config_options.skip_dirs
         dev_mode = kwargs.get('dev_mode')
         packages = []
 
@@ -65,7 +64,7 @@ class GitRepoDriver(PkgInfoDriver):
                 pkg_hash['maintainers'] = 'test@example.com'
                 pkg_hash['master-distgit'] = (repo + '/' + path + '/' +
                                               package)
-                if config_options.use_version_from_spec is True:
+                if self.config_options.use_version_from_spec is True:
                     version = None
                     # Try to deduce version from spec template
                     pkgdir = os.path.join(packagepath, package)
@@ -89,7 +88,7 @@ class GitRepoDriver(PkgInfoDriver):
         since = kwargs.get('since')
         local = kwargs.get('local')
         dev_mode = kwargs.get('dev_mode')
-        datadir = config_options.datadir
+        datadir = self.config_options.datadir
         repo = package['upstream']
 
         distro_dir = self.distgit_dir(package['name'])
@@ -143,6 +142,6 @@ class GitRepoDriver(PkgInfoDriver):
         preprocess('--spec-style', 'fedora')
 
     def distgit_dir(self, package_name):
-        datadir = config_options.datadir
-        path = config_options.gitrepo_dir.strip('/')
+        datadir = self.config_options.datadir
+        path = self.config_options.gitrepo_dir.strip('/')
         return os.path.join(datadir, 'package_info', path, package_name)
