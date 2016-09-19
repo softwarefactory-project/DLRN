@@ -87,6 +87,45 @@ of the finished ``.rpm`` files for download, located in ``/repos/current``, and 
 of the failures in ``/repos/status_report.html``, and a report of all builds in
 ``/repos/report.html``.
 
+Importing commits built by another DLRN instance
+------------------------------------------------
+
+DLRN has the ability to import a commit built by another instance. This allows a master-worker
+architecture, where a central instance aggregates builds made by multiple, possibly short-lived
+instances.
+
+The builder instance will be invoked as usual, and it will output a ``commit.yaml`` file in the
+generated repo. In general, we will want to use the ``--use-public`` command-line option to make
+sure all repos are available. Note it is very important to **not use** the ``--dev`` command-line
+option, as some of the commit metadata will be lost, specifically all data related to the distgit
+repository.
+
+On the central instance side, the ``dlrn-remote`` has the following syntax:
+
+.. code-block:: console
+
+usage: dlrn-remote [-h] [--config-file CONFIG_FILE] --repo-url REPO_URL [--info-repo INFO_REPO]
+
+arguments:
+  -h, --help            show this help message and exit
+  --config-file CONFIG_FILE
+                        Config file. Default: projects.ini
+  --repo-url REPO_URL   Base repository URL for remotely generated repo
+                        (required)
+  --info-repo INFO_REPO
+                        use a local rdoinfo repo instead of fetching the
+                        default one using rdopkg. Only applies when
+                        pkginfo_driver is rdoinfo in projects.ini
+
+An example command-line would be:
+
+.. code-block:: console
+
+    $ dlrn-remote --config-file projects.ini \
+      --repo-url http://<builder IP>/repos/<hash>/
+
+Where ``http://192.168.122.164/repos/<hash>`` is the URL where the builder instance exports
+its built repo. The ``commit.yaml`` file must be on the same hashed repo, as created by DLRN.
 
 Purging old commits
 -------------------
