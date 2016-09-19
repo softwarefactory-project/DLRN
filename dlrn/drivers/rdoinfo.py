@@ -21,7 +21,6 @@
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
-from dlrn.shell import config_options
 from dlrn.shell import getdistrobranch
 from dlrn.shell import getsourcebranch
 from dlrn.shell import refreshrepo
@@ -71,7 +70,7 @@ class RdoInfoDriver(PkgInfoDriver):
         since = kwargs.get('since')
         local = kwargs.get('local')
         dev_mode = kwargs.get('dev_mode')
-        datadir = config_options.datadir
+        datadir = self.config_options.datadir
         repo = package['upstream']
         distro = package['master-distgit']
 
@@ -122,5 +121,5 @@ class RdoInfoDriver(PkgInfoDriver):
         return
 
     def distgit_dir(self, package_name):
-        datadir = config_options.datadir
+        datadir = self.config_options.datadir
         return os.path.join(datadir, package_name + "_distro")
