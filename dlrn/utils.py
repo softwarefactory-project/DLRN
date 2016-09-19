@@ -42,6 +42,20 @@ def loadYAML(session, yamlfile):
     session.commit()
 
 
+# Load a yaml file into a list of commits
+def loadYAML_list(yamlfile):
+    fp = open(yamlfile)
+    data = yaml.load(fp)
+    fp.close()
+
+    commit_list = []
+    for commit in data['commits']:
+        c = Commit(**commit)
+        commit_list.append(c)
+
+    return commit_list
+
+
 # Save a database to yaml, this is a helper function to assist in creating
 # yaml files for unit tests.
 def saveYAML(session, yamlfile):

@@ -48,6 +48,8 @@ from dlrn.rpmspecfile import RpmSpecCollection
 from dlrn.rpmspecfile import RpmSpecFile
 from dlrn.utils import dumpshas2file
 from dlrn.utils import import_object
+from dlrn.utils import loadYAML_list
+from dlrn.utils import saveYAML
 from dlrn import version
 
 logging.basicConfig(level=logging.ERROR,
@@ -173,7 +175,7 @@ def main():
     config_options = ConfigOptions(cp)
     pkginfo_driver = config_options.pkginfo_driver
     global pkginfo
-    pkginfo = import_object(pkginfo_driver)
+    pkginfo = import_object(pkginfo_driver, cfg_options=config_options)
     global packages
     packages = pkginfo.getpackages(local_info_repo=options.info_repo,
                                    tags=config_options.tags,
@@ -361,6 +363,13 @@ def main():
                     # This needs to be sequential
                     post_build(status)
                 exit_code = process_build_result(status)
+                # FIXME this is a test
+                commit = status[0]
+                datadir = os.path.realpath(config_options.datadir)
+                yumrepodir = os.path.join(datadir, "repos",
+                                          commit.getshardedcommitdir())
+                saveYAML(session, os.path.join(yumrepodir, 'commit.yaml'))
+                # End FIXME
                 if options.stop and exit_code != 0:
                     return exit_code
             except StopIteration:
@@ -373,7 +382,7 @@ def main():
             commit.status = 'RETRY'
             session.add(commit)
             session.commit()
-    genreports(packages, options)
+    genreports(packages, options.head_only)
     return exit_code
 
 
@@ -486,7 +495,7 @@ def process_build_result(status):
         session.add(commit)
     if options.dev is False:
         session.commit()
-    genreports(packages, options)
+    genreports(packages, options.head_only)
     # TODO(jpena): could we launch this asynchronously?
     sync_repo(commit)
     return exit_code
@@ -524,7 +533,7 @@ def compare():
 
     options, args = parser.parse_known_args(sys.argv[1:])
     pkginfo_driver = config_options.pkginfo_driver
-    pkginfo_object = import_object(pkginfo_driver)
+    pkginfo_object = import_object(pkginfo_driver, cfg_options=config_options)
     packages = pkginfo_object.getpackages(local_info_repo=options.info_repo,
                                           tags=config_options.tags)
 
@@ -1000,3 +1009,100 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars):
 
     run(os.path.join(scriptsdir, "build_rpm.sh"), commit, env_vars,
         dev_mode, use_public, bootstrap)
+
+
+def remote():
+    parser = argparse.ArgumentParser()
+    # Some of the non-positional arguments are required, so change the text
+    # saying "optional arguments" to just "arguments":
+    parser._optionals.title = 'arguments'
+
+    parser.add_argument('--config-file',
+                        help="Config file (required)", required=True)
+    parser.add_argument('--remote-yaml',
+                        help="URL for remotely generated DLRN yaml file "
+                             "(required)", required=True)
+    parser.add_argument('--repo-url',
+                        help="Base repository URL for remotely generated repo "
+                             "(required)", required=True)
+    parser.add_argument('--info-repo',
+                        help="use a local rdoinfo repo instead of "
+                             "fetching the default one using rdopkg. Only"
+                             "applies when pkginfo_driver is rdoinfo in"
+                             "projects.ini")
+
+    options, args = parser.parse_known_args(sys.argv[1:])
+
+    cp = configparser.RawConfigParser(default_options)
+    cp.read(options.config_file)
+    global config_options
+    config_options = ConfigOptions(cp)
+    pkginfo_driver = config_options.pkginfo_driver
+    global pkginfo
+    pkginfo = import_object(pkginfo_driver, cfg_options=config_options)
+    global packages
+    packages = pkginfo.getpackages(local_info_repo=options.info_repo,
+                                   tags=config_options.tags,
+                                   dev_mode=False)
+    global session
+    session = getSession('sqlite:///commits.sqlite')
+
+    r = urllib2.urlopen(options.remote_yaml)
+    contents = r.readlines()
+    with open('/tmp/test.yaml', "w") as fp:
+        fp.writelines(contents)
+
+    commits = loadYAML_list('/tmp/test.yaml')
+    datadir = os.path.realpath(config_options.datadir)
+
+    for commit in commits:
+        commit.id = None
+        if commit.rpms == 'None':
+            commit.rpms = None
+        commit.dt_build = int(commit.dt_build)
+        yumrepodir = os.path.join(datadir, "repos",
+                                  commit.getshardedcommitdir())
+        if not os.path.exists(yumrepodir):
+            os.makedirs(yumrepodir)
+
+        for logfile in ['build.log', 'installed', 'mock.log', 'root.log',
+                        'rpmbuild.log', 'state.log']:
+            logfile_url = options.repo_url + '/' + logfile
+            try:
+                r = urllib2.urlopen(logfile_url)
+                contents = r.readlines()
+                with open(os.path.join(yumrepodir, logfile), "w") as fp:
+                    fp.writelines(contents)
+            except urllib2.HTTPError:
+                # Ignore errors, if the remote build failed there may be
+                # some missing files
+                pass
+
+        if commit.rpms:
+            for rpm in commit.rpms.split(","):
+                rpm_url = options.repo_url + '/' + rpm.split('/')[-1]
+                try:
+                    r = urllib2.urlopen(rpm_url)
+                    contents = r.readlines()
+                    with open(os.path.join(datadir, rpm), "w") as fp:
+                        fp.writelines(contents)
+                except urllib2.HTTPError:
+                    # Ignore errors, if the remote build failed there may be
+                    # some missing files
+                    pass
+        if commit.status == 'SUCCESS':
+            built_rpms = []
+            for rpm in commit.rpms.split(","):
+                built_rpms.append(rpm)
+            status = [commit, built_rpms, commit.notes, None]
+            post_build(status)
+        else:
+            status = [commit, '', '', commit.notes]
+        session.add(commit)
+        session.commit()
+        # If we assume the external entity is taking care of opening any
+        # required review, we could just finish here and not call
+        # process_build_status()
+        genreports(packages, False)
+        sync_repo(commit)
+    return 0
