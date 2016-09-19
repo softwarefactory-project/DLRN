@@ -13,6 +13,7 @@
 import base64
 import mock
 import os
+import sh
 import tempfile
 
 from datetime import datetime
@@ -27,6 +28,14 @@ def mocked_session(url):
     session = db.getSession(new=True)
     utils.loadYAML(session, './dlrn/tests/samples/commits_2.yaml')
     return session
+
+
+def mocked_urlopen(url):
+    if url.startswith('http://example.com'):
+        fp = open('./dlrn/tests/samples/commits_remote.yaml', 'r')
+        return fp
+    else:
+        return urllib2.urlopen(url)
 
 
 class DLRNAPITestCase(base.TestCase):
@@ -399,3 +408,29 @@ class TestRepoStatus(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data['results']), 1)
+
+
+@mock.patch('dlrn.remote.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestRemoteImport(DLRNAPITestCase):
+    def test_post_remote_import_needs_auth(self, db2_mock, db_mock):
+        response = self.app.post('/api/remote/import')
+        self.assertEqual(response.status_code, 401)
+
+    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('dlrn.remote.post_build')
+    @mock.patch('urllib2.urlopen', side_effect=mocked_urlopen)
+    def test_post_remove_import_success(self, url_mock, build_mock, sh_mock,
+                                        db2_mock, db_mock):
+
+        req_data = json.dumps(dict(repo_url='http://example.com/1/'))
+        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
+                  ":" + 'bar')}
+        response = self.app.post('/api/remote/import',
+                                 data=req_data,
+                                 headers=header,
+                                 content_type='application/json')
+
+        self.assertEqual(response.status_code, 201)
+        data = json.loads(response.data)
+        self.assertEqual(data['repo_url'], 'http://example.com/1/')
