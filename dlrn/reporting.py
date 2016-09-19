@@ -60,7 +60,7 @@ def _jinja2_filter_get_commit_url(commit, packages):
     return "???"
 
 
-def genreports(packages, options):
+def genreports(packages, head_only):
     global session
     session = getSession('sqlite:///commits.sqlite')
     config_options = getConfigOptions()
@@ -99,7 +99,7 @@ def genreports(packages, options):
         fp.write(content)
 
     # Generate status report
-    if options.head_only:
+    if head_only:
         msg = "(all commit not built)"
     else:
         msg = ""
