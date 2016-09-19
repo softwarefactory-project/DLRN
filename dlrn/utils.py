@@ -48,9 +48,8 @@ def import_object(import_str, *args, **kwargs):
 # Load a yaml file into a db session, used to populate a in memory database
 # during tests
 def loadYAML(session, yamlfile):
-    fp = open(yamlfile)
-    data = yaml.load(fp)
-    fp.close()
+    with open(yamlfile) as fp:
+        data = yaml.load(fp)
 
     for commit in data['commits']:
         c = Commit(**commit)
@@ -77,6 +76,19 @@ def loadYAML(session, yamlfile):
     session.commit()
 
 
+# Load a yaml file into a list of commits
+def loadYAML_list(yamlfile):
+    with open(yamlfile) as fp:
+        data = yaml.load(fp)
+
+    commit_list = []
+    for commit in data['commits']:
+        c = Commit(**commit)
+        commit_list.append(c)
+
+    return commit_list
+
+
 # Save a database to yaml, this is a helper function to assist in creating
 # yaml files for unit tests.
 def saveYAML(session, yamlfile):
@@ -93,9 +105,26 @@ def saveYAML(session, yamlfile):
         for a in attrs:
             d[a] = str(getattr(commit, a))
         data['commits'].append(d)
-    fp = open(yamlfile, "w")
-    fp.write(yaml.dump(data, default_flow_style=False))
-    fp.close()
+    with open(yamlfile, 'w') as fp:
+        fp.write(yaml.dump(data, default_flow_style=False))
+
+
+# Save a single commit to yaml
+def saveYAML_commit(commit, yamlfile):
+    data = {}
+    attrs = []
+    for a in dir(Commit):
+        if type(getattr(Commit, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['commits'] = []
+    # Add commit
+    d = {}
+    for a in attrs:
+        d[a] = str(getattr(commit, a))
+    data['commits'].append(d)
+    with open(yamlfile, 'w') as fp:
+        fp.write(yaml.dump(data, default_flow_style=False))
 
 
 def dumpshas2file(shafile, commit, source_repo, distgit_repo,

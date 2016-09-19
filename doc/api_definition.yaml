@@ -1,0 +1,399 @@
+swagger: '2.0'
+info:
+  version: "1.0.0"
+  title: DLRN API
+host: 127.0.0.1:5000
+schemes:
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+# Describe your paths here
+paths:
+  /api/last_tested_repo:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Get the last tested repo since a specific time.
+
+        If a ``job_id`` is specified, the order of precedence for the repo returned is:
+        - The last tested repo within that timeframe for that CI job.
+        - The last tested repo within that timeframe for any CI job, so we can have
+          several CIs converge on a single repo.
+        - The last "consistent" repo, if no repo has been tested in the timeframe.
+
+        If ``sequential_mode`` is set to true, a different algorithm is used. Another
+        parameter ``previous_job_id`` needs to be specified, and the order of
+        precedence for the repo returned is:
+
+        - The last tested repo within that timeframe for the CI job described by
+        ``previous_job_id``.
+        - If no repo for ``previous_job_id`` is found, an error will be returned
+
+        The sequential mode is meant to be used by CI pipelines, where a CI (n) job needs
+        to use the same repo tested by CI (n-1).
+      # This is array of GET operation parameters:
+      parameters:
+        - name: params
+          in: body
+          description: The JSON params to post
+          schema:
+            type: object
+            required:
+              - max_age
+            properties:
+              max_age:
+                description: |
+                  Maximum age (in hours) for the repo to be considered. Any repo
+                  tested or being tested after "now - max_age" will be taken
+                  into account. If set to 0, all repos will be considered.
+                type: integer
+                minimum: 0
+              success:
+                description: |
+                  If set to a value, find repos with a successful/unsuccessful
+                  vote (as specified). If not set, any tested repo will be
+                  considered.
+                type: boolean
+              job_id:
+                description: |
+                  Name of the CI that sent the vote. If not set, no filter will
+                  be set on CI.
+                type: string
+              sequential_mode:
+                description: |
+                  Use the sequential mode algorithm. In this case, return the
+                  last tested repo within that timeframe for the CI job
+                  described by previous_job_id. Defaults to false.
+                type: boolean
+              previous_job_id:
+                description: |
+                  If sequential_mode is set to true, look for jobs tested by
+                  the CI identified by previous_job_id.
+                type: string
+          required: true
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            $ref: '#/definitions/Repo'
+    post:
+      security:
+       - basicAuth: []
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Get the last tested repo since a specific time (optionally for a CI job),
+        and add an "in progress" entry in the CI job table for this.
+
+        If a job_id is specified, the order of precedence for the repo returned is:
+
+        - The last tested repo within that timeframe for that CI job.
+        - The last tested repo within that timeframe for any CI job, so we can have
+          several CIs converge on a single repo.
+        - The last "consistent" repo, if no repo has been tested in the timeframe.
+
+        If ``sequential_mode`` is set to true, a different algorithm is used. Another
+        parameter ``previous_job_id`` needs to be specified, and the order of
+        precedence for the repo returned is:
+
+        - The last tested repo within that timeframe for the CI job described by
+          ``previous_job_id``.
+        - If no repo for ``previous_job_id`` is found, an error will be returned
+
+        The sequential mode is meant to be used by CI pipelines, where a CI (n) job needs
+        to use the same repo tested by CI (n-1).
+      # This is array of GET operation parameters:
+      parameters:
+        - name: params
+          in: body
+          description: The JSON params to post
+          schema:
+            type: object
+            required:
+              - max_age
+              - reporting_job_id
+            properties:
+              max_age:
+                description: |
+                  Maximum age (in hours) for the repo to be considered. Any repo
+                  tested or being tested after "now - max_age" will be taken
+                  into account. If set to 0, all repos will be considered.
+                type: integer
+                minimum: 0
+              reporting_job_id:
+                description: |
+                  Name of the CI that will add the "in progress" entry in the CI
+                  job table.
+                type: string
+              success:
+                description: |
+                  If set to a value, find repos with a successful/unsuccessful
+                  vote (as specified). If not set, any tested repo will be
+                  considered.
+                type: boolean
+              job_id:
+                description: |
+                  Name of the CI that sent the vote. If not set, no filter will
+                  be set on CI.
+                type: string
+              sequential_mode:
+                description: |
+                  Use the sequential mode algorithm. In this case, return the
+                  last tested repo within that timeframe for the CI job
+                  described by previous_job_id. Defaults to false.
+                type: boolean
+              previous_job_id:
+                description: |
+                  If sequential_mode is set to true, look for jobs tested by
+                  the CI identified by previous_job_id.
+                type: string
+          required: true
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        201:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            $ref: '#/definitions/Repo'
+  /api/repo_status:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Get all the CI reports for a specific repository.
+      parameters:
+        - name: params
+          in: body
+          description: The JSON params to post
+          required: true
+          schema:
+            type: object
+            required:
+              - commit_hash
+              - distro_hash
+            properties:
+              commit_hash:
+                description: |
+                  commit_hash of the repo to fetch information for.
+                type: string
+              distro_hash:
+                description: |
+                  distro_hash of the repo to fetch information for.
+                type: string
+              success:
+                description: |
+                  If set to a value, only return the CI reports with the
+                  specified vote. If not set, return all CI reports.
+                type: boolean
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: An array of votes
+          schema:
+            title: ArrayOfVotes
+            type: array
+            items:
+              $ref: '#/definitions/CIVote'
+  /api/report_result:
+    post:
+      security:
+       - basicAuth: []
+      description: |
+        Report the result of a CI job.
+      parameters:
+        - name: params
+          in: body
+          description: The JSON params to post
+          required: true
+          schema:
+            type: object
+            required:
+              - job_id
+              - commit_hash
+              - distro_hash
+              - url
+              - timestamp
+              - success
+            properties:
+              job_id:
+                description: |
+                  Name of the CI sending the vote.
+                type: string
+              commit_hash:
+                description: |
+                  commit_hash of tested repo.
+                type: string
+              distro_hash:
+                description: |
+                  distro_hash of tested repo.
+                type: string
+              url:
+                description: |
+                  URL where to find additional information from the CI execution.
+                type: string
+              timestamp:
+                description: |
+                  Timestamp (in seconds since the epoch)
+                type: integer
+              success:
+                description: |
+                  Was the CI execution successful?
+                type: boolean
+              notes:
+                description: |
+                  Additional notes
+                type: string
+      responses:
+        # Response code
+        201:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            $ref: '#/definitions/CIVote'
+  /api/promote:
+    post:
+      security:
+       - basicAuth: []
+      description: |
+        Promote a repository. This can be implemented as a local symlink creation in the DLRN
+        worker, or any other form in the future.
+
+        Note the API will refuse to promote using promote_name="consistent" or "current", since
+        those are reserved keywords for DLRN.
+      parameters:
+        - name: params
+          in: body
+          description: The JSON params to post
+          required: true
+          schema:
+            type: object
+            required:
+              - commit_hash
+              - distro_hash
+              - promote_name
+            properties:
+              commit_hash:
+                description: |
+                  commit_hash of the repo to be promoted.
+                type: string
+              distro_hash:
+                description: |
+                  distro_hash of the repo to be promoted.
+                type: string
+              promote_name:
+                description: |
+                  Name to be used for the promotion. In the current
+                  implementation, this is the name of the symlink to be created
+                type: string
+      responses:
+        201:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            $ref: '#/definitions/Promotion'
+  /api/remote/import:
+    post:
+      security:
+       - basicAuth: []
+      description: |
+        Import a commit built by another instance. This API call mimics the behavior of the
+        ``dlrn-remote`` command, with the only exception of not being able to specify a custom
+        rdoinfo location.
+      parameters:
+        - name: params
+          in: body
+          description: The JSON params to post
+          required: true
+          schema:
+            $ref: '#/definitions/Import'
+      responses:
+        201:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Import'
+
+definitions:
+  CIVote:
+    type: object
+    properties:
+      job_id:
+        type: string
+        description: name of the CI sending the vote
+      commit_hash:
+        type: string
+        description: commit_hash of tested repo
+      distro_hash:
+        type: string
+        description: distro_hash of tested repo
+      url:
+        type: string
+        description: URL where to find additional information from the CI execution
+      timestamp:
+        type: integer
+        description: Timestamp (in seconds since the epoch)
+      in_progress:
+        type: boolean
+        description: is this CI job still in-progress?
+      success:
+        type: boolean
+        description: Was the CI execution successful?
+      notes:
+        type: string
+        description: additional notes
+  Repo:
+    type: object
+    properties:
+      commit_hash:
+        type: string
+        description: commit_hash of tested repo
+      distro_hash:
+        type: string
+        description: distro_hash of tested repo
+      success:
+        type: boolean
+        description: whether the test was successful or not
+      job_id:
+        type: string
+        description: name of the CI sending the vote
+      in_progress:
+        type: boolean
+        description: is this CI job still in-progress?
+      timestamp:
+        type: integer
+        description: Timestamp for this CI Vote (taken from the DLRN system time)
+  Promotion:
+    type: object
+    properties:
+      commit_hash:
+        type: string
+        description: commit_hash of promoted repo
+      distro_hash:
+        type: string
+        description: distro_hash of promoted repo
+      promote_name:
+        type: string
+        description: name used for the promotion
+  Import:
+    type: object
+    properties:
+      repo_url:
+        type: string
+        description: Base repository URL for imported remote repo
