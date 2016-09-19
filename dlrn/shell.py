@@ -51,6 +51,7 @@ from dlrn.rpmspecfile import RpmSpecCollection
 from dlrn.rpmspecfile import RpmSpecFile
 from dlrn.utils import dumpshas2file
 from dlrn.utils import import_object
+from dlrn.utils import saveYAML_commit
 from dlrn import version
 
 logging.basicConfig(level=logging.ERROR,
@@ -356,6 +357,8 @@ def main():
                                              stop=options.stop,
                                              build_env=options.build_env,
                                              head_only=options.head_only)
+            # Export YAML file containing commit metadata
+            export_commit_yaml(status[0])
             if options.stop and exit_code != 0:
                 return exit_code
     else:
@@ -386,7 +389,8 @@ def main():
                                                  stop=options.stop,
                                                  build_env=options.build_env,
                                                  head_only=options.head_only)
-
+                # Export YAML file containing commit metadata
+                export_commit_yaml(status[0])
                 if options.stop and exit_code != 0:
                     return exit_code
             except StopIteration:
@@ -707,6 +711,15 @@ def getsourcebranch(package):
 def process_mock_output(line):
     if verbose_mock:
         logger.info(line[:-1])
+
+
+def export_commit_yaml(commit):
+    config_options = getConfigOptions()
+    # Export YAML file containing commit metadata
+    datadir = os.path.realpath(config_options.datadir)
+    yumrepodir = os.path.join(datadir, "repos",
+                              commit.getshardedcommitdir())
+    saveYAML_commit(commit, os.path.join(yumrepodir, 'commit.yaml'))
 
 
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
