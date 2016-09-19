@@ -1,0 +1,25 @@
+commits:
+- commit_hash: 3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a
+  distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  dt_build: '1444139517'
+  dt_commit: '1444139038'
+  dt_distro: '1431949433'
+  flags: '0'
+  id: '7835'
+  notes: OK
+  project_name: python-pysaml2
+  repo_dir: /home/centos-master/data/python-pysaml2
+  rpms: repos/3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
+  status: SUCCESS
+- commit_hash: 3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a
+  distro_hash: abce24f0cf4366c2290c22f24e42de714d1addd1
+  dt_build: '1444139517'
+  dt_commit: '1444139038'
+  dt_distro: '1441949433'
+  flags: '0'
+  id: '7836'
+  notes: OK
+  project_name: python-pysaml2
+  repo_dir: /home/centos-master/data/python-pysaml2
+  rpms: repos/3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_abce24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_abce24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
+  status: SUCCESS
