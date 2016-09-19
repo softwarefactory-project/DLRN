@@ -255,6 +255,32 @@ distro_hash     string      distro_hash of the promoted repo
 promote_name    string      name used for the promotion
 ==============  ==========  ==============================================================
 
+POST /api/remote/import
+-----------------------
+
+Import a commit built by another instance. This API call mimics the behavior of the
+``dlrn-remote`` command, with the only exception of not being able to specify a custom
+rdoinfo location.
+
+Normal response codes: 201
+
+Error response codes: 400, 415, 500
+
+Request:
+
+==============  ==========  ==============================================================
+  Parameter       Type                             Description
+==============  ==========  ==============================================================
+repo_url        string      Base repository URL for remotely generated repo
+==============  ==========  ==============================================================
+
+Response:
+
+==============  ==========  ==============================================================
+Parameter         Type                             Description
+==============  ==========  ==============================================================
+repo_url        string      Base repository URL for imported remote repo
+==============  ==========  ==============================================================
 
 *********************************
 Running the API server using WSGI
@@ -327,7 +353,9 @@ in the above example, with the following syntax:
 
     DB_PATH = 'sqlite:////home/centos-master/DLRN/commits.sqlite'
     REPO_PATH = '/home/centos-master/DLRN/data/repos'
+    CONFIG_FILE = 'projects.ini'
 
 Where ``DB_PATH`` is the path to the SQLite database for your environment,
-and ``REPO_PATH`` will point to the base directory for the generated
-repositories.
+``REPO_PATH`` will point to the base directory for the generated repositories,
+and ``CONFIG_FILE`` will point to the projects.ini file used when running
+DLRN.

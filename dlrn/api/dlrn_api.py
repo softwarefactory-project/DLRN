@@ -22,6 +22,8 @@ from dlrn.db import CIVote
 from dlrn.db import Commit
 from dlrn.db import getSession
 
+from dlrn.remote import import_commit
+
 from flask import jsonify
 from flask import request
 
@@ -361,4 +363,27 @@ def promote():
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
               'promote_name': promote_name}
+    return jsonify(result), 201
+
+
+@app.route('/api/remote/import', methods=['POST'])
+@auth.login_required
+def remote_import():
+    # repo_url: repository URL to import from
+    if request.headers['Content-Type'] != 'application/json':
+        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
+
+    try:
+        repo_url = request.json['repo_url']
+    except KeyError:
+        raise InvalidUsage('Missing parameters', status_code=400)
+
+    try:
+        import_commit(repo_url, app.config['CONFIG_FILE'],
+                      db_connection=app.config['DB_PATH'])
+    except Exception as e:
+        raise InvalidUsage("Remote import failed with error: %s" %
+                           e, status_code=500)
+
+    result = {'repo_url': repo_url}
     return jsonify(result), 201
