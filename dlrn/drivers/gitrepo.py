@@ -20,6 +20,7 @@
 # 3- A preprocess function using renderspec on any *.spec.j2 file found in the
 #    distgit.
 
+import logging
 import os
 import sh
 
@@ -28,6 +29,10 @@ from dlrn.drivers.pkginfo import PkgInfoDriver
 from dlrn.shell import getsourcebranch
 from dlrn.shell import refreshrepo
 from pymod2pkg import module2upstream
+
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger("dlrn-gitrepo-driver")
+logger.setLevel(logging.INFO)
 
 
 class GitRepoDriver(PkgInfoDriver):
@@ -38,6 +43,7 @@ class GitRepoDriver(PkgInfoDriver):
     def getpackages(self, **kwargs):
         repo = self.config_options.gitrepo_repo
         path = self.config_options.gitrepo_dir.strip('/')
+        distro_branch = self.config_options.distro
         datadir = self.config_options.datadir
         skip_dirs = self.config_options.skip_dirs
         dev_mode = kwargs.get('dev_mode')
@@ -50,8 +56,13 @@ class GitRepoDriver(PkgInfoDriver):
         if not dev_mode:
             git = sh.git.bake(_cwd=gitpath, _tty_out=False, _timeout=3600)
             git.fetch("origin")
-            # TODO(jpena): allow passing a branch as argument
-            git.reset("--hard", "origin/master")
+            # Use the the configured distro branch, fall back to master
+            # if it fails
+            try:
+                git.reset("--hard", "origin/%s" % distro_branch)
+            except Exception:
+                logger.info("Falling back to master")
+                git.reset("--hard", "origin/master")
 
         packagepath = os.path.join(gitpath, path)
 
