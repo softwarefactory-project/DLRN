@@ -42,7 +42,7 @@ PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
 target="centos"
 baseurl="http://trunk.rdoproject.org/centos7/"
 src="master"
-branch=""
+branch="ocata"
 
 # If we're testing a commit on a specific branch, make sure we're using it
 if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
