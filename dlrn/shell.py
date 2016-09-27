@@ -172,7 +172,6 @@ def main():
     if options.order is True:
         options.sequential = True
 
-    global session
     session = getSession('sqlite:///commits.sqlite')
     config_options = ConfigOptions(cp)
     pkginfo_driver = config_options.pkginfo_driver
@@ -350,8 +349,8 @@ def main():
             if exception is not None:
                 logger.error("Received exception %s" % exception)
             else:
-                post_build(status, packages)
-            exit_code = process_build_result(status, packages,
+                post_build(status, packages, session)
+            exit_code = process_build_result(status, packages, session,
                                              dev_mode=options.dev,
                                              run=options.run,
                                              stop=options.stop,
@@ -380,8 +379,8 @@ def main():
                 else:
                     # Create repo, build versions.csv file.
                     # This needs to be sequential
-                    post_build(status, packages)
-                exit_code = process_build_result(status, packages,
+                    post_build(status, packages, session)
+                exit_code = process_build_result(status, packages, session,
                                                  dev_mode=options.dev,
                                                  run=options.run,
                                                  stop=options.stop,
@@ -404,7 +403,7 @@ def main():
     return exit_code
 
 
-def process_build_result(status, packages, dev_mode=False, run=False,
+def process_build_result(status, packages, session, dev_mode=False, run=False,
                          stop=False, build_env=None, head_only=False):
     config_options = getConfigOptions()
     commit = status[0]
@@ -435,7 +434,7 @@ def process_build_result(status, packages, dev_mode=False, run=False,
         logfile = os.path.join(yumrepodir,
                                "rpmbuild.log")
         if (isknownerror(logfile) and
-            (timesretried(project, commit_hash, commit.distro_hash) <
+            (timesretried(project, session, commit_hash, commit.distro_hash) <
              config_options.maxretries)):
             logger.exception("Known error building packages for %s,"
                              " will retry later" % project)
@@ -753,7 +752,7 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         raise e
 
 
-def post_build(status, packages):
+def post_build(status, packages, session):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
@@ -945,7 +944,7 @@ def isknownerror(logfile):
     return False
 
 
-def timesretried(project, commit_hash, distro_hash):
+def timesretried(project, session, commit_hash, distro_hash):
     # Return how many times a commit hash / distro had combination has
     # been retried for a given project
 
