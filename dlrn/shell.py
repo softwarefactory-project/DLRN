@@ -178,7 +178,6 @@ def main():
     pkginfo_driver = config_options.pkginfo_driver
     global pkginfo
     pkginfo = import_object(pkginfo_driver, cfg_options=config_options)
-    global packages
     packages = pkginfo.getpackages(local_info_repo=options.info_repo,
                                    tags=config_options.tags,
                                    dev_mode=options.dev)
@@ -342,7 +341,7 @@ def main():
     exit_code = 0
     if options.sequential is True:
         for commit in toprocess:
-            status = build_worker(commit, run=options.run,
+            status = build_worker(packages, commit, run=options.run,
                                   build_env=options.build_env,
                                   dev_mode=options.dev,
                                   use_public=options.use_public,
@@ -351,8 +350,9 @@ def main():
             if exception is not None:
                 logger.error("Received exception %s" % exception)
             else:
-                post_build(status)
-            exit_code = process_build_result(status, dev_mode=options.dev,
+                post_build(status, packages)
+            exit_code = process_build_result(status, packages,
+                                             dev_mode=options.dev,
                                              run=options.run,
                                              stop=options.stop,
                                              build_env=options.build_env,
@@ -364,7 +364,7 @@ def main():
         pool = multiprocessing.Pool(config_options.workers)
         # Use functools.partial to iterate on the commits to process,
         # while keeping a few options fixed
-        build_worker_wrapper = partial(build_worker, run=options.run,
+        build_worker_wrapper = partial(build_worker, packages, run=options.run,
                                        build_env=options.build_env,
                                        dev_mode=options.dev,
                                        use_public=options.use_public,
@@ -380,8 +380,8 @@ def main():
                 else:
                     # Create repo, build versions.csv file.
                     # This needs to be sequential
-                    post_build(status)
-                exit_code = process_build_result(status,
+                    post_build(status, packages)
+                exit_code = process_build_result(status, packages,
                                                  dev_mode=options.dev,
                                                  run=options.run,
                                                  stop=options.stop,
@@ -404,8 +404,8 @@ def main():
     return exit_code
 
 
-def process_build_result(status, dev_mode=False, run=False, stop=False,
-                         build_env=None, head_only=False):
+def process_build_result(status, packages, dev_mode=False, run=False,
+                         stop=False, build_env=None, head_only=False):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
@@ -521,7 +521,7 @@ def process_build_result(status, dev_mode=False, run=False, stop=False,
     return exit_code
 
 
-def build_worker(commit, run=False, build_env=None, dev_mode=False,
+def build_worker(packages, commit, run=False, build_env=None, dev_mode=False,
                  use_public=False, order=False, sequential=False):
 
     if run:
@@ -753,7 +753,7 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         raise e
 
 
-def post_build(status):
+def post_build(status, packages):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
