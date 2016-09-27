@@ -37,6 +37,7 @@ from six.moves import configparser
 
 
 from dlrn.config import ConfigOptions
+from dlrn.config import getConfigOptions
 
 from dlrn.db import Commit
 from dlrn.db import getCommits
@@ -173,7 +174,6 @@ def main():
 
     global session
     session = getSession('sqlite:///commits.sqlite')
-    global config_options
     config_options = ConfigOptions(cp)
     pkginfo_driver = config_options.pkginfo_driver
     global pkginfo
@@ -406,6 +406,7 @@ def main():
 
 def process_build_result(status, dev_mode=False, run=False, stop=False,
                          build_env=None, head_only=False):
+    config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
     notes = status[2]
@@ -549,7 +550,7 @@ def compare():
                              "fetching the default one using rdopkg. Only"
                              "applies when pkginfo_driver is rdoinfo in"
                              "projects.ini")
-
+    config_options = getConfigOptions()
     options, args = parser.parse_known_args(sys.argv[1:])
     pkginfo_driver = config_options.pkginfo_driver
     pkginfo_object = import_object(pkginfo_driver, cfg_options=config_options)
@@ -588,6 +589,7 @@ def compare():
 
 
 def sendnotifymail(packages, commit):
+    config_options = getConfigOptions()
     error_details = copy.copy(
         [package for package in packages
             if package["name"] == commit.project_name][0])
@@ -687,6 +689,7 @@ def getdistrobranch(package):
     if 'distro-branch' in package:
         return package['distro-branch']
     else:
+        config_options = getConfigOptions()
         return config_options.distro
 
 
@@ -694,6 +697,7 @@ def getsourcebranch(package):
     if 'source-branch' in package:
         return package['source-branch']
     else:
+        config_options = getConfigOptions()
         return config_options.source
 
 
@@ -704,7 +708,7 @@ def process_mock_output(line):
 
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         do_build=True):
-
+    config_options = getConfigOptions()
     datadir = os.path.realpath(config_options.datadir)
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
@@ -750,6 +754,7 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
 
 
 def post_build(status):
+    config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
     project_name = commit.project_name
@@ -835,6 +840,7 @@ def post_build(status):
 
 def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
           sequential):
+    config_options = getConfigOptions()
     # Set the build timestamp to now
     commit.dt_build = int(time())
 
@@ -873,6 +879,7 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
 
 
 def sync_repo(commit):
+    config_options = getConfigOptions()
     rsyncdest = config_options.rsyncdest
     rsyncport = config_options.rsyncport
     datadir = os.path.realpath(config_options.datadir)
@@ -903,6 +910,7 @@ def sync_repo(commit):
 
 
 def submit_review(commit, env_vars):
+    config_options = getConfigOptions()
     datadir = os.path.realpath(config_options.datadir)
     scriptsdir = os.path.realpath(config_options.scriptsdir)
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
@@ -950,6 +958,7 @@ def timesretried(project, commit_hash, distro_hash):
 
 def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
                       sequential):
+    config_options = getConfigOptions()
     # Get the worker id
     if sequential is True:
         worker_id = 1
