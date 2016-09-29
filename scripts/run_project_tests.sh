@@ -87,7 +87,7 @@ function copy_logs() {
 trap copy_logs ERR EXIT
 
 # Run DLRN
-dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev --local --info-repo /tmp/rdoinfo --verbose-mock
+dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --use-public --local --info-repo /tmp/rdoinfo --verbose-mock
 copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn-1.cfg --scrub=all
