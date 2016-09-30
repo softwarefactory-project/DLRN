@@ -83,6 +83,7 @@ cp *.spec ${TOP_DIR}/SPECS/
 cd ${TOP_DIR}/SPECS/
 
 sed -i -e "1i%define upstream_version $UPSTREAMVERSION\\" *.spec
+sed -i -e "1i%global dlrn 1\\" *.spec
 sed -i -e "s/UPSTREAMVERSION/$UPSTREAMVERSION/g" *.spec
 VERSION=${VERSION/-/.}
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
