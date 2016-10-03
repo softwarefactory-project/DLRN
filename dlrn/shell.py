@@ -24,6 +24,8 @@ import smtplib
 import sys
 import urllib2
 
+from functools import partial
+
 from time import time
 
 from email.mime.text import MIMEText
@@ -156,8 +158,10 @@ def main():
     parser.add_argument('--verbose-mock', action="store_true",
                         help="Show verbose mock output during build.")
 
-    global options
     options, args = parser.parse_known_args(sys.argv[1:])
+
+    global verbose_mock
+    verbose_mock = options.verbose_mock
 
     cp = configparser.RawConfigParser(default_options)
     cp.read(options.config_file)
@@ -338,29 +342,52 @@ def main():
     exit_code = 0
     if options.sequential is True:
         for commit in toprocess:
-            status = build_worker(commit)
+            status = build_worker(commit, run=options.run,
+                                  build_env=options.build_env,
+                                  dev_mode=options.dev,
+                                  use_public=options.use_public,
+                                  order=options.order, sequential=True)
             exception = status[3]
             if exception is not None:
                 logger.error("Received exception %s" % exception)
             else:
                 post_build(status)
-            exit_code = process_build_result(status)
+            exit_code = process_build_result(status, dev_mode=options.dev,
+                                             run=options.run,
+                                             stop=options.stop,
+                                             build_env=options.build_env,
+                                             head_only=options.head_only)
             if options.stop and exit_code != 0:
                 return exit_code
     else:
         # Setup multiprocessing pool
         pool = multiprocessing.Pool(config_options.workers)
-        iterator = pool.imap(build_worker, toprocess)
+        # Use functools.partial to iterate on the commits to process,
+        # while keeping a few options fixed
+        build_worker_wrapper = partial(build_worker, run=options.run,
+                                       build_env=options.build_env,
+                                       dev_mode=options.dev,
+                                       use_public=options.use_public,
+                                       order=options.order, sequential=False)
+        iterator = pool.imap(build_worker_wrapper, toprocess)
 
         while True:
             try:
                 status = iterator.next()
                 exception = status[3]
-                if exception is None:
+                if exception is not None:
+                    logger.info("Received exception %s" % exception)
+                else:
                     # Create repo, build versions.csv file.
                     # This needs to be sequential
                     post_build(status)
-                exit_code = process_build_result(status)
+                exit_code = process_build_result(status,
+                                                 dev_mode=options.dev,
+                                                 run=options.run,
+                                                 stop=options.stop,
+                                                 build_env=options.build_env,
+                                                 head_only=options.head_only)
+
                 if options.stop and exit_code != 0:
                     return exit_code
             except StopIteration:
@@ -377,7 +404,8 @@ def main():
     return exit_code
 
 
-def process_build_result(status):
+def process_build_result(status, dev_mode=False, run=False, stop=False,
+                         build_env=None, head_only=False):
     commit = status[0]
     built_rpms = status[1]
     notes = status[2]
@@ -390,10 +418,10 @@ def process_build_result(status):
         project_info = Project(project_name=project, last_email=0)
     exit_code = 0
 
-    if options.run is True:
+    if run:
         if exception is not None:
             exit_code = 1
-            if options.stop:
+            if stop:
                 return exit_code
         return exit_code
 
@@ -436,8 +464,8 @@ def process_build_result(status):
             # was successful or non existent to avoid creating a gerrit
             # review for the same problem multiple times.
             if config_options.gerrit is not None:
-                if options.build_env:
-                    env_vars = list(options.build_env)
+                if build_env:
+                    env_vars = list(build_env)
                 else:
                     env_vars = []
                 last_build = getLastProcessedCommit(session, project)
@@ -477,26 +505,27 @@ def process_build_result(status):
             commit.status = "FAILED"
             commit.notes = getattr(exception, "message", notes)
             session.add(commit)
-        if options.stop:
+        if stop:
             return exit_code
     else:
         commit.status = "SUCCESS"
         commit.notes = notes
         commit.rpms = ",".join(built_rpms)
         session.add(commit)
-    if options.dev is False:
+    if dev_mode is False:
         session.commit()
-    genreports(packages, options.head_only)
+    genreports(packages, head_only)
     # TODO(jpena): could we launch this asynchronously?
     sync_repo(commit)
     return exit_code
 
 
-def build_worker(commit):
-    if options.run:
+def build_worker(commit, run=False, build_env=None, dev_mode=False,
+                 use_public=False, order=False, sequential=False):
+
+    if run:
         try:
-            run(options.run, commit, options.build_env,
-                options.dev, options.use_public, options.order,
+            run(run, commit, build_env, dev_mode, use_public, order,
                 do_build=False)
             return [commit, '', '', None]
         except Exception as e:
@@ -506,9 +535,8 @@ def build_worker(commit):
 
     notes = ""
     try:
-        built_rpms, notes = build(packages, commit, options.build_env,
-                                  options.dev, options.use_public,
-                                  options.order)
+        built_rpms, notes = build(packages, commit, build_env, dev_mode,
+                                  use_public, order, sequential)
         return [commit, built_rpms, notes, None]
     except Exception as e:
         return [commit, '', '', e]
@@ -670,7 +698,7 @@ def getsourcebranch(package):
 
 
 def process_mock_output(line):
-    if options.verbose_mock:
+    if verbose_mock:
         logger.info(line[:-1])
 
 
@@ -805,7 +833,8 @@ def post_build(status):
         os.rename(target_repo_dir + "_", target_repo_dir)
 
 
-def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
+def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
+          sequential):
     # Set the build timestamp to now
     commit.dt_build = int(time())
 
@@ -816,7 +845,7 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap):
 
     try:
         build_rpm_wrapper(commit, dev_mode, use_public, bootstrap,
-                          env_vars)
+                          env_vars, sequential)
     except Exception as e:
         raise Exception("Error in build_rpm_wrapper for %s: %s" %
                         (project_name, e))
@@ -919,9 +948,10 @@ def timesretried(project, commit_hash, distro_hash):
         count()
 
 
-def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars):
+def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
+                      sequential):
     # Get the worker id
-    if options.sequential is True:
+    if sequential is True:
         worker_id = 1
     else:
         worker_id = multiprocessing.current_process()._identity[0]
