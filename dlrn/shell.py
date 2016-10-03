@@ -373,7 +373,7 @@ def main():
             commit.status = 'RETRY'
             session.add(commit)
             session.commit()
-    genreports(packages, options)
+    genreports(packages, options.head_only)
     return exit_code
 
 
@@ -486,7 +486,7 @@ def process_build_result(status):
         session.add(commit)
     if options.dev is False:
         session.commit()
-    genreports(packages, options)
+    genreports(packages, options.head_only)
     # TODO(jpena): could we launch this asynchronously?
     sync_repo(commit)
     return exit_code
