@@ -173,7 +173,7 @@ def main():
     config_options = ConfigOptions(cp)
     pkginfo_driver = config_options.pkginfo_driver
     global pkginfo
-    pkginfo = import_object(pkginfo_driver)
+    pkginfo = import_object(pkginfo_driver, cfg_options=config_options)
     global packages
     packages = pkginfo.getpackages(local_info_repo=options.info_repo,
                                    tags=config_options.tags,
@@ -524,7 +524,7 @@ def compare():
 
     options, args = parser.parse_known_args(sys.argv[1:])
     pkginfo_driver = config_options.pkginfo_driver
-    pkginfo_object = import_object(pkginfo_driver)
+    pkginfo_object = import_object(pkginfo_driver, cfg_options=config_options)
     packages = pkginfo_object.getpackages(local_info_repo=options.info_repo,
                                           tags=config_options.tags)
 
