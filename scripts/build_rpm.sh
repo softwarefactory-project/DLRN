@@ -56,7 +56,12 @@ else
     fi
     setversionandrelease "$version" $(git log -n1 --format=format:%h)
     if [ -r metadata.json ]; then
-        TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@;s@\.git$@@')
+        MODULE_NAME=$(python -c "import json; print json.loads(open('metadata.json').read(-1))['name']")
+        if [[ $MODULE_NAME == openstack-* ]]; then
+            TARNAME=$MODULE_NAME
+        else
+            TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@;s@\.git$@@')
+        fi
     else
         TARNAME=${PROJECT_NAME}
     fi
