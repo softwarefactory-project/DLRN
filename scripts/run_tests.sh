@@ -50,6 +50,12 @@ if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
     baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
     src="stable/${branch}"
     PROJECT_DISTRO_BRANCH=$ZUUL_BRANCH
+# Add logic for new branches, *-rdo
+elif [[ "${ZUUL_BRANCH}" =~ -rdo && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
+    branch=$(sed "s/-rdo//" <<< "${ZUUL_BRANCH}")
+    baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
+    src="stable/${branch}"
+    PROJECT_DISTRO_BRANCH=$ZUUL_BRANCH
 fi
 
 # Update the configuration
