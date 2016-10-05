@@ -41,6 +41,8 @@ if [ -r setup.py -a ! -r metadata.json ]; then
     setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
                          $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
 else
+    # remove known bad tags e.g. release-* in puppet-nssdb
+    git tag -d $(git tag|grep ^release-)
     version="$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)"
     # fallback to the version in metadata.json or Modulefile
     if [ -z "$version" ]; then
