@@ -140,7 +140,8 @@ class GitRepoDriver(PkgInfoDriver):
         distgit_dir = self.distgit_dir(package_name)
         preprocess = sh.renderspec.bake(_cwd=distgit_dir,
                                         _tty_out=False, _timeout=3600)
-        preprocess('--spec-style', 'fedora')
+        preprocess('--spec-style', 'fedora', '--epoch',
+                   '../../epoch/fedora.yaml')
 
     def distgit_dir(self, package_name):
         datadir = self.config_options.datadir
