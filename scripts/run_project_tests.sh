@@ -57,11 +57,23 @@ sed -i "s%^tags=.*%tags=${branch}%" projects.ini
 # Prepare directories
 mkdir -p data/repos
 if [ -e /usr/bin/zuul-cloner ]; then
-    zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
-    mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
-    # same for source git
+    # source git
     zuul-cloner --workspace data/ --zuul-ref $ZUUL_REF --zuul-branch $ZUUL_BRANCH --zuul-url $ZUUL_URL  $OPENSTACK_GIT_URL ${PROJECT_NAME}
     mv data/${PROJECT_NAME} data/${PROJECT_TO_BUILD_MAPPED}
+    # distgit
+    # Try to find a RDO-Id: <Change Id> to be able to have a
+    # dependency on an RDO change in OpenStack
+    RDO_ID=$(cd data/${PROJECT_TO_BUILD_MAPPED}; git log -1|sed -ne 's/RDO-Id: //p')
+    if [ -n "$RDO_ID" ]; then
+        JSON=$(curl -s -L $GIT_BASE_URL/r/changes/$RDO_ID/revisions/current/review)
+        COMMIT=$(jq -r '.revisions | keys[0]' <<< $JSON)
+        REF=$(jq -r ".revisions[\"$COMMIT\"].ref" <<< $JSON)
+        if [ -n "$REF" -a "$REF" != null ]; then
+            REF_OPT="--zuul-ref $REF"
+        fi
+    fi
+    zuul-cloner --workspace data/ $REF_OPT $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
+    mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
 else
     # We're outside the gate, just do a regular git clone
     pushd data/
