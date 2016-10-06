@@ -3,7 +3,7 @@ set -ex
 
 # Simple script to test DLRN build from an upstream project
 # Works either locally or in a zuul environment
-GIT_BASE_URL="https://review.rdoproject.org/r/p"
+GIT_BASE_URL="https://review.rdoproject.org/r"
 OPENSTACK_GIT_URL="git://git.openstack.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
 
@@ -23,7 +23,7 @@ PROJECT_NAME="openstack/python-glanceclient"
 PROJECT_TO_BUILD=${PROJECT_NAME#*/}
 
 # Fetch rdoinfo using zuul_cloner, if available
-if [ -e /usr/bin/zuul-cloner ] ; then
+if type -p zuul-cloner; then
     zuul-cloner --workspace /tmp ${GIT_BASE_URL} rdoinfo
 else
     rm -rf /tmp/rdoinfo
@@ -56,12 +56,26 @@ sed -i "s%^tags=.*%tags=${branch}%" projects.ini
 
 # Prepare directories
 mkdir -p data/repos
-if [ -e /usr/bin/zuul-cloner ]; then
-    zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
-    mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
-    # same for source git
+if type -p zuul-cloner; then
+    # source git
     zuul-cloner --workspace data/ --zuul-ref $ZUUL_REF --zuul-branch $ZUUL_BRANCH --zuul-url $ZUUL_URL  $OPENSTACK_GIT_URL ${PROJECT_NAME}
     mv data/${PROJECT_NAME} data/${PROJECT_TO_BUILD_MAPPED}
+    # distgit
+    zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
+    # Try to find a RDO-Id: <Change Id> to be able to have a
+    # dependency on an RDO change in OpenStack
+    RDO_ID=$(cd data/${PROJECT_TO_BUILD_MAPPED}; git log -1|sed -ne 's/RDO-Id: //p')
+    if [ -n "$RDO_ID" ]; then
+        JSON=$(curl -s -L $GIT_BASE_URL/changes/$RDO_ID/revisions/current/review|sed 1d)
+        COMMIT=$(jq -r '.revisions | keys[0]' <<< $JSON)
+        REF=$(jq -r ".revisions[\"$COMMIT\"].ref" <<< $JSON)
+        if [ -n "$REF" -a "$REF" != null ]; then
+            (cd data/$PROJECT_DISTRO
+             git fetch $GIT_BASE_URL/$PROJECT_DISTRO $REF
+             git checkout FETCH_HEAD)
+        fi
+    fi
+    mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
 else
     # We're outside the gate, just do a regular git clone
     pushd data/
