@@ -1033,7 +1033,7 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     # if bootstraping, set the appropriate mock config option
     if bootstrap is True:
-        os.environ['ADDITIONAL_MOCK_OPTIONS'] = '-D "repo_bootstrap 1"'
+        os.environ['ADDITIONAL_MOCK_OPTIONS'] = '-D repo_bootstrap 1'
     pkginfo.preprocess(package_name=commit.project_name)
 
     run(os.path.join(scriptsdir, "build_rpm.sh"), commit, env_vars,
