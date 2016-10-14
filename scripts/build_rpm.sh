@@ -97,7 +97,7 @@ sed -i -e "s/UPSTREAMVERSION/$UPSTREAMVERSION/g" *.spec
 VERSION=${VERSION/-/.}
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
-sed -i -e "s/Source0:.*/Source0: $TARBALLREL/g" *.spec
+sed -i -e "s/^\(Source\|Source0\):.*/\1: $TARBALLREL/" *.spec
 sed -i -e '/^%changelog.*/q' *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
