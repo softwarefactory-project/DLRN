@@ -3,6 +3,7 @@ set -ex
 
 # Simple script to test that DLRN works either locally or in a zuul environment
 GIT_BASE_URL="https://review.rdoproject.org/r/p"
+OPENSTACK_GIT_URL="git://git.openstack.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
 
 # Display the current commit
@@ -27,7 +28,7 @@ PROJECT_TO_BUILD=${PROJECT_DISTRO#*/}
 PROJECT_TO_BUILD=$(sed "s/-distgit//" <<< "${PROJECT_TO_BUILD}")
 
 # Fetch rdoinfo using zuul_cloner, if available
-if [ -e /usr/bin/zuul-cloner ] ; then
+if type -p zuul-cloner; then
     zuul-cloner --workspace /tmp ${GIT_BASE_URL} rdoinfo
 else
     rm -rf /tmp/rdoinfo
@@ -66,9 +67,21 @@ sed -i "s%tags=.*%tags=${branch}%" projects.ini
 
 # Prepare directories
 mkdir -p data/repos
-if [ -e /usr/bin/zuul-cloner ]; then
+if type -p zuul-cloner; then
     zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
     mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
+    pushd data/${PROJECT_DISTRO_DIR}
+    UPSTREAM_ID=$(git log -1|sed -ne 's/\s*Upstream-Id: //p')
+    git log -1
+    popd
+    if [ -n "$UPSTREAM_ID" -a "${ZUUL_PIPELINE}" = "gate" ]; then
+        zuul-cloner --workspace data/ $OPENSTACK_GIT_URL openstack/${PROJECT_TO_BUILD}
+        mv data/openstack/${PROJECT_TO_BUILD} data/${PROJECT_TO_BUILD_MAPPED}
+        pushd data/${PROJECT_TO_BUILD_MAPPED}
+        git review -d $UPSTREAM_ID
+        git log -1
+        popd
+    fi
 else
     # We're outside the gate, just do a regular git clone
     pushd data/
