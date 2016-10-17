@@ -626,17 +626,21 @@ def refreshrepo(url, path, branch="master", local=False):
         git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
         try:
             remotes = git("remote", "-v").splitlines()
+            fetch_url = None
             for remote in remotes:
                 if '(fetch)' in remote:
                     line = remote.split()
-                    if line[1] != url:
-                        # URL changed, so remove directory
-                        logger.warning("URL for %s changed from %s to %s, "
-                                       "cleaning directory and cloning again"
-                                       % (path, line[1], url))
-                        shutil.rmtree(path)
-                        sh.git.clone(url, path)
-                    break
+                    if line[1] == url:
+                        break
+                    else:
+                        fetch_url = line[1]
+            else:
+                # URL changed, so remove directory
+                logger.warning("URL for %s changed from %s to %s, "
+                               "cleaning directory and cloning again"
+                               % (path, fetch_url, url))
+                shutil.rmtree(path)
+                sh.git.clone(url, path)
         except Exception:
             # Something failed here, maybe this is a failed repo clone
             # Let's warn, remove directory and clone again
