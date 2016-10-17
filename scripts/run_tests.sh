@@ -3,6 +3,7 @@ set -ex
 
 # Simple script to test that DLRN works either locally or in a zuul environment
 GIT_BASE_URL="https://review.rdoproject.org/r/p"
+OPENSTACK_GIT_URL="git://git.openstack.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
 
 # Display the current commit
@@ -27,7 +28,7 @@ PROJECT_TO_BUILD=${PROJECT_DISTRO#*/}
 PROJECT_TO_BUILD=$(sed "s/-distgit//" <<< "${PROJECT_TO_BUILD}")
 
 # Fetch rdoinfo using zuul_cloner, if available
-if [ -e /usr/bin/zuul-cloner ] ; then
+if type -p zuul-cloner; then
     zuul-cloner --workspace /tmp ${GIT_BASE_URL} rdoinfo
 else
     rm -rf /tmp/rdoinfo
@@ -64,20 +65,60 @@ sed -i "s%source=.*%source=${src}%" projects.ini
 sed -i "s%baseurl=.*%baseurl=${baseurl}%" projects.ini
 sed -i "s%tags=.*%tags=${branch}%" projects.ini
 
-# Prepare directories
+# Prepare directories for distro repo
 mkdir -p data/repos
-if [ -e /usr/bin/zuul-cloner ]; then
+
+# Remove distro dir first for idempotency
+rm -rf data/$PROJECT_DISTRO_DIR
+
+# Clone distro repo
+if type -p zuul-cloner; then
     zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
     mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
 else
     # We're outside the gate, just do a regular git clone
     pushd data/
-    # rm -rf first for idempotency
-    rm -rf $PROJECT_DISTRO_DIR
     git clone "${GIT_BASE_URL}/${PROJECT_DISTRO}" $PROJECT_DISTRO_DIR
     cd $PROJECT_DISTRO_DIR
     git checkout $PROJECT_DISTRO_BRANCH
     popd
+fi
+
+# Lookup if we need to extract an upstream review
+pushd data/${PROJECT_DISTRO_DIR}
+[ -n "$UPSTREAM_ID" ] || UPSTREAM_ID=$(git log -1|sed -ne 's/\s*Upstream-Id: //p')
+git log -1
+popd
+
+if [ -n "$UPSTREAM_ID" ]; then
+    rm -rf data/${PROJECT_TO_BUILD_MAPPED}
+    if type -p zuul-cloner; then
+        # Only build in the check pipeline to avoid merging a change
+        # in packaging that is dependent of an non merged upstream
+        # change
+        if [ "${ZUUL_PIPELINE}" = "check" ]; then
+            zuul-cloner --workspace data/ $OPENSTACK_GIT_URL openstack/${PROJECT_TO_BUILD}
+            mv data/openstack/${PROJECT_TO_BUILD} data/${PROJECT_TO_BUILD_MAPPED}
+        else
+            NOT_EXTRACTED=1
+        fi
+     else
+        git clone "$OPENSTACK_GIT_URL/openstack/${PROJECT_TO_BUILD}" "data/${PROJECT_TO_BUILD_MAPPED}"
+    fi
+    if [ -z "$NOT_EXTRACTED" ]; then
+        # We cannot run git review -d because we don't have an
+        # available account. So we do the same using curl, jq and git.
+        JSON=$(curl -s -L https://review.openstack.org/changes/$UPSTREAM_ID/revisions/current/review|sed 1d)
+        COMMIT=$(python -c 'import json;import sys; s = json.loads(sys.stdin.read(-1)); print s["revisions"].keys()[0]' <<< $JSON)
+        REF=$(python -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print s['revisions']['$COMMIT']['ref']" <<< $JSON)
+        pushd data/${PROJECT_TO_BUILD_MAPPED}
+        if [ -n "$REF" -a "$REF" != null ]; then
+            git fetch "$OPENSTACK_GIT_URL/openstack/${PROJECT_TO_BUILD}" $REF
+            git checkout FETCH_HEAD
+        fi
+        git log -1
+        popd
+    fi
 fi
 
 # If the commands below throws an error we still want the logs
@@ -88,7 +129,7 @@ function copy_logs() {
 trap copy_logs ERR EXIT
 
 # Run DLRN
-dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev --info-repo /tmp/rdoinfo --verbose-mock
+dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev --local --info-repo /tmp/rdoinfo --verbose-mock
 copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn-1.cfg --scrub=all

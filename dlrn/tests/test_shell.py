@@ -28,6 +28,10 @@ class TestsWithData(base.TestCase):
         utils.loadYAML(self.session, './dlrn/tests/samples/commits_1.yaml')
 
 
+def _aux(*x):
+    return 'origin (fetch) url'
+
+
 @mock.patch.object(sh.Command, '__call__', autospec=True)
 class TestRefreshRepo(base.TestCase):
 
@@ -41,9 +45,11 @@ class TestRefreshRepo(base.TestCase):
         self.assertEqual(sh_mock.call_args_list, expected)
 
     @mock.patch('os.path.exists', return_value=True)
-    def test_dont_clone_if_cloned(self, path_mock, sh_mock):
+    @mock.patch('shutil.rmtree', return_value=True)
+    def test_dont_clone_if_cloned(self, path_mock, shutil_mock, sh_mock):
         shell.refreshrepo('url', 'path', branch='branch')
         expected = [mock.call(sh.git, 'remote', '-v'),
+                    mock.call(sh.git.clone, 'url', 'path'),
                     mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, '-f', 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
