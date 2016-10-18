@@ -6,6 +6,7 @@ sh
 six
 SQLAlchemy
 PyYAML
+pycparser==2.14
 rdopkg>=0.34
 PrettyTable
 alembic
