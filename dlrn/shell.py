@@ -350,12 +350,14 @@ def main():
                 logger.error("Received exception %s" % exception)
             else:
                 post_build(status, packages, session)
-            exit_code = process_build_result(status, packages, session,
-                                             dev_mode=options.dev,
-                                             run=options.run,
-                                             stop=options.stop,
-                                             build_env=options.build_env,
-                                             head_only=options.head_only)
+            exit_value = process_build_result(status, packages, session,
+                                              dev_mode=options.dev,
+                                              run=options.run,
+                                              stop=options.stop,
+                                              build_env=options.build_env,
+                                              head_only=options.head_only)
+            if exit_value != 0:
+                exit_code = exit_value
             if options.stop and exit_code != 0:
                 return exit_code
     else:
@@ -380,13 +382,15 @@ def main():
                     # Create repo, build versions.csv file.
                     # This needs to be sequential
                     post_build(status, packages, session)
-                exit_code = process_build_result(status, packages, session,
-                                                 dev_mode=options.dev,
-                                                 run=options.run,
-                                                 stop=options.stop,
-                                                 build_env=options.build_env,
-                                                 head_only=options.head_only)
-
+                exit_value = process_build_result(status, packages,
+                                                  session,
+                                                  dev_mode=options.dev,
+                                                  run=options.run,
+                                                  top=options.stop,
+                                                  build_env=options.build_env,
+                                                  head_only=options.head_only)
+                if exit_value != 0:
+                    exit_code = exit_value
                 if options.stop and exit_code != 0:
                     return exit_code
             except StopIteration:
