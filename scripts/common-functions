@@ -38,7 +38,7 @@ function setversionandrelease(){
         echo  "WARNING: Couldn't parse VERSION, falling back to 0.0.1"
         VERSION=0.0.1
     fi
-    RELEASE=0.$(date --utc "+%Y%m%d%H%M%S").$2
+    RELEASE=0.0.$(date --utc "+%Y%m%d%H%M%S").$2
 }
 
 function cleanup_sdist() {
