@@ -340,7 +340,7 @@ def main():
     exit_code = 0
     if options.sequential is True:
         for commit in toprocess:
-            status = build_worker(packages, commit, run=options.run,
+            status = build_worker(packages, commit, run_cmd=options.run,
                                   build_env=options.build_env,
                                   dev_mode=options.dev,
                                   use_public=options.use_public,
@@ -352,7 +352,7 @@ def main():
                 post_build(status, packages, session)
             exit_value = process_build_result(status, packages, session,
                                               dev_mode=options.dev,
-                                              run=options.run,
+                                              run_cmd=options.run,
                                               stop=options.stop,
                                               build_env=options.build_env,
                                               head_only=options.head_only)
@@ -365,7 +365,8 @@ def main():
         pool = multiprocessing.Pool(config_options.workers)
         # Use functools.partial to iterate on the commits to process,
         # while keeping a few options fixed
-        build_worker_wrapper = partial(build_worker, packages, run=options.run,
+        build_worker_wrapper = partial(build_worker, packages,
+                                       run_cmd=options.run,
                                        build_env=options.build_env,
                                        dev_mode=options.dev,
                                        use_public=options.use_public,
@@ -385,7 +386,7 @@ def main():
                 exit_value = process_build_result(status, packages,
                                                   session,
                                                   dev_mode=options.dev,
-                                                  run=options.run,
+                                                  run_cmd=options.run,
                                                   stop=options.stop,
                                                   build_env=options.build_env,
                                                   head_only=options.head_only)
@@ -407,8 +408,9 @@ def main():
     return exit_code
 
 
-def process_build_result(status, packages, session, dev_mode=False, run=False,
-                         stop=False, build_env=None, head_only=False):
+def process_build_result(status, packages, session, dev_mode=False,
+                         run_cmd=False, stop=False, build_env=None,
+                         head_only=False):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
@@ -422,7 +424,7 @@ def process_build_result(status, packages, session, dev_mode=False, run=False,
         project_info = Project(project_name=project, last_email=0)
     exit_code = 0
 
-    if run:
+    if run_cmd:
         if exception is not None:
             exit_code = 1
             if stop:
@@ -524,12 +526,13 @@ def process_build_result(status, packages, session, dev_mode=False, run=False,
     return exit_code
 
 
-def build_worker(packages, commit, run=False, build_env=None, dev_mode=False,
-                 use_public=False, order=False, sequential=False):
+def build_worker(packages, commit, run_cmd=False, build_env=None,
+                 dev_mode=False, use_public=False, order=False,
+                 sequential=False):
 
-    if run:
+    if run_cmd:
         try:
-            run(run, commit, build_env, dev_mode, use_public, order,
+            run(run_cmd, commit, build_env, dev_mode, use_public, order,
                 do_build=False)
             return [commit, '', '', None]
         except Exception as e:
