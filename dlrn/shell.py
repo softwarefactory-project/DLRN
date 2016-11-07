@@ -566,8 +566,8 @@ def post_build(status, packages, session):
         # Output sha's of all other projects represented in this repo
         last_success = getCommits(session, project=otherprojectname,
                                   with_status="SUCCESS").first()
-        last_processed = getLastProcessedCommit(session, otherprojectname,
-                                                'INVALID STATE')
+        last_processed = getCommits(session, project=otherprojectname).first()
+
         if last_success:
             for rpm in last_success.rpms.split(","):
                 rpm_link_src = os.path.join(yumrepodir_abs,
