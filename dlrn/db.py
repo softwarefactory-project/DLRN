@@ -16,11 +16,14 @@ import sqlalchemy
 import sqlalchemy.ext.declarative
 
 from sqlalchemy import asc
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import desc
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import or_
 from sqlalchemy import String
+from sqlalchemy import Text
 
 
 Base = sqlalchemy.ext.declarative.declarative_base()
@@ -75,6 +78,26 @@ class Project(Base):
         self.last_email = int(time.time())
 
 
+class CIVote(Base):
+    __tablename__ = "civotes"
+
+    id = Column(Integer, primary_key=True)
+    commit_id = Column(Integer, ForeignKey('commits.id'), nullable=False)
+    ci_name = Column(String(256))
+    ci_url = Column(String(1024))
+    ci_vote = Column(Boolean)
+    ci_in_progress = Column(Boolean)
+    timestamp = Column(Integer)
+    notes = Column(Text)
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    username = Column(String(256), primary_key=True)
+    password = Column(String(256), nullable=False)
+
+
 # Return a db session
 def getSession(url='sqlite://', new=False):
     if _sessions.get(url) and new is False:
@@ -103,7 +126,8 @@ def getLastBuiltCommit(session, project_name, commit_branch,
                        not_status="RETRY"):
     commit = session.query(Commit).filter(Commit.project_name == project_name,
                                           Commit.status != not_status,
-                                          Commit.commit_branch == commit_branch).\
+                                          Commit.commit_branch ==
+                                          commit_branch).\
         order_by(desc(Commit.dt_build)).\
         order_by(desc(Commit.id)).first()
     return commit

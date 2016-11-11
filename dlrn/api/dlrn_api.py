@@ -1,0 +1,317 @@
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+from datetime import datetime
+from datetime import timedelta
+from distutils.util import strtobool
+
+from dlrn.api import app
+from dlrn.api.utils import auth
+from dlrn.api.utils import InvalidUsage
+
+from dlrn.db import CIVote
+from dlrn.db import Commit
+from dlrn.db import getSession
+
+from flask import jsonify
+from flask import request
+
+import os
+from sqlalchemy import desc
+import time
+
+
+@app.errorhandler(InvalidUsage)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
+
+def getVote(session, timestamp, success=None, job_id=None):
+    votes = session.query(CIVote)
+    votes = votes.filter(CIVote.timestamp > timestamp)
+    # Initially we want to get any tested repo, excluding consistent repos
+    votes = votes.filter(CIVote.ci_name != 'consistent')
+    if success is not None:
+        votes = votes.filter(CIVote.ci_vote == int(success))
+    if job_id is not None:
+        votes = votes.filter(CIVote.ci_name == job_id)
+    vote = votes.order_by(desc(CIVote.timestamp)).first()
+
+    if vote is None and job_id is not None:
+        # Second chance: no votes found for job_id. Let's find any real CI
+        # vote, other than 'consistent'
+        votes = session.query(CIVote).filter(CIVote.timestamp >
+                                             timestamp)
+        if success is not None:
+            votes = votes.filter(CIVote.ci_vote == success)
+        votes.filter(CIVote.ci_name != 'consistent')
+        vote = votes.order_by(desc(CIVote.timestamp)).first()
+
+    if vote is None:
+        # No votes found, let's try to find one for consistent
+        votes = session.query(CIVote).filter(CIVote.timestamp >
+                                             timestamp)
+        if success is not None:
+            votes = votes.filter(CIVote.ci_vote == success)
+        votes.filter(CIVote.ci_name == 'consistent')
+        vote = votes.order_by(desc(CIVote.timestamp)).first()
+
+    if vote is None:
+        # No Votes found at all
+        raise InvalidUsage('No vote found', status_code=404)
+
+    return vote
+
+
+@app.route('/api/repo_status', methods=['GET'])
+def repo_status():
+    # commit_hash: commit hash
+    # distro_hash: distro hash
+    # success(optional): only report successful/unsuccessful votes
+    if request.headers['Content-Type'] != 'application/json':
+        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
+
+    commit_hash = request.json.get('commit_hash', None)
+    distro_hash = request.json.get('distro_hash', None)
+    success = request.json.get('success', None)
+    if (commit_hash is None or distro_hash is None):
+        raise InvalidUsage('Missing parameters', status_code=400)
+
+    if success is not None:
+        success = bool(strtobool(success))
+
+    # Find the commit id for commit_hash/distro_hash
+    session = getSession(app.config['DB_PATH'])
+    commit = session.query(Commit).filter(
+        Commit.status == 'SUCCESS',
+        Commit.commit_hash == commit_hash,
+        Commit.distro_hash == distro_hash).first()
+    if commit is None:
+        raise InvalidUsage('commit_hash+distro_hash combination not found',
+                           status_code=404)
+    commit_id = commit.id
+
+    # Now find every vote for this commit_hash/distro_hash combination
+    votes = session.query(CIVote).filter(CIVote.commit_id == commit_id)
+    if success is not None:
+        votes = votes.filter(CIVote.ci_vote == int(success))
+
+    # And format the output
+    data = {}
+    data['results'] = []
+    for vote in votes:
+        d = {'timestamp': vote.timestamp,
+             'job_id': vote.ci_name,
+             'success': bool(vote.ci_vote),
+             'in_progress': vote.ci_in_progress,
+             'url': vote.ci_url,
+             'notes': vote.notes}
+        data['results'].append(d)
+    return jsonify(data)
+
+
+@app.route('/api/last_tested_repo', methods=['GET'])
+def last_tested_repo_GET():
+    # max_age: Maximum age in hours, used as base for the search
+    # success(optional): find repos with a successful/unsuccessful vote
+    # job_id(optional); name of the CI that sent the vote
+    if request.headers['Content-Type'] != 'application/json':
+        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
+
+    max_age = request.json.get('max_age', None)
+    job_id = request.json.get('job_id', None)
+    success = request.json.get('success', None)
+
+    if success is not None:
+        success = bool(strtobool(success))
+
+    if max_age is None:
+        raise InvalidUsage('Missing parameters', status_code=400)
+
+    # Calculate timestamp as now - max_age
+    if int(max_age) == 0:
+        timestamp = 0
+    else:
+        oldest_time = datetime.now() - timedelta(hours=int(max_age))
+        timestamp = time.mktime(oldest_time.timetuple())
+
+    session = getSession(app.config['DB_PATH'])
+    try:
+        vote = getVote(session, timestamp, success, job_id)
+    except Exception as e:
+        raise e
+
+    commit = session.query(Commit).filter(
+        Commit.status == 'SUCCESS',
+        Commit.id == vote.commit_id).first()
+
+    result = {'commit_hash': commit.commit_hash,
+              'distro_hash': commit.distro_hash,
+              'timestamp': vote.timestamp,
+              'job_id': vote.ci_name,
+              'success': vote.ci_vote,
+              'in_progress': vote.ci_in_progress}
+    return jsonify(result), 200
+
+
+@app.route('/api/last_tested_repo', methods=['POST'])
+@auth.login_required
+def last_tested_repo_POST():
+    # max_age: Maximum age in hours, used as base for the search
+    # success(optional): find repos with a successful/unsuccessful vote
+    # job_id(optional); name of the CI that sent the vote
+    if request.headers['Content-Type'] != 'application/json':
+        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
+
+    max_age = request.json.get('max_age', None)
+    my_job_id = request.json.get('reporting_job_id', None)
+    job_id = request.json.get('job_id', None)
+    success = request.json.get('success', None)
+
+    if success is not None:
+        success = bool(strtobool(success))
+
+    if (max_age is None or my_job_id is None):
+        raise InvalidUsage('Missing parameters', status_code=400)
+
+    # Calculate timestamp as now - max_age
+    if int(max_age) == 0:
+        timestamp = 0
+    else:
+        oldest_time = datetime.now() - timedelta(hours=int(max_age))
+        timestamp = time.mktime(oldest_time.timetuple())
+
+    session = getSession(app.config['DB_PATH'])
+
+    try:
+        vote = getVote(session, timestamp, success, job_id)
+    except Exception as e:
+        raise e
+
+    newvote = CIVote(commit_id=vote.commit_id, ci_name=my_job_id,
+                     ci_url='', ci_vote=False, ci_in_progress=True,
+                     timestamp=int(time.time()), notes='')
+    session.add(newvote)
+    session.commit()
+
+    commit = session.query(Commit).filter(
+        Commit.status == 'SUCCESS',
+        Commit.id == vote.commit_id).first()
+
+    result = {'commit_hash': commit.commit_hash,
+              'distro_hash': commit.distro_hash,
+              'timestamp': newvote.timestamp,
+              'job_id': newvote.ci_name,
+              'success': newvote.ci_vote,
+              'in_progress': newvote.ci_in_progress}
+    return jsonify(result), 201
+
+
+@app.route('/api/report_result', methods=['POST'])
+@auth.login_required
+def report_result():
+    # job_id: name of CI
+    # commit_hash: commit hash
+    # distro_hash: distro hash
+    # url: URL where more information can be found
+    # timestamp: CI execution timestamp
+    # success: boolean
+    # notes(optional): notes
+
+    if request.headers['Content-Type'] != 'application/json':
+        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
+
+    try:
+        commit_hash = request.json['commit_hash']
+        distro_hash = request.json['distro_hash']
+        timestamp = request.json['timestamp']
+        job_id = request.json['job_id']
+        success = request.json['success']
+        url = request.json['url']
+    except KeyError:
+        raise InvalidUsage('Missing parameters', status_code=400)
+
+    notes = request.json.get('notes', '')
+
+    session = getSession(app.config['DB_PATH'])
+    commit = session.query(Commit).filter(
+        Commit.status == 'SUCCESS',
+        Commit.commit_hash == commit_hash,
+        Commit.distro_hash == distro_hash).first()
+    if commit is None:
+        raise InvalidUsage('commit_hash+distro_hash combination not found',
+                           status_code=404)
+
+    commit_id = commit.id
+
+    vote = CIVote(commit_id=commit_id, ci_name=job_id, ci_url=url,
+                  ci_vote=bool(strtobool(success)), ci_in_progress=False,
+                  timestamp=int(timestamp), notes=notes)
+    session.add(vote)
+    session.commit()
+
+    result = {'commit_hash': commit_hash,
+              'distro_hash': distro_hash,
+              'timestamp': timestamp,
+              'job_id': job_id,
+              'success': bool(success),
+              'in_progress': False,
+              'url': url,
+              'notes': notes}
+    return jsonify(result), 201
+
+
+@app.route('/api/promote', methods=['POST'])
+@auth.login_required
+def promote():
+    # commit_hash: commit hash
+    # distro_hash: distro hash
+    # promote_name: symlink name
+
+    if request.headers['Content-Type'] != 'application/json':
+        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
+
+    try:
+        commit_hash = request.json['commit_hash']
+        distro_hash = request.json['distro_hash']
+        promote_name = request.json['promote_name']
+    except KeyError:
+        raise InvalidUsage('Missing parameters', status_code=400)
+
+    if (promote_name == 'consistent' or promote_name == 'current'):
+        raise InvalidUsage('Invalid promote_name %s' % promote_name,
+                           status_code=403)
+
+    session = getSession(app.config['DB_PATH'])
+    commit = session.query(Commit).filter(
+        Commit.status == 'SUCCESS',
+        Commit.commit_hash == commit_hash,
+        Commit.distro_hash == distro_hash).first()
+    if commit is None:
+        raise InvalidUsage('commit_hash+distro_hash combination not found',
+                           status_code=404)
+
+    target_link = os.path.join(app.config['REPO_PATH'], promote_name)
+    yumrepodir = os.path.join(app.config['REPO_PATH'],
+                              commit.getshardedcommitdir())
+    try:
+        os.symlink(yumrepodir, target_link)
+    except Exception as e:
+        raise InvalidUsage("Symlink creation failed with error: %s" %
+                           e, status_code=500)
+
+    result = {'commit_hash': commit_hash,
+              'distro_hash': distro_hash,
+              'promote_name': promote_name}
+    return jsonify(result), 201
