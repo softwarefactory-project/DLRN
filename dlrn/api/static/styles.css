@@ -1,0 +1,45 @@
+@import url(https://openshift.redhat.com/app/assets/overpass.css);
+@import url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css);
+
+#dlrn {
+    font-family: Arial, sans-serif;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#dlrn td, #dlrn th {
+    font-size: 1em;
+    border: 1px dotted #6E0000;
+    padding: 3px 7px 2px 7px;
+}
+
+#dlrn th {
+    font-family: Overpass, Arial, sans-serif;
+    font-size: 1.1em;
+    text-align: left;
+    padding-top: 5px;
+    padding-bottom: 4px;
+    background-color: #6E0000;
+    color: #ffffff;
+}
+#dlrn tr.success td {
+    color: #000000;
+    background-color: #E6E6E6;
+}
+
+#dlrn td.commit {
+    font-family: monospace,serif;
+}
+
+h1 {
+    font-family: Overpass, sans-serif;
+    color: #7F0A0C;
+    margin-top: 2.25rem;
+    margin-bottom: 1em;
+    font-size: 2em;
+}
+
+a {color:#0088CE; text-decoration:none;}
+a:link {text-decoration:none;}
+a:visited {text-decoration:none;}
+a:hover {text-decoration:underline;}

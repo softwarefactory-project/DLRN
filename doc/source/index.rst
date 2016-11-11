@@ -17,6 +17,7 @@ Contents:
    repositories
    usage
    troubleshooting
+   api
    contributing
 
 Indices and tables
