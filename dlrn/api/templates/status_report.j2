@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>RDO Packaging By DLRN</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <h1>
+      <i class='fa fa-chevron-circle-right pull-left'></i>
+      {{ reponame | capitalize }} - {{ target | capitalize }} ({{ src }})
+    </h1>
+    <table id="dlrn">
+      <tr>
+        <th>Project Name</th>
+        <th>Status</th>
+        <th>First failure after success {{ msg }}</th>
+        <th>Number of days since last success</th>
+      </tr>
+      {% for pkg in pkgs %}
+        <tr {% if pkg["last_build"].status == "SUCCESS" %}class="success"{% endif %}>
+          <td>{{ pkg["name"] }}</td>
+          {% if pkg["last_build"].status == "SUCCESS"  %}
+            <td>
+              <i class="fa fa-thumbs-o-up pull-left" style="color:green"></i>
+              <a href="{{ pkg["last_build"].getshardedcommitdir() }}/rpmbuild.log">SUCCESS</a>
+            </td>
+            <td></td>
+            <td></td>
+          {% elif pkg["last_build"].status == "RETRY"  %}
+            <td>
+              <i class="fa fa-warning pull-left" style="color:yellow"></i>
+              <a href="{{ pkg["last_build"].getshardedcommitdir() }}/rpmbuild.log">RETRY</a>
+            </td>
+            <td></td>
+            <td></td>
+          {% else %}
+            <td>
+              <i class="fa fa-thumbs-o-down pull-left" style="color:red"></i>
+              <a href="{{ pkg["last_build"].getshardedcommitdir() }}/rpmbuild.log">FAILED</a>
+            </td>
+            <td>
+              {% if "first_failure" in pkg %}
+                <i class="fa fa-git pull-left"></i>
+                <a href="{{ pkg["first_failure"] | get_commit_url }}{{ pkg["first_failure"].commit_hash }}">{{ pkg["first_failure"].commit_hash }}</a> (<a href="{{pkg["first_failure"].getshardedcommitdir() }}/rpmbuild.log">build log</a>)
+              {% else %}
+                ??????
+              {% endif %}
+            </td>
+            <td>
+              {% if pkg["days"] == -1 %}
+                Never
+              {% else %}
+                {{ pkg["days"] }} days
+              {% endif %}
+            </td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
