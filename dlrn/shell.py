@@ -28,6 +28,7 @@ from dlrn.build import build_worker
 from dlrn.config import ConfigOptions
 from dlrn.config import getConfigOptions
 
+from dlrn.db import CIVote
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getLastBuiltCommit
@@ -318,17 +319,19 @@ def main():
                                   use_public=options.use_public,
                                   order=options.order, sequential=True)
             exception = status[3]
+            consistent = False
             if exception is not None:
                 logger.error("Received exception %s" % exception)
             else:
                 if not options.run:
-                    post_build(status, packages, session)
+                    consistent = post_build(status, packages, session)
             exit_value = process_build_result(status, packages, session,
                                               dev_mode=options.dev,
                                               run_cmd=options.run,
                                               stop=options.stop,
                                               build_env=options.build_env,
-                                              head_only=options.head_only)
+                                              head_only=options.head_only,
+                                              consistent=consistent)
             if exit_value != 0:
                 exit_code = exit_value
             if options.stop and exit_code != 0:
@@ -350,20 +353,22 @@ def main():
             try:
                 status = iterator.next()
                 exception = status[3]
+                consistent = False
                 if exception is not None:
                     logger.info("Received exception %s" % exception)
                 else:
                     # Create repo, build versions.csv file.
                     # This needs to be sequential
                     if not options.run:
-                        post_build(status, packages, session)
+                        consistent = post_build(status, packages, session)
                 exit_value = process_build_result(status, packages,
                                                   session,
                                                   dev_mode=options.dev,
                                                   run_cmd=options.run,
                                                   stop=options.stop,
                                                   build_env=options.build_env,
-                                                  head_only=options.head_only)
+                                                  head_only=options.head_only,
+                                                  consistent=consistent)
                 if exit_value != 0:
                     exit_code = exit_value
                 if options.stop and exit_code != 0:
@@ -384,7 +389,7 @@ def main():
 
 def process_build_result(status, packages, session, dev_mode=False,
                          run_cmd=False, stop=False, build_env=None,
-                         head_only=False):
+                         head_only=False, consistent=False):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
@@ -494,7 +499,14 @@ def process_build_result(status, packages, session, dev_mode=False,
         session.add(commit)
     if dev_mode is False:
         session.commit()
-    genreports(packages, head_only, session)
+        if consistent:
+            # We have a consistent repo. Let's create a CIVote entry in the DB
+            vote = CIVote(commit_id=commit.id, ci_name='consistent',
+                          ci_url='', ci_vote=True, ci_in_progress=False,
+                          timestamp=int(commit.dt_build), notes='')
+            session.add(vote)
+            session.commit()
+    genreports(packages, head_only)
     # TODO(jpena): could we launch this asynchronously?
     sync_repo(commit)
     return exit_code
@@ -583,3 +595,5 @@ def post_build(status, packages, session):
                                    os.path.join(datadir, "repos")),
                    target_repo_dir + "_")
         os.rename(target_repo_dir + "_", target_repo_dir)
+
+    return (failures == 0)
