@@ -1,0 +1,17 @@
+(This file must be removed before merging!!!)
+
+https://review.rdoproject.org/etherpad/p/ci-aggregation
+
+Pending stuff:
+- Alembic scripts
+- Starting on Apache
+- Where to get the configuration from
+
+Sample curl calls:
+
+curl -i -u test:test -H "Content-Type: application/json" -X POST -d '{"link_name":"consistent", "commit_hash":"cdaf2c77d974d5e794909313dceb3554be69a42e", "distro_hash":"4b1619fef4e43727d95744c75b81c653de00a01e", "url":"", "timestamp":"1479141400", "success":"true"}' http://localhost:5000/api/report_result
+
+curl -i -H "Content-Type: application/json" -X GET -d '{"timestamp": "0"}' http://localhost:5000/api/get_last_tested_repo
+
+curl -i -u test:test -H "Content-Type: application/json" -X POST -d '{"timestamp": "1479141488", "reporting_link_name":"current-passed-ci"}' http://localhost:5000/api/get_last_tested_repo
+
