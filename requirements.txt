@@ -13,3 +13,6 @@ alembic>=0.7.0
 renderspec
 pymod2pkg>=0.5.5
 requests
+Flask
+Flask-HTTPAuth
+passlib>=1.6.5
