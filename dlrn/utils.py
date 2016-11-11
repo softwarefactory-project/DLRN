@@ -16,9 +16,11 @@ import yaml
 
 import sqlalchemy
 
+from dlrn.db import CIVote
 from dlrn.db import Commit
 from dlrn.db import getSession
 from dlrn.db import Project
+from dlrn.db import User
 
 re_known_errors = re.compile('Error: Nothing to do|'
                              'Error downloading packages|'
@@ -56,6 +58,19 @@ def loadYAML(session, yamlfile):
     for project in data['projects']:
         p = Project(**project)
         session.add(p)
+    try:
+        for civote in data['civotes']:
+            vote = CIVote(**civote)
+            session.add(vote)
+    except KeyError:
+        pass   # No civotes in yaml, just ignore
+    try:
+        for user in data['users']:
+            my_user = User(**user)
+            session.add(my_user)
+    except KeyError:
+        pass   # No users in yaml, just ignore
+
     session.commit()
 
 
