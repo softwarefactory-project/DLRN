@@ -614,6 +614,12 @@ def post_build(status, packages, session):
 
     if failures == 0:
         dirnames.append('consistent')
+        # We have a consistent repo. Let's create a CIVote entry in the DB
+        vote = CIVote(commit_id=commit.commit_id, ci_name='consistent',
+                      ci_url='', ci_vote=True, ci_in_progress=False,
+                      timestamp=int(commit.dt_build), notes='')
+        session.add(vote)
+        session.commit()
     else:
         logger.info('%d packages not built correctly: not updating'
                     ' the consistent symlink' % failures)
