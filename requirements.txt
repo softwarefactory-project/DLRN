@@ -13,3 +13,5 @@ alembic
 renderspec
 pymod2pkg>=0.5.5
 requests
+Flask
+Flask-HTTPAuth
