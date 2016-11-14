@@ -42,6 +42,7 @@ from dlrn.reporting import genreports
 from dlrn.reporting import get_commit_url
 from dlrn.rpmspecfile import RpmSpecCollection
 from dlrn.rpmspecfile import RpmSpecFile
+from dlrn.rsync import sync_repo
 from dlrn.utils import dumpshas2file
 from dlrn.utils import import_object
 from dlrn.utils import isknownerror
@@ -711,34 +712,3 @@ def post_build(status, packages, session):
                                    os.path.join(datadir, "repos")),
                    target_repo_dir + "_")
         os.rename(target_repo_dir + "_", target_repo_dir)
-
-
-def sync_repo(commit):
-    config_options = getConfigOptions()
-    rsyncdest = config_options.rsyncdest
-    rsyncport = config_options.rsyncport
-    datadir = os.path.realpath(config_options.datadir)
-
-    if rsyncdest != '':
-        # We are only rsyncing the current repo dir to rsyncdest
-        rsyncpaths = []
-        # We are inserting a dot in the path after repos, this is used by
-        # rsync -R (see man rsync)
-        commitdir_abs = os.path.join(datadir, "repos", ".",
-                                     commit.getshardedcommitdir())
-        rsyncpaths.append(commitdir_abs)
-        # We also need report.html, status_report.html, styles.css and the
-        # consistent and current symlinks
-        for filename in ['report.html', 'status_report.html', 'styles.css',
-                         'consistent', 'current']:
-            filepath = os.path.join(datadir, "repos", ".", filename)
-            rsyncpaths.append(filepath)
-
-        rsh_command = 'ssh -p %s -o StrictHostKeyChecking=no' % rsyncport
-        try:
-            sh.rsync('-avzR', '--delete-delay',
-                     '-e', rsh_command,
-                     rsyncpaths, rsyncdest)
-        except Exception as e:
-            logger.warn('Failed to rsync content to %s ,'
-                        'got error %s' % (rsyncdest, e))
