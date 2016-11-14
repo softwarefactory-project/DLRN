@@ -9,6 +9,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import re
 import sys
 import yaml
 
@@ -16,6 +17,17 @@ import sqlalchemy
 
 from dlrn.db import Commit
 from dlrn.db import getSession
+
+re_known_errors = re.compile('Error: Nothing to do|'
+                             'Error downloading packages|'
+                             'No more mirrors to try|'
+                             'Cannot retrieve metalink for repository|'
+                             'Could not retrieve mirrorlist|'
+                             'Failed to synchronize cache for repo|'
+                             'No route to host|'
+                             'Device or resource busy|'
+                             'Could not resolve host|'
+                             'Temporary failure in name resolution')
 
 
 # Import a Python object
@@ -82,6 +94,33 @@ def getNVRfromlist(rpmlist):
         if pkg.endswith(".src.rpm"):
             return pkg.split('/')[-1].split('.src.rpm')[0]
     return ""
+
+
+# Check log file against known errors
+# Return True if known error, False otherwise
+def isknownerror(logfile):
+
+    if not os.path.isfile(logfile):
+        return False
+
+    with open(logfile) as fp:
+        for line in fp:
+            line = line.strip()
+            if re_known_errors.search(line):
+                # Found a known issue
+                return True
+
+    return False
+
+
+# Return how many times a commit hash / distro had combination has
+# been retried for a given project
+def timesretried(project, session, commit_hash, distro_hash):
+    return session.query(Commit).filter(Commit.project_name == project,
+                                        Commit.commit_hash == commit_hash,
+                                        Commit.distro_hash == distro_hash,
+                                        Commit.status == "RETRY").\
+        count()
 
 
 if __name__ == '__main__':
