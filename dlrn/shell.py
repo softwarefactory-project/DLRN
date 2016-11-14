@@ -17,7 +17,6 @@ import copy
 import logging
 import multiprocessing
 import os
-import re
 import shutil
 import smtplib
 import sys
@@ -47,6 +46,8 @@ from dlrn.rpmspecfile import RpmSpecCollection
 from dlrn.rpmspecfile import RpmSpecFile
 from dlrn.utils import dumpshas2file
 from dlrn.utils import import_object
+from dlrn.utils import isknownerror
+from dlrn.utils import timesretried
 from dlrn import version
 
 logging.basicConfig(level=logging.ERROR,
@@ -71,17 +72,6 @@ feel free to ask questions on the RDO irc channel (#rdo on Freenode).
 [4] - https://github.com/redhat-openstack/rdoinfo/blob/master/rdo.yml
 [5] - https://www.rdoproject.org/packaging/rdo-packaging.html#master-pkg-guide
 """
-
-re_known_errors = re.compile('Error: Nothing to do|'
-                             'Error downloading packages|'
-                             'No more mirrors to try|'
-                             'Cannot retrieve metalink for repository|'
-                             'Could not retrieve mirrorlist|'
-                             'Failed to synchronize cache for repo|'
-                             'No route to host|'
-                             'Device or resource busy|'
-                             'Could not resolve host|'
-                             'Temporary failure in name resolution')
 
 default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'templatedir': os.path.join(
@@ -820,30 +810,3 @@ def submit_review(commit, env_vars):
                     datadir, config_options.baseurl,
                     os.path.realpath(commit.distgit_dir)])
     sh.env(run_cmd)
-
-
-def isknownerror(logfile):
-    # Check log file against known errors
-    # Return True if known error, False otherwise
-    if not os.path.isfile(logfile):
-        return False
-
-    with open(logfile) as fp:
-        for line in fp:
-            line = line.strip()
-            if re_known_errors.search(line):
-                # Found a known issue
-                return True
-
-    return False
-
-
-def timesretried(project, session, commit_hash, distro_hash):
-    # Return how many times a commit hash / distro had combination has
-    # been retried for a given project
-
-    return session.query(Commit).filter(Commit.project_name == project,
-                                        Commit.commit_hash == commit_hash,
-                                        Commit.distro_hash == distro_hash,
-                                        Commit.status == "RETRY").\
-        count()
