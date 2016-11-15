@@ -45,9 +45,10 @@ class RpmSpecFile(object):
                 # lookup Name:
                 res = name_regexp.search(line)
                 if res:
-                    self.name = self._expand_defines(res.group(1))
-                    self._packages.append(self.name)
-                    self._defines['name'] = self.name
+                    if self.name == '<none>':
+                        self.name = self._expand_defines(res.group(1))
+                        self._packages.append(self.name)
+                        self._defines['name'] = self.name
                 else:
                     # lookup package
                     res = package_regexp.search(line)
