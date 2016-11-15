@@ -36,7 +36,7 @@ class RpmSpecFile(object):
         self._build_requires = []
         self.name = '<none>'
         self._provided = {}
-        for line in content.split('\n'):
+        for line in reversed(content.split('\n')):
             # lookup macros
             res = define_regexp.search(line)
             if res:
