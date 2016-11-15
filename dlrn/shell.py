@@ -16,7 +16,6 @@ import argparse
 import logging
 import multiprocessing
 import os
-import shutil
 import sys
 
 from functools import partial
@@ -538,95 +537,6 @@ def compare():
             compare_detail[1] = "*"
         table.add_row(compare_detail)
     print(table)
-
-
-def refreshrepo(url, path, branch="master", local=False):
-    logger.info("Getting %s to %s (%s)" % (url, path, branch))
-    checkout_not_present = not os.path.exists(path)
-    if checkout_not_present is True:
-        sh.git.clone(url, path)
-    elif local is False:
-        # We need to cover a corner case here, where the repo URL has changed
-        # since the last execution
-        git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
-        try:
-            remotes = git("remote", "-v").splitlines()
-            fetch_url = None
-            for remote in remotes:
-                if '(fetch)' in remote:
-                    line = remote.split()
-                    if line[1] == url:
-                        break
-                    else:
-                        fetch_url = line[1]
-            else:
-                # URL changed, so remove directory
-                logger.warning("URL for %s changed from %s to %s, "
-                               "cleaning directory and cloning again"
-                               % (path, fetch_url, url))
-                shutil.rmtree(path)
-                sh.git.clone(url, path)
-        except Exception:
-            # Something failed here, maybe this is a failed repo clone
-            # Let's warn, remove directory and clone again
-            logger.warning("Directory %s does not contain a valid Git repo, "
-                           "cleaning directory and cloning again" % path)
-            shutil.rmtree(path)
-            sh.git.clone(url, path)
-
-    git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
-    if local is False or checkout_not_present is True:
-        try:
-            git.fetch("origin")
-        except Exception:
-            # Sometimes hg repositories get into a invalid state leaving them
-            # unusable, to avoid a looping error just remove it so it will be
-            # recloned.
-            logger.error("Error fetching into %s, deleting." % (path))
-            sh.sudo("rm", "-rf", path)
-            raise
-        try:
-            git.checkout('-f', branch)
-        except sh.ErrorReturnCode_1:
-            if "master" in branch:
-                # Do not try fallback if already on master branch
-                raise
-            else:
-                # Fallback to master
-                if branch.startswith("rpm-"):
-                    branch = "rpm-master"
-                elif branch.endswith("-rdo"):
-                    # Distgit branches can start with rpm- or end with -rdo
-                    branch = "rpm-master"
-                else:
-                    branch = "master"
-                logger.info("Falling back to %s" % branch)
-                git.checkout(branch)
-        try:
-            git.reset("--hard", "origin/%s" % branch)
-        except Exception:
-            # Maybe it was a tag, not a branch
-            git.reset("--hard", "%s" % branch)
-
-    repoinfo = str(git.log("--pretty=format:%H %ct", "-1")).strip().split(" ")
-    repoinfo.insert(0, branch)
-    return repoinfo
-
-
-def getdistrobranch(package):
-    if 'distro-branch' in package:
-        return package['distro-branch']
-    else:
-        config_options = getConfigOptions()
-        return config_options.distro
-
-
-def getsourcebranch(package):
-    if 'source-branch' in package:
-        return package['source-branch']
-    else:
-        config_options = getConfigOptions()
-        return config_options.source
 
 
 def post_build(status, packages, session):
