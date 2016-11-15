@@ -26,8 +26,8 @@ import sh
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
-from dlrn.shell import getsourcebranch
-from dlrn.shell import refreshrepo
+from dlrn.repositories import getsourcebranch
+from dlrn.repositories import refreshrepo
 from pymod2pkg import module2upstream
 
 logging.basicConfig(level=logging.ERROR)

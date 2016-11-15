@@ -21,9 +21,9 @@
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
-from dlrn.shell import getdistrobranch
-from dlrn.shell import getsourcebranch
-from dlrn.shell import refreshrepo
+from dlrn.repositories import getdistrobranch
+from dlrn.repositories import getsourcebranch
+from dlrn.repositories import refreshrepo
 
 import os
 import sh
