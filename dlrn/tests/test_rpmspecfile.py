@@ -64,6 +64,10 @@ class TestRpmSpecCollection(unittest.TestCase):
         specs = RpmSpecCollection([RpmSpecFile(BASIC_SPEC_CONTENT)])
         self.assertEqual(specs.compute_order(), ['package'])
 
+    def test_multiple_names(self):
+        specs = RpmSpecCollection([RpmSpecFile(MULTIPLE_NAME_CONTENT)])
+        self.assertEqual(specs.compute_order(), ['package'])
+
     def test_dep(self):
         specs = RpmSpecCollection([RpmSpecFile(BASIC_SPEC_CONTENT),
                                    RpmSpecFile(BASIC2_SPEC_CONTENT)])
@@ -150,6 +154,15 @@ Name: package
 DEP_SUB_PKG_CONTENT = '''
 Name: packageD
 BuildRequires: package-subpkg-toto
+'''
+
+MULTIPLE_NAME_CONTENT = '''
+Name: package
+
+%prep
+cat > fake.egg-info <<EOF
+Name: anothername
+EOF
 '''
 
 if __name__ == "__main__":
