@@ -8,7 +8,7 @@ SQLAlchemy
 PyMySQL
 PyYAML
 pycparser==2.14
-rdopkg>=0.34
+rdopkg>=0.42
 alembic>=0.7.0
 renderspec
 pymod2pkg>=0.5.5
