@@ -112,12 +112,21 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     # Add the most current repo, we may have dependencies in it
     if os.path.exists(os.path.join(datadir, "repos", "current", "repodata")):
+        # Get the real path for the current repo, this could change during
+        # parallel builds
+        repolink = os.readlink(os.path.join(datadir, "repos", "current"))
+        if repolink.startswith('/'):
+            # absolute symlink
+            repopath = repolink
+        else:
+            # relative symlink
+            repopath = os.path.join(datadir, "repos", repolink)
         with open(newcfg, "r") as fp:
             contents = fp.readlines()
         # delete the last line which must be """
         contents = contents[:-1]
         contents = contents + ["[local]\n", "name=local\n",
-                               "baseurl=file://%s/repos/current\n" % datadir,
+                               "baseurl=file://%s\n" % repopath,
                                "enabled=1\n", "gpgcheck=0\n", "priority=1\n",
                                "\"\"\""]
         with open(newcfg, "w") as fp:
