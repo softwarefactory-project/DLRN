@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import mock
-import sqlalchemy
 
 from dlrn import db
 from dlrn.tests import base
@@ -26,7 +25,7 @@ class TestsWithData(base.TestCase):
         utils.loadYAML(self.session, './dlrn/tests/samples/commits_1.yaml')
 
 
-@mock.patch.object(sqlalchemy.orm.sessionmaker, '__call__', autospec=True)
+@mock.patch('sqlalchemy.orm.sessionmaker', autospec=True)
 class TestGetSessions(base.TestCase):
     def setUp(self):
         super(TestGetSessions, self).setUp()

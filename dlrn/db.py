@@ -22,6 +22,7 @@ from sqlalchemy import Integer
 from sqlalchemy import or_
 from sqlalchemy import String
 
+from sqlalchemy.orm import scoped_session
 
 Base = sqlalchemy.ext.declarative.declarative_base()
 _sessions = {}
@@ -82,8 +83,7 @@ def getSession(url='sqlite://', new=False):
 
     engine = sqlalchemy.create_engine(url)
     Base.metadata.create_all(engine)
-    Session = sqlalchemy.orm.sessionmaker(bind=engine)
-    _sessions[url] = Session()
+    _sessions[url] = scoped_session(sqlalchemy.orm.sessionmaker(bind=engine))
     return _sessions[url]
 
 
