@@ -7,7 +7,7 @@ six
 SQLAlchemy
 PyYAML
 pycparser==2.14
-rdopkg>=0.34
+rdopkg>=0.42
 PrettyTable
 alembic
 renderspec
