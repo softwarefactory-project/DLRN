@@ -20,6 +20,16 @@ function test_setvr(){
     return 0
 }
 
+# STRING_TO_TEST EXPECTED_PKG_NAME
+function test_rdopkg_findpkg(){
+    PKG_NAME=$(rdopkg findpkg $1 | grep ^name: | awk '{print $2}')
+    if [ $2 != $PKG_NAME ]; then
+        echo "$0 FAILED EXPECTED: $@ (GOT: $PKG_NAME)"
+        return 1
+    fi
+    return 0
+}
+
 # Test a good representation of known use cases
 test_setvr 1.0.0-d7f1b849          1.0.0-d7f1b849          1.0.0      0.20150102034455.shortsha
 test_setvr 0.10.1.11.ga5f0e3c      0.10.1.11.ga5f0e3c      0.10.1.11  0.20150102034455.shortsha
@@ -42,3 +52,11 @@ test_setvr 2015.1.9-13-g53b605d    2015.1.9-13-g53b605d    2015.1.9   0.20150102
 # This one tests a special case for python-alembic
 TARBALL=alembic-0.0.9.dev0.tar.gz \
 test_setvr 0.0.9                   0.0.9.dev0              0.0.9      0.20150102034455.shortsha
+
+# rdopkg findpkg tests
+test_rdopkg_findpkg glance                          openstack-glance
+test_rdopkg_findpkg puppet-glance                   puppet-glance
+test_rdopkg_findpkg puppet/puppet-glance            puppet-glance
+test_rdopkg_findpkg glanceclient                    python-glanceclient
+test_rdopkg_findpkg openstack/glanceclient-distgit  python-glanceclient
+test_rdopkg_findpkg python-glanceclient             python-glanceclient
