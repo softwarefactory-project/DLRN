@@ -36,7 +36,7 @@ else
 fi
 
 # Map to rdoinfo
-PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD /tmp/rdoinfo)
+PROJECT_TO_BUILD_MAPPED=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^name | awk '{print $2}')
 PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
 
 # Prepare config
