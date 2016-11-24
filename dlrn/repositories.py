@@ -71,7 +71,7 @@ def refreshrepo(url, path, branch="master", local=False):
         try:
             git.checkout('-f', branch)
         except sh.ErrorReturnCode_1:
-            if "master" in branch:
+            if branch in ["master", "rpm-master"]:
                 # Do not try fallback if already on master branch
                 raise
             else:
