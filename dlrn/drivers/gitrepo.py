@@ -22,6 +22,7 @@
 
 import logging
 import os
+import re
 import sh
 
 from dlrn.db import Commit
@@ -33,6 +34,8 @@ from pymod2pkg import module2upstream
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-gitrepo-driver")
 logger.setLevel(logging.INFO)
+
+version_match = re.compile('\W*set upstream_version\D+([\w.]+).*')
 
 
 class GitRepoDriver(PkgInfoDriver):
@@ -85,9 +88,16 @@ class GitRepoDriver(PkgInfoDriver):
                             with open(os.path.join(pkgdir, pkgfile)) as fp:
                                 j2content = fp.readlines()
                             for line in j2content:
+                                # Check if template defines upstream_version
+                                m = version_match.match(line)
+                                if m is not None:
+                                    version = m.group(1)
+                                    break
+                                # Otherwise, we're using a direct version
                                 if line.startswith('Version:'):
                                     version = line.split(':')[1].strip().\
                                         replace('~', '')
+                                    break
 
                     if version is not None:
                         pkg_hash['source-branch'] = version
