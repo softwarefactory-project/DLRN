@@ -70,6 +70,12 @@ needed, to break dependency loops between packages. For example:
     BuildRequires: package-with-circular-dependency
     %endif
 
+Be sure to put your user in the mock group.
+
+.. code-block:: shell-session
+
+    # usermod -a -G mock <user>
+
 Running
 -------
 
