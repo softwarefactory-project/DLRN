@@ -62,6 +62,7 @@ default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'pkginfo_driver': 'dlrn.drivers.rdoinfo.RdoInfoDriver',
                    'workers': '1',
                    'gerrit_topic': 'rdo-FTBFS',
+                   'database_connection': 'sqlite:///commits.sqlite'
                    }
 
 
@@ -139,8 +140,8 @@ def main():
     if options.order is True:
         options.sequential = True
 
-    session = getSession('sqlite:///commits.sqlite')
     config_options = ConfigOptions(cp)
+    session = getSession(config_options.database_connection)
     pkginfo_driver = config_options.pkginfo_driver
     global pkginfo
     pkginfo = import_object(pkginfo_driver, cfg_options=config_options)
@@ -373,7 +374,7 @@ def main():
             commit.status = 'RETRY'
             session.add(commit)
             session.commit()
-    genreports(packages, options.head_only)
+    genreports(packages, options.head_only, session)
     return exit_code
 
 
@@ -489,7 +490,7 @@ def process_build_result(status, packages, session, dev_mode=False,
         session.add(commit)
     if dev_mode is False:
         session.commit()
-    genreports(packages, head_only)
+    genreports(packages, head_only, session)
     # TODO(jpena): could we launch this asynchronously?
     sync_repo(commit)
     return exit_code
