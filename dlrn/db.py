@@ -21,6 +21,7 @@ from sqlalchemy import desc
 from sqlalchemy import Integer
 from sqlalchemy import or_
 from sqlalchemy import String
+from sqlalchemy import Text
 
 
 Base = sqlalchemy.ext.declarative.declarative_base()
@@ -34,15 +35,15 @@ class Commit(Base):
     dt_commit = Column(Integer)
     dt_distro = Column(Integer)
     dt_build = Column(Integer)
-    project_name = Column(String)
-    repo_dir = Column(String)
-    distgit_dir = Column(String)
-    commit_hash = Column(String)
-    distro_hash = Column(String)
-    commit_branch = Column(String)
-    status = Column(String)
-    rpms = Column(String)
-    notes = Column(String)
+    project_name = Column(String(256))
+    repo_dir = Column(String(1024))
+    distgit_dir = Column(String(1024))
+    commit_hash = Column(String(64))
+    distro_hash = Column(String(64))
+    commit_branch = Column(String(256))
+    status = Column(String(64))
+    rpms = Column(Text)
+    notes = Column(Text)
     flags = Column(Integer, default=0)
 
     def __cmp__(self, b):
@@ -60,7 +61,7 @@ class Project(Base):
     __tablename__ = "projects"
 
     id = Column(Integer, primary_key=True)
-    project_name = Column(String)
+    project_name = Column(String(256))
     last_email = Column(Integer)
 
     # Returns True if the last email sent for this project

@@ -83,7 +83,7 @@ def purge():
         if ans.lower() != "y":
             return
 
-    session = getSession('sqlite:///commits.sqlite')
+    session = getSession(cp.get('DEFAULT', 'database_connection'))
 
     # To remove builds we have to start at a point in time and move backwards
     # builds with no build date are also purged as these are legacy
