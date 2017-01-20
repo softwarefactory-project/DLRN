@@ -91,6 +91,12 @@ class RpmSpecFile(object):
     def build_requires(self):
         return self._build_requires
 
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def __eq__(self, other):
+        return self.name == other.name
+
 
 class RpmSpecCollection(object):
     def __init__(self, initial_list=None, debug=False):
