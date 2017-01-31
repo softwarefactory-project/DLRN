@@ -74,13 +74,10 @@ def deprecation():
 
 def main():
     parser = argparse.ArgumentParser()
-    # Some of the non-positional arguments are required, so change the text
-    # saying "optional arguments" to just "arguments":
-    parser._optionals.title = 'arguments'
 
     parser.add_argument('--config-file',
-                        help="Config file (required).",
-                        required=True)
+                        default='projects.ini',
+                        help="Config file. Default: projects.ini")
     parser.add_argument('--info-repo',
                         help="use a local rdoinfo repo instead of "
                              "fetching the default one using rdopkg. Only"

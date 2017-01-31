@@ -7,15 +7,15 @@ Parameters
 
 .. code-block:: console
 
-    usage: dlrn [-h] --config-file CONFIG_FILE [--info-repo INFO_REPO]
+    usage: dlrn [-h] [--config-file CONFIG_FILE] [--info-repo INFO_REPO]
                 [--build-env BUILD_ENV] [--local] [--head-only]
                 [--package-name PACKAGE_NAME] [--dev] [--log-commands]
                 [--use-public] [--order] [--sequential] [--status]
                 [--recheck] [--version] [--run RUN] [--stop]
-    arguments:
+    optional arguments:
       -h, --help            show this help message and exit
       --config-file CONFIG_FILE
-                            Config file (required)
+                            Config file. Default: projects.ini
       --info-repo INFO_REPO
                             use a local rdoinfo repo instead of fetching the
                             default one using rdopkg.
@@ -56,7 +56,7 @@ timestamps of the commits.
 
 .. code-block:: shell-session
 
-    $ dlrn --config-file projects.ini --order
+    $ dlrn --order
 
 
 Run DLRN
@@ -66,7 +66,7 @@ Run DLRN for the package you are trying to build.
 
 .. code-block:: shell-session
 
-    $ dlrn --config-file projects.ini --local --package-name openstack-cinder
+    $ dlrn --local --package-name openstack-cinder
 
 This will clone the packaging for the project you’re interested in into ``data/openstack-cinder_repo``,
 you can now change this packaging and rerun the DLRN command in test your changes.

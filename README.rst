@@ -58,7 +58,7 @@ your repository.
 
 .. code-block:: shell-session
 
-    $ dlrn --config-file projects.ini --order
+    $ dlrn --order
 
 When using this special option, a special variable ``repo_bootstrap``
 is defined in the specs, with a value of 1. You can use this variable if
@@ -78,7 +78,7 @@ the packages in the order of the timestamps of the commits.
 
 .. code-block:: shell-session
 
-    $ dlrn --config-file projects.ini
+    $ dlrn
 
 Troubleshooting
 ---------------
