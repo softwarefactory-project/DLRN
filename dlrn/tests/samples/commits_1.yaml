@@ -1,3 +1,6 @@
+projects:
+- project_name: 'python-pysaml2'
+  last_email: 0
 commits:
 - commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc
   distro_hash: c31d1b18eb5ab5aed6721fc4fad06c9bd242490c

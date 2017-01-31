@@ -45,8 +45,14 @@ class Commit(Base):
     notes = Column(String)
     flags = Column(Integer, default=0)
 
-    def __cmp__(self, b):
-        return cmp(self.dt_commit, b.dt_commit)
+    def __gt__(self, b):
+        return self.dt_commit > b.dt_commit
+
+    def __lt__(self, b):
+        return self.dt_commit < b.dt_commit
+
+    def __eq__(self, b):
+        return self.dt_commit == b.dt_commit
 
     def getshardedcommitdir(self):
         distro_hash_suffix = ""

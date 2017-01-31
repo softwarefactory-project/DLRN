@@ -64,6 +64,24 @@ class TestGetLastProcessedCommit(TestsWithData):
         self.assertEqual(commit, None)
 
 
+class TestGetLastBuiltCommit(TestsWithData):
+    def test_noretry(self):
+        commit = \
+            db.getLastBuiltCommit(self.session, 'python-pysaml2', None)
+        self.assertEqual(commit.dt_build, 1444139517)
+
+    def test_withretry(self):
+        # In our sample data the most recent of these has status == RETRY
+        commit = \
+            db.getLastBuiltCommit(self.session, 'python-tripleoclient', None)
+        self.assertEqual(commit.dt_build, 1444033941)
+
+    def test_newproject(self):
+        commit = \
+            db.getLastBuiltCommit(self.session, 'python-newproject', None)
+        self.assertEqual(commit, None)
+
+
 class TestGetCommits(TestsWithData):
     def test_defaults(self):
         commits = db.getCommits(self.session)
@@ -105,3 +123,25 @@ class TestGetCommits(TestsWithData):
                                 since="1442487440")
         self.assertEqual(commits.count(), 1)
         self.assertEqual(commits.first().id, 6230)
+
+
+class TestCommit(TestsWithData):
+    def test_commit_compare(self):
+        commits = db.getCommits(self.session, project="python-tripleoclient")
+        self.assertGreater(commits[0], commits[1])
+        self.assertLess(commits[1], commits[0])
+        self.assertEqual(commits[0], commits[-1])
+
+    def test_commit_getshardedcommitdir(self):
+        commit = db.getLastProcessedCommit(self.session, 'python-pysaml2')
+        self.assertIn(commit.commit_hash, commit.getshardedcommitdir())
+        commit.distro_hash = None
+        self.assertIn(commit.commit_hash, commit.getshardedcommitdir())
+
+
+class TestProject(TestsWithData):
+    def test_email(self):
+        project = self.session.query(db.Project).first()
+        self.assertFalse(project.suppress_email())
+        project.sent_email()
+        self.assertTrue(project.suppress_email())
