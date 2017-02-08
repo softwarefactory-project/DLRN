@@ -21,7 +21,8 @@ Parameters
                             default one using rdopkg.
       --build-env BUILD_ENV
                             Variables for the build environment.
-      --local               Use local git repos if possible
+      --local               Use local git repos if possible. Only commited changes
+                            in the local repo will be used in the build.
       --head-only           Build from the most recent Git commit only.
       --package-name PACKAGE_NAME
                             Build a specific package name only. Use multiple times
