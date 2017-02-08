@@ -97,22 +97,25 @@ class RdoInfoDriver(PkgInfoDriver):
             repo_dir = os.path.join(datadir, project)
             if len(repos) > 1:
                 repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
-            source_branch, _, _ = refreshrepo(repo, repo_dir, source_branch,
-                                              local=local)
+            try:
+                source_branch, _, _ = refreshrepo(repo, repo_dir, source_branch,
+                                                  local=local)
 
-            git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
-            # Git gives us commits already sorted in the right order
-            lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
-                            "--reverse")
+                git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
+                # Git gives us commits already sorted in the right order
+                lines = git.log("--pretty=format:'%ct %H'", since, "--first-parent",
+                                "--reverse")
 
-            for line in lines:
-                dt, commit_hash = str(line).strip().strip("'").split(" ")
-                commit = Commit(dt_commit=float(dt), project_name=project,
-                                commit_hash=commit_hash, repo_dir=repo_dir,
-                                distro_hash=distro_hash, dt_distro=dt_distro,
-                                distgit_dir=distro_dir,
-                                commit_branch=source_branch)
-                project_toprocess.append(commit)
+                for line in lines:
+                    dt, commit_hash = str(line).strip().strip("'").split(" ")
+                    commit = Commit(dt_commit=float(dt), project_name=project,
+                                    commit_hash=commit_hash, repo_dir=repo_dir,
+                                    distro_hash=distro_hash, dt_distro=dt_distro,
+                                    distgit_dir=distro_dir,
+                                    commit_branch=source_branch)
+                    project_toprocess.append(commit)
+            except Exception:
+                continue
 
         return project_toprocess
 
