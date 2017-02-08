@@ -27,7 +27,12 @@ def refreshrepo(url, path, branch="master", local=False):
     logger.info("Getting %s to %s (%s)" % (url, path, branch))
     checkout_not_present = not os.path.exists(path)
     if checkout_not_present is True:
-        sh.git.clone(url, path)
+        try:
+            sh.git.clone(url, path)
+        except Exception as e:
+            logger.error("Error cloning %s into %s: %s" % (url, path, e))
+            raise
+
     elif local is False:
         # We need to cover a corner case here, where the repo URL has changed
         # since the last execution
@@ -47,8 +52,13 @@ def refreshrepo(url, path, branch="master", local=False):
                 logger.warning("URL for %s changed from %s to %s, "
                                "cleaning directory and cloning again"
                                % (path, fetch_url, url))
-                shutil.rmtree(path)
-                sh.git.clone(url, path)
+                shutil.rmtree(path, ignore_errors=True)
+                try:
+                    sh.git.clone(url, path)
+                except Exception as e:
+                    logger.error("Error cloning %s into %s: %s" % (url, path,
+                                                                   e))
+                    raise
         except Exception:
             # Something failed here, maybe this is a failed repo clone
             # Let's warn, remove directory and clone again
