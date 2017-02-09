@@ -25,7 +25,6 @@ import jinja2
 from dlrn.config import getConfigOptions
 from dlrn.db import Commit
 from dlrn.db import getCommits
-from dlrn.db import getSession
 
 
 def get_commit_url(commit, pkg):
@@ -60,9 +59,7 @@ def _jinja2_filter_get_commit_url(commit, packages):
     return "???"
 
 
-def genreports(packages, head_only):
-    global session
-    session = getSession('sqlite:///commits.sqlite')
+def genreports(packages, head_only, session):
     config_options = getConfigOptions()
 
     # Generate report of the last 300 package builds

@@ -66,6 +66,7 @@ The configuration file looks like this:
     rsyncport=22
     workers=1
     gerrit_topic=rdo-FTBFS
+    database_connection=sqlite:///commits.sqlite
 
 
 * ``datadir`` is the directory where the packages and repositories will be
@@ -125,6 +126,10 @@ The configuration file looks like this:
 * ``workers`` is the number of parallel build processes to launch. When using
   multiple workers, the mock build part will be handled by a pool of processes,
   while the repo creation and synchronization will still be sequential.
+
+* The ``database_connection`` string defines a database connection string. By
+  default, a local SQLite3 database is used, but it is also possible to set up
+  an external database.
 
 * ``pkginfo_driver`` defines the driver to be used to manage the distgit
   repositories. There are currently two drivers:
@@ -186,10 +191,42 @@ data directories, or just make a symbolic link:
     $ sudo ln -s <datadir>/repos .
 
 
+Database support
+----------------
+
+DLRN supports different database engines through SQLAlchemy. SQLite3 and MariaDB have
+been tested so far. You can set the ``database_connection`` parameter in projects.ini
+with the required string, using `the SQLAlchemy syntax
+ <http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls>`_. 
+
+For MariaDB, use a mysql+pymysql driver, with the following string:
+
+.. code-block:: ini
+
+    database_connection=mysql+pymysql://user:password@serverIP/dlrn
+
+That requires you to pre-create the ``dlrn``database. You can use the following commands
+on a mysql session to create the database and grant the required permissions:
+
+.. code-block:: mysql
+
+    use mysql;
+    create database dlrn;
+    grant all on dlrn.* to 'user'@'%' identified by 'password';
+    flush privileges
+
+If your MariaDB database is placed on a publicly accessible server, you will also
+want to secure it before:
+
+.. code-block:: bash
+
+    $ sudo mysql_secure_installation
+
+
 Database migration
 ++++++++++++++++++
 
-during DLRN upgrades, you may need to upgrade the database schemas,
+During DLRN upgrades, you may need to upgrade the database schemas,
 in order to keep your old history.
 To migrate database to the latest revision, you need the alembic command-line
 and to run the ``alembic upgrade head`` command.
@@ -200,3 +237,14 @@ and to run the ``alembic upgrade head`` command.
     $ alembic upgrade head
 
 If the database doesn't exist, ``alembic upgrade head`` will create it from scratch.
+
+If you are using a MariaDB database, the initial schema will not be valid. You should
+start by running DLRN a first time, so it creates the basic schema, then run the
+following command to stamp the database to the first version of the schema that
+supported MariaDB:
+
+.. code-block:: bash
+    
+    $ alembic stamp head
+
+After that initial command, you will be able to run future migrations.
