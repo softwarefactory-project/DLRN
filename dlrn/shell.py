@@ -87,7 +87,9 @@ def main():
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
     parser.add_argument('--local', action="store_true",
-                        help="Use local git repos if possible.")
+                        help="Use local git repos if possible. Only commited"
+                             " changes in the local repo will be used in the"
+                             " build.")
     parser.add_argument('--head-only', action="store_true",
                         help="Build from the most recent Git commit only.")
     group = parser.add_mutually_exclusive_group()
