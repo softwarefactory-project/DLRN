@@ -17,7 +17,8 @@ import multiprocessing
 import os
 import sh
 import shutil
-import urllib2
+
+from six.moves.urllib.request import urlopen
 
 from dlrn.config import getConfigOptions
 from pbr.version import SemanticVersion
@@ -147,8 +148,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
         contents = fp.readlines()
     contents = contents[:-1]
 
-    r = urllib2.urlopen(baseurl + "/delorean-deps.repo")
-    contents = contents + r.readlines()
+    r = urlopen(baseurl + "/delorean-deps.repo")
+    contents.extend(map(lambda x: x.decode('utf8'), r.readlines()))
     contents = contents + ["\n\"\"\""]
     with open(newcfg, "w") as fp:
         fp.writelines(contents)
@@ -160,7 +161,7 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
         # delete the last line which must be """
         contents = contents[:-1]
 
-        r = urllib2.urlopen(baseurl + "/current/delorean.repo")
+        r = urlopen(baseurl + "/current/delorean.repo")
         contents = contents + r.readlines()
         contents = contents + ["\n\"\"\""]
         with open(newcfg, "w") as fp:

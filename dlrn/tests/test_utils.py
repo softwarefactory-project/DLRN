@@ -14,7 +14,11 @@
 from mock import call
 from mock import MagicMock
 
+import os
+import tempfile
+
 from dlrn import db
+from dlrn.tests import base
 from dlrn.tests.test_db import TestsWithData
 from dlrn import utils
 
@@ -49,3 +53,27 @@ class Testdumpshas2file(TestsWithData):
                        ',SUCCESS,2,file2-1.2-3.el7\n')
         ]
         self.assertEqual(mock_fp.mock_calls, expected)
+
+
+class TestIsKnownError(base.TestCase):
+    def setUp(self):
+        super(TestIsKnownError, self).setUp()
+        self.logfile = tempfile.mkstemp()[1]
+
+    def tearDown(self):
+        super(TestIsKnownError, self).tearDown()
+        os.unlink(self.logfile)
+
+    def test_isknownerror(self):
+        self.assertFalse(utils.isknownerror("/unkownfile"),
+                         msg="isknownerror didn't succeed on unknown file")
+
+        with open(self.logfile, "w") as fp:
+            fp.write("Error: Nothing to do")
+        self.assertTrue(utils.isknownerror(self.logfile),
+                        msg="isknownerror didn't find an error")
+
+        with open(self.logfile, "w") as fp:
+            fp.write("Success")
+        self.assertFalse(utils.isknownerror(self.logfile),
+                         msg="isknownerror found unknown error")

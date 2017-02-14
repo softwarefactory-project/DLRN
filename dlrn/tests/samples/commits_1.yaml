@@ -276,5 +276,6 @@ commits:
   notes: "\n\n  RAN: '/bin/docker run -t --volume=/home/centos-master/data:/data --volume=/home/centos-master/de"
   project_name: python-tripleoclient
   repo_dir: /home/centos-master/data/python-tripleoclient
+  distgit_dir: /home/centos-master/data/python-tripleoclient-distgit
   rpms: None
   status: RETRY

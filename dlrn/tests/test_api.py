@@ -36,6 +36,8 @@ class DLRNAPITestCase(base.TestCase):
         app.config['REPO_PATH'] = '/tmp'
         self.app = app.test_client()
         self.app.testing = True
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:bar').decode('ascii'))}
 
     def tearDown(self):
         os.close(self.db_fd)
@@ -183,13 +185,11 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
     def test_post_last_tested_repo_missing_params(self, db2_mock, db_mock,
                                                   dt_mock):
         req_data = json.dumps(dict(max_age='0'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
         dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
 
         response = self.app.post('/api/last_tested_repo',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
@@ -197,13 +197,11 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
                                                  dt_mock):
         req_data = json.dumps(dict(max_age='0',
                                    reporting_job_id='foo-ci'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
         dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
 
         response = self.app.post('/api/last_tested_repo',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 201)
@@ -221,12 +219,10 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
                                    reporting_job_id='foo-ci',
                                    sequential_mode='true',
                                    previous_job_id='current-passed-ci'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
         dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
         response = self.app.post('/api/last_tested_repo',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 201)
@@ -245,12 +241,10 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
                                    job_id='foo-ci',
                                    reporting_job_id='foo-ci',
                                    sequential_mode='true'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
         dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
         response = self.app.post('/api/last_tested_repo',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
@@ -261,12 +255,10 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
                                    reporting_job_id='foo-ci',
                                    sequential_mode='true',
                                    previous_job_id='bar-ci'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
         dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
         response = self.app.post('/api/last_tested_repo',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 404)
 
@@ -280,12 +272,10 @@ class TestReportResult(DLRNAPITestCase):
 
     def test_report_result_missing_params(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='0'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
 
         response = self.app.post('/api/report_result',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
@@ -294,12 +284,10 @@ class TestReportResult(DLRNAPITestCase):
                                    timestamp='1941635095', success='true',
                                    distro_hash='8170b8686c38bafb6021d998e2fb26'
                                                '8ab26ccf65'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
 
         response = self.app.post('/api/report_result',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 404)
 
@@ -310,12 +298,10 @@ class TestReportResult(DLRNAPITestCase):
                                    timestamp='1941635095', success='true',
                                    distro_hash='8170b8686c38bafb6021'
                                                'd998e2fb268ab26ccf65'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
 
         response = self.app.post('/api/report_result',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 201)
@@ -333,11 +319,9 @@ class TestPromote(DLRNAPITestCase):
     def test_promote_missing_commit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='abc123', distro_hash='abc123',
                                    promote_name='foo'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
         response = self.app.post('/api/promote',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
 
         self.assertEqual(response.status_code, 404)
@@ -349,11 +333,9 @@ class TestPromote(DLRNAPITestCase):
                                    distro_hash='8170b8686c38bafb6021'
                                                'd998e2fb268ab26ccf65',
                                    promote_name='foo-ci'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
         response = self.app.post('/api/promote',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
 
         expected = [mock.call('/tmp/1c/67/1c67b1ab8c6fe273d4e175a'
@@ -368,11 +350,9 @@ class TestPromote(DLRNAPITestCase):
                                    distro_hash='8170b8686c38bafb6021'
                                                'd998e2fb268ab26ccf65',
                                    promote_name='consistent'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
         response = self.app.post('/api/promote',
                                  data=req_data,
-                                 headers=header,
+                                 headers=self.headers,
                                  content_type='application/json')
 
         self.assertEqual(response.status_code, 403)
