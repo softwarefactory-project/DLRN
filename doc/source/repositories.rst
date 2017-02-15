@@ -60,9 +60,16 @@ DLRN repository: current
 On a successful build, DLRN will generate a new repository with the latest
 version of every package that successfully built.
 
-This new repository will be tagged as ``current``.
+This new repository will be tagged as ``current``. A ``current`` repo contains
+the last successfully built package from every project.
 
-A DLRN current repository might not contain all the latest upstream commits
+A DLRN current repository might not contain all the latest upstream commits,
+if any of them failed to build the package. For example, if we had 100
+packages, 99 of them have been successfully built but ``openstack-nova``
+failed, the ``current`` repository would contain the latest commits from 99
+projects, and the last commit that could be built for openstack-nova, which
+is at least 1 commit behind the current master.
+
 if there are any ongoing build failures that are unresolved.
 
 This repository is available at ``/current/delorean.repo`` for each release.
@@ -78,7 +85,10 @@ DLRN ``consistent`` repositories are generated for any given set of
 packages that have no current build failures.
 
 These repositories have the latest and greatest of every package and all
-upstream commits have been successfully built up until that point.
+upstream commits have been successfully built up until that point. In the
+above example, if 99 packages are successfully built but ``openstack-nova``
+fails to build, the ``consistent`` repository will not be updated until it is
+fixed.
 
 The continuous integration done to test RDO packages target the DLRN
 consistent repositories.
