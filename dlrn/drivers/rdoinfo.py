@@ -97,8 +97,15 @@ class RdoInfoDriver(PkgInfoDriver):
             repo_dir = os.path.join(datadir, project)
             if len(repos) > 1:
                 repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
-            source_branch, _, _ = refreshrepo(repo, repo_dir, source_branch,
-                                              local=local)
+            try:
+                source_branch, _, _ = refreshrepo(repo, repo_dir, source_branch,
+                                                  local=local)
+            except Exception:
+                # The error was already logged by refreshrepo, and the only
+                # side-effect is that we are not adding this commit to the
+                # list of commits to be processed, so we can ignore it and
+                # move on to the next repo
+                continue
 
             git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
             # Git gives us commits already sorted in the right order
