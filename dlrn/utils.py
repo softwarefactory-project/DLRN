@@ -18,6 +18,7 @@ import sqlalchemy
 
 from dlrn.db import Commit
 from dlrn.db import getSession
+from dlrn.db import Project
 
 re_known_errors = re.compile('Error: Nothing to do|'
                              'Error downloading packages|'
@@ -52,6 +53,9 @@ def loadYAML(session, yamlfile):
     for commit in data['commits']:
         c = Commit(**commit)
         session.add(c)
+    for project in data['projects']:
+        p = Project(**project)
+        session.add(p)
     session.commit()
 
 
