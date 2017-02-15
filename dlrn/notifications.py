@@ -59,7 +59,7 @@ def submit_review(commit, env_vars):
                     project_name, os.path.join(datadir, yumrepodir),
                     datadir, config_options.baseurl,
                     os.path.realpath(commit.distgit_dir)])
-    sh.env(run_cmd)
+    sh.env(run_cmd, _timeout=300)
 
 
 def sendnotifymail(packages, commit):
