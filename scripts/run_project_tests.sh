@@ -31,7 +31,7 @@ else
 fi
 
 # Map to rdoinfo
-PROJECT_TO_BUILD_MAPPED=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo awk '/^name:/ {print $2}')
+PROJECT_TO_BUILD_MAPPED=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | awk '/^name:/ {print $2}')
 PROJECT_IN_RDOINFO=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | awk '/^project:/ {print $2}')
 if [[ "$PROJECT_IN_RDOINFO" =~ puppet- ]]; then
     PROJECT_DISTRO="puppet/$PROJECT_IN_RDOINFO-distgit"
