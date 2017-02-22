@@ -13,7 +13,7 @@
 """Add tables required by DLRN API
 
 Revision ID: 638f980c9169
-Revises: 1268c799620f
+Revises: f38ba3389b85
 Create Date: 2016-11-22 12:43:21.363066
 
 """
@@ -24,7 +24,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '638f980c9169'
-down_revision = '1268c799620f'
+down_revision = 'f38ba3389b85'
 branch_labels = None
 depends_on = None
 
