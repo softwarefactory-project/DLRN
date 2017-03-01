@@ -55,22 +55,26 @@ def loadYAML(session, yamlfile):
     for commit in data['commits']:
         c = Commit(**commit)
         session.add(c)
+        session.commit()
     try:
         for project in data['projects']:
             p = Project(**project)
             session.add(p)
+            session.commit()
     except KeyError:
         pass   # No projects in yaml, just ignore
     try:
         for civote in data['civotes']:
             vote = CIVote(**civote)
             session.add(vote)
+            session.commit()
     except KeyError:
         pass   # No civotes in yaml, just ignore
     try:
         for user in data['users']:
             my_user = User(**user)
             session.add(my_user)
+            session.commit()
     except KeyError:
         pass   # No users in yaml, just ignore
 
@@ -93,9 +97,45 @@ def saveYAML(session, yamlfile):
         for a in attrs:
             d[a] = str(getattr(commit, a))
         data['commits'].append(d)
-    fp = open(yamlfile, "w")
-    fp.write(yaml.dump(data, default_flow_style=False))
-    fp.close()
+
+    attrs = []
+    for a in dir(Project):
+        if type(getattr(Project, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['projects'] = []
+    for project in session.query(Project).all():
+        d = {}
+        for a in attrs:
+            d[a] = str(getattr(project, a))
+        data['projects'].append(d)
+
+    attrs = []
+    for a in dir(CIVote):
+        if type(getattr(CIVote, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['civotes'] = []
+    for vote in session.query(CIVote).all():
+        d = {}
+        for a in attrs:
+            d[a] = str(getattr(vote, a))
+        data['civotes'].append(d)
+
+    attrs = []
+    for a in dir(User):
+        if type(getattr(User, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['users'] = []
+    for user in session.query(User).all():
+        d = {}
+        for a in attrs:
+            d[a] = str(getattr(user, a))
+        data['users'].append(d)
+
+    with open(yamlfile, 'w') as fp:
+        fp.write(yaml.dump(data, default_flow_style=False))
 
 
 def dumpshas2file(shafile, commit, source_repo, distgit_repo,
