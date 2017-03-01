@@ -93,9 +93,45 @@ def saveYAML(session, yamlfile):
         for a in attrs:
             d[a] = str(getattr(commit, a))
         data['commits'].append(d)
-    fp = open(yamlfile, "w")
-    fp.write(yaml.dump(data, default_flow_style=False))
-    fp.close()
+
+    attrs = []
+    for a in dir(Project):
+        if type(getattr(Project, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['projects'] = []
+    for project in session.query(Project).all():
+        d = {}
+        for a in attrs:
+            d[a] = str(getattr(project, a))
+        data['projects'].append(d)
+
+    attrs = []
+    for a in dir(CIVote):
+        if type(getattr(CIVote, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['civotes'] = []
+    for vote in session.query(CIVote).all():
+        d = {}
+        for a in attrs:
+            d[a] = str(getattr(vote, a))
+        data['civotes'].append(d)
+
+    attrs = []
+    for a in dir(User):
+        if type(getattr(User, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['users'] = []
+    for user in session.query(User).all():
+        d = {}
+        for a in attrs:
+            d[a] = str(getattr(user, a))
+        data['users'].append(d)
+
+    with open(yamlfile, 'w') as fp:
+        fp.write(yaml.dump(data, default_flow_style=False))
 
 
 def dumpshas2file(shafile, commit, source_repo, distgit_repo,
