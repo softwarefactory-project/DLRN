@@ -94,6 +94,8 @@ else
         fi
     elif [ -r Modulefile ]; then
         TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@;s@\.git$@@')
+    elif [ -r Kconfig -a -r Kbuild ]; then
+        TARNAME=linux
     else
         TARNAME=${PROJECT_NAME}
     fi
@@ -115,7 +117,7 @@ SOURCEWITHREL=$(basename $SOURCE $SOURCEEXT)-$RELEASE$SOURCEEXT
 mv $SOURCEPATH ${TOP_DIR}/SOURCES/$SOURCEWITHREL
 
 cd ${DISTGIT_DIR}
-cp * ${TOP_DIR}/SOURCES/
+cp -a * ${TOP_DIR}/SOURCES/
 cp *.spec ${TOP_DIR}/SPECS/
 cd ${TOP_DIR}/SPECS/
 
