@@ -67,8 +67,9 @@ else
         post_version=$(git describe --tags|sed 's/^[vV]//' || :)
         current_tag=$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)
         if [ "$post_version" != "$current_tag" ]; then
-            # We have a potential post-version. Only applies if version == current_tag
-            if [ "$version" = "$current_tag" ]; then
+            # We have a potential post-version. Only applies if
+            # version == current_tag without -rc inside
+            if [[ "$version" = "$current_tag" && ! "$version" =~ "-rc" ]]; then
                 # Now increase the .Z release
                 version=$(echo $version | awk -F. '{ for (i=1;i<NF;i++) printf $i"."; print $NF+1 }')
             fi
@@ -94,6 +95,8 @@ else
         fi
     elif [ -r Modulefile ]; then
         TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@;s@\.git$@@')
+    elif [ -r Kconfig -a -r Kbuild ]; then
+        TARNAME=linux
     else
         TARNAME=${PROJECT_NAME}
     fi
@@ -115,7 +118,7 @@ SOURCEWITHREL=$(basename $SOURCE $SOURCEEXT)-$RELEASE$SOURCEEXT
 mv $SOURCEPATH ${TOP_DIR}/SOURCES/$SOURCEWITHREL
 
 cd ${DISTGIT_DIR}
-cp * ${TOP_DIR}/SOURCES/
+cp -a * ${TOP_DIR}/SOURCES/
 cp *.spec ${TOP_DIR}/SPECS/
 cd ${TOP_DIR}/SPECS/
 
