@@ -205,23 +205,42 @@ For MariaDB, use a mysql+pymysql driver, with the following string:
 
     database_connection=mysql+pymysql://user:password@serverIP/dlrn
 
-That requires you to pre-create the ``dlrn``database. You can use the following commands
-on a mysql session to create the database and grant the required permissions:
+That requires you to pre-create the ``dlrn``database. 
 
-.. code-block:: mysql
-
-    use mysql;
-    create database dlrn;
-    grant all on dlrn.* to 'user'@'%' identified by 'password';
-    flush privileges
-
-If your MariaDB database is placed on a publicly accessible server, you will also
-want to secure it before:
+If your MariaDB database is placed on a publicly accessible server, you will want to
+secure it as a first steo:
 
 .. code-block:: bash
 
     $ sudo mysql_secure_installation
 
+You can use the following commands to create the database and grant the required permissions:
+
+.. code-block:: mysql
+
+    use mysql
+    create database dlrn;
+    grant all on dlrn.* to 'user'@'%' identified by 'password';
+    flush privileges;
+
+You may also want to enable TLS support in your connections. In this case, follow the
+steps detailed in the `MariaDB documentation
+ <https://mariadb.com/kb/en/mariadb/secure-connections-overview/>`_ to enable SSL
+support on your server. Generate the client key and certificates, and then set up
+your database connection string as follows:
+
+.. code-block:: ini
+
+    database_connection=mysql+pymysql://user:password@serverIP/dlrn?ssl_cert=/dir/client-cert.pem&ssl_key=/dir/client-key.pem
+
+You can also force the MySQL user to connect using SSL if you create it as follows:
+
+.. code-block:: mysql
+
+    use mysql
+    create database dlrn;
+    grant all on dlrn.* to 'user'@'%' identified by 'password' REQUIRE SSL;
+    flush privileges;
 
 Database migration
 ++++++++++++++++++
