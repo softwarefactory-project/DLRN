@@ -139,7 +139,7 @@ The configuration file looks like this:
     distgit repo location and information.
   * ``dlrn.drivers.gitrepo.GitRepoDriver``, which uses a single Git repository
     with per-distgit directories, following the same schema used by the
-    `RPM Packaging for OpenStack <https://github.com/openstack/rpm-packaging>`_ 
+    `RPM Packaging for OpenStack <https://github.com/openstack/rpm-packaging>`_
     project. This driver requires setting some optional configuration options
     in the ``[gitrepo_driver]`` section
 
@@ -197,7 +197,7 @@ Database support
 DLRN supports different database engines through SQLAlchemy. SQLite3 and MariaDB have
 been tested so far. You can set the ``database_connection`` parameter in projects.ini
 with the required string, using `the SQLAlchemy syntax
- <http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls>`_. 
+ <http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls>`_.
 
 For MariaDB, use a mysql+pymysql driver, with the following string:
 
@@ -205,23 +205,42 @@ For MariaDB, use a mysql+pymysql driver, with the following string:
 
     database_connection=mysql+pymysql://user:password@serverIP/dlrn
 
-That requires you to pre-create the ``dlrn``database. You can use the following commands
-on a mysql session to create the database and grant the required permissions:
+That requires you to pre-create the ``dlrn``database.
 
-.. code-block:: mysql
-
-    use mysql;
-    create database dlrn;
-    grant all on dlrn.* to 'user'@'%' identified by 'password';
-    flush privileges
-
-If your MariaDB database is placed on a publicly accessible server, you will also
-want to secure it before:
+If your MariaDB database is placed on a publicly accessible server, you will want to
+secure it as a first step:
 
 .. code-block:: bash
 
     $ sudo mysql_secure_installation
 
+You can use the following commands to create the database and grant the required permissions:
+
+.. code-block:: mysql
+
+    use mysql
+    create database dlrn;
+    grant all on dlrn.* to 'user'@'%' identified by 'password';
+    flush privileges;
+
+You may also want to enable TLS support in your connections. In this case, follow the
+steps detailed in the `MariaDB documentation
+ <https://mariadb.com/kb/en/mariadb/secure-connections-overview/>`_ to enable TLS
+support on your server. Generate the client key and certificates, and then set up
+your database connection string as follows:
+
+.. code-block:: ini
+
+    database_connection=mysql+pymysql://user:password@serverIP/dlrn?ssl_cert=/dir/client-cert.pem&ssl_key=/dir/client-key.pem
+
+You can also force the MySQL user to connect using TLS if you create it as follows:
+
+.. code-block:: mysql
+
+    use mysql
+    create database dlrn;
+    grant all on dlrn.* to 'user'@'%' identified by 'password' REQUIRE SSL;
+    flush privileges;
 
 Database migration
 ++++++++++++++++++
@@ -244,7 +263,7 @@ following command to stamp the database to the first version of the schema that
 supported MariaDB:
 
 .. code-block:: bash
-    
+
     $ alembic stamp head
 
 After that initial command, you will be able to run future migrations.
