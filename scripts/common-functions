@@ -48,6 +48,10 @@ function cleanup_sdist() {
     if [ -f setup.cfg ]; then
         sed -i 's/pre-hook.build_config = .*//' setup.cfg
     fi
+    # FIXME: PBR 2.0 was pushed to Pike but we do not have Pike tags/repo ready
+    if [ -f setup.py ]; then
+        sed -i 's/pbr>=2.0.0/pbr/' setup.py
+    fi
 }
 
 if [ $# = 5 ]; then
