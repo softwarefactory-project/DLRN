@@ -47,6 +47,7 @@ function cleanup_sdist() {
     # http://git.openstack.org/cgit/openstack/gnocchi/commit/?id=f34777f1a88536ec3c76a3d4c760a75ecf4a3d5c
     if [ -f setup.cfg ]; then
         sed -i 's/pre-hook.build_config = .*//' setup.cfg
+        sed -i '/warning-is-error/d' setup.cfg
     fi
     # FIXME: PBR 2.0 was pushed to Pike but we do not have Pike tags/repo ready
     if [ -f setup.py ]; then
