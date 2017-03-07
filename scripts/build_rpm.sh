@@ -41,7 +41,15 @@ if [ -r setup.py -a ! -r metadata.json ]; then
     setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
                          $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
 else
-    version="$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)"
+    # Puppet OpenStack modules, with PBR support
+    if [ -r setup.py -a -r metadata.json ]; then
+        mkdir ${MOCKDIR}/tmp/pkgsrc
+        cp -pr . ${MOCKDIR}/tmp/pkgsrc
+        version="$(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1)"
+    fi
+    if [ -z "$version" ]; then
+        version="$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)"
+    fi
     # fallback to the version in metadata.json or Modulefile
     if [ -z "$version" ]; then
         if [ -r metadata.json ]; then
@@ -69,7 +77,7 @@ else
     else
         TARNAME=${PROJECT_NAME}
     fi
-    tar zcvf ../$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${TARNAME}-${VERSION}@" --show-transformed-names $PWD
+    tar zcvf ../$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${TARNAME}-${version}@" --show-transformed-names $PWD
     mkdir -p dist
     mv ../$VERSION.tar.gz dist/
 fi
