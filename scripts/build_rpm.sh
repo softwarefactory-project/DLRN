@@ -41,15 +41,29 @@ if [ -r setup.py -a ! -r metadata.json ]; then
     setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
                          $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
 else
-    version="$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)"
-    # fallback to the version in metadata.json or Modulefile
-    if [ -z "$version" ]; then
-        if [ -r metadata.json ]; then
-            version=$(python -c "import json; print json.loads(open('metadata.json').read(-1))['version']")
-        elif [ -r Modulefile ]; then
-            version=$(grep version Modulefile | sed "s@version *'\(.*\)'@\1@")
-        fi
+    # For Puppet modules, check the version in metadata.json (preferred) or Modulefile
+    if [ -r metadata.json ]; then
+        version=$(python -c "import json; print json.loads(open('metadata.json').read(-1))['version']")
+    elif [ -r Modulefile ]; then
+        version=$(grep version Modulefile | sed "s@version *'\(.*\)'@\1@")
     fi
+
+    # We got a version. Check if we need to increase a .Z release due to post-tag commits
+    if [ -n "$version" ]; then
+        post_version=$(git describe --tags|sed 's/^[vV]//' || :)
+        current_tag=$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)
+        if [ "$post_version" != "$current_tag" ]; then
+            # We have a potential post-version. Only applies if version == current_tag
+            if [ "$version" = "$current_tag" ]; then
+                # Now increase the .Z release
+                version=$(echo $version | awk -F. '{ for (i=1;i<NF;i++) printf $i"."; print $NF+1 }')
+            fi
+        fi
+    else
+        # No Puppet metadata, use git tags
+        version="$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)"
+    fi
+
     # fallback to an arbitrary version
     if [ -z "$version" ]; then
         version=0.0.1
@@ -69,7 +83,7 @@ else
     else
         TARNAME=${PROJECT_NAME}
     fi
-    tar zcvf ../$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${TARNAME}-${VERSION}@" --show-transformed-names $PWD
+    tar zcvf ../$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${TARNAME}-${version}@" --show-transformed-names $PWD
     mkdir -p dist
     mv ../$VERSION.tar.gz dist/
 fi
