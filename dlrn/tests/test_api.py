@@ -338,7 +338,7 @@ class TestPromote(DLRNAPITestCase):
                                  headers=self.headers,
                                  content_type='application/json')
 
-        expected = [mock.call('/tmp/1c/67/1c67b1ab8c6fe273d4e175a'
+        expected = [mock.call('1c/67/1c67b1ab8c6fe273d4e175a'
                               '14f0df5d3cbbd0edc_8170b868', '/tmp/foo-ci')]
 
         self.assertEqual(response.status_code, 201)
@@ -384,7 +384,7 @@ class TestRepoStatus(DLRNAPITestCase):
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data['results']), 2)
+        self.assertEqual(len(data), 2)
 
     def test_repo_status_with_success(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='17234e9ab9dfab4cf5600f'
@@ -398,4 +398,4 @@ class TestRepoStatus(DLRNAPITestCase):
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data['results']), 1)
+        self.assertEqual(len(data), 1)

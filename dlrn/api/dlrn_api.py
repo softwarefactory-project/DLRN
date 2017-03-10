@@ -113,16 +113,17 @@ def repo_status():
         votes = votes.filter(CIVote.ci_vote == int(success))
 
     # And format the output
-    data = {}
-    data['results'] = []
+    data = []
     for vote in votes:
         d = {'timestamp': vote.timestamp,
+             'commit_hash': commit_hash,
+             'distro_hash': distro_hash,
              'job_id': vote.ci_name,
              'success': bool(vote.ci_vote),
              'in_progress': vote.ci_in_progress,
              'url': vote.ci_url,
              'notes': vote.notes}
-        data['results'].append(d)
+        data.append(d)
     return jsonify(data)
 
 
@@ -349,8 +350,8 @@ def promote():
                            status_code=404)
 
     target_link = os.path.join(app.config['REPO_PATH'], promote_name)
-    yumrepodir = os.path.join(app.config['REPO_PATH'],
-                              commit.getshardedcommitdir())
+    # We should create a relative symlink
+    yumrepodir = os.path.join(commit.getshardedcommitdir())
     try:
         os.symlink(yumrepodir, target_link)
     except Exception as e:
