@@ -102,7 +102,7 @@ success              boolean     If set to a value, only return the CI reports w
 
 Response:
 
-The JSON output will contain an array named ``results``, where each item contains:
+The JSON output will contain an array where each item contains:
 
 ===================  ==========  ==============================================================
        Parameter       Type                             Description
