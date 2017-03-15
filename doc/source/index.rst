@@ -19,6 +19,7 @@ Contents:
    troubleshooting
    api
    contributing
+   internals
 
 Indices and tables
 ==================
