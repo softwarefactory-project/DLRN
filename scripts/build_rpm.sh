@@ -29,17 +29,36 @@ MOCKOPTS="-v -r ${DATA_DIR}/${MOCK_CONFIG} --resultdir $OUTPUT_DIRECTORY"
 # A simple mock --copyin should be enough, but it does not handle symlinks properly
 MOCKDIR=$(/usr/bin/mock -r ${DATA_DIR}/${MOCK_CONFIG} -p)
 
+function setuptools_version() {
+    # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
+    # so only look at the last line for version
+    SRC_VERSION=$(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1)
+    SHORT_HASH=$(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
+}
+
 # handle python packages (some puppet modules are carrying a setup.py too)
 if [ -r setup.py -a ! -r metadata.json ]; then
     mkdir ${MOCKDIR}/tmp/pkgsrc
     cp -pr . ${MOCKDIR}/tmp/pkgsrc
+    setuptools_version
+    # check if trunk is behind latest git tags for the same major release
+    # e.g. master branch after RC1 branching and before milestone 1
+    major=$(echo $SRC_VERSION|cut -d. -f1)
+    tmpver=$(mktemp)
+    echo $SRC_VERSION > $tmpver
+    git fetch --tags
+    maxver=$(git tag -l ${major}.*|sort -rnt. - $tmpver|head -n1)
+    rm $tmpver
+    if [ "$maxver" != "$SRC_VERSION" ]; then
+        # force major version bump to ensure master package
+        # is higher N-V-R
+        git commit --allow-empty -m "sem-ver: api-break"
+        cp -upr . ${MOCKDIR}/tmp/pkgsrc
+        setuptools_version
+    fi
+    setversionandrelease $SRC_VERSION $SHORT_HASH
     /usr/bin/mock $MOCKOPTS --chroot "cd /tmp/pkgsrc && python setup.py sdist"
     /usr/bin/mock $MOCKOPTS --copyout /tmp/pkgsrc/dist ./dist
-
-    # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
-    # so only look at the last line for version
-    setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
-                         $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
 else
     # For Puppet modules, check the version in metadata.json (preferred) or Modulefile
     if [ -r metadata.json ]; then
