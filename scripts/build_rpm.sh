@@ -31,6 +31,7 @@ MOCKDIR=$(/usr/bin/mock -r ${DATA_DIR}/${MOCK_CONFIG} -p)
 
 # handle python packages (some puppet modules are carrying a setup.py too)
 if [ -r setup.py -a ! -r metadata.json ]; then
+    SOURCETYPE='tarball'
     mkdir ${MOCKDIR}/tmp/pkgsrc
     cp -pr . ${MOCKDIR}/tmp/pkgsrc
     /usr/bin/mock $MOCKOPTS --chroot "cd /tmp/pkgsrc && python setup.py sdist"
@@ -40,7 +41,18 @@ if [ -r setup.py -a ! -r metadata.json ]; then
     # so only look at the last line for version
     setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && python setup.py --version"| tail -n 1) \
                          $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /tmp/pkgsrc && git log -n1 --format=format:%h")
+elif [ -r *.gemspec ]; then
+    SOURCETYPE='gem'
+    GEMSPEC=$(ls -l | grep gemspec | awk '{print $9}')
+    PROJECT=$(basename $GEMSPEC .gemspec)
+    VERSION=$(ruby -e "require 'rubygems'; spec = Gem::Specification::load('$GEMSPEC'); puts spec.version")
+    mkdir ${MOCKDIR}/tmp/pkgsrc
+    cp -pr . ${MOCKDIR}/tmp/pkgsrc
+    /usr/bin/mock $MOCKOPTS --chroot "cd /tmp/pkgsrc && gem build $GEMSPEC"
+    /usr/bin/mock $MOCKOPTS --copyout /tmp/pkgsrc/$PROJECT-$VERSION.gem ./$PROJECT-$VERSION.gem
+    setversionandrelease "$VERSION" $(git log -n1 --format=format:%h)
 else
+    SOURCETYPE='tarball'
     # For Puppet modules, check the version in metadata.json (preferred) or Modulefile
     if [ -r metadata.json ]; then
         version=$(python -c "import json; print json.loads(open('metadata.json').read(-1))['version']")
@@ -90,10 +102,17 @@ else
     mv ../$VERSION.tar.gz dist/
 fi
 
-TARBALL=$(ls dist|grep '.tar.gz')
-
-TARBALLREL=$(basename $TARBALL .tar.gz)-$RELEASE.tar.gz
-mv dist/$TARBALL ${TOP_DIR}/SOURCES/$TARBALLREL
+if [ "$SOURCETYPE" == 'gem' ]; then
+    SOURCE=$(ls -l | grep '.gem' | awk '{print $9}')
+    SOURCEEXT='.gem'
+    SOURCEPATH=$SOURCE
+else
+    SOURCE=$(ls dist | grep '.tar.gz')
+    SOURCEEXT='.tar.gz'
+    SOURCEPATH="dist/$SOURCE"
+fi
+SOURCEWITHREL=$(basename $SOURCE $SOURCEEXT)-$RELEASE$SOURCEEXT
+mv $SOURCEPATH ${TOP_DIR}/SOURCES/$SOURCEWITHREL
 
 cd ${DISTGIT_DIR}
 cp * ${TOP_DIR}/SOURCES/
@@ -106,7 +125,7 @@ sed -i -e "s/UPSTREAMVERSION/$UPSTREAMVERSION/g" *.spec
 VERSION=${VERSION/-/.}
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
-sed -i -e "s/^\(Source\|Source0\):.*/\1: $TARBALLREL/" *.spec
+sed -i -e "s/^\(Source\|Source0\):.*/\1: $SOURCEWITHREL/" *.spec
 sed -i -e '/^%changelog.*/q' *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
