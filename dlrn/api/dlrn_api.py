@@ -354,6 +354,10 @@ def promote():
     target_link = os.path.join(app.config['REPO_PATH'], promote_name)
     # We should create a relative symlink
     yumrepodir = commit.getshardedcommitdir()
+
+    # Remove symlink if it exists, so we can create it again
+    if os.path.lexists(os.path.abspath(target_link)):
+        os.remove(target_link)
     try:
         os.symlink(yumrepodir, target_link)
     except Exception as e:
