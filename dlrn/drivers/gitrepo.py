@@ -35,8 +35,6 @@ logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-gitrepo-driver")
 logger.setLevel(logging.INFO)
 
-version_match = re.compile('\W*set upstream_version\D+([\w.]+).*')
-
 
 class GitRepoDriver(PkgInfoDriver):
 
@@ -81,24 +79,20 @@ class GitRepoDriver(PkgInfoDriver):
                                               package)
                 if self.config_options.use_version_from_spec is True:
                     version = None
-                    # Try to deduce version from spec template
+                    # Try to deduce version from spec
+                    # First, render the template
+                    self.preprocess(package_name=package)
                     pkgdir = os.path.join(packagepath, package)
                     for pkgfile in os.listdir(pkgdir):
-                        if pkgfile.endswith('.j2'):
+                        if pkgfile.endswith('.spec'):
                             with open(os.path.join(pkgdir, pkgfile)) as fp:
-                                j2content = fp.readlines()
-                            for line in j2content:
-                                # Check if template defines upstream_version
-                                m = version_match.match(line)
-                                if m is not None:
-                                    version = m.group(1)
-                                    break
-                                # Otherwise, we're using a direct version
+                                spec_content = fp.readlines()
+                            for line in spec_content:
+                                # In the spec, we have a direct version
                                 if line.startswith('Version:'):
                                     version = line.split(':')[1].strip().\
                                         replace('~', '')
                                     break
-
                     if version is not None:
                         pkg_hash['source-branch'] = version
                 packages.append(pkg_hash)
