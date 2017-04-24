@@ -74,8 +74,16 @@ else
             fi
         fi
     else
-        # No Puppet metadata, use git tags
+        # No metadata, use git tags
         version="$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)"
+        # just increment the last part of it
+        beg=$(echo $version|sed -n 's/\(.*\.\).*/\1/p')
+        end=$(echo $version|sed -n 's/.*\.\(.*\)/\1/p')
+        if [ -z "$end" ]; then
+            beg=""
+            end=$version
+        fi
+        version="$beg$(($end + 1))"
     fi
 
     # fallback to an arbitrary version
