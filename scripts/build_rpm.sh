@@ -73,9 +73,22 @@ else
                 version=$(echo $version | awk -F. '{ for (i=1;i<NF;i++) printf $i"."; print $NF+1 }')
             fi
         fi
-    else
-        # No Puppet metadata, use git tags
-        version="$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)"
+    fi
+
+    # Not able to discover version, use git tags
+    if [ -z "$version" ]; then
+        version="$(git describe --abbrev=0 --tags|sed 's/^[vVrR]//' || :)"
+        # Increment the version if HEAD is not on the tag
+        if ! git describe --exact-match --tags HEAD >& /dev/null; then
+            # just increment the last part of it
+            beg=$(echo $version|sed -n 's/\(.*\.\).*/\1/p')
+            end=$(echo $version|sed -n 's/.*\.\(.*\)/\1/p')
+            if [ -z "$end" ]; then
+                beg=""
+                end=$version
+            fi
+            version="$beg$(($end + 1))"
+        fi
     fi
 
     # fallback to an arbitrary version
