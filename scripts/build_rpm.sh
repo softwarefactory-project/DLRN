@@ -62,21 +62,23 @@ else
         version=""
     fi
 
+    # Not able to discover version, use git tags
+    if [ -z "$version" ]; then
+        version="$(git describe --abbrev=0 --tags|sed 's/^[vVrR]//' || :)"
+    fi
+
     # We got a version. Check if we need to increase a .Z release due to post-tag commits
     if [ -n "$version" ]; then
-        post_version=$(git describe --tags|sed 's/^[vV]//' || :)
-        current_tag=$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)
+        post_version=$(git describe --tags|sed 's/^[vVrR]//' || :)
+        current_tag=$(git describe --abbrev=0 --tags|sed 's/^[vVrR]//' || :)
         if [ "$post_version" != "$current_tag" ]; then
             # We have a potential post-version. Only applies if
             # version == current_tag without -rc inside
             if [[ "$version" = "$current_tag" && ! "$version" =~ "-rc" ]]; then
                 # Now increase the .Z release
-                version=$(echo $version | awk -F. '{ for (i=1;i<NF;i++) printf $i"."; print $NF+1 }')
+                version=$(awk -F. '{ for (i=1;i<NF;i++) printf $i"."; print $NF+1 }' <<< $version)
             fi
         fi
-    else
-        # No Puppet metadata, use git tags
-        version="$(git describe --abbrev=0 --tags|sed 's/^[vV]//' || :)"
     fi
 
     # fallback to an arbitrary version
