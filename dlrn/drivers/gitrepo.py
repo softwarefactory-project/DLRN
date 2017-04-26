@@ -22,6 +22,7 @@
 
 import logging
 import os
+import re
 import sh
 
 from dlrn.db import Commit
@@ -156,6 +157,16 @@ class GitRepoDriver(PkgInfoDriver):
                                         _tty_out=False, _timeout=3600)
         preprocess('--spec-style', 'fedora', '--epoch',
                    '../../epoch/fedora.yaml')
+        # Replace %{version} with %{upstream_version} in spec
+        # This is required by rpm-packaging specs
+        for specfile in os.listdir(distgit_dir):
+            if specfile.endswith(".spec"):
+                filename = os.path.join(distgit_dir, specfile)
+                with open(filename, 'r+') as fp:
+                    spec = fp.read()
+                    spec = re.sub('-%{version}', '-%{upstream_version}', spec)
+                    fp.seek(0)
+                    fp.write(spec)
 
     def distgit_dir(self, package_name):
         datadir = self.config_options.datadir
