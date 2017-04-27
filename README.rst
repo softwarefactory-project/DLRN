@@ -102,3 +102,6 @@ If the git clone operation fails for a package, DLRN will try to remove
 the source directory using sudo. Please make sure the user running DLRN
 can run ``rm -rf /path/to/dlrn/data/*`` without being asked for a password,
 otherwise DLRN will fail to process new commits.
+
+
+This is just a test
