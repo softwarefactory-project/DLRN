@@ -60,9 +60,10 @@ class TestProcessBuildResult(base.TestCase):
         shutil.rmtree(self.config.datadir)
         shutil.rmtree(self.config.scriptsdir)
 
+    @mock.patch('dlrn.shell.export_commit_yaml')
     @mock.patch('dlrn.shell.genreports')
     @mock.patch('dlrn.shell.sync_repo')
-    def test_successful_build(self, rs_mock, gr_mock):
+    def test_successful_build(self, rs_mock, gr_mock, ec_mock):
         built_rpms = ['foo-1.2.3.rpm']
         status = [self.commit, built_rpms, 'OK', None]
         output = shell.process_build_result(status, self.packages,
@@ -70,11 +71,13 @@ class TestProcessBuildResult(base.TestCase):
         self.assertEqual(output, 0)
         self.assertEqual(gr_mock.call_count, 1)
         self.assertEqual(rs_mock.call_count, 1)
+        self.assertEqual(ec_mock.call_count, 1)
 
+    @mock.patch('dlrn.shell.export_commit_yaml')
     @mock.patch('dlrn.shell.sendnotifymail')
     @mock.patch('dlrn.shell.genreports')
     @mock.patch('dlrn.shell.sync_repo')
-    def test_failed_build(self, rs_mock, gr_mock, sm_mock):
+    def test_failed_build(self, rs_mock, gr_mock, sm_mock, ec_mock):
         error_msg = 'Unit test error'
         status = [self.commit, '', '', error_msg]
         output = shell.process_build_result(status, self.packages,
@@ -83,6 +86,7 @@ class TestProcessBuildResult(base.TestCase):
         self.assertEqual(gr_mock.call_count, 1)
         self.assertEqual(rs_mock.call_count, 1)
         self.assertEqual(sm_mock.call_count, 1)
+        self.assertEqual(ec_mock.call_count, 1)
 
     @mock.patch('dlrn.shell.submit_review')
     @mock.patch('dlrn.shell.sendnotifymail')
