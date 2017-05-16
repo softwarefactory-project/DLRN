@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da9b358b_db095833",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-05-16T20:44:24Z",
+      "side": 0,
+      "message": "Works via indirect dep:\n\nCollecting pycparser (from cffi\u003e\u003d1.4.1-\u003ecryptography\u003e\u003d1.1-\u003eparamiko-\u003erdopkg\u003e\u003d0.42-\u003e-r requirements.txt (line 10))\n  Downloading pycparser-2.17.tar.gz (231kB)",
+      "revId": "f5636383cce4ffe939b57ca4f58b0efee2b53ed5",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
