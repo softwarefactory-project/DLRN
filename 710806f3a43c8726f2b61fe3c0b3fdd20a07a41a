@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "baa041b7_c325085d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 20
+      },
+      "writtenOn": "2017-05-17T12:40:51Z",
+      "side": 1,
+      "message": "Use case is to only build on tags instead of every commits for compute intensive builds like the kernel as an alternative to building on all the commits.",
+      "parentUuid": "baa041b7_63487c2e",
+      "revId": "710806f3a43c8726f2b61fe3c0b3fdd20a07a41a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baa041b7_834b802b",
         "filename": "dlrn/drivers/rdoinfo.py",
         "patchSetId": 1
