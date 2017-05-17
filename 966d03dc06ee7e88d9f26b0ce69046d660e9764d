@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_e3ba4cc0",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-17T13:54:26Z",
+      "side": 1,
+      "message": "Isn\u0027t this block essentially doing the same as the block above (lines 65-76)? This is why I proposed to move the following line to line 62:\n\nversion\u003d\"$(git describe --abbrev\u003d0 --tags|sed \u0027s/^[vVrR]//\u0027 || :)\"\n\nand let lines 65-76 handle this same logic.",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 6
+      },
+      "revId": "966d03dc06ee7e88d9f26b0ce69046d660e9764d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
