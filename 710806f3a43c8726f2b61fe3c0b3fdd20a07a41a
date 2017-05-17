@@ -87,6 +87,24 @@
       "revId": "710806f3a43c8726f2b61fe3c0b3fdd20a07a41a",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_e3e12cd2",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-05-17T14:38:24Z",
+      "side": 1,
+      "message": "agreed. rdoinfo should ideally only contain metadata required to translate upstream repos into packages.\n\nThis looks like a DLRN setting to me so I wouldn\u0027t put it in rdoinfo.\n\nAs a sidenote, you could also use existing tags: rdoinfo structure to label resource costly builds.",
+      "parentUuid": "baa041b7_834b802b",
+      "revId": "710806f3a43c8726f2b61fe3c0b3fdd20a07a41a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
