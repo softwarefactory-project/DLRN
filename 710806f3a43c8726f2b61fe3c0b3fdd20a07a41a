@@ -73,6 +73,23 @@
     },
     {
       "key": {
+        "uuid": "baa041b7_83d140fe",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-17T14:57:23Z",
+      "side": 1,
+      "message": "This is not the cleanest way to do this, as log messages will come from dlrn-repositories. We should do something like https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/gitrepo.py#L23-L36",
+      "revId": "710806f3a43c8726f2b61fe3c0b3fdd20a07a41a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baa041b7_834b802b",
         "filename": "dlrn/drivers/rdoinfo.py",
         "patchSetId": 1
@@ -102,6 +119,29 @@
       "side": 1,
       "message": "agreed. rdoinfo should ideally only contain metadata required to translate upstream repos into packages.\n\nThis looks like a DLRN setting to me so I wouldn\u0027t put it in rdoinfo.\n\nAs a sidenote, you could also use existing tags: rdoinfo structure to label resource costly builds.",
       "parentUuid": "baa041b7_834b802b",
+      "revId": "710806f3a43c8726f2b61fe3c0b3fdd20a07a41a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_23d8341d",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-17T14:57:23Z",
+      "side": 1,
+      "message": "In my tests, this fails if the tagged commit is at HEAD. The line looks like:\n\n1354617692 c937de75c28e63fba8d8738ad6a5f2ede517e53d  (HEAD -\u003e master, tag: 0.1.0, origin/master, origin/HEAD)\n\nso it doesn\u0027t find \"(tag:\"",
+      "range": {
+        "startLine": 119,
+        "startChar": 39,
+        "endLine": 119,
+        "endChar": 44
+      },
       "revId": "710806f3a43c8726f2b61fe3c0b3fdd20a07a41a",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
