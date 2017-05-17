@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_a0879ad6",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-17T09:20:52Z",
+      "side": 1,
+      "message": "I have my doubts on this. For a linux kernel repo with tag 4.12-rc1, it gives us version 4.13 (which is likely correct), but if we are exactly on tag 4.13 it would give us 4.14.\n\nWe have a similar issue with puppet-vlan, which is exactly on tag 0.1.0 now, and this patch would push its version to 0.1.1. This is not a good idea, as the package version will be higher than what we will get on a stable release.\n\nThinking about it, we may want to move line 78 (where we assign version based on git tags) to line 62, and then do the post_version vs current_tag comparison in all cases. That would keep the version if we are on the same commit as the tag, and increase it if we have any post-tag commits for all cases.\n\n@Alan, @Frederic, what do you think?",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 35
+      },
+      "revId": "8c0c53255cb8ff7042c83764543735dbd4792526",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
