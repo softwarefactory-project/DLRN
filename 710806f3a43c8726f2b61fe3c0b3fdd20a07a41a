@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "baa041b7_a3b8c4e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 20
+      },
+      "writtenOn": "2017-05-17T13:15:37Z",
+      "side": 1,
+      "message": "I don\u0027t really understand why it\u0027s not a use case for DLRN. You mean I need to start a new project to update a git repo like DLRN is doing it and look for new tags and then launch DLRN on the new tags?",
+      "parentUuid": "baa041b7_8320204b",
+      "revId": "710806f3a43c8726f2b61fe3c0b3fdd20a07a41a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baa041b7_834b802b",
         "filename": "dlrn/drivers/rdoinfo.py",
         "patchSetId": 1
