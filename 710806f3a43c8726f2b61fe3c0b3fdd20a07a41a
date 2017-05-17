@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_63487c2e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-05-17T11:54:04Z",
+      "side": 1,
+      "message": "can you expand on the use case for this?",
+      "revId": "710806f3a43c8726f2b61fe3c0b3fdd20a07a41a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_834b802b",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-05-17T11:54:04Z",
+      "side": 1,
+      "message": "-1 for adding more magic metadata to rdoinfo",
+      "revId": "710806f3a43c8726f2b61fe3c0b3fdd20a07a41a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
