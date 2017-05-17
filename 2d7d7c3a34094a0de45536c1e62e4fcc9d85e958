@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_23bb9410",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-05-17T11:44:12Z",
+      "side": 1,
+      "message": "Can you expand more on the use-case where kernel RPM is built?",
+      "revId": "2d7d7c3a34094a0de45536c1e62e4fcc9d85e958",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
