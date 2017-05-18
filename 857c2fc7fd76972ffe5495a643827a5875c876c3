@@ -16,6 +16,24 @@
       "revId": "857c2fc7fd76972ffe5495a643827a5875c876c3",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_e67dbae8",
+        "filename": "dlrn/drivers/gitrepo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-18T13:44:42Z",
+      "side": 1,
+      "message": "I\u0027ll add some error logging, so we can trace it.",
+      "parentUuid": "baa041b7_c60bd67c",
+      "revId": "857c2fc7fd76972ffe5495a643827a5875c876c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
