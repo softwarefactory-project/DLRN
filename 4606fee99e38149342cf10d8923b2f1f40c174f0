@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_26bba210",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-18T09:54:41Z",
+      "side": 1,
+      "message": "First I thought we should do this on line 62, but doing it here helps us fix some corner cases where the info in Modulefile or metadata.json is incorrect.",
+      "revId": "4606fee99e38149342cf10d8923b2f1f40c174f0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
