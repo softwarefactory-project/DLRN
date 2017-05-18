@@ -24,6 +24,7 @@ import logging
 import os
 import re
 import sh
+import urllib2
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
@@ -37,6 +38,20 @@ logger.setLevel(logging.INFO)
 
 version_match = re.compile('\W*set upstream_version\D+([\w.]+).*')
 wrong_match = re.compile('\W*set upstream_version\D+\(\).*')
+
+base_urls = ['https://github.com/openstack',
+             'https://github.com/openstack-dev']
+
+
+def check_url(url):
+    logger.info("Checking url %s" % url)
+    try:
+        urllib2.urlopen(url)
+        # URL found
+        return True
+    except (urllib2.HTTPError, urllib2.URLError):
+        # Trouble finding URL
+        return False
 
 
 class GitRepoDriver(PkgInfoDriver):
@@ -74,8 +89,16 @@ class GitRepoDriver(PkgInfoDriver):
                package not in skip_dirs):
                 pkg_hash = {}
                 pkg_hash['name'] = package
-                pkg_hash['upstream'] = ('https://github.com/openstack/' +
-                                        module2upstream(package))
+                for url in base_urls:
+                    if check_url("%s/%s" % (url, module2upstream(package))):
+                        pkg_hash['upstream'] = ("%s/%s" %
+                                                (url,
+                                                 module2upstream(package)))
+                        break
+                else:
+                    logger.error("Could not find upstream URL for project %s" %
+                                 package)
+
                 pkg_hash['maintainers'] = 'test@example.com'
                 pkg_hash['master-distgit'] = (repo + '/' + path + '/' +
                                               package)
