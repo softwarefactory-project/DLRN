@@ -22,6 +22,30 @@
       "revId": "966d03dc06ee7e88d9f26b0ce69046d660e9764d",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_838940cd",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 20
+      },
+      "writtenOn": "2017-05-18T06:57:48Z",
+      "side": 1,
+      "message": "you are right. I\u0027ll merge the 2 blocks in the next iteration.",
+      "parentUuid": "baa041b7_e3ba4cc0",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 6
+      },
+      "revId": "966d03dc06ee7e88d9f26b0ce69046d660e9764d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
