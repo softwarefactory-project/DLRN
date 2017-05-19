@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_b47118e3",
+        "filename": "dlrn/repositories.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-19T14:07:59Z",
+      "side": 1,
+      "message": "I would move this function to rdoinfo.py, it seems to be a pretty driver-specific one.",
+      "range": {
+        "startLine": 125,
+        "startChar": 4,
+        "endLine": 125,
+        "endChar": 17
+      },
+      "revId": "d61a52af80f7ffd4c456c4f636facf1ad7467cc5",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_d46c9c0a",
+        "filename": "dlrn/repositories.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-19T14:07:59Z",
+      "side": 1,
+      "message": "If we make it be \u0027build-tags-only\u0027 in package, we\u0027ll be able to do it on a per-branch basis, instead of a global per-project tag.\n\nI\u0027m fine with either option, it just depends on how much flexibility we want.",
+      "range": {
+        "startLine": 127,
+        "startChar": 32,
+        "endLine": 127,
+        "endChar": 48
+      },
+      "revId": "d61a52af80f7ffd4c456c4f636facf1ad7467cc5",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
