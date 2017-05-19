@@ -46,6 +46,30 @@
       "revId": "7ef60d7b9aa2c110c7dd998dd87a6b0ee36dfe2a",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_d4081c2b",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-19T09:40:11Z",
+      "side": 1,
+      "message": "Ohhh I see",
+      "parentUuid": "baa041b7_890cc143",
+      "range": {
+        "startLine": 71,
+        "startChar": 48,
+        "endLine": 72,
+        "endChar": 73
+      },
+      "revId": "7ef60d7b9aa2c110c7dd998dd87a6b0ee36dfe2a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
