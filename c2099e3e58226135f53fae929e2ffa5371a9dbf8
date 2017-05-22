@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_ba3fc1d5",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-05-22T10:16:23Z",
+      "side": 1,
+      "message": "Sorry for nitpicking, but we should not import logger from another file, or logs will be labeled with the wrong module name.\n\nWe should do the same thing as in https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/gitrepo.py#L23-L37",
+      "revId": "c2099e3e58226135f53fae929e2ffa5371a9dbf8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
