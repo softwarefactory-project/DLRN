@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_0a4f7c93",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-05-24T13:46:43Z",
+      "side": 1,
+      "message": "So this is b/c kernel distgit has some subfolders[1] but nice side-effect is that it also keep timestamps.\n\n[1] http://pkgs.fedoraproject.org/cgit/rpms/kernel.git/tree/",
+      "range": {
+        "startLine": 120,
+        "startChar": 3,
+        "endLine": 120,
+        "endChar": 6
+      },
+      "revId": "572fddfd80fb145378a0990af5223e6662e8bbc2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
