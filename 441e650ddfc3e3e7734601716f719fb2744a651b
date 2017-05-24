@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_6a81688f",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-05-24T13:41:50Z",
+      "side": 1,
+      "message": "ahh, git magic!\n       --simplify-by-decoration\n           Commits that are referred by some branch or tag are selected.",
+      "range": {
+        "startLine": 130,
+        "startChar": 29,
+        "endLine": 130,
+        "endChar": 53
+      },
+      "revId": "441e650ddfc3e3e7734601716f719fb2744a651b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
