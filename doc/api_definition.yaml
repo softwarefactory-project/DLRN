@@ -210,6 +210,32 @@ paths:
             type: array
             items:
               $ref: '#/definitions/CIVote'
+  /api/civotes.html:
+    get:
+      description: |
+        Get all the CI reports, with optional filtering.
+      produces:
+        - text/html
+      parameters:
+        - name: ciname
+          in: query
+          description: Filter on CI name
+          required: false
+          type: string
+        - name: commit_hash
+          in: query
+          description: Filter on this commit hash. If specified, you must specify distro_hash.
+          required: false
+          type: string
+        - name: distro_hash
+          in: query
+          description: Filter on this distro hash. If specified, you must specify commit_hash.
+          required: false
+          type: string          
+      responses:
+        # Response code
+        200:
+          description: An HTML page with the CI votes
   /api/report_result:
     post:
       security:
