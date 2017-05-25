@@ -20,11 +20,13 @@ from dlrn.api.utils import InvalidUsage
 
 from dlrn.db import CIVote
 from dlrn.db import Commit
+from dlrn.db import getCommits
 from dlrn.db import getSession
 
 from dlrn.remote import import_commit
 
 from flask import jsonify
+from flask import render_template
 from flask import request
 
 import os
@@ -391,3 +393,43 @@ def remote_import():
 
     result = {'repo_url': repo_url}
     return jsonify(result), 201
+
+
+@app.template_filter()
+def strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
+    gmdate = time.gmtime(date)
+    return "%s" % time.strftime(fmt, gmdate)
+
+
+@app.route('/api/civotes.html', methods=['GET'])
+def get_civotes():
+    ciname = request.args.get('ciname', None)
+    commit_hash = request.args.get('commit_hash', None)
+    distro_hash = request.args.get('distro_hash', None)
+
+    session = getSession(app.config['DB_PATH'])
+    votes = session.query(CIVote)
+
+    votes = votes.filter(CIVote.ci_name != 'consistent')
+    if ciname:
+        votes = votes.filter(CIVote.ci_name == ciname)
+
+    if commit_hash and distro_hash:
+        commit = session.query(Commit).filter(
+            Commit.status == 'SUCCESS',
+            Commit.commit_hash == commit_hash,
+            Commit.distro_hash == distro_hash).first()
+        votes = votes.filter(CIVote.commit_id == commit.id)
+
+    votelist = votes.all()
+
+    for i in range(len(votelist)):
+        commit = getCommits(session, limit=0).filter(
+                    Commit.id == votelist[i].commit_id).first()
+        votelist[i].commit_hash = commit.commit_hash
+        votelist[i].distro_hash =  commit.distro_hash
+        votelist[i].distro_hash_short = commit.distro_hash[:8]
+
+    return render_template('votes.j2',
+                           target='master',
+                           votes=votelist)
