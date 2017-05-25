@@ -337,9 +337,6 @@ def main():
                                               consistent=consistent)
             if exit_value != 0:
                 exit_code = exit_value
-
-            # Export YAML file containing commit metadata
-            export_commit_yaml(status[0])
             if options.stop and exit_code != 0:
                 return exit_code
     else:
@@ -377,9 +374,6 @@ def main():
                                                   consistent=consistent)
                 if exit_value != 0:
                     exit_code = exit_value
-
-                # Export YAML file containing commit metadata
-                export_commit_yaml(status[0])
                 if options.stop and exit_code != 0:
                     return exit_code
             except StopIteration:
@@ -516,6 +510,8 @@ def process_build_result(status, packages, session, dev_mode=False,
             session.add(vote)
             session.commit()
     genreports(packages, head_only, session)
+    # Export YAML file containing commit metadata
+    export_commit_yaml(commit)
     # TODO(jpena): could we launch this asynchronously?
     sync_repo(commit)
     return exit_code
