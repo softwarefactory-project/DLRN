@@ -38,16 +38,24 @@ hack on.
 Setting up a development environment manually
 ---------------------------------------------
 
-Follow the instructions from the `Setup section <https://github.com/openstack-packages/DLRN/blob/master/README.rst#setup>`_ of `README.rst <https://github.com/openstack-packages/DLRN/blob/master/README.rst>`_ to manually setup a development environment.
+Follow the instructions from the `Setup section <https://github.com/softwarefactory-project/DLRN/blob/master/README.rst#setup>`_ of `README.rst <https://github.com/softwarefactory-project/DLRN/blob/master/README.rst>`_ to manually setup a development environment.
 
 Submitting pull requests
 ------------------------
 
 Pull requests submitted through GitHub will be ignored.  They should be sent
-to GerritHub instead, using git-review.  Once submitted, they will show up
-here:
+to SoftwareFactory's Gerrit instead, using git-review. The usual workflow is:
 
-   https://review.rdoproject.org/r/#/q/project:DLRN+status:open
+.. code-block:: bash
+     $ sudo yum install git-review  (you can also use pip install if needed)
+     $ git clone https:/github.com/softwarefactory-project/DLRN
+     <edit your files here>
+     $ git commit
+     $ git review  
+
+Once submitted, your change request will show up here:
+
+   https://softwarefactory-project.io/r/#/q/project:DLRN+status:open
 
 Generating the documentation
 ----------------------------
