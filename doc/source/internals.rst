@@ -145,8 +145,8 @@ Each driver must provide the following methods:
   given package name.
 
 You can check the code of the existing
-`rdoinfo <https://github.com/openstack-packages/DLRN/blob/master/dlrn/drivers/rdoinfo.py>`_
-and `gitrepo <https://github.com/openstack-packages/DLRN/blob/master/dlrn/drivers/gitrepo.py>`_
+`rdoinfo <https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/rdoinfo.py>`_
+and `gitrepo <https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/gitrepo.py>`_
 drivers to see their implementation specifics. If you create a new driver, you
 need to add the project name to the ``projects.ini`` configuration file, and
 if you need any new options, be sure to add them to a driver-specific section

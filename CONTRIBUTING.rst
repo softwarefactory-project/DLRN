@@ -38,7 +38,7 @@ hack on.
 Setting up a development environment manually
 ---------------------------------------------
 
-Follow the instructions from the `Setup section <https://github.com/openstack-packages/DLRN/blob/master/README.rst#setup>`_ of `README.rst <https://github.com/openstack-packages/DLRN/blob/master/README.rst>`_ to manually setup a development environment.
+Follow the instructions from the `Setup section <https://github.com/softwarefactory-project/DLRN/blob/master/README.rst#setup>`_ of `README.rst <https://github.com/softwarefactory-project/DLRN/blob/master/README.rst>`_ to manually setup a development environment.
 
 Submitting pull requests
 ------------------------
