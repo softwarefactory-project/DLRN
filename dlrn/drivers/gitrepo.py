@@ -89,16 +89,6 @@ class GitRepoDriver(PkgInfoDriver):
                package not in skip_dirs):
                 pkg_hash = {}
                 pkg_hash['name'] = package
-                for url in base_urls:
-                    if check_url("%s/%s" % (url, module2upstream(package))):
-                        pkg_hash['upstream'] = ("%s/%s" %
-                                                (url,
-                                                 module2upstream(package)))
-                        break
-                else:
-                    logger.error("Could not find upstream URL for project %s" %
-                                 package)
-
                 pkg_hash['maintainers'] = 'test@example.com'
                 pkg_hash['master-distgit'] = (repo + '/' + path + '/' +
                                               package)
@@ -139,6 +129,17 @@ class GitRepoDriver(PkgInfoDriver):
         local = kwargs.get('local')
         dev_mode = kwargs.get('dev_mode')
         datadir = self.config_options.datadir
+
+        for url in base_urls:
+            if check_url("%s/%s" % (url, module2upstream(package['name']))):
+                package['upstream'] = ("%s/%s" %
+                                       (url,
+                                        module2upstream(package['name'])))
+                break
+        else:
+            logger.error("Could not find upstream URL for project %s" %
+                         package)
+
         repo = package['upstream']
 
         distro_dir = self.distgit_dir(package['name'])

@@ -28,21 +28,28 @@ from dlrn.db import getCommits
 
 
 def get_commit_url(commit, pkg):
-    upstream_url = parse.urlsplit(pkg["upstream"])
-    if upstream_url.netloc == "git.openstack.org":
-        commit_url = ("http",
-                      upstream_url.netloc,
-                      "/cgit%s/commit/?id=" % upstream_url.path,
-                      "", "", "")
-        commit_url = parse.urlunparse(commit_url)
-    elif upstream_url.netloc == "github.com":
-        commit_url = ("https",
-                      upstream_url.netloc,
-                      "%s/commit/" % upstream_url.path,
-                      "", "", "")
-        commit_url = parse.urlunparse(commit_url)
-    else:
-        commit_url = upstream_url
+    try:
+        upstream_url = parse.urlsplit(pkg["upstream"])
+
+        if upstream_url.netloc == "git.openstack.org":
+            commit_url = ("http",
+                          upstream_url.netloc,
+                          "/cgit%s/commit/?id=" % upstream_url.path,
+                          "", "", "")
+            commit_url = parse.urlunparse(commit_url)
+        elif upstream_url.netloc == "github.com":
+            commit_url = ("https",
+                          upstream_url.netloc,
+                          "%s/commit/" % upstream_url.path,
+                          "", "", "")
+            commit_url = parse.urlunparse(commit_url)
+        else:
+            commit_url = upstream_url
+    except KeyError:
+        # This should not happen, but pkg['upstream'] may not be present
+        # after some error in the gitrepo driver
+        commit_url = ''
+
     return commit_url
 
 
