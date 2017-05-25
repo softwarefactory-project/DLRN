@@ -25,6 +25,7 @@ from dlrn.db import getSession
 from dlrn.remote import import_commit
 
 from flask import jsonify
+from flask import render_template
 from flask import request
 
 import os
@@ -391,3 +392,19 @@ def remote_import():
 
     result = {'repo_url': repo_url}
     return jsonify(result), 201
+
+
+@app.template_filter()
+def strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
+    gmdate = time.gmtime(date)
+    return "%s" % time.strftime(fmt, gmdate)
+
+
+@app.route('/api/civotes.html', methods=['GET'])
+def get_civotes():
+    session = getSession(app.config['DB_PATH'])
+    votes = session.query(CIVote)
+    votes = votes.filter(CIVote.ci_name != 'consistent')
+    return render_template('votes.j2',
+                           target='master',
+                           votes=votes)
