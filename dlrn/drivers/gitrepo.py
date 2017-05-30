@@ -58,6 +58,30 @@ class GitRepoDriver(PkgInfoDriver):
     def __init__(self, *args, **kwargs):
         super(GitRepoDriver, self).__init__(*args, **kwargs)
 
+    def _get_version_from_pkg(self, packagepath, package):
+        self.preprocess(package_name=package)
+        pkgdir = os.path.join(packagepath, package)
+        for pkgfile in os.listdir(pkgdir):
+            if pkgfile.endswith('.spec'):
+                with open(os.path.join(pkgdir, pkgfile)) as fp:
+                    speccontent = fp.readlines()
+                    for line in speccontent:
+                        if line.startswith('Version:'):
+                            version = line.split(':')[1].strip().replace('~',
+                                                                         '')
+                        if line.startswith('Release:'):
+                            release = line.split(':')[1].strip()
+                            # version always trails release, so we should
+                            # have both by now
+                            break
+
+        if release.startswith('0'):
+            # This is a pre-release version, so we are following trunk
+            return None
+        else:
+            # This is a tagged release
+            return version
+
     def getpackages(self, **kwargs):
         repo = self.config_options.gitrepo_repo
         path = self.config_options.gitrepo_dir.strip('/')
@@ -105,7 +129,17 @@ class GitRepoDriver(PkgInfoDriver):
                                 # version of the upstream_version() macro
                                 m = wrong_match.match(line)
                                 if m is not None:
-                                    break   # So do not store a version
+                                    # We are deducing the version using the
+                                    # source tarball. This is a bit more
+                                    # complex, since we need to run renderspec
+                                    # and find the version in the resulting
+                                    # spec
+                                    version = self._get_version_from_pkg(
+                                        packagepath, package)
+                                    logger.info(
+                                        "Got version %s for %s from the spec"
+                                        % (version, package))
+                                    break
                                 # Check if template defines upstream_version
                                 m = version_match.match(line)
                                 if m is not None:
