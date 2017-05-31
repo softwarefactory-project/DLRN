@@ -36,7 +36,7 @@ else
 fi
 
 # Map to rdoinfo
-PROJECT_TO_BUILD_MAPPED=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^name | awk '{print $2}')
+PROJECT_TO_BUILD_MAPPED=$(./scripts/map-project-name $PROJECT_TO_BUILD /tmp/rdoinfo)
 PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
 
 # Prepare config
@@ -133,11 +133,12 @@ fi
 function copy_logs() {
     mkdir -p logs
     rsync -avzr data/repos logs/centos
+    rsync -avzrL data/repos/current logs/centos
 }
 trap copy_logs ERR EXIT
 
 # Run DLRN
-dlrn --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev --local --info-repo /tmp/rdoinfo --verbose-mock
+dlrn --config-file projects.ini --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev --local --info-repo /tmp/rdoinfo --verbose-mock
 copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn-1.cfg --scrub=all
