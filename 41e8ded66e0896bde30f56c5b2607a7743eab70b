@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_59a672c2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-06-05T17:29:14Z",
+      "side": 1,
+      "message": "It was actually renamed the other way around :)\n\nhttps://www.rdoproject.org/blog/2016/04/naming-is-hard-or-who-let-the-vowels-out/",
+      "revId": "41e8ded66e0896bde30f56c5b2607a7743eab70b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
