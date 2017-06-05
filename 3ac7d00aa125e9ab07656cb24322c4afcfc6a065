@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_590af2d3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-06-05T16:01:07Z",
+      "side": 1,
+      "message": "Thanks for the change! Just a couple style details to ensure git history looks ok after merging:\n\n- There needs to be a blank line between the commit title (Resolving confusion...) and the rest of the commit message.\n\n- We try to keep lines in the commit message below 80 chars.\n\nThe quickest way to fix this is to edit the commit in the Gerrit UI itself. Click on the notepad icon next to \"Patch Set 1\", and you\u0027ll see the file in an editor. When finished, click on \"Save\", then \"Publish Edit\".",
+      "revId": "3ac7d00aa125e9ab07656cb24322c4afcfc6a065",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
