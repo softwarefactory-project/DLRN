@@ -3,7 +3,8 @@ DLRN
 ====
 
 DLRN builds and maintains yum repositories following OpenStack
-uptream commit streams.
+uptream commit streams. (DLRN is not an acronym or an abbreviation,
+and it can be pronounced "dee el arr en".)
 
 Documentation is available at
 http://dlrn.readthedocs.org/en/latest/
