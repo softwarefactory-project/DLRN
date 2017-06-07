@@ -43,3 +43,13 @@ class InvalidUsage(Exception):
         rv = dict(self.payload or ())
         rv['message'] = self.message
         return rv
+
+
+class RepoDetail(object):
+    def __init__(self):
+        self.commit_hash = None
+        self.distro_hash = None
+        self.distro_hash_short = None
+        self.success = 0
+        self.failure = 0
+        self.timestamp = 0

@@ -434,3 +434,25 @@ class TestRemoteImport(DLRNAPITestCase):
         self.assertEqual(response.status_code, 201)
         data = json.loads(response.data)
         self.assertEqual(data['repo_url'], 'http://example.com/1/')
+
+
+@mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestGetCIVotes(DLRNAPITestCase):
+    def test_get_civotes(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/civotes.html')
+        self.assertEqual(rt_mock.call_count, 1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_civotes_detail_fail(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/civotes_detail.html')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_civotes_detail_fail_ok(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/civotes_detail.html?'
+                                'commit_hash=17234e9ab9dfab4cf5600f67f1d24db5'
+                                '064f1025&distro_hash=024e24f0cf4366c2290c22f'
+                                '24e42de714d1addd1')
+        self.assertEqual(rt_mock.call_count, 1)
+        self.assertEqual(response.status_code, 200)
