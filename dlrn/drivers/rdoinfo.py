@@ -17,7 +17,8 @@
 #
 # 2- A getinfo function based on a multi-distgit repo paradigm
 #
-# 3- A no-op preprocess function
+# 3- A preprocess function that is only used if the distgit directory
+#    containts a .spec.j2 file
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
@@ -85,18 +86,21 @@ class RdoInfoDriver(PkgInfoDriver):
         distro = package['master-distgit']
         tags_only = buildtagsonly(package)
 
-        distro_dir = self.distgit_dir(package['name'])
+        distro_dir = self._distgit_clone_dir(package['name'])
+        distro_dir_full = self.distgit_dir(package['name'])
         distro_branch = getdistrobranch(package)
         source_branch = getsourcebranch(package)
 
         if dev_mode is False:
             distro_branch, distro_hash, dt_distro = refreshrepo(
-                distro, distro_dir, distro_branch, local=local)
+                distro, distro_dir, distro_branch, local=local,
+                full_path=distro_dir_full)
         else:
             distro_hash = "dev"
             dt_distro = 0  # Doesn't get used in dev mode
             if not os.path.isdir(distro_dir):
-                refreshrepo(distro, distro_dir, distro_branch, local=local)
+                refreshrepo(distro, distro_dir, distro_branch, local=local,
+                full_path=distro_dir_full)
 
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory
@@ -141,16 +145,43 @@ class RdoInfoDriver(PkgInfoDriver):
                 commit = Commit(dt_commit=float(dt), project_name=project,
                                 commit_hash=commit_hash, repo_dir=repo_dir,
                                 distro_hash=distro_hash, dt_distro=dt_distro,
-                                distgit_dir=distro_dir,
+                                distgit_dir=self.distgit_dir(package['name']),
                                 commit_branch=source_branch)
                 project_toprocess.append(commit)
 
         return project_toprocess
 
     def preprocess(self, **kwargs):
-        # No pre-processing required here
+        # Pre-processing is only required if we have a jinja2 spec template
+        package_name = kwargs.get('package_name')
+        distgit_dir = self.distgit_dir(package_name)
+        # Now, try to check if we need to run a pre-processing job
+        preprocess_needed = False
+        for f in os.listdir(distgit_dir):
+            if f.endswith('.spec.j2'):
+                # We have a template here, so we have to preprocess
+                preprocess_needed = True
+                break
+        if preprocess_needed:
+            logger.info('Pre-processing template at %s' % distgit_dir)
+            renderspec = sh.renderspec.bake(_cwd=distgit_dir,
+                                            _tty_out=False, _timeout=3600)
+            renderspec('--spec-style', 'fedora', '--epoch',
+                       '../../epoch/fedora.yaml')
         return
 
     def distgit_dir(self, package_name):
+        datadir = self.config_options.datadir
+        # Find extra directory inside it, if needed
+        extra_dir = '/'
+        for package in self.packages:
+            if package['name'] == package_name:
+                if 'distgit-path' in package:
+                    extra_dir = package['distgit-path']
+                    break
+        return os.path.join(datadir, package_name + "_distro",
+                            extra_dir.lstrip('/'))
+
+    def _distgit_clone_dir(self, package_name):
         datadir = self.config_options.datadir
         return os.path.join(datadir, package_name + "_distro")
