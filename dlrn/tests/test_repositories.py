@@ -38,7 +38,7 @@ class TestRefreshRepo(base.TestCase):
                     mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, '-f', 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
-                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
+                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1', '.')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
     @mock.patch('os.path.exists', return_value=True)
@@ -50,13 +50,13 @@ class TestRefreshRepo(base.TestCase):
                     mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, '-f', 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
-                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
+                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1', '.')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
     @mock.patch('os.path.exists', return_value=True)
     def test_dont_fetch_if_local_repo_exists(self, path_mock, sh_mock):
         repositories.refreshrepo('url', 'path', branch='branch', local=True)
-        expected = [mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
+        expected = [mock.call(sh.git.log, '--pretty=format:%H %ct', '-1', '.')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
     def test_clone_fetch_if_local_repo_missing(self, sh_mock):
@@ -65,7 +65,7 @@ class TestRefreshRepo(base.TestCase):
                     mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, '-f', 'branch'),
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
-                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
+                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1', '.')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
     def test_clone_no_fallback(self, sh_mock):
