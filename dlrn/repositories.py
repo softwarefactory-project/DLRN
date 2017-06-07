@@ -23,7 +23,7 @@ logger = logging.getLogger("dlrn-repositories")
 logger.setLevel(logging.INFO)
 
 
-def refreshrepo(url, path, branch="master", local=False):
+def refreshrepo(url, path, branch="master", local=False, full_path=None):
     logger.info("Getting %s to %s (%s)" % (url, path, branch))
     checkout_not_present = not os.path.exists(path)
     if checkout_not_present is True:
@@ -67,7 +67,11 @@ def refreshrepo(url, path, branch="master", local=False):
             shutil.rmtree(path)
             sh.git.clone(url, path)
 
-    git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
+    if full_path:
+        git = sh.git.bake(_cwd=full_path, _tty_out=False, _timeout=3600)
+    else:
+        git = sh.git.bake(_cwd=path, _tty_out=False, _timeout=3600)
+
     if local is False or checkout_not_present is True:
         try:
             git.fetch("origin")
@@ -101,7 +105,8 @@ def refreshrepo(url, path, branch="master", local=False):
             # Maybe it was a tag, not a branch
             git.reset("--hard", "%s" % branch)
 
-    repoinfo = str(git.log("--pretty=format:%H %ct", "-1")).strip().split(" ")
+    repoinfo = str(git.log("--pretty=format:%H %ct", "-1", ".")).\
+        strip().split(" ")
     repoinfo.insert(0, branch)
     return repoinfo
 
