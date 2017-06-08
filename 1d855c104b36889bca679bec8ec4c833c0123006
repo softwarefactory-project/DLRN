@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_6dddf013",
+        "filename": "CONTRIBUTING.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 89
+      },
+      "writtenOn": "2017-06-08T11:03:27Z",
+      "side": 1,
+      "message": "use git add to include the editted files.",
+      "range": {
+        "startLine": 52,
+        "startChar": 5,
+        "endLine": 52,
+        "endChar": 27
+      },
+      "revId": "1d855c104b36889bca679bec8ec4c833c0123006",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_8dc15431",
+        "filename": "CONTRIBUTING.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 89
+      },
+      "writtenOn": "2017-06-08T11:03:27Z",
+      "side": 1,
+      "message": "Nit: please remove white space.",
+      "revId": "1d855c104b36889bca679bec8ec4c833c0123006",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
