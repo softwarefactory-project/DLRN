@@ -329,6 +329,7 @@ def main():
                 if not options.run:
                     consistent = post_build(status, packages, session)
             exit_value = process_build_result(status, packages, session,
+                                              toprocess,
                                               dev_mode=options.dev,
                                               run_cmd=options.run,
                                               stop=options.stop,
@@ -365,7 +366,7 @@ def main():
                     if not options.run:
                         consistent = post_build(status, packages, session)
                 exit_value = process_build_result(status, packages,
-                                                  session,
+                                                  session, toprocess,
                                                   dev_mode=options.dev,
                                                   run_cmd=options.run,
                                                   stop=options.stop,
@@ -386,13 +387,13 @@ def main():
             commit.status = 'RETRY'
             session.add(commit)
             session.commit()
-    genreports(packages, options.head_only, session)
+    genreports(packages, options.head_only, session, [])
     return exit_code
 
 
-def process_build_result(status, packages, session, dev_mode=False,
-                         run_cmd=False, stop=False, build_env=None,
-                         head_only=False, consistent=False):
+def process_build_result(status, packages, session, packages_to_process,
+                         dev_mode=False, run_cmd=False, stop=False,
+                         build_env=None, head_only=False, consistent=False):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
@@ -509,7 +510,7 @@ def process_build_result(status, packages, session, dev_mode=False,
                           timestamp=int(commit.dt_build), notes='')
             session.add(vote)
             session.commit()
-    genreports(packages, head_only, session)
+    genreports(packages, head_only, session, packages_to_process)
     # Export YAML file containing commit metadata
     export_commit_yaml(commit)
     # TODO(jpena): could we launch this asynchronously?

@@ -36,10 +36,10 @@ def sync_repo(commit):
         commitdir_abs = os.path.join(datadir, "repos", ".",
                                      commit.getshardedcommitdir())
         rsyncpaths.append(commitdir_abs)
-        # We also need report.html, status_report.html, styles.css and the
-        # consistent and current symlinks
+        # We also need report.html, status_report.html, queue.html,
+        # styles.css and the consistent and current symlinks
         for filename in ['report.html', 'status_report.html', 'styles.css',
-                         'consistent', 'current']:
+                         'queue.html', 'consistent', 'current']:
             filepath = os.path.join(datadir, "repos", ".", filename)
             rsyncpaths.append(filepath)
 
