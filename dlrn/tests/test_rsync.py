@@ -63,6 +63,7 @@ class TestSyncRepo(base.TestCase):
                                os.path.join(repodir, 'report.html'),
                                os.path.join(repodir, 'status_report.html'),
                                os.path.join(repodir, 'styles.css'),
+                               os.path.join(repodir, 'queue.html'),
                                os.path.join(repodir, 'consistent'),
                                os.path.join(repodir, 'current')],
                               'user@host:/directory')]

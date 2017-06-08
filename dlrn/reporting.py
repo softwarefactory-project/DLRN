@@ -66,7 +66,7 @@ def _jinja2_filter_get_commit_url(commit, packages):
     return "???"
 
 
-def genreports(packages, head_only, session):
+def genreports(packages, head_only, session, all_commits):
     config_options = getConfigOptions()
 
     # Generate report of the last 300 package builds
@@ -158,5 +158,24 @@ def genreports(packages, head_only, session):
                                     pkgs=pkgs)
 
     report_file = os.path.join(repodir, "status_report.html")
+    with open(report_file, "w") as fp:
+        fp.write(content)
+
+    # Create a report for the pending packages
+    jinja_template = jinja_env.get_template("queue.j2")
+    pending_commits = []
+    for commit in all_commits:
+        old_commit = getCommits(session, project=commit.project_name,
+                                without_status="RETRY", limit=None).filter(
+            Commit.commit_hash == commit.commit_hash).filter(
+            Commit.distro_hash == commit.distro_hash).first()
+        if not old_commit:
+            pending_commits.append(commit)
+
+    content = jinja_template.render(reponame=reponame,
+                                    src=src,
+                                    target=target,
+                                    commits=pending_commits)
+    report_file = os.path.join(repodir, "queue.html")
     with open(report_file, "w") as fp:
         fp.write(content)
