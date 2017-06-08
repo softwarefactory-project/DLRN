@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_885262dc",
+        "filename": "dlrn/templates/queue.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-06-08T17:25:00Z",
+      "side": 1,
+      "message": "this would be 404 since it has not been built and rsynced to the remote site yet, so maybe better to remove this column",
+      "range": {
+        "startLine": 17,
+        "startChar": 12,
+        "endLine": 17,
+        "endChar": 22
+      },
+      "revId": "9d36026aed8cb02937641e23569e777de240ffcf",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
