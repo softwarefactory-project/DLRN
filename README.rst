@@ -22,7 +22,7 @@ Add the user you intend to run as to the mock group and login again.
 
 .. code-block:: shell-session
 
-    $ git clone https://github.com/openstack-packages/DLRN.git
+    $ git clone https://github.com/softwarefactory-project/DLRN.git
 
 If you want to serve the built packages and the status reports, enable the
 httpd service, and then either add a section in the server configuration to
