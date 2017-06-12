@@ -14,6 +14,7 @@ import logging
 import os
 import sh
 import shutil
+import subprocess
 
 from dlrn.config import getConfigOptions
 
@@ -81,14 +82,17 @@ def refreshrepo(url, path, branch="master", local=False):
         try:
             git.checkout('-f', branch)
         except sh.ErrorReturnCode_1:
-            if branch in ["master", "rpm-master"]:
+            # Note(mmagr): git('rev-parse', ...) does not work
+            current = subprocess.check_output(
+                        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+            if branch == current:
                 # Do not try fallback if already on master branch
                 raise
             else:
                 # Fallback to master
-                if branch.startswith("rpm-"):
+                if current.startswith("rpm-"):
                     branch = "rpm-master"
-                elif branch.endswith("-rdo"):
+                elif current.endswith("-rdo"):
                     # Distgit branches can start with rpm- or end with -rdo
                     branch = "rpm-master"
                 else:
