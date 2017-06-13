@@ -148,7 +148,14 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
         contents = fp.readlines()
     contents = contents[:-1]
 
-    r = urlopen(baseurl + "/delorean-deps.repo")
+    try:
+        r = urlopen(baseurl + "/delorean-deps.repo")
+    except Exception as e:
+        logger.error("Could not open %s/delorean-deps.repo. Check the baseurl"
+                     " value in projects.ini, and make sure the file can be "
+                     "downloaded." % baseurl)
+        raise e
+
     contents.extend(map(lambda x: x.decode('utf8'), r.readlines()))
     contents = contents + ["\n\"\"\""]
     with open(newcfg, "w") as fp:
@@ -160,8 +167,14 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
         # delete the last line which must be """
         contents = contents[:-1]
+        try:
+            r = urlopen(baseurl + "/current/delorean.repo")
+        except Exception as e:
+            logger.error("Could not open %s/current/delorean.repo. Check the "
+                         "baseurl value in projects.ini, and make sure the "
+                         "file can be downloaded." % baseurl)
+            raise e
 
-        r = urlopen(baseurl + "/current/delorean.repo")
         contents = contents + r.readlines()
         contents = contents + ["\n\"\"\""]
         with open(newcfg, "w") as fp:
