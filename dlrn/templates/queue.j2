@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Pending commits for the current run</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <h1>
+      <i class='fa fa-chevron-circle-right pull-left'></i>
+      Pending commits for the current run: {{ target | capitalize }} ({{ src }})
+    </h1>
+    <table id="dlrn">
+      <tr>
+        <th>Commit Date Time</th>
+        <th>Project Name</th>
+        <th>Commit Hash</th>
+      </tr>
+      {% for commit in commits %}
+        <tr {% if commit.status == "SUCCESS" %}class="success"{% endif %}>
+          <td>{{ commit.dt_commit | strftime }}</td>
+          <td>{{ commit.project_name }}</td>
+          <td class="commit">
+            <i class="fa fa-git pull-left"></i>
+            <i>
+              <a href="{{ commit | get_commit_url }}{{ commit.commit_hash }}">
+                {{ commit.commit_hash }}
+                </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

@@ -67,7 +67,7 @@ class TestProcessBuildResult(base.TestCase):
         built_rpms = ['foo-1.2.3.rpm']
         status = [self.commit, built_rpms, 'OK', None]
         output = shell.process_build_result(status, self.packages,
-                                            self.session)
+                                            self.session, [])
         self.assertEqual(output, 0)
         self.assertEqual(gr_mock.call_count, 1)
         self.assertEqual(rs_mock.call_count, 1)
@@ -81,7 +81,7 @@ class TestProcessBuildResult(base.TestCase):
         error_msg = 'Unit test error'
         status = [self.commit, '', '', error_msg]
         output = shell.process_build_result(status, self.packages,
-                                            self.session)
+                                            self.session, [])
         self.assertEqual(output, 1)
         self.assertEqual(gr_mock.call_count, 1)
         self.assertEqual(rs_mock.call_count, 1)
@@ -97,7 +97,7 @@ class TestProcessBuildResult(base.TestCase):
         error_msg = 'Unit test error'
         status = [self.commit, '', '', error_msg]
         output = shell.process_build_result(status, self.packages,
-                                            self.session)
+                                            self.session, [])
         self.assertEqual(output, 1)
         self.assertEqual(gr_mock.call_count, 1)
         self.assertEqual(rs_mock.call_count, 1)

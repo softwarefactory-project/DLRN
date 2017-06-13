@@ -127,7 +127,7 @@ def import_commit(repo_url, config_file, db_connection=None,
                 post_build(status, packages, session)
             else:
                 status = [commit, '', '', commit.notes]
-            process_build_result(status, packages, session)
+            process_build_result(status, packages, session, [])
         fcntl.flock(lock_fp, fcntl.LOCK_UN)
     return 0
 
