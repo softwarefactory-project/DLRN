@@ -67,7 +67,7 @@ The configuration file looks like this:
     workers=1
     gerrit_topic=rdo-FTBFS
     database_connection=sqlite:///commits.sqlite
-
+    fallback_to_master=1
 
 * ``datadir`` is the directory where the packages and repositories will be
   created.
@@ -130,6 +130,16 @@ The configuration file looks like this:
 * The ``database_connection`` string defines a database connection string. By
   default, a local SQLite3 database is used, but it is also possible to set up
   an external database.
+
+* ``fallback_to_master`` defines the fallback behavior when cloning Git
+  repositories. 
+
+  * With the default value of 1, DLRN will fall back to the ``master`` branch
+    for source repositories if the configured branch cannot be found, and
+    ``rpm-master`` for distgit repositories. 
+  * If the value is 0, there will be no fallback, so if the configured branch
+    does not exist an error message will be displayed, and the project will be
+    ignored when deciding which packages need to be built.
 
 * ``pkginfo_driver`` defines the driver to be used to manage the distgit
   repositories. There are currently two drivers:

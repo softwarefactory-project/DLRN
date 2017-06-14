@@ -24,6 +24,7 @@ logger.setLevel(logging.INFO)
 
 
 def refreshrepo(url, path, branch="master", local=False):
+    config_options = getConfigOptions()
     logger.info("Getting %s to %s (%s)" % (url, path, branch))
     checkout_not_present = not os.path.exists(path)
     if checkout_not_present is True:
@@ -85,16 +86,22 @@ def refreshrepo(url, path, branch="master", local=False):
                 # Do not try fallback if already on master branch
                 raise
             else:
-                # Fallback to master
-                if branch.startswith("rpm-"):
-                    branch = "rpm-master"
-                elif branch.endswith("-rdo"):
-                    # Distgit branches can start with rpm- or end with -rdo
-                    branch = "rpm-master"
+                if config_options.fallback_to_master:
+                    # Fallback to master
+                    if branch.startswith("rpm-"):
+                        branch = "rpm-master"
+                    elif branch.endswith("-rdo"):
+                        # Distgit branches can start with rpm- or end with -rdo
+                        branch = "rpm-master"
+                    else:
+                        branch = "master"
+                    logger.info("Falling back to %s" % branch)
+                    git.checkout(branch)
                 else:
-                    branch = "master"
-                logger.info("Falling back to %s" % branch)
-                git.checkout(branch)
+                    logger.error("Branch %s for %s does not exist, and the "
+                                 "configuration does not allow a fallback to "
+                                 "master." % (branch, url))
+                    raise
         try:
             git.reset("--hard", "origin/%s" % branch)
         except Exception:
