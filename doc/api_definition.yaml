@@ -245,6 +245,25 @@ paths:
         # Response code
         200:
           description: An HTML page with the CI votes detail for a repo.
+  /api/report.html:
+    get:
+      description: |
+        Get a detailed report of the commit build status, with optional filtering.
+      produces:
+        - text/html
+      parameters:
+        - name: package
+          in: query
+          description: Filter on this package name.
+          type: string
+        - name: success
+          in: query
+          description: Filter on this successful/unsuccessful builds.
+          type: boolean
+      responses:
+        # Response code
+        200:
+          description: An HTML page with the report of the commit build status.
   /api/report_result:
     post:
       security:

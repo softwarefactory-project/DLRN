@@ -24,13 +24,17 @@ from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getSession
 
+from dlrn.config import ConfigOptions
+
 from dlrn.remote import import_commit
+from dlrn.shell import default_options
 
 from flask import jsonify
 from flask import render_template
 from flask import request
 
 import os
+from six.moves import configparser
 from sqlalchemy import desc
 import time
 
@@ -474,3 +478,32 @@ def get_civotes_detail():
     return render_template('votes.j2',
                            target='master',
                            votes=votelist)
+
+
+@app.route('/api/report.html', methods=['GET'])
+def get_report():
+    package_name = request.args.get('package', None)
+    success = request.args.get('success', None)
+
+    if success is not None:
+        if bool(strtobool(success)):
+            with_status = "SUCCESS"
+        else:
+            with_status = "FAILED"
+    else:
+        with_status = None
+
+    session = getSession(app.config['DB_PATH'])
+    commits = getCommits(session, without_status="RETRY",
+                         project=package_name, with_status=with_status,
+                         limit=1000)
+
+    cp = configparser.RawConfigParser(default_options)
+    cp.read(app.config['CONFIG_FILE'])
+    config_options = ConfigOptions(cp)
+
+    return render_template('report.j2',
+                           reponame='Detailed build report',
+                           target=config_options.target,
+                           src=config_options.source,
+                           commits=commits)

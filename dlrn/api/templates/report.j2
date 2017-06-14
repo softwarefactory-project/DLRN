@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>RDO Packaging By DLRN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
+  </head>
+  <body>
+    <h1>
+      <i class='fa fa-chevron-circle-right pull-left'></i>
+      {{ reponame | capitalize }} - {{ target | capitalize }} ({{ src }})
+    </h1>
+    <table id="dlrn">
+      <tr>
+        <th>Build Date Time</th>
+        <th>Commit Date Time</th>
+        <th>Project Name</th>
+        <th>Commit Hash</th>
+        <th>Status</th>
+        <th>Repository</th>
+        <th>Build Log</th>
+      </tr>
+      {% for commit in commits %}
+        <tr {% if commit.status == "SUCCESS" %}class="success"{% endif %}>
+          <td>{{ commit.dt_build | strftime }}</td>
+          <td>{{ commit.dt_commit | strftime }}</td>
+          <td>
+            <i class="fa fa-link pull-left"></i>
+            <form action="report.html" method="get">
+               <input type="hidden" name="package" value="{{ commit.project_name }}" />
+               {% if request.args.get('success') != None %}
+                 <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+               {% endif %}
+              <button type="submit" class="button">{{ commit.project_name }}</button>
+            </form>
+          </td>
+          <td class="commit">
+            <i class="fa fa-git pull-left"></i>
+            <i>
+                {{ commit.commit_hash }}
+          </td>
+          <td>
+            {% if commit.status == "SUCCESS"  %}
+              <i class="fa fa-link pull-left" style="color:#004153"></i>
+                <form action="report.html" method="get">
+                   {% if request.args.get('package') != None %}
+                   <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
+                   {% endif %}
+                   <input type="hidden" name="success" value=1 />
+                  <button type="submit" class="button">SUCCESS</button>
+                </form>
+            {% else %}
+              <i class="fa fa-link pull-left" style="color:red"></i>
+                <form action="report.html" method="get">
+                   <input type="hidden" name="package" value="{{ commit.project_name }}" />
+                   <input type="hidden" name="success" value=0 />
+                  <button type="submit" class="button">FAILED</button>
+                </form>
+            {% endif %}
+          </td>
+          <td>
+            <i class="fa fa-link pull-left" style='color:#004153'></i>
+            <a href="../{{ commit.getshardedcommitdir() }}">repo</a>
+          </td>
+          <td>
+            <a href="../{{ commit.getshardedcommitdir() }}/rpmbuild.log">build log</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
