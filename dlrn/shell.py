@@ -63,7 +63,8 @@ default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'pkginfo_driver': 'dlrn.drivers.rdoinfo.RdoInfoDriver',
                    'workers': '1',
                    'gerrit_topic': 'rdo-FTBFS',
-                   'database_connection': 'sqlite:///commits.sqlite'
+                   'database_connection': 'sqlite:///commits.sqlite',
+                   'fallback_to_master': '1'
                    }
 
 

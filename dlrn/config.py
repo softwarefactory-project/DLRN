@@ -34,6 +34,8 @@ class ConfigOptions(object):
         self.workers = cp.getint('DEFAULT', 'workers')
         self.gerrit_topic = cp.get('DEFAULT', 'gerrit_topic')
         self.database_connection = cp.get('DEFAULT', 'database_connection')
+        self.fallback_to_master = cp.getboolean('DEFAULT',
+                                                'fallback_to_master')
 
         # Handling for optional sections, driver-based
         if cp.has_section('gitrepo_driver'):

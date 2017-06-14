@@ -14,13 +14,19 @@
 import mock
 import sh
 
+from dlrn.config import ConfigOptions
 from dlrn.tests import base
 
 from dlrn import repositories
 
+from six.moves import configparser
 
-def _aux(*x):
-    return 'origin (fetch) url'
+
+def _aux_sh(*args):
+    call = args[0]
+    if call == '-f':
+        raise sh.ErrorReturnCode_1('blabla', '', '')
+    return
 
 
 @mock.patch.object(sh.Command, '__call__', autospec=True)
@@ -61,3 +67,20 @@ class TestRefreshRepo(base.TestCase):
                     mock.call(sh.git.reset, '--hard', 'origin/branch'),
                     mock.call(sh.git.log, '--pretty=format:%H %ct', '-1')]
         self.assertEqual(sh_mock.call_args_list, expected)
+
+    def test_clone_no_fallback(self, sh_mock):
+        config = configparser.RawConfigParser({"gerrit": 'yes'})
+        config.read("projects.ini")
+        config.set('DEFAULT', 'fallback_to_master', '0')
+        self.config = ConfigOptions(config)
+        # We need to redefine the mock object again, to use a side effect
+        # that will fail in the git checkout call. A bit convoluted, but
+        # it works
+        with mock.patch.object(sh.Command, '__call__') as new_mock:
+            new_mock.side_effect = _aux_sh
+            self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
+                              'url', 'path', branch='branch')
+            expected = [mock.call('url', 'path'),
+                        mock.call('origin'),
+                        mock.call('-f', 'branch')]
+            self.assertEqual(new_mock.call_args_list, expected)
