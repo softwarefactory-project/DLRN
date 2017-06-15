@@ -569,7 +569,8 @@ def post_build(status, packages, session):
                 rpmlist = last.rpms.split(",")
             else:
                 rpmlist = []
-            dumpshas2file(shafile, last, otherproject["upstream"],
+            upstream = otherproject.get('upstream', '')
+            dumpshas2file(shafile, last, upstream,
                           otherproject["master-distgit"],
                           last_processed.status, last.dt_build,
                           rpmlist)
