@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_c273a24c",
+        "filename": "dlrn/drivers/gitrepo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-06-15T13:25:14Z",
+      "side": 1,
+      "message": "Note this could be written using rdopkg code with fewer lines:\n\nspec \u003d specfile.Spec()\nversion \u003d spec.get_tag(\u0027Version\u0027)\nrelease \u003d spec.get_tag(\u0027Release\u0027)\n\nget_tag also accepts expand_macros argument (False by default) and default\u003dNone to not throw exceptions on errors.\n\nSince rdopkg is DLRN dependency anyway, I say let\u0027s reuse ;)",
+      "revId": "6bfec4a6ac7d1263d9a92a68825bdced73172a03",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
