@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_c2aa8270",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-06-15T13:36:48Z",
+      "side": 1,
+      "message": "renderspec \u003d sh.renderspec.bake(...)\nrenderspec(\u0027--spec-style\u0027, ...)\n\nseems more transparent and consistent.",
+      "revId": "60389b7e184a1534fa293a3535c725535d8ebb59",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
