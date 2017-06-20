@@ -16,6 +16,24 @@
       "revId": "88db09e61549700866bfbb1869eb13a9af9e200a",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_df64bb4a",
+        "filename": "dlrn/drivers/gitrepo.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-06-20T11:53:26Z",
+      "side": 1,
+      "message": "Not sure, all of rdopkg works in unicode now, so it might be better to just encode() in DLRN, which doesn\u0027t.",
+      "parentUuid": "9aa53dc9_1f7463fb",
+      "revId": "88db09e61549700866bfbb1869eb13a9af9e200a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
