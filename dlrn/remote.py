@@ -65,8 +65,6 @@ def import_commit(repo_url, config_file, db_connection=None,
         os.makedirs(datadir)
 
     with open(os.path.join(datadir, 'remote.lck'), 'a') as lock_fp:
-        # Get remote update lock, to prevent any other remote operation
-        fcntl.flock(lock_fp, fcntl.LOCK_EX)
         for commit in commits:
             commit.id = None
             if commit.rpms == 'None':
@@ -119,6 +117,11 @@ def import_commit(repo_url, config_file, db_connection=None,
                         if rpm != 'None':
                             logger.warning("Failed to download rpm file %s"
                                            % rpm_url)
+            # Get remote update lock, to prevent any other remote operation
+            # while we are creating the repo and updating the database
+            logger.debug("Acquiring remote update lock")
+            fcntl.flock(lock_fp, fcntl.LOCK_EX)
+            logger.debug("Acquired lock")
             if commit.status == 'SUCCESS':
                 built_rpms = []
                 for rpm in commit.rpms.split(","):
@@ -128,7 +131,8 @@ def import_commit(repo_url, config_file, db_connection=None,
             else:
                 status = [commit, '', '', commit.notes]
             process_build_result(status, packages, session, [])
-        fcntl.flock(lock_fp, fcntl.LOCK_UN)
+            fcntl.flock(lock_fp, fcntl.LOCK_UN)
+            logger.debug("Released lock")
     return 0
 
 
