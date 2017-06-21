@@ -134,6 +134,7 @@ sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
 sed -i -e "s/^\(Source\|Source0\):.*/\1: $SOURCEWITHREL/" *.spec
 sed -i -e '/^%changelog.*/q' *.spec
 cat *.spec
+spectool -g -C ${TOP_DIR}/SOURCES *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
 
 if [ "${ADDITIONAL_MOCK_OPTIONS}" != "" ]
