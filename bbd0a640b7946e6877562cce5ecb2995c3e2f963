@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_6222b8bb",
+        "filename": "dlrn/repositories.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-06-21T12:20:25Z",
+      "side": 1,
+      "message": "This is redundant and begs for inconsistency on future modifications. _tty_out and _timeout are the same no matter the _cwd, so I\u0027d rather got with\n\n    cwd \u003d full_path or path\n    git \u003d sh.git.bake(_cwd\u003dcwd, ...)\n\nor even\n\n    git \u003d sh.git.bake(_cwd\u003dfull_path or path, ...)\n\nor equivalent to your liking.",
+      "revId": "bbd0a640b7946e6877562cce5ecb2995c3e2f963",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
