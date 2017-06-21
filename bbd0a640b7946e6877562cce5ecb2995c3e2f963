@@ -16,6 +16,24 @@
       "revId": "bbd0a640b7946e6877562cce5ecb2995c3e2f963",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_c211845f",
+        "filename": "dlrn/repositories.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-06-21T14:20:29Z",
+      "side": 1,
+      "message": "Yes, makes sense. I\u0027ll fix it now",
+      "parentUuid": "9aa53dc9_6222b8bb",
+      "revId": "bbd0a640b7946e6877562cce5ecb2995c3e2f963",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
