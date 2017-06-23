@@ -31,6 +31,7 @@ from dlrn.drivers.pkginfo import PkgInfoDriver
 from dlrn.repositories import getsourcebranch
 from dlrn.repositories import refreshrepo
 from pymod2pkg import module2upstream
+from rdopkg.utils import specfile
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-gitrepo-driver")
@@ -57,6 +58,23 @@ def check_url(url):
 class GitRepoDriver(PkgInfoDriver):
     def __init__(self, *args, **kwargs):
         super(GitRepoDriver, self).__init__(*args, **kwargs)
+
+    def _get_version_from_pkg(self, packagepath, package):
+        self.preprocess(package_name=package)
+        pkgdir = os.path.join(packagepath, package)
+        for pkgfile in os.listdir(pkgdir):
+            if pkgfile.endswith('.spec'):
+                spec = specfile.Spec(fn=os.path.join(packagepath, package,
+                                                     pkgfile))
+                version = spec.get_tag('Version').encode()
+                release = spec.get_tag('Release').encode()
+
+        if release.startswith('0'):
+            # This is a pre-release version, so we are following trunk
+            return None
+        else:
+            # This is a tagged release
+            return version
 
     def getpackages(self, **kwargs):
         repo = self.config_options.gitrepo_repo
@@ -105,7 +123,17 @@ class GitRepoDriver(PkgInfoDriver):
                                 # version of the upstream_version() macro
                                 m = wrong_match.match(line)
                                 if m is not None:
-                                    break   # So do not store a version
+                                    # We are deducing the version using the
+                                    # source tarball. This is a bit more
+                                    # complex, since we need to run renderspec
+                                    # and find the version in the resulting
+                                    # spec
+                                    version = self._get_version_from_pkg(
+                                        packagepath, package)
+                                    logger.info(
+                                        "Got version %s for %s from the spec"
+                                        % (version, package))
+                                    break
                                 # Check if template defines upstream_version
                                 m = version_match.match(line)
                                 if m is not None:
@@ -194,9 +222,9 @@ class GitRepoDriver(PkgInfoDriver):
                    '../../epoch/fedora.yaml')
         # Replace %{version} with %{upstream_version} in spec
         # This is required by rpm-packaging specs
-        for specfile in os.listdir(distgit_dir):
-            if specfile.endswith(".spec"):
-                filename = os.path.join(distgit_dir, specfile)
+        for specf in os.listdir(distgit_dir):
+            if specf.endswith(".spec"):
+                filename = os.path.join(distgit_dir, specf)
                 with open(filename, 'r+') as fp:
                     spec = fp.read()
                     spec = re.sub('-%{version}', '-%{upstream_version}', spec)
