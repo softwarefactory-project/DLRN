@@ -216,40 +216,17 @@ def main():
         options.head_only = True
     # Build a list of commits we need to process
     toprocess = []
-    for package in packages:
-        project = package["name"]
-        since = "-1"
-        commit = getLastProcessedCommit(session, project)
-        if commit:
-            # If we have switched source branches, we want to behave
-            # as if no previous commits had been built, and only build
-            # the last one
-            if commit.commit_branch == getsourcebranch(package):
-                # This will return all commits since the last handled commit
-                # including the last handled commit, remove it later if needed.
-                since = "--after=%d" % (commit.dt_commit)
-            else:
-                # The last processed commit belongs to a different branch. Just
-                # in case, let's check if we built a previous commit from the
-                # current branch
-                commit = getLastBuiltCommit(session, project,
-                                            getsourcebranch(package))
-                if commit:
-                    logger.info("Last commit belongs to another branch, but"
-                                " we're ok with that")
-                    since = "--after=%d" % (commit.dt_commit)
-
-        if not pkg_name or package["name"] in pkg_names:
-            project_toprocess = pkginfo.getinfo(project=project,
-                                                package=package,
-                                                since=since,
-                                                local=options.local,
-                                                dev_mode=options.dev)
-            # If since == -1, then we only want to trigger a build for the
-            # most recent change
-            if since == "-1" or options.head_only:
-                del project_toprocess[:-1]
-
+    pool = multiprocessing.Pool()   # This will use all the system cpus
+    # Use functools.partial to iterate on the packages to process,
+    # while keeping a few options fixed
+    getinfo_wrapper = partial(getinfo, local=options.local,
+                              dev_mode=options.dev,
+                              head_only=options.head_only,
+                              db_connection=config_options.database_connection)
+    iterator = pool.imap(getinfo_wrapper, packages)
+    while True:
+        try:
+            project_toprocess = iterator.next()
             # The first entry in the list of commits is a commit we have
             # already processed, we want to process it again only if in dev
             # mode or distro hash has changed, we can't simply check against
@@ -264,6 +241,10 @@ def main():
                         Commit.status != "RETRY")
                         .all())):
                     toprocess.append(commit_toprocess)
+        except StopIteration:
+            break
+    pool.close()
+    pool.join()
 
     # if requested do a sort according to build and install
     # dependencies
@@ -380,6 +361,8 @@ def main():
                     return exit_code
             except StopIteration:
                 break
+        pool.close()
+        pool.join()
 
     # If we were bootstrapping, set the packages that required it to RETRY
     if options.order is True and not pkg_name:
@@ -614,3 +597,40 @@ def post_build(status, packages, session):
         os.rename(target_repo_dir + "_", target_repo_dir)
 
     return (failures == 0)
+
+
+def getinfo(package, local=False, dev_mode=False, head_only=False,
+            db_connection=None):
+    project = package["name"]
+    since = "-1"
+    session = getSession(db_connection)
+    commit = getLastProcessedCommit(session, project)
+    if commit:
+        # If we have switched source branches, we want to behave
+        # as if no previous commits had been built, and only build
+        # the last one
+        if commit.commit_branch == getsourcebranch(package):
+            # This will return all commits since the last handled commit
+            # including the last handled commit, remove it later if needed.
+            since = "--after=%d" % (commit.dt_commit)
+        else:
+            # The last processed commit belongs to a different branch. Just
+            # in case, let's check if we built a previous commit from the
+            # current branch
+            commit = getLastBuiltCommit(session, project,
+                                        getsourcebranch(package))
+            if commit:
+                logger.info("Last commit belongs to another branch, but"
+                            " we're ok with that")
+                since = "--after=%d" % (commit.dt_commit)
+
+    project_toprocess = pkginfo.getinfo(project=project, package=package,
+                                        since=since, local=local,
+                                        dev_mode=dev_mode)
+
+    # If since == -1, then we only want to trigger a build for the
+    # most recent change
+    if since == "-1" or head_only:
+        del project_toprocess[:-1]
+
+    return project_toprocess
