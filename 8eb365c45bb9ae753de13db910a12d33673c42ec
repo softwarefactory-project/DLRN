@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_0ebc336b",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-06-26T07:56:55Z",
+      "side": 1,
+      "message": "This is my biggest doubt.\n\nWe should not use the workers parameter here, since we may want to clone git repos as quickly as possible but not use concurrent builds. Maybe we could add yet another parameter here, but using all available CPUs also looks good to me.",
+      "range": {
+        "startLine": 219,
+        "startChar": 22,
+        "endLine": 219,
+        "endChar": 26
+      },
+      "revId": "8eb365c45bb9ae753de13db910a12d33673c42ec",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
