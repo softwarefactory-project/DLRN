@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_f99f97b2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-06-26T11:16:53Z",
+      "side": 1,
+      "message": "openstack ?",
+      "range": {
+        "startLine": 23,
+        "startChar": 54,
+        "endLine": 23,
+        "endChar": 60
+      },
+      "revId": "af0bd3ddcbf28f4abdfc483129cc644ac1f64024",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_d9a4d309",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-06-26T11:16:53Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 24,
+        "startChar": 53,
+        "endLine": 24,
+        "endChar": 59
+      },
+      "revId": "af0bd3ddcbf28f4abdfc483129cc644ac1f64024",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
