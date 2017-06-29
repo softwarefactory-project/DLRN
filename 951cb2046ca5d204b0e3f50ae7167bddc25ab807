@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_ab965492",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 20
+      },
+      "writtenOn": "2017-06-29T12:07:59Z",
+      "side": 1,
+      "message": "we should not abort on failure of this command (ignore the status).\n\nCould we also use -v to see what has been changed?",
+      "revId": "951cb2046ca5d204b0e3f50ae7167bddc25ab807",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
