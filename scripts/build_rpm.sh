@@ -146,10 +146,19 @@ if [ $? -eq 0 ]
 then
     if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
         touch $OUTPUT_DIRECTORY/installed
-        exit 0
+        ret=0
     else
-        exit 1
+        ret=1
     fi
 else
-    exit 1
+    ret=1
 fi
+
+# We want to ignore any error in restorecon
+set +e
+if [ $(which restorecon) ]; then
+    restorecon -Rv $OUTPUT_DIRECTORY
+fi
+set -e
+
+exit $ret
