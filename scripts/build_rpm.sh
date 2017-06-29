@@ -146,10 +146,13 @@ if [ $? -eq 0 ]
 then
     if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
         touch $OUTPUT_DIRECTORY/installed
-        exit 0
+        ret=0
     else
-        exit 1
+        ret=1
     fi
 else
-    exit 1
+    ret=1
 fi
+
+restorecon -R $OUTPUT_DIRECTORY
+exit $ret
