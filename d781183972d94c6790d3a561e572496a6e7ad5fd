@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_9e02ac3d",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-06-30T16:20:34Z",
+      "side": 1,
+      "message": "This is the part that worries me, sqlalchemy connection pools are not supposed to be used by forked processes. \nDocumentation comes up with some recipes to handle such cases.\nhttp://docs.sqlalchemy.org/en/latest/core/pooling.html#using-connection-pools-with-multiprocessing",
+      "revId": "d781183972d94c6790d3a561e572496a6e7ad5fd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
