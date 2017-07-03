@@ -99,19 +99,22 @@ git log -1
 popd
 
 if [ -n "$UPSTREAM_ID" ]; then
+    # Get upstream URL
+    UPSTREAM_URL=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^upstream | awk '{print $2}')
+    UPSTREAM_PROJECT_NAME=$(echo ${UPSTREAM_URL} | awk -F/ '{print $NF}')
     rm -rf data/${PROJECT_TO_BUILD_MAPPED}
     if type -p zuul-cloner; then
         # Only build in the check pipeline to avoid merging a change
         # in packaging that is dependent of an non merged upstream
         # change
         if [ "${ZUUL_PIPELINE}" = "check" ]; then
-            zuul-cloner --workspace data/ $OPENSTACK_GIT_URL openstack/${PROJECT_TO_BUILD}
-            mv data/openstack/${PROJECT_TO_BUILD} data/${PROJECT_TO_BUILD_MAPPED}
+            zuul-cloner --workspace data/ $OPENSTACK_GIT_URL openstack/${UPSTREAM_PROJECT_NAME}
+            mv data/openstack/${UPSTREAM_PROJECT_NAME} data/${PROJECT_TO_BUILD_MAPPED}
         else
             NOT_EXTRACTED=1
         fi
      else
-        git clone "$OPENSTACK_GIT_URL/openstack/${PROJECT_TO_BUILD}" "data/${PROJECT_TO_BUILD_MAPPED}"
+        git clone ${UPSTREAM_URL} "data/${PROJECT_TO_BUILD_MAPPED}"
     fi
     if [ -z "$NOT_EXTRACTED" ]; then
         # We cannot run git review -d because we don't have an
@@ -121,7 +124,7 @@ if [ -n "$UPSTREAM_ID" ]; then
         REF=$(python -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print s['revisions']['$COMMIT']['ref']" <<< $JSON)
         pushd data/${PROJECT_TO_BUILD_MAPPED}
         if [ -n "$REF" -a "$REF" != null ]; then
-            git fetch "$OPENSTACK_GIT_URL/openstack/${PROJECT_TO_BUILD}" $REF
+            git fetch ${UPSTREAM_URL} $REF
             git checkout FETCH_HEAD
         fi
         git log -1
