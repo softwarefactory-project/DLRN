@@ -17,7 +17,7 @@ tox -epy27 --notest
 . .tox/py27/bin/activate
 
 # Default project to build
-PROJECT_DISTRO="openstack/glanceclient-distgit"
+PROJECT_DISTRO="openstack/packstack-distgit"
 PROJECT_DISTRO_BRANCH="rpm-master"
 
 # If we're actually building for a Zuul project, build that unless it's DLRN
