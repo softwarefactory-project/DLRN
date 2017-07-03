@@ -341,6 +341,7 @@ def promote():
     except KeyError:
         raise InvalidUsage('Missing parameters', status_code=400)
 
+    # Check for invalid promote names
     if (promote_name == 'consistent' or promote_name == 'current'):
         raise InvalidUsage('Invalid promote_name %s' % promote_name,
                            status_code=403)
@@ -355,6 +356,12 @@ def promote():
                            status_code=404)
 
     target_link = os.path.join(app.config['REPO_PATH'], promote_name)
+    # Check for invalid target links, like ../promotename
+    target_dir = os.path.dirname(os.path.abspath(target_link))
+    if not os.path.samefile(target_dir, app.config['REPO_PATH']):
+        raise InvalidUsage('Invalid promote_name %s' % promote_name,
+                           status_code=403)
+
     # We should create a relative symlink
     yumrepodir = commit.getshardedcommitdir()
 

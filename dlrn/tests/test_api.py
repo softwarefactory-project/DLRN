@@ -366,6 +366,19 @@ class TestPromote(DLRNAPITestCase):
 
         self.assertEqual(response.status_code, 403)
 
+    def test_promote_invalid_name_relative(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='1c67b1ab8c6fe273d4e'
+                                               '175a14f0df5d3cbbd0edc',
+                                   distro_hash='8170b8686c38bafb6021'
+                                               'd998e2fb268ab26ccf65',
+                                   promote_name='../consistent'))
+        response = self.app.post('/api/promote',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+
+        self.assertEqual(response.status_code, 403)
+
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
