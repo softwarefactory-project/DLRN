@@ -16,6 +16,24 @@
       "revId": "d781183972d94c6790d3a561e572496a6e7ad5fd",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_2131450c",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-07-03T10:13:19Z",
+      "side": 1,
+      "message": "Thanks! We were being lucky that no connection had been created at this moment, so each child was creating its own pool. Anyway, I have added the code in dlrn/db.py to handle this case.",
+      "parentUuid": "9aa53dc9_9e02ac3d",
+      "revId": "d781183972d94c6790d3a561e572496a6e7ad5fd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
