@@ -10,6 +10,7 @@ The following cloud-config script can be passed as a --user-data argument to
 hack on.
 
 .. code-block:: yaml
+
     #cloud-config
     disable_root: 0
 
@@ -47,6 +48,7 @@ Pull requests submitted through GitHub will be ignored.  They should be sent
 to SoftwareFactory's Gerrit instead, using git-review. The usual workflow is:
 
 .. code-block:: bash
+
      $ sudo yum install git-review  (you can also use pip install if needed)
      $ git clone https:/github.com/softwarefactory-project/DLRN
      <edit your files here>
