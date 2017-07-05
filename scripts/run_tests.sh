@@ -140,6 +140,9 @@ function copy_logs() {
 }
 trap copy_logs ERR EXIT
 
+# Just a test, to see if SELinux is enabled
+getenforce
+
 # Run DLRN
 dlrn --head-only --package-name $PROJECT_TO_BUILD_MAPPED --dev --local --info-repo /tmp/rdoinfo --verbose-mock
 copy_logs
