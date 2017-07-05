@@ -129,6 +129,7 @@ def repo_status():
              'url': vote.ci_url,
              'notes': vote.notes}
         data.append(d)
+    session.close()
     return jsonify(data)
 
 
@@ -193,6 +194,7 @@ def last_tested_repo_GET():
               'job_id': vote.ci_name,
               'success': vote.ci_vote,
               'in_progress': vote.ci_in_progress}
+    session.close()
     return jsonify(result), 200
 
 
@@ -267,6 +269,7 @@ def last_tested_repo_POST():
               'job_id': newvote.ci_name,
               'success': newvote.ci_vote,
               'in_progress': newvote.ci_in_progress}
+    session.close()
     return jsonify(result), 201
 
 
@@ -321,6 +324,7 @@ def report_result():
               'in_progress': False,
               'url': url,
               'notes': notes}
+    session.close()
     return jsonify(result), 201
 
 
@@ -370,6 +374,7 @@ def promote():
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
               'promote_name': promote_name}
+    session.close()
     return jsonify(result), 201
 
 
@@ -433,7 +438,7 @@ def get_civotes():
         repolist.append(repodetail)
 
     repolist = sorted(repolist, key=lambda repo: repo.timestamp, reverse=True)
-
+    session.close()
     return render_template('votes_general.j2',
                            target='master',
                            repodetail=repolist)
@@ -470,7 +475,7 @@ def get_civotes_detail():
         votelist[i].commit_hash = commit.commit_hash
         votelist[i].distro_hash = commit.distro_hash
         votelist[i].distro_hash_short = commit.distro_hash[:8]
-
+    session.close()
     return render_template('votes.j2',
                            target='master',
                            votes=votelist)
