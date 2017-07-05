@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_52a7754f",
+        "filename": "dlrn/build.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-07-05T16:39:37Z",
+      "side": 1,
+      "message": "nitpick:\nfrom six.moves.urllib.parse import urljoin\nr \u003d urlopen(urljoin(baseurl, \u0027delorean-deps.repo\u0027)",
+      "revId": "d3f0b7055a4e8b9972ab2bfe451d0f3ad8d9ce94",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
