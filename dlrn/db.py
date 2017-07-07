@@ -19,12 +19,15 @@ from sqlalchemy import asc
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import desc
+from sqlalchemy import event
+from sqlalchemy import exc
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import or_
 from sqlalchemy import String
 from sqlalchemy import Text
 
+from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import scoped_session
 
 Base = sqlalchemy.ext.declarative.declarative_base()
@@ -160,3 +163,20 @@ def getCommits(session, project=None, with_status=None, without_status=None,
     if limit:
         commits = commits.limit(limit)
     return commits
+
+
+@event.listens_for(Engine, "connect")
+def connect(dbapi_connection, connection_record):
+    connection_record.info['pid'] = os.getpid()
+
+
+@event.listens_for(Engine, "checkout")
+def checkout(dbapi_connection, connection_record, connection_proxy):
+    pid = os.getpid()
+    if connection_record.info['pid'] != pid:
+        connection_record.connection = connection_proxy.connection = None
+        raise exc.DisconnectionError(
+            "Connection record belongs to pid %s, "
+            "attempting to check out in pid %s" %
+            (connection_record.info['pid'], pid)
+        )
