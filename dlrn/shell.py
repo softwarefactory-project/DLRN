@@ -267,10 +267,13 @@ def main():
 
     # if requested do a sort according to build and install
     # dependencies
-    if options.order is True and not pkg_name:
+    if options.order is True:
         # collect info from all spec files
         logger.info("Reading rpm spec files")
-        projects = sorted([p['name'] for p in packages])
+        if pkg_names:
+            projects = sorted(pkg_names)
+        else:
+            projects = sorted([p['name'] for p in packages])
 
         speclist = []
         bootstraplist = []
