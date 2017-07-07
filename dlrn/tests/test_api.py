@@ -469,3 +469,19 @@ class TestGetCIVotes(DLRNAPITestCase):
                                 '24e42de714d1addd1')
         self.assertEqual(rt_mock.call_count, 1)
         self.assertEqual(response.status_code, 200)
+
+
+@mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestGetReport(DLRNAPITestCase):
+    def test_get_report(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/report.html')
+        self.assertEqual(rt_mock.call_count, 1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_report_detail(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/report.html?project=python-pysaml2'
+                                '&success=1')
+        self.assertEqual(rt_mock.call_count, 1)
+        self.assertEqual(response.status_code, 200)
