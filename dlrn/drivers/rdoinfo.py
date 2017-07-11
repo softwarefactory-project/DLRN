@@ -92,15 +92,23 @@ class RdoInfoDriver(PkgInfoDriver):
         source_branch = getsourcebranch(package)
 
         if dev_mode is False:
-            distro_branch, distro_hash, dt_distro = refreshrepo(
-                distro, distro_dir, distro_branch, local=local,
-                full_path=distro_dir_full)
+            try:
+                distro_branch, distro_hash, dt_distro = refreshrepo(
+                    distro, distro_dir, distro_branch, local=local,
+                    full_path=distro_dir_full)
+            except Exception:
+                # The error was already logged by refreshrepo, and we want
+                # to avoid halting the whole run because this distgit repo
+                # failed, so return an empty list
+                return []
         else:
             distro_hash = "dev"
             dt_distro = 0  # Doesn't get used in dev mode
             if not os.path.isdir(distro_dir):
+                # We should fail in this case, since we are running
+                # in dev mode, so no try/except
                 refreshrepo(distro, distro_dir, distro_branch, local=local,
-                full_path=distro_dir_full)
+                            full_path=distro_dir_full)
 
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory
