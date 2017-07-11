@@ -16,7 +16,7 @@ Setup
 
     # yum install git createrepo python-virtualenv mock gcc \
                   redhat-rpm-config rpmdevtools httpd libffi-devel \
-                  openssl-devel
+                  openssl-devel yum-utils
 
 Add the user you intend to run as to the mock group and login again.
 
