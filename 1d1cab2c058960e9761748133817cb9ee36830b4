@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_4588cc22",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-07-12T13:54:58Z",
+      "side": 1,
+      "message": "My first reaction to this line was \"dafuq is this ascii vomit\" - so it\u0027s a proper shell code :)",
+      "revId": "1d1cab2c058960e9761748133817cb9ee36830b4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_258dc831",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-07-12T13:54:58Z",
+      "side": 1,
+      "message": "findpkg being useful, whooo \\o/",
+      "revId": "1d1cab2c058960e9761748133817cb9ee36830b4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
