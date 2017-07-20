@@ -136,6 +136,9 @@ def main():
     parser.add_argument('--verbose-mock', action="store_true",
                         help="Show verbose mock output during build.")
 
+    parser.add_argument('--force-rebuild', action="store_true",
+                        help="Force rebuild "
+                        "(requires a package/project name)")
     options, args = parser.parse_known_args(sys.argv[1:])
 
     global verbose_mock
@@ -165,6 +168,15 @@ def main():
         pkg_names = options.package_name
     else:
         pkg_names = None
+
+    if options.force_rebuild is True:
+        if not pkg_names:
+            pkg_names = [p['name'] for p in packages]
+        for name in pkg_names:
+            commit = getLastProcessedCommit(session, name)
+            # force rebuild by deleting a specific commit
+            print(name, "forced rebuild")
+            session.delete(commit)
 
     if options.status is True:
         if not pkg_names:
