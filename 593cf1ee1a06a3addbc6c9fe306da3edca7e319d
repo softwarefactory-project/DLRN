@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aa745d1_7dddb76f",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2017-07-20T15:46:49Z",
+      "side": 1,
+      "message": "Deleting an entry from the database is not the right approach IMO. We want to keep history intact, just force a rebuild with a new epoch ?",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 34
+      },
+      "revId": "593cf1ee1a06a3addbc6c9fe306da3edca7e319d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
