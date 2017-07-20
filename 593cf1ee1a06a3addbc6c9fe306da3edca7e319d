@@ -22,6 +22,30 @@
       "revId": "593cf1ee1a06a3addbc6c9fe306da3edca7e319d",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aa745d1_5dc79b45",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-07-20T22:00:44Z",
+      "side": 1,
+      "message": "Bumping epoch is not the right way -and I won\u0027t list why it would be bad idea to introduce them in DLRN-, bumping release would suffices here.\n\n1. retrieve last build NVR\n2. bump the first part of release X in X.\u003cdate\u003e.\u003cshort hash\u003e\n3. change DLRN to allow overriding computed NVR (notably setversionandrelease shell function.\n\nSo it would end up with something like:\ndlrn build --bump --project-name novaclient\n\n\nBut it won\u0027t work for backwards builds, so an alternative would be invalidating builds.\ndlrn invalidate ID # mark a build as invalidated and let DLRN automagically process it during the next run\n\n1. add logic in DLRN to detect that a build has been invalidated (through a new status MARKED_INVALIDATION)\n2. let DLRN process it during next run\n3. check if computed NVR changed, here\u0027s the logic will need tweaking but if it doesn\u0027t change, we bump release as done above, if not, continue as above\n4. mark previous build as processed (INVALIDATED)",
+      "parentUuid": "5aa745d1_7dddb76f",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 34
+      },
+      "revId": "593cf1ee1a06a3addbc6c9fe306da3edca7e319d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
