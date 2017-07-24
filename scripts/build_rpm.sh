@@ -134,6 +134,7 @@ sed -i -e "s/^\(Source\|Source0\):.*/\1: $SOURCEWITHREL/" *.spec
 sed -i -e '/^%changelog.*/q' *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
+cp ${TOP_DIR}/SRPMS/*.src.rpm $OUTPUT_DIRECTORY/
 
 if [ "${ADDITIONAL_MOCK_OPTIONS}" != "" ]
 then
