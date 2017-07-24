@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aa745d1_0382d252",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-07-24T14:32:18Z",
+      "side": 1,
+      "message": "when in shell, speak like shell :)\n\nUPSTREAM_PROJECT_NAME\u003d$(basename ${UPSTREAM_URL})",
+      "revId": "e6c1600626fa3484efabca67d4e3d8e35454c6bc",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
