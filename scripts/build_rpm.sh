@@ -156,14 +156,21 @@ if [ -n "$COPR_ID" ]; then
     rm -rf $OUTPUT_DIRECTORY/$buildid
     rm -f $OUTPUT_DIRECTORY/index.html $OUTPUT_DIRECTORY/build.log.gz
 else
+    set +e
     /usr/bin/mock ${MOCKOPTS} ${ADDITIONAL_MOCK_OPTIONS} --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+    ret=$?
+    set -e
 
-    if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
+    if [ $ret = 0 ] && ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
         touch $OUTPUT_DIRECTORY/installed
         ret=0
     else
         ret=1
     fi
+fi
+
+if [ $ret != 0]; then
+    cp ${TOP_DIR}/SRPMS/*.src.rpm $OUTPUT_DIRECTORY/
 fi
 
 # We want to ignore any error in restorecon
