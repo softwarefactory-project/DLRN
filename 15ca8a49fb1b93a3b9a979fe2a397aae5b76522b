@@ -22,6 +22,30 @@
       "revId": "15ca8a49fb1b93a3b9a979fe2a397aae5b76522b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aa745d1_0674209a",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 267
+      },
+      "writtenOn": "2017-07-25T16:42:31Z",
+      "side": 1,
+      "message": "The idea behind was to avoid changing it again when pushing a fix in rdopkg, but ok, we can do it in the most safe way",
+      "parentUuid": "5aa745d1_464b485a",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 21
+      },
+      "revId": "15ca8a49fb1b93a3b9a979fe2a397aae5b76522b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
