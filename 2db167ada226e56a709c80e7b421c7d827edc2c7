@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aa745d1_8326e214",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-07-25T08:44:55Z",
+      "side": 1,
+      "message": "I\u0027d rather copy the src.rpm after the build effectively failed",
+      "revId": "2db167ada226e56a709c80e7b421c7d827edc2c7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
