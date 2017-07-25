@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aa745d1_464b485a",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2017-07-25T16:40:43Z",
+      "side": 1,
+      "message": "I think I would pin to \u003c0.44.0 for now to be safe",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 21
+      },
+      "revId": "15ca8a49fb1b93a3b9a979fe2a397aae5b76522b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
