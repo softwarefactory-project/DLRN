@@ -6,7 +6,8 @@ Installing prerequisites:
 
 .. code-block:: bash
 
-    $ sudo yum install git createrepo python-virtualenv mock gcc redhat-rpm-config rpmdevtools httpd
+    $ sudo yum install git createrepo python-virtualenv mock gcc redhat-rpm-config rpmdevtools httpd \
+      libffi-devel openssl-devel
 
 Add the user you intend to run as to the mock group:
 
