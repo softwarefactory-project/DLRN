@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aa745d1_e625af5c",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-02T15:22:01Z",
+      "side": 1,
+      "message": "if 0.44.0 is creating trouble, let\u0027s set the pin to \u003e\u003d 0.44.2",
+      "revId": "e655af6d098f8a93587236d9dd069fe7b249814e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
