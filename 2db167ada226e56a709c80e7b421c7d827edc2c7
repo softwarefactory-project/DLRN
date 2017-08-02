@@ -16,6 +16,24 @@
       "revId": "2db167ada226e56a709c80e7b421c7d827edc2c7",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aa745d1_861dcb11",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-02T15:23:11Z",
+      "side": 1,
+      "message": "Agreed, let\u0027s do it in line 155",
+      "parentUuid": "5aa745d1_8326e214",
+      "revId": "2db167ada226e56a709c80e7b421c7d827edc2c7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
