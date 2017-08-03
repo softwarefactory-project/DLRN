@@ -113,7 +113,7 @@ def getSession(url='sqlite://', new=False):
     if _sessions.get(url) and new is False:
         return _sessions.get(url)
 
-    engine = sqlalchemy.create_engine(url)
+    engine = sqlalchemy.create_engine(url, pool_recycle=300)
     Base.metadata.create_all(engine)
     _sessions[url] = scoped_session(sqlalchemy.orm.sessionmaker(bind=engine))
     return _sessions[url]
