@@ -34,6 +34,24 @@
       "revId": "2db167ada226e56a709c80e7b421c7d827edc2c7",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aa745d1_292b68ed",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 20
+      },
+      "writtenOn": "2017-08-03T16:22:03Z",
+      "side": 1,
+      "message": "I\u0027d prefer to let it like that to have it available as soon as possible for packages that are taking very long to build...",
+      "parentUuid": "5aa745d1_861dcb11",
+      "revId": "2db167ada226e56a709c80e7b421c7d827edc2c7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
