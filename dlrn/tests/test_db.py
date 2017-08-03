@@ -42,8 +42,8 @@ class TestGetSessions(base.TestCase):
         # The 2nd call shouldn't result in a new session
         db.getSession()
         self.assertEqual(len(sm_mock.call_args_list), 2)
-        expected = [mock.call('sqlite://'),
-                    mock.call('sqlite:///test.db')]
+        expected = [mock.call('sqlite://', pool_recycle=300),
+                    mock.call('sqlite:///test.db', pool_recycle=300)]
         self.assertEqual(ce_mock.call_args_list, expected)
 
 
