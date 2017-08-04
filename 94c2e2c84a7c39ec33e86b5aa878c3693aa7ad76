@@ -16,6 +16,24 @@
       "revId": "94c2e2c84a7c39ec33e86b5aa878c3693aa7ad76",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ab451fb_1c73554f",
+        "filename": "dlrn/drivers/gitrepo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-04T15:41:40Z",
+      "side": 1,
+      "message": "This is the key point I want to think about.\n\nCurrently, this only allows us to have one rebuild for a given commit+distro hash combination. To allow an arbitrary number of rebuilds, we should track them in the database. I\u0027ll give it a thought.",
+      "parentUuid": "3ab451fb_bcc901af",
+      "revId": "94c2e2c84a7c39ec33e86b5aa878c3693aa7ad76",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
