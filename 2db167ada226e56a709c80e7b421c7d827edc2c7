@@ -52,6 +52,24 @@
       "revId": "2db167ada226e56a709c80e7b421c7d827edc2c7",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ab451fb_dc3bad9b",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-04T10:55:31Z",
+      "side": 1,
+      "message": "What would be the goal of that, checking the src.rpm while the package is being built?",
+      "parentUuid": "5aa745d1_292b68ed",
+      "revId": "2db167ada226e56a709c80e7b421c7d827edc2c7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
