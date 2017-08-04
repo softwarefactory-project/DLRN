@@ -156,6 +156,7 @@ class GitRepoDriver(PkgInfoDriver):
         since = kwargs.get('since')
         local = kwargs.get('local')
         dev_mode = kwargs.get('dev_mode')
+        force_rebuild = kwargs.get('force_rebuild')
         datadir = self.config_options.datadir
 
         for url in base_urls:
@@ -183,6 +184,9 @@ class GitRepoDriver(PkgInfoDriver):
                            ).strip().split(" ")
             distro_hash = repoinfo[0]
             dt_distro = repoinfo[1]
+            if force_rebuild:
+                distro_hash = 'R' + distro_hash
+                dt_distro = 0
 
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory

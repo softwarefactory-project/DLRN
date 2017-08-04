@@ -135,6 +135,10 @@ def main():
                         help="Stop on error.")
     parser.add_argument('--verbose-mock', action="store_true",
                         help="Show verbose mock output during build.")
+    parser.add_argument('--force-rebuild', action='store_true',
+                        help="Force rebuild of the most current commit of a "
+                             "package, based on the information provided by "
+                             "the driver.")
 
     options, args = parser.parse_known_args(sys.argv[1:])
 
@@ -224,7 +228,8 @@ def main():
                                   dev_mode=options.dev,
                                   head_only=options.head_only,
                                   db_connection=config_options.
-                                  database_connection)
+                                  database_connection,
+                                  force_rebuild=options.force_rebuild)
         iterator = pool.imap(getinfo_wrapper, packages)
         while True:
             try:
@@ -254,7 +259,8 @@ def main():
                                             dev_mode=options.dev,
                                             head_only=options.head_only,
                                             db_connection=config_options.
-                                            database_connection)
+                                            database_connection,
+                                            force_rebuild=options.force_rebuild)
                 for commit_toprocess in project_toprocess:
                     if ((options.dev is True) or
                         options.run or
@@ -619,7 +625,7 @@ def post_build(status, packages, session):
 
 
 def getinfo(package, local=False, dev_mode=False, head_only=False,
-            db_connection=None):
+            db_connection=None, force_rebuild=False):
     project = package["name"]
     since = "-1"
     session = getSession(db_connection)
@@ -645,7 +651,8 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
 
     project_toprocess = pkginfo.getinfo(project=project, package=package,
                                         since=since, local=local,
-                                        dev_mode=dev_mode)
+                                        dev_mode=dev_mode,
+                                        force_rebuild=force_rebuild)
 
     # If since == -1, then we only want to trigger a build for the
     # most recent change
