@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ab451fb_bc56a104",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-04T09:12:23Z",
+      "side": 1,
+      "message": "I guess this new global will later be used by the rubygem specs. Do you have an example?",
+      "revId": "adfd42d5f6cc63bb8e630eb9814939c97f5ef603",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
