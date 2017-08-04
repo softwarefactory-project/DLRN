@@ -70,6 +70,24 @@
       "revId": "adfd42d5f6cc63bb8e630eb9814939c97f5ef603",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ab451fb_7ca3799f",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-04T16:17:31Z",
+      "side": 1,
+      "message": "Ok, after testing a rubygem build I understand the issue. We do not face this with python packages because of the way %setup works with the version, and there we can use %upstream_version safely. Let\u0027s add this if it helps ruby gems.",
+      "parentUuid": "3ab451fb_9caf6594",
+      "revId": "adfd42d5f6cc63bb8e630eb9814939c97f5ef603",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
