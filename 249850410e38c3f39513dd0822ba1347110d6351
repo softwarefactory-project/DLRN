@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ab451fb_3cbe1100",
+        "filename": "scripts/bisect.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-04T10:35:36Z",
+      "side": 1,
+      "message": "Please use --package-name instead of --project-name. In the RDO case, sometimes the project and package names differ, and the convention is to use package-name for all checks.",
+      "range": {
+        "startLine": 53,
+        "startChar": 20,
+        "endLine": 53,
+        "endChar": 34
+      },
+      "revId": "249850410e38c3f39513dd0822ba1347110d6351",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ab451fb_1cbb5510",
+        "filename": "scripts/bisect.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-04T10:35:36Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 82,
+        "startChar": 33,
+        "endLine": 82,
+        "endChar": 48
+      },
+      "revId": "249850410e38c3f39513dd0822ba1347110d6351",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
