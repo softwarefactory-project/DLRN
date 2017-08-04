@@ -16,6 +16,24 @@
       "revId": "adfd42d5f6cc63bb8e630eb9814939c97f5ef603",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ab451fb_9c72c5ac",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 169
+      },
+      "writtenOn": "2017-08-04T09:36:40Z",
+      "side": 1,
+      "message": "Yes I have:\n\nhttps://github.com/centos-opstools/rubygem-em-http-request/blob/master/rubygem-em-http-request.spec#L51",
+      "parentUuid": "3ab451fb_bc56a104",
+      "revId": "adfd42d5f6cc63bb8e630eb9814939c97f5ef603",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
