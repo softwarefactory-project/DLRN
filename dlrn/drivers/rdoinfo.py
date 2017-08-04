@@ -81,6 +81,7 @@ class RdoInfoDriver(PkgInfoDriver):
         since = kwargs.get('since')
         local = kwargs.get('local')
         dev_mode = kwargs.get('dev_mode')
+        force_rebuild = kwargs.get('force_rebuild')
         datadir = self.config_options.datadir
         repo = package['upstream']
         distro = package['master-distgit']
@@ -96,6 +97,9 @@ class RdoInfoDriver(PkgInfoDriver):
                 distro_branch, distro_hash, dt_distro = refreshrepo(
                     distro, distro_dir, distro_branch, local=local,
                     full_path=distro_dir_full)
+                if force_rebuild:
+                    distro_hash = 'R' + distro_hash
+                    dt_distro = 0
             except Exception:
                 # The error was already logged by refreshrepo, and we want
                 # to avoid halting the whole run because this distgit repo
