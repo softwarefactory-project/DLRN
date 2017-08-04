@@ -34,6 +34,24 @@
       "revId": "adfd42d5f6cc63bb8e630eb9814939c97f5ef603",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ab451fb_dc9f2db3",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-04T09:51:32Z",
+      "side": 1,
+      "message": "Mmm... Have you tried using upstream_version?\n\nWe have that in the RDO specs, see https://github.com/rdo-packages/oslo-policy-distgit/blob/rpm-master/python-oslo-policy.spec#L1 for a fallback macro used to avoid the %if and https://github.com/rdo-packages/oslo-policy-distgit/blob/rpm-master/python-oslo-policy.spec#L134 for its usage in %setup",
+      "parentUuid": "3ab451fb_9c72c5ac",
+      "revId": "adfd42d5f6cc63bb8e630eb9814939c97f5ef603",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
