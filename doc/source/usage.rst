@@ -151,3 +151,18 @@ a certain date.
 Old commits will remain in the database, although their flag will be set to purged, and their
 associated repo directory will be removed. There is one exception to this rule, when an old
 commit is the newest one that was successfully built. In that case, it will be preserved.
+
+Building only the last commit
+-----------------------------
+
+You can use the ``--head-only`` option to build only the last commit of
+the branch for all the projects or a particular project
+using ``--project-name`` or ``--package-name``.
+
+Doing so you skip commits and if you find a problem in the last
+commit, you can use the ``./scripts/bisect.sh`` helper to drive a ``git
+bisect`` session to find which commit has caused the problem:
+
+.. code-block:: console
+
+   Usage: ./scripts/bisect.sh <dlrn config file> <project name> <good sha1> <bad sha1> [<dlrn extra args>]
