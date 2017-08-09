@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Upstream Packaging By DLRN</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <h1>
+      <i class='fa fa-chevron-circle-right pull-left'></i>
+      {{ reponame | capitalize }} - {{ target | capitalize }} ({{ src }})
+    </h1>
+    <table id="dlrn">
+      <tr>
+        <th>Status</th>
+        <th>Project Name</th>
+        <th>Commit Hash</th>
+        <th>Status</th>
+        <th>Repository</th>
+      </tr>
+      {% for commit in commits %}
+        <tr {% if commit.status == "SUCCESS" %}class="success"{% endif %}>
+          <td>{% for status in commit | statuses %}
+            <span style="color:{% if status.ci_in_progress %}orange{% elif status.ci_vote %}green{% else %}red{% endif %}">{{ status.ci_name }}</span> 
+            {% endfor %}</td>
+          <td>{{ commit.project_name }}</td>
+          <td class="commit">
+            <i class="fa fa-git pull-left"></i>
+            <i>
+              <a href="{{ commit | get_commit_url }}{{ commit.commit_hash }}">
+                {{ commit.commit_hash }}
+                </a>
+          </td>
+          <td>
+            {% if commit.status == "SUCCESS"  %}
+              <i class="fa fa-link pull-left" style="color:#004153"></i>SUCCESS
+            {% elif commit.status == "FAILED"  %}
+              <i class="fa fa-link pull-left" style="color:red"></i>FAILED
+            {% elif commit.status == "RETRY"  %}
+              <i class="fa fa-link pull-left" style="color:orange"></i>RETRY
+            {% else %}
+              <i class="fa fa-link pull-left" style="color:blue"></i>UNKNOWN
+            {% endif %}
+          </td>
+          <td>
+            <i class="fa fa-link pull-left" style='color:#004153'></i>
+            <a href="{{ commit.getshardedcommitdir() }}">repo</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

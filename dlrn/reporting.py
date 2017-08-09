@@ -23,6 +23,7 @@ from six.moves.urllib import parse
 import jinja2
 
 from dlrn.config import getConfigOptions
+from dlrn.db import CIVote
 from dlrn.db import Commit
 from dlrn.db import getCommits
 
@@ -66,6 +67,10 @@ def _jinja2_filter_get_commit_url(commit, packages):
     return "???"
 
 
+def _jinja2_filter_statuses(commit, session):
+    return session.query(CIVote).filter(CIVote.commit_id == commit.id).all()
+
+
 def genreports(packages, head_only, session, all_commits):
     config_options = getConfigOptions()
 
@@ -87,6 +92,8 @@ def genreports(packages, head_only, session, all_commits):
     jinja_env = jinja2.Environment(
         loader=jinja2.FileSystemLoader([templatedir]))
     jinja_env.filters["strftime"] = _jinja2_filter_strftime
+    jinja_env.filters["statuses"] =  \
+        partial(_jinja2_filter_statuses, session=session)
     jinja_env.filters["get_commit_url"] = \
         partial(_jinja2_filter_get_commit_url, packages=packages)
 
@@ -99,6 +106,18 @@ def genreports(packages, head_only, session, all_commits):
                                     commits=commits)
     shutil.copy2(css_file, os.path.join(repodir, "styles.css"))
     report_file = os.path.join(repodir, "report.html")
+    with open(report_file, "w") as fp:
+        fp.write(content)
+
+    # generate full report
+    commits = getCommits(session, limit=300)
+    jinja_template = jinja_env.get_template("full.j2")
+    content = jinja_template.render(reponame=reponame,
+                                    src=src,
+                                    target=target,
+                                    commits=commits)
+    shutil.copy2(css_file, os.path.join(repodir, "styles.css"))
+    report_file = os.path.join(repodir, "full.html")
     with open(report_file, "w") as fp:
         fp.write(content)
 
