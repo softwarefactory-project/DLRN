@@ -26,6 +26,9 @@ function setversionandrelease(){
     # 0.10.1.11.ga5f0e3c
     elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(g.+) ]] ; then
         VERSION=${BASH_REMATCH[1]}
+    # prerelease, eg. 1.8.0.pre
+  elif [[ "$UPSTREAMVERSION" =~ (.*?)\.pre.* ]] ; then
+        VERSION=${BASH_REMATCH[1]}
     # Only version e.g. 1.7.3
     elif [[ "$UPSTREAMVERSION" =~ ^([.0-9]*)$ ]] ; then
         VERSION=${BASH_REMATCH[1]}

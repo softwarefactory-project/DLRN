@@ -42,3 +42,5 @@ test_setvr 2015.1.9-13-g53b605d    2015.1.9-13-g53b605d    2015.1.9   0.20150102
 # This one tests a special case for python-alembic
 TARBALL=alembic-0.0.9.dev0.tar.gz \
 test_setvr 0.0.9                   0.0.9.dev0              0.0.9      0.20150102034455.shortsha
+test_setvr 1.8.0.pre               1.8.0.pre               1.8.0      0.20150102034455.shortsha
+test_setvr 1.8.0.pre.1             1.8.0.pre.1             1.8.0      0.20150102034455.shortsha
