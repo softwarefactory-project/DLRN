@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ab451fb_85ddc872",
+        "filename": "scripts/common-functions",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-11T13:14:54Z",
+      "side": 1,
+      "message": "Do they always look like 1.8.0.pre, or could they also have a number after \"pre\"?",
+      "revId": "2c5f1acea7dc5e577b7d8b7b0f3f75ab94eae3be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
