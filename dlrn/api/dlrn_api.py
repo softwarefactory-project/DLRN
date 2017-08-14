@@ -20,6 +20,7 @@ from dlrn.api.utils import InvalidUsage
 from dlrn.api.utils import RepoDetail
 
 from dlrn.db import CIVote
+from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getSession
@@ -134,7 +135,7 @@ def repo_status():
              'url': vote.ci_url,
              'notes': vote.notes}
         data.append(d)
-    session.close()
+    closeSession(session)
     return jsonify(data)
 
 
@@ -199,7 +200,7 @@ def last_tested_repo_GET():
               'job_id': vote.ci_name,
               'success': vote.ci_vote,
               'in_progress': vote.ci_in_progress}
-    session.close()
+    closeSession(session)
     return jsonify(result), 200
 
 
@@ -260,7 +261,7 @@ def promotions_GET():
              'distro_hash': commit.distro_hash,
              'promote_name': promotion.promotion_name}
         data.append(d)
-    session.close()
+    closeSession(session)
     return jsonify(data)
 
 
@@ -335,7 +336,7 @@ def last_tested_repo_POST():
               'job_id': newvote.ci_name,
               'success': newvote.ci_vote,
               'in_progress': newvote.ci_in_progress}
-    session.close()
+    closeSession(session)
     return jsonify(result), 201
 
 
@@ -390,7 +391,7 @@ def report_result():
               'in_progress': False,
               'url': url,
               'notes': notes}
-    session.close()
+    closeSession(session)
     return jsonify(result), 201
 
 
@@ -455,7 +456,7 @@ def promote():
               'distro_hash': distro_hash,
               'promote_name': promote_name,
               'timestamp': timestamp}
-    session.close()
+    closeSession(session)
     return jsonify(result), 201
 
 
@@ -519,7 +520,7 @@ def get_civotes():
         repolist.append(repodetail)
 
     repolist = sorted(repolist, key=lambda repo: repo.timestamp, reverse=True)
-    session.close()
+    closeSession(session)
     return render_template('votes_general.j2',
                            target='master',
                            repodetail=repolist)
@@ -556,7 +557,7 @@ def get_civotes_detail():
         votelist[i].commit_hash = commit.commit_hash
         votelist[i].distro_hash = commit.distro_hash
         votelist[i].distro_hash_short = commit.distro_hash[:8]
-    session.close()
+    closeSession(session)
     return render_template('votes.j2',
                            target='master',
                            votes=votelist)
@@ -583,6 +584,7 @@ def get_report():
     cp = configparser.RawConfigParser(default_options)
     cp.read(app.config['CONFIG_FILE'])
     config_options = ConfigOptions(cp)
+    closeSession(session)
 
     return render_template('report.j2',
                            reponame='Detailed build report',

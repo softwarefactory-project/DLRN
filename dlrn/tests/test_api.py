@@ -26,7 +26,8 @@ from six.moves.urllib.request import urlopen
 
 
 def mocked_session(url):
-    session = db.getSession(new=True)
+    db_fd, filepath = tempfile.mkstemp()
+    session = db.getSession("sqlite:///%s" % filepath)
     utils.loadYAML(session, './dlrn/tests/samples/commits_2.yaml')
     return session
 
@@ -42,7 +43,8 @@ def mocked_urlopen(url):
 class DLRNAPITestCase(base.TestCase):
     def setUp(self):
         super(DLRNAPITestCase, self).setUp()
-        self.db_fd, app.config['DB_PATH'] = tempfile.mkstemp()
+        self.db_fd, self.filepath = tempfile.mkstemp()
+        app.config['DB_PATH'] = "sqlite:///%s" % self.filepath
         app.config['REPO_PATH'] = '/tmp'
         self.app = app.test_client()
         self.app.testing = True
@@ -51,7 +53,7 @@ class DLRNAPITestCase(base.TestCase):
 
     def tearDown(self):
         os.close(self.db_fd)
-        os.unlink(app.config['DB_PATH'])
+        os.unlink(self.filepath)
         super(DLRNAPITestCase, self).tearDown()
 
 

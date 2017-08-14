@@ -16,7 +16,7 @@ import mock
 import sh
 from six.moves.urllib.request import urlopen
 import sys
-
+import tempfile
 
 from dlrn.tests import base
 
@@ -26,7 +26,8 @@ from dlrn import utils
 
 
 def mocked_session(url):
-    session = db.getSession(new=True)
+    db_fd, filepath = tempfile.mkstemp()
+    session = db.getSession("sqlite:///%s" % filepath)
     utils.loadYAML(session, './dlrn/tests/samples/commits_1.yaml')
     return session
 

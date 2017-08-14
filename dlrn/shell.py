@@ -29,6 +29,7 @@ from dlrn.config import ConfigOptions
 from dlrn.config import getConfigOptions
 
 from dlrn.db import CIVote
+from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getLastBuiltCommit
@@ -264,6 +265,7 @@ def main():
                             Commit.status != "RETRY")
                             .all())):
                         toprocess.append(commit_toprocess)
+    closeSession(session)   # Close session, will reopen during post_build
 
     # Check if there is any commit at all to process
     if len(toprocess) == 0:
@@ -336,6 +338,7 @@ def main():
                                   order=options.order, sequential=True)
             exception = status[3]
             consistent = False
+            session = getSession(config_options.database_connection)
             if exception is not None:
                 logger.error("Received exception %s" % exception)
             else:
@@ -349,6 +352,7 @@ def main():
                                               build_env=options.build_env,
                                               head_only=options.head_only,
                                               consistent=consistent)
+            closeSession(session)
             if exit_value != 0:
                 exit_code = exit_value
             if options.stop and exit_code != 0:
@@ -371,6 +375,7 @@ def main():
                 status = iterator.next()
                 exception = status[3]
                 consistent = False
+                session = getSession(config_options.database_connection)
                 if exception is not None:
                     logger.info("Received exception %s" % exception)
                 else:
@@ -386,6 +391,7 @@ def main():
                                                   build_env=options.build_env,
                                                   head_only=options.head_only,
                                                   consistent=consistent)
+                closeSession(session)
                 if exit_value != 0:
                     exit_code = exit_value
                 if options.stop and exit_code != 0:
@@ -396,6 +402,7 @@ def main():
         pool.join()
 
     # If we were bootstrapping, set the packages that required it to RETRY
+    session = getSession(config_options.database_connection)
     if options.order is True and not pkg_name:
         for bpackage in bootstraplist:
             commit = getLastProcessedCommit(session, bpackage)
@@ -403,6 +410,7 @@ def main():
             session.add(commit)
             session.commit()
     genreports(packages, options.head_only, session, [])
+    closeSession(session)
     return exit_code
 
 
@@ -659,6 +667,7 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
                                         since=since, local=local,
                                         dev_mode=dev_mode)
 
+    closeSession(session)
     # If since == -1, then we only want to trigger a build for the
     # most recent change
     if since == "-1" or head_only:
