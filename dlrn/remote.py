@@ -156,7 +156,7 @@ def remote():
                              "applies when pkginfo_driver is rdoinfo in "
                              "projects.ini")
 
-    options, args = parser.parse_known_args(sys.argv[1:])
+    options = parser.parse_args(sys.argv[1:])
 
     return import_commit(options.repo_url, options.config_file,
                          local_info_repo=options.info_repo)
