@@ -70,7 +70,7 @@ def purge():
                         " packages are included in one of the specifided"
                         " directories (comma-separated list).")
 
-    options, args = parser.parse_known_args(sys.argv[1:])
+    options = parser.parse_args(sys.argv[1:])
 
     cp = configparser.RawConfigParser()
     cp.read(options.config_file)
