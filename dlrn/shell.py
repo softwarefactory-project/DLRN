@@ -136,7 +136,7 @@ def main():
     parser.add_argument('--verbose-mock', action="store_true",
                         help="Show verbose mock output during build.")
 
-    options, args = parser.parse_known_args(sys.argv[1:])
+    options = parser.parse_args(sys.argv[1:])
 
     global verbose_mock
     verbose_mock = options.verbose_mock
