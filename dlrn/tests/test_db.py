@@ -21,7 +21,7 @@ from dlrn import utils
 class TestsWithData(base.TestCase):
     def setUp(self):
         super(TestsWithData, self).setUp()
-        self.session = db.getSession(new=True)
+        self.session = db.getSession()
         utils.loadYAML(self.session, './dlrn/tests/samples/commits_1.yaml')
 
 
@@ -39,11 +39,12 @@ class TestGetSessions(base.TestCase):
     def test_getsessions(self, ce_mock, sm_mock):
         db.getSession()
         db.getSession(url="sqlite:///test.db")
-        # The 2nd call shouldn't result in a new session
+        # The 2nd call should now result in a new session
         db.getSession()
-        self.assertEqual(len(sm_mock.call_args_list), 2)
+        self.assertEqual(len(sm_mock.call_args_list), 3)
         expected = [mock.call('sqlite://', pool_recycle=300),
-                    mock.call('sqlite:///test.db', pool_recycle=300)]
+                    mock.call('sqlite:///test.db', pool_recycle=300),
+                    mock.call('sqlite://', pool_recycle=300)]
         self.assertEqual(ce_mock.call_args_list, expected)
 
 

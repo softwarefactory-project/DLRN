@@ -54,7 +54,7 @@ class TestBuild(base.TestCase):
         with open(os.path.join(self.config.datadir,
                   "delorean-deps.repo"), "w") as fp:
             fp.write("[test]\nname=test\nenabled=0\n")
-        self.session = db.getSession(new=True)
+        self.session = db.getSession()
         utils.loadYAML(self.session, './dlrn/tests/samples/commits_1.yaml')
 
     def tearDown(self):

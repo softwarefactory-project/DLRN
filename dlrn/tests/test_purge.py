@@ -32,7 +32,7 @@ expected_repos = [
 
 
 def mocked_session(url):
-    session = db.getSession(new=True)
+    session = db.getSession()
     utils.loadYAML(session, './dlrn/tests/samples/commits_1.yaml')
     return session
 

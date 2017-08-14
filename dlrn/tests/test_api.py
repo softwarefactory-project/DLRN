@@ -25,7 +25,7 @@ from flask import json
 
 
 def mocked_session(url):
-    session = db.getSession(new=True)
+    session = db.getSession()
     utils.loadYAML(session, './dlrn/tests/samples/commits_2.yaml')
     return session
 
