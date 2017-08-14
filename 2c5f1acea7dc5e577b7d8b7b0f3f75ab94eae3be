@@ -16,6 +16,24 @@
       "revId": "2c5f1acea7dc5e577b7d8b7b0f3f75ab94eae3be",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ab451fb_65c75c46",
+        "filename": "scripts/common-functions",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 169
+      },
+      "writtenOn": "2017-08-14T08:51:18Z",
+      "side": 1,
+      "message": "I did not see a nvr with something after \u0027pre\u0027, but it\u0027s a valid point. Will improve regex so that dlrn doesn\u0027t miss such nvr too.",
+      "parentUuid": "3ab451fb_85ddc872",
+      "revId": "2c5f1acea7dc5e577b7d8b7b0f3f75ab94eae3be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
