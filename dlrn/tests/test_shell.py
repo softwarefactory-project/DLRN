@@ -26,7 +26,7 @@ from six.moves import configparser
 
 
 def mocked_session(url):
-    session = db.getSession(new=True)
+    session = db.getSession(url)
     utils.loadYAML(session, './dlrn/tests/samples/commits_1.yaml')
     return session
 
@@ -50,7 +50,8 @@ class TestProcessBuildResult(base.TestCase):
                                 dt_distro=123,
                                 distgit_dir='/home/dlrn/data/foo_distro',
                                 commit_branch='master', dt_build=1441245153)
-        self.session = mocked_session('sqlite:///commits.sqlite')
+        self.db_fd, filepath = tempfile.mkstemp()
+        self.session = mocked_session("sqlite:///%s" % filepath)
         self.packages = [{'upstream': 'https://github.com/openstack/foo',
                           'name': 'foo', 'maintainers': 'test@test.com'},
                          {'upstream': 'https://github.com/openstack/test',
@@ -60,6 +61,7 @@ class TestProcessBuildResult(base.TestCase):
         super(TestProcessBuildResult, self).tearDown()
         shutil.rmtree(self.config.datadir)
         shutil.rmtree(self.config.scriptsdir)
+        os.close(self.db_fd)
 
     @mock.patch('dlrn.shell.export_commit_yaml')
     @mock.patch('dlrn.shell.genreports')
@@ -126,7 +128,8 @@ class TestPostBuild(base.TestCase):
                                 dt_distro=123,
                                 distgit_dir='/home/dlrn/data/foo_distro',
                                 commit_branch='master', dt_build=1441245153)
-        self.session = mocked_session('sqlite:///commits.sqlite')
+        self.db_fd, filepath = tempfile.mkstemp()
+        self.session = mocked_session("sqlite:///%s" % filepath)
         self.packages = [{'upstream': 'https://github.com/openstack/foo',
                           'name': 'foo', 'maintainers': 'test@test.com',
                           'master-distgit':
@@ -140,6 +143,7 @@ class TestPostBuild(base.TestCase):
         super(TestPostBuild, self).tearDown()
         shutil.rmtree(self.config.datadir)
         shutil.rmtree(self.config.scriptsdir)
+        os.close(self.db_fd)
 
     def test_successful_build(self, sh_mock):
         built_rpms = ['repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf'
