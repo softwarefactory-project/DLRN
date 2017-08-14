@@ -14,6 +14,7 @@
 
 import mock
 import sys
+import tempfile
 
 from dlrn.tests import base
 
@@ -32,7 +33,8 @@ expected_repos = [
 
 
 def mocked_session(url):
-    session = db.getSession(new=True)
+    db_fd, filepath = tempfile.mkstemp()
+    session = db.getSession("sqlite:///%s" % filepath)
     utils.loadYAML(session, './dlrn/tests/samples/commits_1.yaml')
     return session
 

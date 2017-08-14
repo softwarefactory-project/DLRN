@@ -22,6 +22,7 @@ from six.moves import configparser
 from tempfile import mkstemp
 
 from dlrn.config import ConfigOptions
+from dlrn.db import closeSession
 from dlrn.db import getLastProcessedCommit
 from dlrn.db import getSession
 from dlrn.shell import default_options
@@ -45,10 +46,6 @@ def import_commit(repo_url, config_file, db_connection=None,
     packages = pkginfo.getpackages(local_info_repo=local_info_repo,
                                    tags=config_options.tags,
                                    dev_mode=False)
-    if db_connection:
-        session = getSession(db_connection)
-    else:
-        session = getSession(config_options.database_connection)
 
     remote_yaml = repo_url + '/' + 'commit.yaml'
     r = urllib2.urlopen(remote_yaml)
@@ -74,6 +71,10 @@ def import_commit(repo_url, config_file, db_connection=None,
             commit.dt_distro = int(commit.dt_distro)
             # Check if the latest built commit for this project is newer
             # than this one. In that case, we should ignore it
+            if db_connection:
+                session = getSession(db_connection)
+            else:
+                session = getSession(config_options.database_connection)
             package = commit.project_name
             old_commit = getLastProcessedCommit(session, package)
             if old_commit:
@@ -131,6 +132,7 @@ def import_commit(repo_url, config_file, db_connection=None,
             else:
                 status = [commit, '', '', commit.notes]
             process_build_result(status, packages, session, [])
+            closeSession(session)   # Keep one session per commit
             fcntl.flock(lock_fp, fcntl.LOCK_UN)
             logger.debug("Released lock")
     return 0
