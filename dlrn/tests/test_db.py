@@ -12,24 +12,32 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import mock
+import os
+import tempfile
 
 from dlrn import db
 from dlrn.tests import base
 from dlrn import utils
 
+from sqlalchemy.pool import NullPool
+
 
 class TestsWithData(base.TestCase):
     def setUp(self):
         super(TestsWithData, self).setUp()
-        self.session = db.getSession(new=True)
+        self.db_fd, filepath = tempfile.mkstemp()
+        self.session = db.getSession("sqlite:///%s" % filepath)
         utils.loadYAML(self.session, './dlrn/tests/samples/commits_1.yaml')
+
+    def tearDown(self):
+        super(TestsWithData, self).tearDown()
+        os.close(self.db_fd)
 
 
 @mock.patch('sqlalchemy.orm.sessionmaker', autospec=True)
 class TestGetSessions(base.TestCase):
     def setUp(self):
         super(TestGetSessions, self).setUp()
-        db._sessions = {}
 
     def test_getsession(self, sm_mock):
         db.getSession()
@@ -39,11 +47,12 @@ class TestGetSessions(base.TestCase):
     def test_getsessions(self, ce_mock, sm_mock):
         db.getSession()
         db.getSession(url="sqlite:///test.db")
-        # The 2nd call shouldn't result in a new session
+        # The 2nd call should now result in a new session
         db.getSession()
-        self.assertEqual(len(sm_mock.call_args_list), 2)
-        expected = [mock.call('sqlite://', pool_recycle=300),
-                    mock.call('sqlite:///test.db', pool_recycle=300)]
+        self.assertEqual(len(sm_mock.call_args_list), 3)
+        expected = [mock.call('sqlite://', poolclass=NullPool),
+                    mock.call('sqlite:///test.db', poolclass=NullPool),
+                    mock.call('sqlite://', poolclass=NullPool)]
         self.assertEqual(ce_mock.call_args_list, expected)
 
 
