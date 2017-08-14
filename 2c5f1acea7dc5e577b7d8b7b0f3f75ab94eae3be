@@ -52,6 +52,24 @@
       "revId": "2c5f1acea7dc5e577b7d8b7b0f3f75ab94eae3be",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ab451fb_0512d8b4",
+        "filename": "scripts/common-functions",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-14T13:18:02Z",
+      "side": 1,
+      "message": "Nice, then please add a couple tests to run_sh_tests.sh so we can be sure we don\u0027t break it.",
+      "parentUuid": "3ab451fb_653cfc2f",
+      "revId": "2c5f1acea7dc5e577b7d8b7b0f3f75ab94eae3be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
