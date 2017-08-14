@@ -21,6 +21,7 @@ from datetime import timedelta
 from six.moves import configparser
 from time import mktime
 
+from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getSession
@@ -70,7 +71,7 @@ def purge():
                         " packages are included in one of the specifided"
                         " directories (comma-separated list).")
 
-    options, args = parser.parse_known_args(sys.argv[1:])
+    options = parser.parse_args(sys.argv[1:])
 
     cp = configparser.RawConfigParser()
     cp.read(options.config_file)
@@ -163,3 +164,4 @@ def purge():
             commit.flags |= FLAG_PURGED
     if options.dry_run is False:
         session.commit()
+    closeSession(session)
