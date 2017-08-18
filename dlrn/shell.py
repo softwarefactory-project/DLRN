@@ -265,6 +265,18 @@ def main():
                             .all())):
                         toprocess.append(commit_toprocess)
 
+    # Check if there is any commit at all to process
+    if len(toprocess) == 0:
+        if not pkg_name:
+            # Use a shorter message if this was a full run
+            logger.info("No commits to build.")
+        else:
+            logger.info("No commits to build. If this is not expected, please"
+                        " make sure the package name(s) are correct, and that "
+                        "any failed commit you want to rebuild has been "
+                        "removed from the database.")
+        return 0
+
     # if requested do a sort according to build and install
     # dependencies
     if options.order is True and not pkg_name:
