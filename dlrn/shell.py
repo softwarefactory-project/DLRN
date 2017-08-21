@@ -228,7 +228,14 @@ def main():
         iterator = pool.imap(getinfo_wrapper, packages)
         while True:
             try:
-                project_toprocess = iterator.next()
+                project_toprocess, updated_pkg = iterator.next()
+                for package in packages:
+                    if (package['name'] == updated_pkg['name'] and
+                            package['upstream'] == 'Unknown'):
+                        package['upstream'] = updated_pkg['upstream']
+                        logger.debug("Updated upstream for package %s to %s"
+                                     % (package['name'], package['upstream']))
+                        break
                 # The first entry in the list of commits is a commit we have
                 # already processed, we want to process it again only if in dev
                 # mode or distro hash has changed, we can't simply check
@@ -250,11 +257,11 @@ def main():
     else:
         for package in packages:
             if package['name'] in pkg_names:
-                project_toprocess = getinfo(package, local=options.local,
-                                            dev_mode=options.dev,
-                                            head_only=options.head_only,
-                                            db_connection=config_options.
-                                            database_connection)
+                project_toprocess, _ = getinfo(package, local=options.local,
+                                               dev_mode=options.dev,
+                                               head_only=options.head_only,
+                                               db_connection=config_options.
+                                               database_connection)
                 for commit_toprocess in project_toprocess:
                     if ((options.dev is True) or
                         options.run or
@@ -652,4 +659,4 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
     if since == "-1" or head_only:
         del project_toprocess[:-1]
 
-    return project_toprocess
+    return project_toprocess, package
