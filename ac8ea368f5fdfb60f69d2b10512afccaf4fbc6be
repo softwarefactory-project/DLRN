@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ab14d0d_5bc7a345",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-08-21T11:11:53Z",
+      "side": 1,
+      "message": "Actually, why do we need that, when building from trunk source tarball is local ?",
+      "revId": "ac8ea368f5fdfb60f69d2b10512afccaf4fbc6be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
