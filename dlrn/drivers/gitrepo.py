@@ -111,6 +111,7 @@ class GitRepoDriver(PkgInfoDriver):
                 pkg_hash['maintainers'] = 'test@example.com'
                 pkg_hash['master-distgit'] = (repo + '/' + path + '/' +
                                               package)
+                pkg_hash['upstream'] = 'Unknown'
                 if self.config_options.use_version_from_spec is True:
                     version = None
                     # Try to deduce version from spec template
