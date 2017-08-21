@@ -20,6 +20,7 @@ from dlrn.db import CIVote
 from dlrn.db import Commit
 from dlrn.db import getSession
 from dlrn.db import Project
+from dlrn.db import Promotion
 from dlrn.db import User
 
 re_known_errors = re.compile('Error: Nothing to do|'
@@ -76,6 +77,13 @@ def loadYAML(session, yamlfile):
             session.commit()
     except KeyError:
         pass   # No users in yaml, just ignore
+    try:
+        for promotion in data['promotions']:
+            p = Promotion(**promotion)
+            session.add(p)
+            session.commit()
+    except KeyError:
+        pass   # No promotions in yaml, just ignore
 
     session.commit()
 
@@ -145,6 +153,13 @@ def saveYAML(session, yamlfile):
         for a in attrs:
             d[a] = str(getattr(user, a))
         data['users'].append(d)
+
+    data['promotions'] = []
+    for promotion in session.query(Promotion).all():
+        d = {}
+        for a in attrs:
+            d[a] = str(getattr(promotion, a))
+        data['promotions'].append(d)
 
     with open(yamlfile, 'w') as fp:
         fp.write(yaml.dump(data, default_flow_style=False))
