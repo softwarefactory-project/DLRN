@@ -20,6 +20,7 @@ from dlrn.db import CIVote
 from dlrn.db import Commit
 from dlrn.db import getSession
 from dlrn.db import Project
+from dlrn.db import Promotion
 from dlrn.db import User
 
 re_known_errors = re.compile('Error: Nothing to do|'
@@ -76,6 +77,13 @@ def loadYAML(session, yamlfile):
             session.commit()
     except KeyError:
         pass   # No users in yaml, just ignore
+    try:
+        for promotion in data['promotions']:
+            p = Promotion(**promotion)
+            session.add(p)
+            session.commit()
+    except KeyError:
+        pass   # No promotions in yaml, just ignore
 
     session.commit()
 
@@ -105,9 +113,7 @@ def saveYAML(session, yamlfile):
             attrs.append(a)
     data['commits'] = []
     for commit in session.query(Commit).all():
-        d = {}
-        for a in attrs:
-            d[a] = str(getattr(commit, a))
+        d = {a: str(getattr(commit, a)) for a in attrs}
         data['commits'].append(d)
 
     attrs = []
@@ -117,9 +123,7 @@ def saveYAML(session, yamlfile):
             attrs.append(a)
     data['projects'] = []
     for project in session.query(Project).all():
-        d = {}
-        for a in attrs:
-            d[a] = str(getattr(project, a))
+        d = {a: str(getattr(project, a)) for a in attrs}
         data['projects'].append(d)
 
     attrs = []
@@ -129,9 +133,7 @@ def saveYAML(session, yamlfile):
             attrs.append(a)
     data['civotes'] = []
     for vote in session.query(CIVote).all():
-        d = {}
-        for a in attrs:
-            d[a] = str(getattr(vote, a))
+        d = {a: str(getattr(vote, a)) for a in attrs}
         data['civotes'].append(d)
 
     attrs = []
@@ -141,10 +143,13 @@ def saveYAML(session, yamlfile):
             attrs.append(a)
     data['users'] = []
     for user in session.query(User).all():
-        d = {}
-        for a in attrs:
-            d[a] = str(getattr(user, a))
+        d = {a: str(getattr(user, a)) for a in attrs}
         data['users'].append(d)
+
+    data['promotions'] = []
+    for promotion in session.query(Promotion).all():
+        d = {a: str(getattr(promotion, a)) for a in attrs}
+        data['promotions'].append(d)
 
     with open(yamlfile, 'w') as fp:
         fp.write(yaml.dump(data, default_flow_style=False))
@@ -160,9 +165,7 @@ def saveYAML_commit(commit, yamlfile):
             attrs.append(a)
     data['commits'] = []
     # Add commit
-    d = {}
-    for a in attrs:
-        d[a] = str(getattr(commit, a))
+    d = {a: str(getattr(commit, a)) for a in attrs}
     data['commits'].append(d)
     with open(yamlfile, 'w') as fp:
         fp.write(yaml.dump(data, default_flow_style=False))

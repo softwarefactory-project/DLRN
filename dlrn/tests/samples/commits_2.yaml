@@ -60,3 +60,8 @@ users:
 - username: 'foo'
 # passlib.hash.sha512_crypt.encrypt("bar")
   password: '$6$rounds=656000$T678cDhCoMtxLlnq$yXrpe.kJgiP8Y1JZpAYQ0.yCE12Qr6zv6nZY1VY7OP6bxhoZezlzWSitvoqkx26Z30pUBKM4kX/JZJPdMIv1a.'
+promotions:
+- id: '1'
+  commit_id: '5654'
+  promotion_name: 'another-ci'
+  timestamp: '1503307094'

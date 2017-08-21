@@ -23,6 +23,7 @@ from dlrn.db import CIVote
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getSession
+from dlrn.db import Promotion
 
 from dlrn.config import ConfigOptions
 
@@ -37,6 +38,10 @@ import os
 from six.moves import configparser
 from sqlalchemy import desc
 import time
+
+
+def _timestamp(datetime_obj):
+    return time.mktime(datetime_obj.timetuple())
 
 
 @app.errorhandler(InvalidUsage)
@@ -174,7 +179,7 @@ def last_tested_repo_GET():
         timestamp = 0
     else:
         oldest_time = datetime.now() - timedelta(hours=int(max_age))
-        timestamp = time.mktime(oldest_time.timetuple())
+        timestamp = _timestamp(oldest_time)
 
     session = getSession(app.config['DB_PATH'])
     try:
@@ -242,7 +247,7 @@ def last_tested_repo_POST():
         timestamp = 0
     else:
         oldest_time = datetime.now() - timedelta(hours=int(max_age))
-        timestamp = time.mktime(oldest_time.timetuple())
+        timestamp = _timestamp(oldest_time)
 
     session = getSession(app.config['DB_PATH'])
 
@@ -381,6 +386,13 @@ def promote():
     except Exception as e:
         raise InvalidUsage("Symlink creation failed with error: %s" %
                            e, status_code=500)
+
+    timestamp = _timestamp(datetime.now())
+    promotion = Promotion(commit_id=commit.id, promotion_name=promote_name,
+                          timestamp=timestamp)
+
+    session.add(promotion)
+    session.commit()
 
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
