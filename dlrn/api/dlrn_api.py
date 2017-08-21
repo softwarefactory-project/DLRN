@@ -23,6 +23,7 @@ from dlrn.db import CIVote
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getSession
+from dlrn.db import Promotion
 
 from dlrn.config import ConfigOptions
 
@@ -381,6 +382,13 @@ def promote():
     except Exception as e:
         raise InvalidUsage("Symlink creation failed with error: %s" %
                            e, status_code=500)
+
+    timestamp = time.mktime(datetime.now().timetuple())
+    promotion = Promotion(commit_id=commit.id, promotion_name=promote_name,
+                          timestamp=timestamp)
+
+    session.add(promotion)
+    session.commit()
 
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
