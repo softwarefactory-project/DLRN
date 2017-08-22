@@ -488,3 +488,65 @@ class TestGetReport(DLRNAPITestCase):
                                 '&success=1')
         self.assertEqual(rt_mock.call_count, 1)
         self.assertEqual(response.status_code, 200)
+
+
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestGetPromotions(DLRNAPITestCase):
+    def test_get_promotions_needs_json(self, db2_mock, db_mock):
+        response = self.app.get('/api/promotions')
+        self.assertEqual(response.status_code, 415)
+
+    def test_get_promotions_missing_commit(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(distro_hash='abc123'))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_promotions_no_such_commit(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='abc123',
+                              distro_hash='abc123'))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_promotions_multiple_votes(self, db2_mock, db_mock):
+        req_data = '{}'
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 2)
+
+    def test_get_promotions_with_promote_name(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(promote_name='another-ci'))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
+    def test_get_promotions_with_commit(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='17234e9ab9dfab4cf5600f67f1'
+                                               'd24db5064f1025',
+                                   distro_hash='024e24f0cf4366c2290c22f24e'
+                                               '42de714d1addd1'))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
+    def test_get_promotions_with_offset(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(offset=1))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
