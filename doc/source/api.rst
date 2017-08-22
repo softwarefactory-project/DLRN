@@ -117,6 +117,39 @@ success              boolean     Was the CI execution successful?
 notes                Text        Additional notes
 ===================  ==========  ==============================================================
 
+GET /api/promotions
+--------------------
+
+Get all the promotions, optionally for a specific repository or promotion name.
+
+Normal response codes: 200
+
+Error response codes: 400, 404, 415
+
+Request:
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+commit_hash          string      If set, commit_hash of the repo to use as filter key.
+                     (optional)  Requires distro_hash.
+distro_hash          string      If set, commit_hash of the repo to use as filter key.
+                     (optional)  Requires commit_hash.
+success              boolean     If set to a value, filter results by the specified promotion
+                     (optional)  name.
+===================  ==========  ==============================================================
+
+The JSON output will contain an array where each item contains:
+
+==============  ==========  ==============================================================
+Parameter         Type                             Description
+==============  ==========  ==============================================================
+commit_hash     string      commit_hash of the promoted repo
+distro_hash     string      distro_hash of the promoted repo
+promote_name    string      name used for the promotion
+timestamp       integer     Timestamp (in seconds since the epoch)
+==============  ==========  ==============================================================
+
 
 POST /api/last_tested_repo
 --------------------------
@@ -253,6 +286,7 @@ Parameter         Type                             Description
 commit_hash     string      commit_hash of the promoted repo
 distro_hash     string      distro_hash of the promoted repo
 promote_name    string      name used for the promotion
+timestamp       integer     Timestamp (in seconds since the epoch)
 ==============  ==========  ==============================================================
 
 POST /api/remote/import
