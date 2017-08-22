@@ -203,6 +203,64 @@ def last_tested_repo_GET():
     return jsonify(result), 200
 
 
+@app.route('/api/promotions', methods=['GET'])
+def promotions_GET():
+    # commit_hash(optional): commit hash
+    # distro_hash(optional): distro hash
+    # promote_name(optional): only report promotions for promote_name
+    if request.headers['Content-Type'] != 'application/json':
+        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
+
+    commit_hash = request.json.get('commit_hash', None)
+    distro_hash = request.json.get('distro_hash', None)
+    promote_name = request.json.get('promote_name', None)
+
+    if ((commit_hash and not distro_hash) or
+            (distro_hash and not commit_hash)):
+
+        raise InvalidUsage('Both commit_hash and distro_hash must be '
+                           'specified if any of them is.',
+                           status_code=400)
+
+    # Find the commit id for commit_hash/distro_hash
+    session = getSession(app.config['DB_PATH'])
+    if commit_hash and distro_hash:
+        commit = session.query(Commit).filter(
+            Commit.status == 'SUCCESS',
+            Commit.commit_hash == commit_hash,
+            Commit.distro_hash == distro_hash).first()
+        if commit is None:
+            raise InvalidUsage('commit_hash+distro_hash combination not found',
+                               status_code=404)
+        commit_id = commit.id
+    else:
+        commit_id = None
+
+    # Now find the promotions, and filter if necessary
+    promotions = session.query(Promotion)
+    if commit_id is not None:
+        promotions = promotions.filter(Promotion.commit_id == commit_id)
+    if promote_name is not None:
+        promotions = promotions.filter(
+            Promotion.promotion_name == promote_name)
+
+    promotions = sorted(promotions, key=lambda prom: prom.timestamp,
+                        reverse=True)
+
+    # And format the output
+    data = []
+    for promotion in promotions:
+        commit = getCommits(session, limit=0).filter(
+            Commit.id == promotion.commit_id).first()
+        d = {'timestamp': promotion.timestamp,
+             'commit_hash': commit.commit_hash,
+             'distro_hash': commit.distro_hash,
+             'promote_name': promotion.promotion_name}
+        data.append(d)
+    session.close()
+    return jsonify(data)
+
+
 @app.route('/api/last_tested_repo', methods=['POST'])
 @auth.login_required
 def last_tested_repo_POST():
@@ -392,7 +450,8 @@ def promote():
 
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
-              'promote_name': promote_name}
+              'promote_name': promote_name,
+              'timestamp': timestamp}
     session.close()
     return jsonify(result), 201
 
