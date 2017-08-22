@@ -363,6 +363,48 @@ paths:
           # Use JSON Schema format
           schema:
             $ref: '#/definitions/Promotion'
+  /api/promotions:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Get all the promotions, optionally for a specific repository or promotion name.
+        The output will be sorted by the promotion timestamp, with the newest first, and
+        limited to 100 results per query.
+      parameters:
+        - name: params
+          in: body
+          description: The JSON params to post
+          required: true
+          schema:
+            type: object
+            properties:
+              commit_hash:
+                description: |
+                  If set, commit_hash of the repo to use as filter key. Requires distro_hash.
+                type: string
+              distro_hash:
+                description: |
+                  If set, commit_hash of the repo to use as filter key. Requires commit_hash.
+                type: string
+              promote_name:
+                description: |
+                  If set to a value, filter results by the specified promotion name.
+                type: string
+              offset:
+                description: |
+                  If set to a value, skip the initial <offset> promotions.
+                type: integer
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: An array of promotions
+          schema:
+            title: ArrayOfPromotions
+            type: array
+            items:
+              $ref: '#/definitions/Promotion'
   /api/remote/import:
     post:
       security:
@@ -445,6 +487,24 @@ definitions:
       promote_name:
         type: string
         description: name used for the promotion
+      timestamp:
+        type: integer
+        description: Timestamp for this CI Vote (taken from the DLRN system time)
+  PromotionQuery:
+    type: object
+    properties:
+      commit_hash:
+        type: string
+        description: commit_hash of promoted repo
+      distro_hash:
+        type: string
+        description: distro_hash of promoted repo
+      promote_name:
+        type: string
+        description: name used for the promotion
+      offset:
+        type: integer
+        description: Skip the first <offset> promotions from the results
   Import:
     type: object
     properties:

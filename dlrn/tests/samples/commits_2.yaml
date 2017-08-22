@@ -65,3 +65,7 @@ promotions:
   commit_id: '5654'
   promotion_name: 'another-ci'
   timestamp: '1503307094'
+- id: '2'
+  commit_id: '5627'
+  promotion_name: 'foo-ci'
+  timestamp: '1503307099'
