@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ab14d0d_a1b8bae6",
+        "filename": "doc/source/api.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 465
+      },
+      "writtenOn": "2017-08-23T15:15:06Z",
+      "side": 1,
+      "message": "This should be \"promote_name\".",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 7
+      },
+      "revId": "45192424ef90d120c47e8cff748fabbba7f550c0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
