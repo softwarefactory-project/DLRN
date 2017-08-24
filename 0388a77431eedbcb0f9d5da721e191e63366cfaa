@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fabf19d9_fd11c3b0",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 465
+      },
+      "writtenOn": "2017-08-24T13:13:05Z",
+      "side": 1,
+      "message": "Thanks for adding the sorting!",
+      "revId": "0388a77431eedbcb0f9d5da721e191e63366cfaa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
