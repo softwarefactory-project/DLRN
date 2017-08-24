@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fabf19d9_1d55971c",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-08-24T19:07:28Z",
+      "side": 1,
+      "message": "fourth time, we\u0027re using this pattern to generate timestamp, I suggest that we create a utility function so we ensure consistency in the future.\ndef _timestamp(datetime_obj):\n  time.mktime(datetime_obj.timetuple())\n\n(not a blocking point, just a thought)",
+      "revId": "0ccdbaed9fe41df02e25a8925fa5679131297cb0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fabf19d9_3d585b56",
+        "filename": "dlrn/db.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-08-24T19:07:28Z",
+      "side": 1,
+      "message": "what\u0027s promotion_name?\nIt\u0027d be better to rename this property into release_name or something. symlink would be ok but it has no meaning if you don\u0027t know DLRN infra architecture.",
+      "revId": "0ccdbaed9fe41df02e25a8925fa5679131297cb0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fabf19d9_fd30a309",
+        "filename": "dlrn/migrations/versions/4a5651777e5e_add_promotions_table.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-08-24T19:07:28Z",
+      "side": 1,
+      "message": "Good!",
+      "revId": "0ccdbaed9fe41df02e25a8925fa5679131297cb0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fabf19d9_7d25b3c0",
+        "filename": "dlrn/utils.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-08-24T19:07:28Z",
+      "side": 1,
+      "message": "I think it can be more concise, by using here a dict comprehension\nd \u003d { a: str(getattr(promotion, a) for a in attrs }\n\nIn that aspect, nesting it into a list comprehension would not be a good idea for readability.",
+      "revId": "0ccdbaed9fe41df02e25a8925fa5679131297cb0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
