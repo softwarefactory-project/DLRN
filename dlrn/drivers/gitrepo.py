@@ -29,6 +29,7 @@ from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
 from dlrn.repositories import getsourcebranch
 from dlrn.repositories import refreshrepo
+from pymod2pkg import module2package
 from pymod2pkg import module2upstream
 from rdopkg.utils import specfile
 from six.moves import urllib
@@ -225,10 +226,11 @@ class GitRepoDriver(PkgInfoDriver):
     def preprocess(self, **kwargs):
         package_name = kwargs.get('package_name')
         distgit_dir = self.distgit_dir(package_name)
+        output_filename = "%s.spec" % module2package(package_name, 'fedora')
         preprocess = sh.renderspec.bake(_cwd=distgit_dir,
                                         _tty_out=False, _timeout=3600)
         preprocess('--spec-style', 'fedora', '--epoch',
-                   '../../epoch/fedora.yaml')
+                   '../../epoch/fedora.yaml', '--output', output_filename)
         # Replace %{version} with %{upstream_version} in spec
         # This is required by rpm-packaging specs
         for specf in os.listdir(distgit_dir):
