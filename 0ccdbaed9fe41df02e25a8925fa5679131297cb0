@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fabf19d9_60a06691",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-25T09:11:31Z",
+      "side": 1,
+      "message": "Ok, fair point. Fixed.",
+      "parentUuid": "fabf19d9_1d55971c",
+      "revId": "0ccdbaed9fe41df02e25a8925fa5679131297cb0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fabf19d9_3d585b56",
         "filename": "dlrn/db.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-08-24T19:07:28Z",
       "side": 1,
       "message": "what\u0027s promotion_name?\nIt\u0027d be better to rename this property into release_name or something. symlink would be ok but it has no meaning if you don\u0027t know DLRN infra architecture.",
+      "revId": "0ccdbaed9fe41df02e25a8925fa5679131297cb0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fabf19d9_40ad6287",
+        "filename": "dlrn/db.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-25T09:11:31Z",
+      "side": 1,
+      "message": "It\u0027s the name we use for the promotion, as you said symlink doesn\u0027t mean a lot :). It is consistent with the parameter we use when promoting, see https://github.com/softwarefactory-project/DLRN/blob/master/doc/api_definition.yaml#L344 .\n\nTBH, I can\u0027t find a better name. release_name doesn\u0027t really refect what we do in a promotion... Maybe promotion_key?",
+      "parentUuid": "fabf19d9_3d585b56",
       "revId": "0ccdbaed9fe41df02e25a8925fa5679131297cb0",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
@@ -64,6 +100,24 @@
       "writtenOn": "2017-08-24T19:07:28Z",
       "side": 1,
       "message": "I think it can be more concise, by using here a dict comprehension\nd \u003d { a: str(getattr(promotion, a) for a in attrs }\n\nIn that aspect, nesting it into a list comprehension would not be a good idea for readability.",
+      "revId": "0ccdbaed9fe41df02e25a8925fa5679131297cb0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fabf19d9_c0af327c",
+        "filename": "dlrn/utils.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-08-25T09:11:31Z",
+      "side": 1,
+      "message": "Fixed",
+      "parentUuid": "fabf19d9_7d25b3c0",
       "revId": "0ccdbaed9fe41df02e25a8925fa5679131297cb0",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
