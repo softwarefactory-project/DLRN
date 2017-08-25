@@ -101,7 +101,7 @@ popd
 if [ -n "$UPSTREAM_ID" ]; then
     # Get upstream URL
     UPSTREAM_URL=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^upstream | awk '{print $2}')
-    UPSTREAM_PROJECT_NAME=$(echo ${UPSTREAM_URL} | awk -F/ '{print $NF}')
+    UPSTREAM_PROJECT_NAME=$(basename ${UPSTREAM_URL})
     rm -rf data/${PROJECT_TO_BUILD_MAPPED}
     if type -p zuul-cloner; then
         # Only build in the check pipeline to avoid merging a change
