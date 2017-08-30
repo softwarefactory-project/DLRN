@@ -22,6 +22,7 @@ from dlrn import db
 from dlrn.tests import base
 from dlrn import utils
 from flask import json
+from six.moves.urllib.request import urlopen
 
 
 def mocked_session(url):
@@ -32,10 +33,10 @@ def mocked_session(url):
 
 def mocked_urlopen(url):
     if url.startswith('http://example.com'):
-        fp = open('./dlrn/tests/samples/commits_remote.yaml', 'r')
+        fp = open('./dlrn/tests/samples/commits_remote.yaml', 'rb')
         return fp
     else:
-        return urllib2.urlopen(url)
+        return urlopen(url)
 
 
 class DLRNAPITestCase(base.TestCase):
@@ -432,13 +433,15 @@ class TestRemoteImport(DLRNAPITestCase):
 
     @mock.patch.object(sh.Command, '__call__', autospec=True)
     @mock.patch('dlrn.remote.post_build')
-    @mock.patch('urllib2.urlopen', side_effect=mocked_urlopen)
-    def test_post_remove_import_success(self, url_mock, build_mock, sh_mock,
+    @mock.patch('dlrn.remote.urlopen', side_effect=mocked_urlopen)
+    def test_post_remote_import_success(self, url_mock, build_mock, sh_mock,
                                         db2_mock, db_mock):
 
         req_data = json.dumps(dict(repo_url='http://example.com/1/'))
-        header = {'Authorization': 'Basic ' + base64.b64encode('foo' +
-                  ":" + 'bar')}
+
+        header = {'Authorization': 'Basic %s' % (
+                  base64.b64encode(b'foo:bar').decode('ascii'))}
+
         response = self.app.post('/api/remote/import',
                                  data=req_data,
                                  headers=header,

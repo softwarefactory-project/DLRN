@@ -14,8 +14,9 @@
 
 import mock
 import sh
+from six.moves.urllib.request import urlopen
 import sys
-import urllib2
+
 
 from dlrn.tests import base
 
@@ -32,16 +33,16 @@ def mocked_session(url):
 
 def mocked_urlopen(url):
     if url.startswith('http://example.com'):
-        fp = open('./dlrn/tests/samples/commits_remote.yaml', 'r')
+        fp = open('./dlrn/tests/samples/commits_remote.yaml', 'rb')
         return fp
     else:
-        return urllib2.urlopen(url)
+        return urlopen(url)
 
 
 @mock.patch.object(sh.Command, '__call__', autospec=True)
 @mock.patch('dlrn.remote.post_build')
 @mock.patch('dlrn.remote.getSession', side_effect=mocked_session)
-@mock.patch('urllib2.urlopen', side_effect=mocked_urlopen)
+@mock.patch('dlrn.remote.urlopen', side_effect=mocked_urlopen)
 class TestRemote(base.TestCase):
     def test_remote(self, url_mock, db_mock, build_mock, sh_mock):
         testargs = ["dlrn-remote", "--config-file", "projects.ini",

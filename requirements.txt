@@ -6,7 +6,7 @@ six
 SQLAlchemy
 PyMySQL
 PyYAML
-rdopkg>=0.42,<0.44.0
+rdopkg>=0.45.0
 alembic>=0.7.0
 renderspec
 pymod2pkg>=0.5.5
