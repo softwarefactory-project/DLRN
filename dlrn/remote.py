@@ -16,9 +16,10 @@ import fcntl
 import logging
 import os
 import sys
-import urllib2
 
 from six.moves import configparser
+from six.moves import urllib
+from six.moves.urllib.request import urlopen
 from tempfile import mkstemp
 
 from dlrn.config import ConfigOptions
@@ -51,8 +52,9 @@ def import_commit(repo_url, config_file, db_connection=None,
         session = getSession(config_options.database_connection)
 
     remote_yaml = repo_url + '/' + 'commit.yaml'
-    r = urllib2.urlopen(remote_yaml)
-    contents = r.readlines()
+    r = urlopen(remote_yaml)
+    contents = map(lambda x: x.decode('utf8'), r.readlines())
+
     osfd, tmpfilename = mkstemp()
     fp = os.fdopen(osfd, 'w')
     fp.writelines(contents)
@@ -96,11 +98,11 @@ def import_commit(repo_url, config_file, db_connection=None,
                             'rpmbuild.log', 'state.log']:
                 logfile_url = repo_url + '/' + logfile
                 try:
-                    r = urllib2.urlopen(logfile_url)
-                    contents = r.readlines()
+                    r = urlopen(logfile_url)
+                    contents = map(lambda x: x.decode('utf8'), r.readlines())
                     with open(os.path.join(yumrepodir, logfile), "w") as fp:
                         fp.writelines(contents)
-                except urllib2.HTTPError:
+                except urllib.error.HTTPError:
                     # Ignore errors, if the remote build failed there may be
                     # some missing files
                     pass
@@ -109,11 +111,11 @@ def import_commit(repo_url, config_file, db_connection=None,
                 for rpm in commit.rpms.split(","):
                     rpm_url = repo_url + '/' + rpm.split('/')[-1]
                     try:
-                        r = urllib2.urlopen(rpm_url)
-                        contents = r.readlines()
-                        with open(os.path.join(datadir, rpm), "w") as fp:
-                            fp.writelines(contents)
-                    except urllib2.HTTPError:
+                        r = urlopen(rpm_url)
+                        contents = r.read()
+                        with open(os.path.join(datadir, rpm), "wb") as fp:
+                            fp.write(contents)
+                    except urllib.error.HTTPError:
                         if rpm != 'None':
                             logger.warning("Failed to download rpm file %s"
                                            % rpm_url)
