@@ -24,7 +24,6 @@ import logging
 import os
 import re
 import sh
-import urllib2
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
@@ -32,6 +31,8 @@ from dlrn.repositories import getsourcebranch
 from dlrn.repositories import refreshrepo
 from pymod2pkg import module2upstream
 from rdopkg.utils import specfile
+from six.moves import urllib
+from six.moves.urllib.request import urlopen
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-gitrepo-driver")
@@ -47,10 +48,10 @@ base_urls = ['https://github.com/openstack',
 def check_url(url):
     logger.info("Checking url %s" % url)
     try:
-        urllib2.urlopen(url)
+        urlopen(url)
         # URL found
         return True
-    except (urllib2.HTTPError, urllib2.URLError):
+    except (urllib.error.HTTPError, urllib.error.URLError):
         # Trouble finding URL
         return False
 
