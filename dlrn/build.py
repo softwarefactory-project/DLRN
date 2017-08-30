@@ -175,8 +175,9 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
                          "file can be downloaded." % baseurl)
             raise e
 
-        contents = contents + r.readlines()
-        contents = contents + ["\n\"\"\""]
+        contents.extend(map(lambda x: x.decode('utf8'), r.readlines()))
+        contents.extend(["\n\"\"\""])
+
         with open(newcfg, "w") as fp:
             fp.writelines(contents)
 
