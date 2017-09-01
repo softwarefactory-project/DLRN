@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dac4157f_dc8cc137",
+        "filename": "dlrn/drivers/gitrepo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-09-01T13:07:10Z",
+      "side": 1,
+      "message": "I\u0027d go with lowercase \u0027unknown\u0027 as this normalnny contains lowercase strings and it\u0027s not really a sentence.",
+      "revId": "dc2e062da4c95ecd972c4fabca422b14fdca7028",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
