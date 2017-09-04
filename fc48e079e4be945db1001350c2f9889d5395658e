@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dac4157f_421d6865",
+        "filename": "dlrn/reporting.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-09-04T13:20:05Z",
+      "side": 1,
+      "message": "Let\u0027s add without_status\u003d\"RETRY\" to the query, it makes no sense to show the CI votes of a commit in the RETRY status",
+      "revId": "fc48e079e4be945db1001350c2f9889d5395658e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dac4157f_62106c4f",
+        "filename": "dlrn/reporting.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-09-04T13:20:05Z",
+      "side": 1,
+      "message": "This is already done in line 107 so probably not needed",
+      "revId": "fc48e079e4be945db1001350c2f9889d5395658e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
