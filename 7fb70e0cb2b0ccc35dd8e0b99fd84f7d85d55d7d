@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dac4157f_0818af83",
+        "filename": "dlrn/db.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-09-06T13:17:52Z",
+      "side": 1,
+      "message": "I wonder why this isn\u0027t pythonic lower_case_functions - close_session() and get_session()? Not in a scope of this patch, but I noticed this inconsistency before...",
+      "revId": "7fb70e0cb2b0ccc35dd8e0b99fd84f7d85d55d7d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
