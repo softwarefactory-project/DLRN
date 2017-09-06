@@ -16,6 +16,24 @@
       "revId": "455b38922348d68b10e1261413ef1134c2e2bfb4",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dac4157f_f351f00f",
+        "filename": "dlrn/tests/test_api.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-09-06T14:29:23Z",
+      "side": 1,
+      "message": "Using a byte array instead of a str makes the test fail in python3.5 (just tested it).",
+      "parentUuid": "dac4157f_933ab4cc",
+      "revId": "455b38922348d68b10e1261413ef1134c2e2bfb4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
