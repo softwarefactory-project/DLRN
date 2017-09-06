@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dac4157f_68096b31",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-09-06T13:44:19Z",
+      "side": 1,
+      "message": "nitpick could be not len(toprocess) but not a blocker",
+      "revId": "ead24a818e6287940f79abd73ddfbec1eee8056b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
