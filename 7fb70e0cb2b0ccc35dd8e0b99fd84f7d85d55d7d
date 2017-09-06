@@ -16,6 +16,24 @@
       "revId": "7fb70e0cb2b0ccc35dd8e0b99fd84f7d85d55d7d",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dac4157f_7310404f",
+        "filename": "dlrn/db.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-09-06T13:54:53Z",
+      "side": 1,
+      "message": "I did it mostly to be consistent with previous definitions (getSession, getLastProcessedCommit, etc). Just trying to match history :)",
+      "parentUuid": "dac4157f_0818af83",
+      "revId": "7fb70e0cb2b0ccc35dd8e0b99fd84f7d85d55d7d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
