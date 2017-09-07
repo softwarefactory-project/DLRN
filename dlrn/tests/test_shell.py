@@ -18,6 +18,7 @@ import tempfile
 from dlrn.config import ConfigOptions
 from dlrn import db
 from dlrn import shell
+from dlrn.shell import default_options
 from dlrn.tests import base
 from dlrn import utils
 
@@ -33,7 +34,7 @@ def mocked_session(url):
 class TestProcessBuildResult(base.TestCase):
     def setUp(self):
         super(TestProcessBuildResult, self).setUp()
-        config = configparser.RawConfigParser({"gerrit": None})
+        config = configparser.RawConfigParser(default_options)
         config.read("projects.ini")
         config.set('DEFAULT', 'datadir', tempfile.mkdtemp())
         config.set('DEFAULT', 'scriptsdir', tempfile.mkdtemp())
@@ -109,7 +110,7 @@ class TestProcessBuildResult(base.TestCase):
 class TestPostBuild(base.TestCase):
     def setUp(self):
         super(TestPostBuild, self).setUp()
-        config = configparser.RawConfigParser({"gerrit": None})
+        config = configparser.RawConfigParser(default_options)
         config.read("projects.ini")
         config.set('DEFAULT', 'datadir', tempfile.mkdtemp())
         config.set('DEFAULT', 'scriptsdir', tempfile.mkdtemp())
