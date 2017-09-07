@@ -136,23 +136,34 @@ sed -i -e '/^%changelog.*/q' *.spec
 cat *.spec
 rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
 
-if [ "${ADDITIONAL_MOCK_OPTIONS}" != "" ]
-then
-    /usr/bin/mock ${MOCKOPTS} "${ADDITIONAL_MOCK_OPTIONS}" --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+if [ -n "$COPR_ID" ]; then
+    set +e
+    copr build $COPR_ID ${TOP_DIR}/SRPMS/*.src.rpm >& $OUTPUT_DIRECTORY/copr.log
+    ret=$?
+    set -e
+    if [ $ret -eq 0 ]; then
+        touch $OUTPUT_DIRECTORY/installed
+    fi
+    buildid=$(sed -n 's/Created builds: //p' < $OUTPUT_DIRECTORY/copr.log)
+    if [ -z "$buildid" ]; then
+        echo "Unable to find copr build id" 1>&2
+        exit 1
+    fi
+    mkdir -p $OUTPUT_DIRECTORY/$buildid
+    copr download-build -d $OUTPUT_DIRECTORY/$buildid $buildid
+    mv $OUTPUT_DIRECTORY/$buildid/*/* $OUTPUT_DIRECTORY
+    zcat $OUTPUT_DIRECTORY/build.log.gz > $OUTPUT_DIRECTORY/rpmbuild.log
+    rm -rf $OUTPUT_DIRECTORY/$buildid
+    rm -f $OUTPUT_DIRECTORY/index.html $OUTPUT_DIRECTORY/build.log.gz
 else
-    /usr/bin/mock ${MOCKOPTS} --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
-fi
+    /usr/bin/mock ${MOCKOPTS} ${ADDITIONAL_MOCK_OPTIONS} --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
 
-if [ $? -eq 0 ]
-then
     if ! grep -F 'WARNING: Failed install built packages' $OUTPUT_DIRECTORY/mock.log; then
         touch $OUTPUT_DIRECTORY/installed
         ret=0
     else
         ret=1
     fi
-else
-    ret=1
 fi
 
 # We want to ignore any error in restorecon
