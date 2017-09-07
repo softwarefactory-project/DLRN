@@ -18,6 +18,7 @@ import tempfile
 from dlrn.config import ConfigOptions
 from dlrn import db
 from dlrn import notifications
+from dlrn.shell import default_options
 from dlrn.tests import base
 from six.moves import configparser
 
@@ -25,7 +26,7 @@ from six.moves import configparser
 class TestNotifications(base.TestCase):
     def setUp(self):
         super(TestNotifications, self).setUp()
-        config = configparser.RawConfigParser({"gerrit": 'yes'})
+        config = configparser.RawConfigParser(default_options)
         config.read("projects.ini")
         config.set('DEFAULT', 'datadir', tempfile.mkdtemp())
         config.set('DEFAULT', 'scriptsdir', tempfile.mkdtemp())
