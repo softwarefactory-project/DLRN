@@ -21,6 +21,7 @@ from six.moves import configparser
 
 from dlrn.config import ConfigOptions
 from dlrn.drivers.gitrepo import GitRepoDriver
+from dlrn.shell import default_options
 from dlrn.tests import base
 
 
@@ -28,7 +29,7 @@ from dlrn.tests import base
 class TestDriverGit(base.TestCase):
     def setUp(self):
         super(TestDriverGit, self).setUp()
-        config = configparser.RawConfigParser({"gerrit": None})
+        config = configparser.RawConfigParser(default_options)
         config.read("projects.ini")
         self.config = ConfigOptions(config)
         self.config.gitrepo_dir = tempfile.mkdtemp()

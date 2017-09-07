@@ -26,6 +26,7 @@ from dlrn.build import build
 from dlrn.build import build_rpm_wrapper
 from dlrn.config import ConfigOptions
 from dlrn import db
+from dlrn.shell import default_options
 from dlrn.tests import base
 from dlrn import utils
 
@@ -42,7 +43,7 @@ dlrn.shell.pkginfo = FakePkgInfo()
 class TestBuild(base.TestCase):
     def setUp(self):
         super(TestBuild, self).setUp()
-        config = configparser.RawConfigParser({"gerrit": None})
+        config = configparser.RawConfigParser(default_options)
         config.read("projects.ini")
         config.set('DEFAULT', 'datadir', tempfile.mkdtemp())
         config.set('DEFAULT', 'scriptsdir', tempfile.mkdtemp())
