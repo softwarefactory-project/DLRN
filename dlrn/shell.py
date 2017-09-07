@@ -64,7 +64,8 @@ default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'workers': '1',
                    'gerrit_topic': 'rdo-FTBFS',
                    'database_connection': 'sqlite:///commits.sqlite',
-                   'fallback_to_master': '1'
+                   'fallback_to_master': '1',
+                   'coprid': None,
                    }
 
 
@@ -137,6 +138,11 @@ def main():
                         help="Show verbose mock output during build.")
 
     options, args = parser.parse_known_args(sys.argv[1:])
+
+    if len(args) != 0:
+        sys.stderr.write('Unknown argument(s): %s\n' % ' '.join(args))
+        parser.print_usage(sys.stderr)
+        sys.exit(1)
 
     global verbose_mock
     verbose_mock = options.verbose_mock
