@@ -25,7 +25,8 @@ from six.moves import configparser
 def _aux_sh(*args):
     call = args[0]
     if call == '-f':
-        raise sh.ErrorReturnCode_1('blabla', '', '')
+        raise sh.ErrorReturnCode_1('blabla'.encode(), ''.encode(),
+                                   ''.encode())
     return
 
 
