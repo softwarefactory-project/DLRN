@@ -36,6 +36,7 @@ class ConfigOptions(object):
         self.database_connection = cp.get('DEFAULT', 'database_connection')
         self.fallback_to_master = cp.getboolean('DEFAULT',
                                                 'fallback_to_master')
+        self.coprid = cp.get('DEFAULT', 'coprid')
 
         # Handling for optional sections, driver-based
         if cp.has_section('gitrepo_driver'):
