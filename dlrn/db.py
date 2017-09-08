@@ -101,6 +101,15 @@ class CIVote(Base):
     notes = Column(Text)
 
 
+class Promotion(Base):
+    __tablename__ = "promotions"
+
+    id = Column(Integer, primary_key=True)
+    commit_id = Column(Integer, ForeignKey('commits.id'), nullable=False)
+    promotion_name = Column(String(256), nullable=False)
+    timestamp = Column(Integer, nullable=False)
+
+
 class User(Base):
     __tablename__ = "users"
 
