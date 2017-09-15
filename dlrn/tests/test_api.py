@@ -424,6 +424,7 @@ class TestRepoStatus(DLRNAPITestCase):
         self.assertEqual(len(data), 1)
 
 
+
 @mock.patch('dlrn.remote.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
 class TestRemoteImport(DLRNAPITestCase):
@@ -431,11 +432,12 @@ class TestRemoteImport(DLRNAPITestCase):
         response = self.app.post('/api/remote/import')
         self.assertEqual(response.status_code, 401)
 
+    @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver.getpackages')
     @mock.patch.object(sh.Command, '__call__', autospec=True)
     @mock.patch('dlrn.remote.post_build')
     @mock.patch('dlrn.remote.urlopen', side_effect=mocked_urlopen)
     def test_post_remote_import_success(self, url_mock, build_mock, sh_mock,
-                                        db2_mock, db_mock):
+                                        db2_mock, db_mock, gp_mock):
 
         req_data = json.dumps(dict(repo_url='http://example.com/1/'))
 
