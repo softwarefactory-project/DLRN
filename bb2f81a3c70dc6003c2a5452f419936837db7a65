@@ -22,6 +22,30 @@
       "revId": "bb2f81a3c70dc6003c2a5452f419936837db7a65",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_2c69478c",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 20
+      },
+      "writtenOn": "2017-09-18T19:31:10Z",
+      "side": 0,
+      "message": "not really because we are in set -e mode so this is not executed in case of error.",
+      "parentUuid": "9abe1de1_b116d053",
+      "range": {
+        "startLine": 146,
+        "startChar": 0,
+        "endLine": 147,
+        "endChar": 4
+      },
+      "revId": "bb2f81a3c70dc6003c2a5452f419936837db7a65",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
