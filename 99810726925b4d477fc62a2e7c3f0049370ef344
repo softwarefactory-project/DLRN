@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_6ca05f91",
+        "filename": "dlrn/build.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-09-19T13:30:41Z",
+      "side": 1,
+      "message": "This should be config_options, config_opts is not defined in this context.",
+      "range": {
+        "startLine": 193,
+        "startChar": 32,
+        "endLine": 193,
+        "endChar": 43
+      },
+      "revId": "99810726925b4d477fc62a2e7c3f0049370ef344",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_ecba2fc0",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-09-19T13:30:41Z",
+      "side": 1,
+      "message": "This line is failing in my tests, I get several errors like the following:\n\nmv: will not overwrite just-created \u0027/tmp/DLRN/data/repos/0a/71/0a71320c714967a064da3be0881d9565737632bb_dev/build-00604765.rsync.log\u0027 with \u0027/tmp/DLRN/data/repos/0a/71/0a71320c714967a064da3be0881d9565737632bb_dev/604765/fedora-rawhide-x86_64/build-00604765.rsync.log\u0027",
+      "revId": "99810726925b4d477fc62a2e7c3f0049370ef344",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
