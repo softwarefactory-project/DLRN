@@ -40,7 +40,7 @@ if [ -r setup.py -a ! -r metadata.json ]; then
     # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
     # so only look at the last line for version
     setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && python setup.py --version"| tail -n 1) \
-                         $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && git log -n1 --format=format:%h")
+                         $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && git log --abbrev=7 -n1 --format=format:%h")
 elif [ -r *.gemspec ]; then
     SOURCETYPE='gem'
     GEMSPEC=$(ls -l | grep gemspec | awk '{print $9}')
@@ -50,7 +50,7 @@ elif [ -r *.gemspec ]; then
     cp -pr . ${MOCKDIR}/var/tmp/pkgsrc
     /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && gem build $GEMSPEC"
     /usr/bin/mock $MOCKOPTS --copyout /var/tmp/pkgsrc/$PROJECT-$VERSION.gem ./$PROJECT-$VERSION.gem
-    setversionandrelease "$VERSION" $(git log -n1 --format=format:%h)
+    setversionandrelease "$VERSION" $(git log --abbrev=7 -n1 --format=format:%h)
 else
     SOURCETYPE='tarball'
     # For Puppet modules, check the version in metadata.json (preferred) or Modulefile
@@ -85,7 +85,7 @@ else
     if [ -z "$version" ]; then
         version=0.0.1
     fi
-    setversionandrelease "$version" $(git log -n1 --format=format:%h)
+    setversionandrelease "$version" $(git log --abbrev=7 -n1 --format=format:%h)
     if [ -r metadata.json ]; then
         TARBALLS_OPS=$(egrep -c "^Source0.*tarballs.openstack.org" ${DISTGIT_DIR}/*spec||true)
         echo $TARBALLS_OPS
