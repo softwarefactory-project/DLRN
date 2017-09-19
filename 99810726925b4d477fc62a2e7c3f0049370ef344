@@ -99,6 +99,24 @@
       "revId": "99810726925b4d477fc62a2e7c3f0049370ef344",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_2cef07b2",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 20
+      },
+      "writtenOn": "2017-09-19T15:11:11Z",
+      "side": 1,
+      "message": "yes that can be that.",
+      "parentUuid": "9abe1de1_cce64be8",
+      "revId": "99810726925b4d477fc62a2e7c3f0049370ef344",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
