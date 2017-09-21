@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_20126bb5",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-09-21T09:23:27Z",
+      "side": 1,
+      "message": "Idea for the future improvement:\nsince builds are stored in copr, just put links to copr in dlrn generated repo.",
+      "revId": "713a116eb6a7d3b8efe54cb6746b99f070c965c9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_e00b537c",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-09-21T09:23:27Z",
+      "side": 1,
+      "message": "not from this change but  et is not actual used later?",
+      "range": {
+        "startLine": 164,
+        "startChar": 8,
+        "endLine": 164,
+        "endChar": 11
+      },
+      "revId": "713a116eb6a7d3b8efe54cb6746b99f070c965c9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
