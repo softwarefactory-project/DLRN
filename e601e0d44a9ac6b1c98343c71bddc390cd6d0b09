@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_602063f8",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-09-21T09:25:55Z",
+      "side": 1,
+      "message": "ah ret is used, ignore my comment in the previous review, gerrit UI didn\u0027t show the whole file :(",
+      "range": {
+        "startLine": 182,
+        "startChar": 6,
+        "endLine": 182,
+        "endChar": 9
+      },
+      "revId": "e601e0d44a9ac6b1c98343c71bddc390cd6d0b09",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
