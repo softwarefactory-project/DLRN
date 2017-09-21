@@ -1,0 +1,9 @@
+Code-Review+2: Haïkel Guémar <hguemar@fedoraproject.org>
+Code-Review+2: Javier Peña <jpena@redhat.com>
+Workflow+1: Javier Peña <jpena@redhat.com>
+Verified+2: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-by: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-at: Thu, 21 Sep 2017 09:29:44 +0000
+Reviewed-on: https://softwarefactory-project.io/r/9046
+Project: DLRN
+Branch: refs/heads/master
