@@ -64,7 +64,8 @@ default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'workers': '1',
                    'gerrit_topic': 'rdo-FTBFS',
                    'database_connection': 'sqlite:///commits.sqlite',
-                   'fallback_to_master': '1'
+                   'fallback_to_master': '1',
+                   'coprid': None,
                    }
 
 

@@ -189,6 +189,10 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     except OSError:
         shutil.copyfile(newcfg, oldcfg)
 
+    # Set env variable for Copr configuration
+    if config_options.coprid:
+        os.environ['COPR_ID'] = config_options.coprid
+
     # Set env variable for mock configuration
     os.environ['MOCK_CONFIG'] = mock_config
 

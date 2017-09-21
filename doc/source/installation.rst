@@ -69,6 +69,7 @@ The configuration file looks like this:
     gerrit_topic=rdo-FTBFS
     database_connection=sqlite:///commits.sqlite
     fallback_to_master=1
+    coprid=account/repo
 
 * ``datadir`` is the directory where the packages and repositories will be
   created.
@@ -153,6 +154,12 @@ The configuration file looks like this:
     `RPM Packaging for OpenStack <https://github.com/openstack/rpm-packaging>`_
     project. This driver requires setting some optional configuration options
     in the ``[gitrepo_driver]`` section
+
+* ``coprid`` defines the Fedora Copr id to use to compile the packages
+  instead of using mock. The ``copr-cli`` package needs to be
+  installed. Configure only one target architecture per COPR builder
+  else it would confuse DLRN. Details on Fedora Copr at
+  https://copr.fedorainfracloud.org/
 
 The optional ``[gitrepo_driver]`` section has the following configuration
 options:
