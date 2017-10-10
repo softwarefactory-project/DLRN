@@ -64,13 +64,12 @@ else
 
     # Not able to discover version, use git tags
     if [ -z "$version" ]; then
-        version="$(git describe --abbrev=0 --tags|sed 's/^[vVrR]//' || :)"
+        version="$(git describe --abbrev=0 --tags 2> /dev/null|sed 's/^[vVrR]//' || :)"
     fi
 
     # One final attempt for openstack/rpm-packaging
     if [ -z "$version" ]; then
-        git remote -v | grep openstack/rpm-packaging
-        if [ $? -eq 0 ]; then
+        if git remote -v | grep openstack/rpm-packaging; then
             pushd ${DISTGIT_DIR}
             version=$(grep Version *.spec | awk '{print $2}' | head -n 1)
             popd
