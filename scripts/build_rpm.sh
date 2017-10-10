@@ -69,12 +69,14 @@ else
 
     # One final attempt for openstack/rpm-packaging
     if [ -z "$version" ]; then
+        set +e
         git remote -v | grep openstack/rpm-packaging
         if [ $? -eq 0 ]; then
             pushd ${DISTGIT_DIR}
             version=$(grep Version *.spec | awk '{print $2}' | head -n 1)
             popd
         fi
+        set -e
     fi
 
     # We got a version. Check if we need to increase a .Z release due to post-tag commits
