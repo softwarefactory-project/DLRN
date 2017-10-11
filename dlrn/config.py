@@ -37,6 +37,7 @@ class ConfigOptions(object):
         self.fallback_to_master = cp.getboolean('DEFAULT',
                                                 'fallback_to_master')
         self.coprid = cp.get('DEFAULT', 'coprid')
+        self.release_numbering = cp.get('DEFAULT', 'release_numbering')
 
         # Handling for optional sections, driver-based
         if cp.has_section('gitrepo_driver'):

@@ -27,7 +27,7 @@ function setversionandrelease(){
     elif [[ "$UPSTREAMVERSION" =~ (.*?)\.(g.+) ]] ; then
         VERSION=${BASH_REMATCH[1]}
     # prerelease, eg. 1.8.0.pre
-  elif [[ "$UPSTREAMVERSION" =~ (.*?)\.pre.* ]] ; then
+    elif [[ "$UPSTREAMVERSION" =~ (.*?)\.pre.* ]] ; then
         VERSION=${BASH_REMATCH[1]}
     # Only version e.g. 1.7.3
     elif [[ "$UPSTREAMVERSION" =~ ^([.0-9]*)$ ]] ; then
@@ -41,7 +41,13 @@ function setversionandrelease(){
         echo  "WARNING: Couldn't parse VERSION, falling back to 0.0.1"
         VERSION=0.0.1
     fi
-    RELEASE=0.$(date --utc "+%Y%m%d%H%M%S").$2
+
+    if [ "${RELEASE_NUMBERING-}" = "0.1.date.hash" ] ; then
+        RELEASE=0.1.$(date --utc "+%Y%m%d%H%M%S").$2
+    else
+        # Default to 0.date.hash release numbers
+        RELEASE=0.$(date --utc "+%Y%m%d%H%M%S").$2
+    fi
 }
 
 function cleanup_sdist() {

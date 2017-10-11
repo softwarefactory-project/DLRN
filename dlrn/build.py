@@ -193,6 +193,12 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     if config_options.coprid:
         os.environ['COPR_ID'] = config_options.coprid
 
+    # Set release numbering option
+    if config_options.release_numbering == '0.1.date.hash':
+        os.environ['RELEASE_NUMBERING'] = '0.1.date.hash'
+    else:
+        os.environ['RELEASE_NUMBERING'] = '0.date.hash'
+
     # Set env variable for mock configuration
     os.environ['MOCK_CONFIG'] = mock_config
 
