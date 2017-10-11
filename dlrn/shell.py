@@ -66,6 +66,7 @@ default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'database_connection': 'sqlite:///commits.sqlite',
                    'fallback_to_master': '1',
                    'coprid': None,
+                   'release_numbering': '0.date.hash',
                    }
 
 
