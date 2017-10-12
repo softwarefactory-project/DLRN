@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_7de7dd40",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-10-12T15:46:57Z",
+      "side": 1,
+      "message": "\"legacy\" and \"new\" are time relative. When a new format is devised, new won\u0027t be new anymore... it will be legacy 2 :) I suggest more descriptive names, such as 0.date.hash and 0.1.date.hash so it\u0027s clear just from the config file what to expect.\n\nThinking further, instead of hardcoding named templates, we might just parse that field with simple templating a la\ns/date/$ACTUAL_DATE/ or using format() or whatever simple way you see fit. It might be safe to have predefined formats, but this seems more flexible for changes... I don\u0027t know, just mentioning the possibility.\n\nrelease_format\u003d0.{date}.{hash} # default\nrelease_format\u003d0.1.{date}.{hash}\nrelease_format\u003d1.2.3.{date}-{hash} # whatever else\n...",
+      "revId": "d69bc71de29964d8177e5685cddead4b21956595",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_1dd58142",
+        "filename": "scripts/common-functions",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-10-12T15:46:57Z",
+      "side": 1,
+      "message": "s/ $//",
+      "revId": "d69bc71de29964d8177e5685cddead4b21956595",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
