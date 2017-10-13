@@ -165,7 +165,11 @@ if [ -n "$COPR_ID" ]; then
     rm -f $OUTPUT_DIRECTORY/index.html
 else
     set +e
-    /usr/bin/mock ${MOCKOPTS} ${ADDITIONAL_MOCK_OPTIONS} --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+    if [ -n "${ADDITIONAL_MOCK_OPTIONS}" ]; then
+        /usr/bin/mock ${MOCKOPTS} "${ADDITIONAL_MOCK_OPTIONS}" --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+    else
+        /usr/bin/mock ${MOCKOPTS} --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+    fi
     ret=$?
     set -e
 
