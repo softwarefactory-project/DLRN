@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9abe1de1_bdca154e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-10-13T09:38:17Z",
+      "side": 1,
+      "message": "Ok,  I\u0027ll change to a more descriptive name. About the option of having a full template for the release format... It\u0027s interesting, but I think it might be an overkill right now.",
+      "parentUuid": "9abe1de1_7de7dd40",
+      "revId": "d69bc71de29964d8177e5685cddead4b21956595",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abe1de1_1dd58142",
         "filename": "scripts/common-functions",
         "patchSetId": 1
