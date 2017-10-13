@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_1d8d8131",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-10-13T08:29:41Z",
+      "side": 1,
+      "message": "This ignores git describe failure w/o tags but produces misleading warning, what about:\n\n  version\u003d$(git describe --abbrev\u003d0 --tags 2\u003e/dev/null|sed \u0027s/^[vVrR]//\u0027 || :)",
+      "revId": "8b4ef45727298897de290967c0e016a2b9de3d83",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_7d76bd3f",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-10-13T08:29:41Z",
+      "side": 1,
+      "message": "can be replaced with:\n\nif git remote -v | grep openstack/rpm-packaging; then\n...",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 29
+      },
+      "revId": "8b4ef45727298897de290967c0e016a2b9de3d83",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
