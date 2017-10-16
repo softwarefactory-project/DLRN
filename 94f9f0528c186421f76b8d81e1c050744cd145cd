@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9abe1de1_d813970c",
+        "filename": "projects.ini",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-10-16T09:41:55Z",
+      "side": 1,
+      "message": "Yes, the idea was to avoid changes in defaults, and handle the change for centos-master-uc in puppet-dlrn. In the future we can change the default.",
+      "parentUuid": "9abe1de1_78624bda",
+      "revId": "94f9f0528c186421f76b8d81e1c050744cd145cd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abe1de1_585f870e",
         "filename": "scripts/common-functions",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-10-15T15:36:27Z",
       "side": 1,
       "message": "I\u0027d just move the date computation above to avoid that someone by mistake change the parameters in one of the copies and forget updating the other.",
+      "revId": "94f9f0528c186421f76b8d81e1c050744cd145cd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_b8f903cb",
+        "filename": "scripts/common-functions",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-10-16T09:41:55Z",
+      "side": 1,
+      "message": "Thanks! It makes sense, I\u0027ll fix it",
+      "parentUuid": "9abe1de1_585f870e",
       "revId": "94f9f0528c186421f76b8d81e1c050744cd145cd",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
