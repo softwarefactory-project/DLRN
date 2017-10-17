@@ -34,6 +34,24 @@
       "revId": "ac8ea368f5fdfb60f69d2b10512afccaf4fbc6be",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_43d0bc53",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-10-17T10:14:44Z",
+      "side": 1,
+      "message": "Still not quite sure how this will work for _trunk_ builds i.e. how remote Source1 tarball will be kept in sync?\nLooking at https://github.com/search?p\u003d2\u0026q\u003dorg%3Acentos-opstools+Source1%3A\u0026type\u003dCode\nwe have examples:\n\n Source1: http://s3.amazonaws.com/rubygem-rr/tests/v%{version}.tar.gz\n\n Source1: https://github.com/sensu/%{gem_name}/archive/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz\n\nHow is that kept in sync with locally generated Source0 tarball?",
+      "parentUuid": "1ab14d0d_7bd13ffb",
+      "revId": "ac8ea368f5fdfb60f69d2b10512afccaf4fbc6be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
