@@ -144,11 +144,11 @@ sed -i -e "s/^\(Source\|Source0\):.*/\1: $SOURCEWITHREL/" *.spec
 sed -i -e '/^%changelog.*/q' *.spec
 cat *.spec
 spectool -g -C ${TOP_DIR}/SOURCES *.spec
-rpmbuild --define="_topdir ${TOP_DIR}" -bs ${TOP_DIR}/SPECS/*.spec
+/usr/bin/mock --buildsrpm ${MOCKOPTS} --spec *.spec --sources=${TOP_DIR}/SOURCES
 
 if [ -n "$COPR_ID" ]; then
     set +e
-    copr build $COPR_ID ${TOP_DIR}/SRPMS/*.src.rpm >& $OUTPUT_DIRECTORY/copr.log
+    copr build $COPR_ID ${OUTPUT_DIRECTORY}/*.src.rpm >& $OUTPUT_DIRECTORY/copr.log
     ret=$?
     set -e
     if [ $ret -eq 0 ]; then
@@ -167,9 +167,9 @@ if [ -n "$COPR_ID" ]; then
 else
     set +e
     if [ -n "${ADDITIONAL_MOCK_OPTIONS}" ]; then
-        /usr/bin/mock ${MOCKOPTS} "${ADDITIONAL_MOCK_OPTIONS}" --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+        /usr/bin/mock ${MOCKOPTS} "${ADDITIONAL_MOCK_OPTIONS}" --postinstall --rebuild ${OUTPUT_DIRECTORY}/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
     else
-        /usr/bin/mock ${MOCKOPTS} --postinstall --rebuild ${TOP_DIR}/SRPMS/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
+        /usr/bin/mock ${MOCKOPTS} --postinstall --rebuild ${OUTPUT_DIRECTORY}/*.src.rpm 2>&1 | tee $OUTPUT_DIRECTORY/mock.log
     fi
     ret=$?
     set -e
@@ -181,8 +181,6 @@ else
         else
             ret=1
         fi
-    else
-        cp ${TOP_DIR}/SRPMS/*.src.rpm $OUTPUT_DIRECTORY/
     fi
 fi
 
