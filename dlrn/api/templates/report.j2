@@ -9,6 +9,35 @@
       <i class='fa fa-chevron-circle-right pull-left'></i>
       {{ reponame | capitalize }} - {{ target | capitalize }} ({{ src }})
     </h1>
+    <table id="navigation1">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="report.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           {% if request.args.get('package') != None %}
+           <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
+           {% endif %}
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - 100 }}"/>
+          <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    <td>
+    <form action="report.html" method="get">
+       {% if request.args.get('success') != None %}
+         <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+       {% endif %}
+       {% if request.args.get('package') != None %}
+       <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
+       {% endif %}
+       <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + 100 }}"/>
+      <button type="submit" class="button"><h4>Next</h4></button>
+    </form>
+    </td>
+    </tr></table>
     <table id="dlrn">
       <tr>
         <th>Build Date Time</th>
@@ -67,5 +96,34 @@
         </tr>
       {% endfor %}
     </table>
+    <table id="navigation2">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="report.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           {% if request.args.get('package') != None %}
+           <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
+           {% endif %}
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - 100 }}"/>
+          <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    <td>
+    <form action="report.html" method="get">
+       {% if request.args.get('success') != None %}
+         <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+       {% endif %}
+       {% if request.args.get('package') != None %}
+       <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
+       {% endif %}
+       <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + 100 }}"/>
+      <button type="submit" class="button"><h4>Next</h4></button>
+    </form>
+    </td>
+    </tr></table>
   </body>
 </html>

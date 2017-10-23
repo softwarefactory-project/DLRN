@@ -9,6 +9,22 @@
       <i class='fa fa-chevron-circle-right pull-left'></i>
       {{ target | capitalize }}
     </h1>
+    <table id="navigation1">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - 100 }}"/>
+           <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    <td>
+        <form action="civotes.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + 100 }}"/>
+           <button type="submit" class="button"><h4>Next</h4></button>
+        </form>
+    </td></tr></table>
     <table id="dlrn">
       <tr>
         <th>Repo hash (distro_commit)</th>
@@ -45,5 +61,21 @@
         </tr>
       {% endfor %}
     </table>
+    <table id="navigation2">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - 100 }}"/>
+           <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    <td>
+        <form action="civotes.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + 100 }}"/>
+           <button type="submit" class="button"><h4>Next</h4></button>
+        </form>
+    </td></tr></table>
   </body>
 </html>
