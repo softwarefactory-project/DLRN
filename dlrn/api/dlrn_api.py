@@ -491,9 +491,12 @@ def strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
 @app.route('/api/civotes.html', methods=['GET'])
 def get_civotes():
     session = getSession(app.config['DB_PATH'])
+    offset = request.args.get('offset', 0)
+
     votes = session.query(CIVote)
     votes = votes.filter(CIVote.ci_name != 'consistent')
-
+    votes = votes.offset(offset).limit(100)
+    count = votes.count()
     # Let's find all individual commit_hash + distro_hash combinations
     commit_id_list = []
     for vote in votes:
@@ -510,19 +513,21 @@ def get_civotes():
         repodetail.commit_hash = commit.commit_hash
         repodetail.distro_hash = commit.distro_hash
         repodetail.distro_hash_short = commit.distro_hash[:8]
-        repodetail.success = votes.filter(CIVote.commit_id == commit_id,
-                                          CIVote.ci_vote == 1).count()
-        repodetail.failure = votes.filter(CIVote.commit_id == commit_id,
-                                          CIVote.ci_vote == 0).count()
-        repodetail.timestamp = votes.filter(CIVote.commit_id == commit_id).\
-            order_by(desc(CIVote.timestamp)).first().timestamp
+        repodetail.success = votes.from_self().filter(
+            CIVote.commit_id == commit_id, CIVote.ci_vote == 1).count()
+        repodetail.failure = votes.from_self().filter(
+            CIVote.commit_id == commit_id, CIVote.ci_vote == 0).count()
+        repodetail.timestamp = votes.from_self().filter(
+            CIVote.commit_id == commit_id).order_by(desc(CIVote.timestamp)).\
+            first().timestamp
         repolist.append(repodetail)
 
     repolist = sorted(repolist, key=lambda repo: repo.timestamp, reverse=True)
     session.close()
     return render_template('votes_general.j2',
                            target='master',
-                           repodetail=repolist)
+                           repodetail=repolist,
+                           count=count)
 
 
 @app.route('/api/civotes_detail.html', methods=['GET'])
@@ -530,25 +535,29 @@ def get_civotes_detail():
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
     success = request.args.get('success', None)
+    offset = request.args.get('offset', 0)
 
     session = getSession(app.config['DB_PATH'])
     votes = session.query(CIVote)
     votes = votes.filter(CIVote.ci_name != 'consistent')
+    votes = votes.offset(offset).limit(100)
 
     if commit_hash and distro_hash:
         commit = session.query(Commit).filter(
             Commit.status == 'SUCCESS',
             Commit.commit_hash == commit_hash,
             Commit.distro_hash == distro_hash).first()
-        votes = votes.filter(CIVote.commit_id == commit.id)
+        votes = votes.from_self().filter(CIVote.commit_id == commit.id)
     else:
         raise InvalidUsage("Please specify commit_hash and distro_hash as "
                            "parameters", status_code=400)
 
     if success is not None:
-        votes = votes.filter(CIVote.ci_vote == bool(strtobool(success)))
+        votes = votes.from_self().filter(
+            CIVote.ci_vote == bool(strtobool(success)))
 
     votelist = votes.all()
+    count = votes.count()
 
     for i in range(len(votelist)):
         commit = getCommits(session, limit=0).filter(
@@ -559,13 +568,15 @@ def get_civotes_detail():
     session.close()
     return render_template('votes.j2',
                            target='master',
-                           votes=votelist)
+                           votes=votelist,
+                           count=count)
 
 
 @app.route('/api/report.html', methods=['GET'])
 def get_report():
     package_name = request.args.get('package', None)
     success = request.args.get('success', None)
+    offset = request.args.get('offset', 0)
 
     if success is not None:
         if bool(strtobool(success)):
@@ -578,7 +589,9 @@ def get_report():
     session = getSession(app.config['DB_PATH'])
     commits = getCommits(session, without_status="RETRY",
                          project=package_name, with_status=with_status,
-                         limit=1000)
+                         limit=100, offset=offset)
+
+    count = commits.count()
 
     cp = configparser.RawConfigParser(default_options)
     cp.read(app.config['CONFIG_FILE'])
@@ -588,4 +601,5 @@ def get_report():
                            reponame='Detailed build report',
                            target=config_options.target,
                            src=config_options.source,
-                           commits=commits)
+                           commits=commits,
+                           count=count)

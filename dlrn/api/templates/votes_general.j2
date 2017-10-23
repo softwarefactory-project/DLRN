@@ -9,6 +9,24 @@
       <i class='fa fa-chevron-circle-right pull-left'></i>
       {{ target | capitalize }}
     </h1>
+    <table id="navigation1">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - 100 }}"/>
+           <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    {% if count == 100 %}
+    <td>
+        <form action="civotes.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + 100 }}"/>
+           <button type="submit" class="button"><h4>Next</h4></button>
+        </form>
+    </td>
+    {% endif %}</tr></table>
     <table id="dlrn">
       <tr>
         <th>Repo hash (distro_commit)</th>
@@ -18,7 +36,7 @@
       </tr>
       {% for repo in repodetail %}
         <tr {% if repo.failure == 0%}class="success"{% endif %}>
-          <td>            
+          <td>
             <form action="civotes_detail.html" method="get">
                <input type="hidden" name="commit_hash" value="{{ repo.commit_hash }}" />
                <input type="hidden" name="distro_hash" value="{{ repo.distro_hash }}" />
@@ -45,5 +63,23 @@
         </tr>
       {% endfor %}
     </table>
+    <table id="navigation2">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - 100 }}"/>
+           <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    {% if count == 100 %}
+    <td>
+        <form action="civotes.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + 100 }}"/>
+           <button type="submit" class="button"><h4>Next</h4></button>
+        </form>
+    </td>{% endif %}
+    </tr></table>
   </body>
 </html>
