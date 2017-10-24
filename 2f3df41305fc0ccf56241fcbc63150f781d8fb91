@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_c83e24b8",
+        "filename": "dlrn/api/templates/votes_general.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-10-24T13:29:31Z",
+      "side": 1,
+      "message": "As with Previous, I\u0027d expect an {% if %} to only show Next button when there are more results.\n\nThat would require passing number of remaining results after pagination or something like that around... That information is available during processing so I\u0027d expose it in APIs too. You decide if it\u0027s worth the effort, this simple solution might be sufficient.",
+      "revId": "2f3df41305fc0ccf56241fcbc63150f781d8fb91",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
