@@ -1,0 +1,10 @@
+Code-Review+1: Fabien Boucher <fboucher@redhat.com>
+Code-Review+2: Frederic Lepied <flepied@redhat.com>
+Code-Review+2: Haïkel Guémar <hguemar@fedoraproject.org>
+Workflow+1: Haïkel Guémar <hguemar@fedoraproject.org>
+Verified+2: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-by: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-at: Tue, 24 Oct 2017 13:39:13 +0000
+Reviewed-on: https://softwarefactory-project.io/r/9968
+Project: DLRN
+Branch: refs/heads/master
