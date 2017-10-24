@@ -16,6 +16,24 @@
       "revId": "2f3df41305fc0ccf56241fcbc63150f781d8fb91",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_483c5493",
+        "filename": "dlrn/api/templates/votes_general.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-10-24T15:03:24Z",
+      "side": 1,
+      "message": "Ok, that makes sense. I think I can\u0027t get the number of results after pagination from the DB query, but at least I can see if the number of results is \u003d\u003d the limit (100). I\u0027ll implement that.",
+      "parentUuid": "9abe1de1_c83e24b8",
+      "revId": "2f3df41305fc0ccf56241fcbc63150f781d8fb91",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
