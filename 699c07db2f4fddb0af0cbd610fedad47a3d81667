@@ -22,6 +22,30 @@
       "revId": "699c07db2f4fddb0af0cbd610fedad47a3d81667",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_88314cef",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-10-24T12:56:34Z",
+      "side": 1,
+      "message": "IIRC we had some issues related to PATH in one of our use cases, but cannot remember which one.",
+      "parentUuid": "9abe1de1_08253caa",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 147,
+        "endChar": 13
+      },
+      "revId": "699c07db2f4fddb0af0cbd610fedad47a3d81667",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
