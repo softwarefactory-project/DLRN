@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_08253caa",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 20
+      },
+      "writtenOn": "2017-10-24T12:48:54Z",
+      "side": 1,
+      "message": "I don\u0027t remember why we are using the full path for mock? Each time I see this I feel a bad smell...",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 147,
+        "endChar": 13
+      },
+      "revId": "699c07db2f4fddb0af0cbd610fedad47a3d81667",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
