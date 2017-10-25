@@ -98,7 +98,6 @@ else
     if [ -r metadata.json ]; then
         TARBALLS_OPS=$(egrep -c "^Source0.*tarballs.openstack.org" ${DISTGIT_DIR}/*spec||true)
         echo $TARBALLS_OPS
-        git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@;s@\.git$@@'
         if [ $TARBALLS_OPS -ne 0 ]; then
             TARNAME=$(python -c "import json; print json.loads(open('metadata.json').read(-1))['name']")
         else
