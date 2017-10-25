@@ -96,8 +96,10 @@ else
     fi
     setversionandrelease "$version" $(git log --abbrev=7 -n1 --format=format:%h)
     if [ -r metadata.json ]; then
-        TARBALLS_OPS=$(egrep -c "^Source0.*tarballs.openstack.org" ${DISTGIT_DIR}/*spec||true)
+        # Detect if this is am OpenStack puppet module
+        TARBALLS_OPS=$(egrep -c -e "^Source0.*tarballs.openstack.org" -e "^Source0.*github.com\/openstack" -e "^Source0.*git.openstack.org\/openstack" ${DISTGIT_DIR}/*spec||true)
         echo $TARBALLS_OPS
+        # We know OpenStack puppet modules have a common style for metadata.json
         if [ $TARBALLS_OPS -ne 0 ]; then
             TARNAME=$(python -c "import json; print json.loads(open('metadata.json').read(-1))['name']")
         else
