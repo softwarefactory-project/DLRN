@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_a8aad017",
+        "filename": "scripts/build_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-10-25T11:15:55Z",
+      "side": 1,
+      "message": "it won\u0027t hurt just dunno if tarballs snap can be created with cgit\nBTW path is git.openstack.org/cgit/openstack/...",
+      "range": {
+        "startLine": 100,
+        "startChar": 121,
+        "endLine": 100,
+        "endChar": 138
+      },
+      "revId": "3e6feb4a6b819368ddbc497f1d28925763790119",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
