@@ -39,7 +39,7 @@ def sync_repo(commit):
         # We also need report.html, status_report.html, queue.html,
         # styles.css and the consistent and current symlinks
         for filename in ['report.html', 'status_report.html', 'styles.css',
-                         'queue.html', 'consistent', 'current']:
+                         'queue.html']:
             filepath = os.path.join(datadir, "repos", ".", filename)
             rsyncpaths.append(filepath)
 
@@ -50,4 +50,19 @@ def sync_repo(commit):
                      rsyncpaths, rsyncdest)
         except Exception as e:
             logger.warn('Failed to rsync content to %s ,'
+                        'got error %s' % (rsyncdest, e))
+
+        # We want to sync the symlinks in a second pass, once all content
+        # has been copied, to avoid a race condition it they are copied first
+        rsyncpaths = []
+        for filename in ['consistent', 'current']:
+            filepath = os.path.join(datadir, "repos", ".", filename)
+            rsyncpaths.append(filepath)
+
+        try:
+            sh.rsync('-avzR', '--delete-delay',
+                     '-e', rsh_command,
+                     rsyncpaths, rsyncdest)
+        except Exception as e:
+            logger.warn('Failed to rsync symlinks to %s ,'
                         'got error %s' % (rsyncdest, e))

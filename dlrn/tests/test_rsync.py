@@ -64,8 +64,11 @@ class TestSyncRepo(base.TestCase):
                                os.path.join(repodir, 'report.html'),
                                os.path.join(repodir, 'status_report.html'),
                                os.path.join(repodir, 'styles.css'),
-                               os.path.join(repodir, 'queue.html'),
-                               os.path.join(repodir, 'consistent'),
+                               os.path.join(repodir, 'queue.html')],
+                              'user@host:/directory'),
+                    mock.call('-avzR', '--delete-delay', '-e',
+                              'ssh -p 30000 -o StrictHostKeyChecking=no',
+                              [os.path.join(repodir, 'consistent'),
                                os.path.join(repodir, 'current')],
                               'user@host:/directory')]
         self.assertEqual(sh_mock.call_args_list, expected)
