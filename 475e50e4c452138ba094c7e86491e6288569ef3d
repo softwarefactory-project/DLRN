@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_5782ad53",
+        "filename": "scripts/common-functions",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-11-02T22:15:16Z",
+      "side": 1,
+      "message": "nitpick: it\u0027s not just date so \"timestamp\" would be more correct but also longer to type :)",
+      "range": {
+        "startLine": 47,
+        "startChar": 40,
+        "endLine": 47,
+        "endChar": 44
+      },
+      "revId": "475e50e4c452138ba094c7e86491e6288569ef3d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
