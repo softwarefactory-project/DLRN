@@ -84,10 +84,10 @@ def main():
                         default='projects.ini',
                         help="Config file. Default: projects.ini")
     parser.add_argument('--info-repo',
-                        help="use a local rdoinfo repo instead of "
-                             "fetching the default one using rdopkg. Only"
-                             "applies when pkginfo_driver is rdoinfo in"
-                             "projects.ini")
+                        help="use a local rdoinfo repo instead of"
+                             " fetching the default one using rdopkg. Only"
+                             " applies when pkginfo_driver is rdoinfo in"
+                             " projects.ini")
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
     parser.add_argument('--local', action="store_true",
@@ -99,11 +99,11 @@ def main():
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--project-name', action='append',
                        help="Build a specific project name only."
-                            "Use multiple times to build more than one "
+                            " Use multiple times to build more than one "
                             "project in a run.")
     group.add_argument('--package-name', action='append',
                        help="Build a specific package name only."
-                            "Use multiple times to build more than one "
+                            " Use multiple times to build more than one "
                             "package in a run.")
     parser.add_argument('--dev', action="store_true",
                         help="Don't reset packaging git repo, force build "

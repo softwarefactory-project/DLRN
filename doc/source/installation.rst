@@ -102,9 +102,6 @@ The configuration file looks like this:
   for known, transient errors such as network issues. If the build fails for
   that reason more than maxretries times, it will be marked as failed.
 
-* ``pkginfo_driver`` is the driver to use for generating the list of packages
-  that will be built.
-
 * ``gerrit`` if set to anything, instructs dlrn to create a gerrit review when
   a build fails. See next section for details on how to configure gerrit to
   work.
@@ -214,8 +211,9 @@ Database support
 
 DLRN supports different database engines through SQLAlchemy. SQLite3 and MariaDB have
 been tested so far. You can set the ``database_connection`` parameter in projects.ini
-with the required string, using `the SQLAlchemy syntax
- <http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls>`_.
+with the required string, using `the SQLAlchemy syntax`_.
+
+.. _the SQLAlchemy syntax: http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls
 
 For MariaDB, use a mysql+pymysql driver, with the following string:
 
@@ -242,10 +240,11 @@ You can use the following commands to create the database and grant the required
     flush privileges;
 
 You may also want to enable TLS support in your connections. In this case, follow the
-steps detailed in the `MariaDB documentation
- <https://mariadb.com/kb/en/mariadb/secure-connections-overview/>`_ to enable TLS
+steps detailed in the `MariaDB documentation`_ to enable TLS
 support on your server. Generate the client key and certificates, and then set up
 your database connection string as follows:
+
+.. _MariaDB documentation: https://mariadb.com/kb/en/mariadb/secure-connections-overview/
 
 .. code-block:: ini
 

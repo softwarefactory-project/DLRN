@@ -9,36 +9,43 @@ Parameters
 
     usage: dlrn [-h] [--config-file CONFIG_FILE] [--info-repo INFO_REPO]
                 [--build-env BUILD_ENV] [--local] [--head-only]
-                [--package-name PACKAGE_NAME] [--dev] [--log-commands]
-                [--use-public] [--order] [--sequential] [--status]
-                [--recheck] [--version] [--run RUN] [--stop]
+                [--project-name PROJECT_NAME | --package-name PACKAGE_NAME]
+                [--dev] [--log-commands] [--use-public] [--order] [--sequential]
+                [--status] [--recheck] [--version] [--run RUN] [--stop]
+                [--verbose-mock]
+    
     optional arguments:
       -h, --help            show this help message and exit
       --config-file CONFIG_FILE
                             Config file. Default: projects.ini
       --info-repo INFO_REPO
                             use a local rdoinfo repo instead of fetching the
-                            default one using rdopkg.
+                            default one using rdopkg. Only applies when
+                            pkginfo_driver is rdoinfo in projects.ini
       --build-env BUILD_ENV
                             Variables for the build environment.
       --local               Use local git repos if possible. Only commited changes
                             in the local repo will be used in the build.
       --head-only           Build from the most recent Git commit only.
-      --package-name PACKAGE_NAME
-                            Build a specific package name only. Use multiple times
-                            to build more than one package in a run.
       --project-name PROJECT_NAME
                             Build a specific project name only. Use multiple times
                             to build more than one project in a run.
+      --package-name PACKAGE_NAME
+                            Build a specific package name only. Use multiple times
+                            to build more than one package in a run.
       --dev                 Don't reset packaging git repo, force build and add
                             public master repo for dependencies (dev mode).
-      --log-commands        Log the commands run by DLRN.
+      --log-commands        Log the commands run by dlrn.
       --use-public          Use the public master repo for dependencies when doing
                             install verification.
       --order               Compute the build order according to the spec files
-                            instead of the dates of the commits. Imply --sequental
+                            instead of the dates of the commits. Implies
+                            --sequential.
       --sequential          Run all actions sequentially, regardless of the number
-                            of workers specified in projects.ini
+                            of workers specified in projects.ini.
+      --status              Get the status of packages.
+      --recheck             Force a rebuild for a particular package. Imply
+                            --package-name
       --version             show program's version number and exit
       --run RUN             Run a program instead of trying to build. Imply
                             --head-only
@@ -46,8 +53,28 @@ Parameters
       --verbose-mock        Show verbose mock output during build.
 
 
-Initial build
--------------
+Quickstart single package build
+-------------------------------
+
+Run DLRN for the package you are trying to build.
+
+.. code-block:: shell-session
+
+    $ dlrn --use-public --package-name openstack-cinder
+
+By using the parameter ``--use-public`` DLRN will configure the build
+environment to use the public master repository.
+
+In case of failure you might need to re-run a build by discarding the
+DLRN database content. To do so you need to run:
+
+.. code-block:: shell-session
+
+    $ dlrn --recheck --package-name openstack-cinder
+    $ dlrn --use-public --package-name openstack-cinder
+
+Full build
+----------
 
 Some of the projects require others to build. As a result, use the
 special option ``--order`` to build in the order computed from the
@@ -60,8 +87,8 @@ timestamps of the commits.
     $ dlrn --order
 
 
-Run DLRN
---------
+Advanced single package build
+----------------------------
 
 Run DLRN for the package you are trying to build.
 
@@ -71,6 +98,9 @@ Run DLRN for the package you are trying to build.
 
 This will clone the packaging for the project you’re interested in into ``data/openstack-cinder_repo``,
 you can now change this packaging and rerun the DLRN command in test your changes.
+
+This command expects build and runtime dependencies to be found in previously
+built repositories (during the initial full build). 
 
 If you have locally changed the packaging make sure to include ``--dev`` in the command line.
 This switches DLRN into **dev mode** which causes it to preserve local changes to your
@@ -104,18 +134,18 @@ On the central instance side, the ``dlrn-remote`` has the following syntax:
 
 .. code-block:: console
 
-usage: dlrn-remote [-h] [--config-file CONFIG_FILE] --repo-url REPO_URL [--info-repo INFO_REPO]
+    usage: dlrn-remote [-h] [--config-file CONFIG_FILE] --repo-url REPO_URL [--info-repo INFO_REPO]
 
-arguments:
-  -h, --help            show this help message and exit
-  --config-file CONFIG_FILE
-                        Config file. Default: projects.ini
-  --repo-url REPO_URL   Base repository URL for remotely generated repo
-                        (required)
-  --info-repo INFO_REPO
-                        use a local rdoinfo repo instead of fetching the
-                        default one using rdopkg. Only applies when
-                        pkginfo_driver is rdoinfo in projects.ini
+    arguments:
+      -h, --help            show this help message and exit
+      --config-file CONFIG_FILE
+                            Config file. Default: projects.ini
+      --repo-url REPO_URL   Base repository URL for remotely generated repo
+                            (required)
+      --info-repo INFO_REPO
+                            use a local rdoinfo repo instead of fetching the
+                            default one using rdopkg. Only applies when
+                            pkginfo_driver is rdoinfo in projects.ini
 
 An example command-line would be:
 
