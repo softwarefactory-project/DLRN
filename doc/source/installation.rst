@@ -70,6 +70,7 @@ The configuration file looks like this:
     database_connection=sqlite:///commits.sqlite
     fallback_to_master=1
     coprid=account/repo
+    release_numbering=0.date.hash
 
 * ``datadir`` is the directory where the packages and repositories will be
   created.
@@ -160,6 +161,14 @@ The configuration file looks like this:
   installed. Configure only one target architecture per COPR builder
   else it would confuse DLRN. Details on Fedora Copr at
   https://copr.fedorainfracloud.org/
+
+* ``release_numbering`` defines the algorithm used by DLRN to assign release
+  numbers to packages. The release number is created from the current date and
+  the source repository git hash, and can use two algorithms:
+
+  * ``0.date.hash`` if the old method is used: 0.<date>.<hash>
+  * ``0.1.date.hash`` if the new method is used: 0.1.<date>.<hash>. This new
+    method provides better compatibility with the Fedora packaging guidelines.
 
 The optional ``[gitrepo_driver]`` section has the following configuration
 options:
