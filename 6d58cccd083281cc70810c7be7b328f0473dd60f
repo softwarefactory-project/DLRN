@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "9abe1de1_b7ffc933",
+        "filename": "doc/source/usage.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-11-03T21:45:32Z",
+      "side": 1,
+      "message": "I just copy/pasted the dlrn -h command\u0027s output :).",
+      "parentUuid": "9abe1de1_97772502",
+      "revId": "6d58cccd083281cc70810c7be7b328f0473dd60f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abe1de1_777491fc",
         "filename": "doc/source/usage.rst",
         "patchSetId": 1
