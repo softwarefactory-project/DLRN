@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_175af583",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-11-03T17:54:18Z",
+      "side": 0,
+      "message": "No, this is required, it has to stay.",
+      "revId": "69ecc2da534b160dafd1375d47718c8dee0dadff",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}

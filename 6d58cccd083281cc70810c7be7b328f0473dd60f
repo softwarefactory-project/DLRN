@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_b76a2919",
+        "filename": "doc/source/usage.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-11-03T17:54:18Z",
+      "side": 1,
+      "message": "spurious tab",
+      "revId": "6d58cccd083281cc70810c7be7b328f0473dd60f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_97772502",
+        "filename": "doc/source/usage.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-11-03T17:54:18Z",
+      "side": 1,
+      "message": "why moving the entry down? (mostly curious)",
+      "revId": "6d58cccd083281cc70810c7be7b328f0473dd60f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_777491fc",
+        "filename": "doc/source/usage.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-11-03T17:54:18Z",
+      "side": 1,
+      "message": "trailing whitespace",
+      "revId": "6d58cccd083281cc70810c7be7b328f0473dd60f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
