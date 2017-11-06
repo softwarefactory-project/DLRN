@@ -152,7 +152,7 @@ def getLastBuiltCommit(session, project_name, commit_branch,
 
 
 def getCommits(session, project=None, with_status=None, without_status=None,
-               limit=1, order="desc", since=None, before=None):
+               limit=1, order="desc", since=None, before=None, offset=0):
     commits = session.query(Commit)
     if project is not None:
         commits = commits.filter(Commit.project_name == project)
@@ -169,6 +169,8 @@ def getCommits(session, project=None, with_status=None, without_status=None,
     if order == "asc":
         order_by = asc
     commits = commits.order_by(order_by(Commit.id))
+    if offset:
+        commits = commits.offset(offset)
     if limit:
         commits = commits.limit(limit)
     return commits

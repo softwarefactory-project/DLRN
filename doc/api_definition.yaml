@@ -216,10 +216,15 @@ paths:
         Get an overview of the CI reports.
       produces:
         - text/html
+      parameters:
+        - name: offset
+          in: query
+          description: Start after offset values. Defaults to 0.
+          type: integer
       responses:
         # Response code
         200:
-          description: An HTML page with the CI votes.
+          description: An HTML page ith the CI votes.
   /api/civotes_detail.html:
     get:
       description: |
@@ -241,6 +246,10 @@ paths:
           in: query
           description: If set filter for successful/failed CI votes
           type: boolean
+        - name: offset
+          in: query
+          description: Start after offset values. Defaults to 0.
+          type: integer
       responses:
         # Response code
         200:
@@ -260,6 +269,10 @@ paths:
           in: query
           description: Filter on this successful/unsuccessful builds.
           type: boolean
+        - name: offset
+          in: query
+          description: Start after offset values. Defaults to 0.
+          type: integer
       responses:
         # Response code
         200:

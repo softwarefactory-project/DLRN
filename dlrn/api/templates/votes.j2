@@ -9,6 +9,35 @@
       <i class='fa fa-chevron-circle-right pull-left'></i>
       {{ target | capitalize }}
     </h1>
+    <table id="navigation1">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes_detail.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
+           <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
+          <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    {% if count == limit %}
+    <td>
+        <form action="civotes_detail.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
+           <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
+          <button type="submit" class="button"><h4>Next</h4></button>
+        </form>    </td>
+    {% endif %}
+    </tr></table>
+
     <table id="dlrn">
       <tr>
         <th>CI Name</th>
@@ -60,5 +89,33 @@
         </tr>
       {% endfor %}
     </table>
+    <table id="navigation2">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes_detail.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
+           <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
+          <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    {% if count == limit %}
+    <td>
+        <form action="civotes_detail.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
+           <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
+          <button type="submit" class="button"><h4>Next</h4></button>
+        </form>    </td>
+    {% endif %}
+    </tr></table>
   </body>
 </html>
