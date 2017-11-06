@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad32947_9672acac",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-11-06T16:52:37Z",
+      "side": 1,
+      "message": "pardon my poor bash-fu, but does this have any advantage over\n\nfallback_to_master\u003d1\n\n? Resistance to trailing space, maybe?",
+      "revId": "e1cf68f5e8460a979fbfad959947701ff36b067d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
