@@ -538,13 +538,13 @@ def get_civotes():
 def get_civotes_detail():
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
+    ci_name = request.args.get('ciname', None)
     success = request.args.get('success', None)
     offset = request.args.get('offset', 0)
 
     session = getSession(app.config['DB_PATH'])
     votes = session.query(CIVote)
     votes = votes.filter(CIVote.ci_name != 'consistent')
-    votes = votes.offset(offset).limit(pagination_limit)
 
     if commit_hash and distro_hash:
         commit = session.query(Commit).filter(
@@ -552,9 +552,13 @@ def get_civotes_detail():
             Commit.commit_hash == commit_hash,
             Commit.distro_hash == distro_hash).first()
         votes = votes.from_self().filter(CIVote.commit_id == commit.id)
+    elif ci_name:
+        votes = votes.filter(CIVote.ci_name == ci_name)
     else:
-        raise InvalidUsage("Please specify commit_hash and distro_hash as "
-                           "parameters", status_code=400)
+        raise InvalidUsage("Please specify either commit_hash+distro_hash or "
+                           "ciname as parameters.", status_code=400)
+
+    votes = votes.offset(offset).limit(pagination_limit)
 
     if success is not None:
         votes = votes.from_self().filter(

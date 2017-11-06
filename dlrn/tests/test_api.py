@@ -466,11 +466,17 @@ class TestGetCIVotes(DLRNAPITestCase):
         response = self.app.get('/api/civotes_detail.html')
         self.assertEqual(response.status_code, 400)
 
-    def test_get_civotes_detail_fail_ok(self, db2_mock, db_mock, rt_mock):
+    def test_get_civotes_detail_ok(self, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/civotes_detail.html?'
                                 'commit_hash=17234e9ab9dfab4cf5600f67f1d24db5'
                                 '064f1025&distro_hash=024e24f0cf4366c2290c22f'
                                 '24e42de714d1addd1')
+        self.assertEqual(rt_mock.call_count, 1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_civotes_detail_with_ci(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/civotes_detail.html?'
+                                'ciname=another-ci')
         self.assertEqual(rt_mock.call_count, 1)
         self.assertEqual(response.status_code, 200)
 
