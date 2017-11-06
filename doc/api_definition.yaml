@@ -234,14 +234,21 @@ paths:
       parameters:
         - name: commit_hash
           in: query
-          description: Filter on this commit hash.
-          required: true
+          description: |
+            Filter on this commit hash.
+            Either ci_name or a combination of commit_hash+distro_hash are required.
           type: string
         - name: distro_hash
           in: query
-          description: Filter on this distro hash.
-          required: true
+          description: |
+            Filter on this distro hash.
+            Either ci_name or a combination of commit_hash+distro_hash are required.
           type: string
+        - name: ci_name
+          in: query
+          description: |
+            Filter on this CI name.
+            Either ci_name or a combination of commit_hash+distro_hash are required.
         - name: success
           in: query
           description: If set filter for successful/failed CI votes
