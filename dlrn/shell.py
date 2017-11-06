@@ -85,10 +85,10 @@ def main():
                         default='projects.ini',
                         help="Config file. Default: projects.ini")
     parser.add_argument('--info-repo',
-                        help="use a local rdoinfo repo instead of "
-                             "fetching the default one using rdopkg. Only"
-                             "applies when pkginfo_driver is rdoinfo in"
-                             "projects.ini")
+                        help="use a local rdoinfo repo instead of"
+                             " fetching the default one using rdopkg. Only"
+                             " applies when pkginfo_driver is rdoinfo in"
+                             " projects.ini")
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
     parser.add_argument('--local', action="store_true",
@@ -100,11 +100,11 @@ def main():
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--project-name', action='append',
                        help="Build a specific project name only."
-                            "Use multiple times to build more than one "
+                            " Use multiple times to build more than one "
                             "project in a run.")
     group.add_argument('--package-name', action='append',
                        help="Build a specific package name only."
-                            "Use multiple times to build more than one "
+                            " Use multiple times to build more than one "
                             "package in a run.")
     parser.add_argument('--dev', action="store_true",
                         help="Don't reset packaging git repo, force build "
@@ -126,13 +126,13 @@ def main():
                         help="Get the status of packages.")
     parser.add_argument('--recheck', action="store_true",
                         help="Force a rebuild for a particular package. "
-                        "Imply --package-name")
+                        "Implies --package-name")
     parser.add_argument('--version',
                         action='version',
                         version=version.version_info.version_string())
     parser.add_argument('--run',
                         help="Run a program instead of trying to build. "
-                             "Imply --head-only")
+                             "Implies --head-only")
     parser.add_argument('--stop', action="store_true",
                         help="Stop on error.")
     parser.add_argument('--verbose-mock', action="store_true",
