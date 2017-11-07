@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad32947_39be2b00",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-11-07T18:16:07Z",
+      "side": 1,
+      "message": "If you strive for perfection, I realized ci_votes_detail.html would be even more consistent ;)",
+      "revId": "076ccc747ef046f4651230277e3b88edf8b3cee6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
