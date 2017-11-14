@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ad0253b_3bf17fce",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-11-14T16:00:17Z",
+      "side": 1,
+      "message": "Should be \"${2:-centos}\"",
+      "revId": "5a107ddd32c485e3f0d5c6de75fcf404d6719546",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad0253b_1beec3ec",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-11-14T16:00:17Z",
+      "side": 1,
+      "message": "Same, should be \"${3:-...}\"",
+      "range": {
+        "startLine": 48,
+        "startChar": 7,
+        "endLine": 48,
+        "endChar": 14
+      },
+      "revId": "5a107ddd32c485e3f0d5c6de75fcf404d6719546",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
