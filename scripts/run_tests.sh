@@ -1,6 +1,10 @@
 #!/bin/bash
 set -ex
 
+# TODO(hguemar): have proper arguments parsing
+# Usage with all supported arguments
+# ./run_tests.sh <path_to_rdoinfo> <distro (either centos or fedora)> <baseurl to trunk repo>
+
 # Simple script to test that DLRN works either locally or in a zuul environment
 GIT_BASE_URL="https://review.rdoproject.org/r/p"
 OPENSTACK_GIT_URL="git://git.openstack.org"
@@ -40,8 +44,8 @@ PROJECT_TO_BUILD_MAPPED=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | gre
 PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
 
 # Prepare config
-target="centos"
-baseurl="http://trunk.rdoproject.org/centos7/"
+target="{2:-centos}"
+baseurl="{3:-http://trunk.rdoproject.org/centos7/}"
 src="master"
 branch=""
 
