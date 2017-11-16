@@ -154,6 +154,11 @@ def saveYAML(session, yamlfile):
             d[a] = str(getattr(user, a))
         data['users'].append(d)
 
+    attrs = []
+    for a in dir(Promotion):
+        if type(getattr(Promotion, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
     data['promotions'] = []
     for promotion in session.query(Promotion).all():
         d = {}
