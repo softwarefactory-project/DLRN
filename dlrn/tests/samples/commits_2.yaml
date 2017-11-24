@@ -32,6 +32,7 @@ civotes:
   ci_in_progress: false
   timestamp: '1441635089'
   notes: ''
+  user: 'foo'
 - id: '2'
   commit_id: '5654'
   ci_name: 'consistent'
@@ -40,6 +41,7 @@ civotes:
   ci_in_progress: false
   timestamp: '1441669026'
   notes: ''
+  user: 'foo'
 - id: '3'
   commit_id: '5627'
   ci_name: 'current-passed-ci'
@@ -48,6 +50,8 @@ civotes:
   ci_in_progress: true
   timestamp: '1441635090'
   notes: ''
+  user: 'foo'
+# This vote has no user, to check that we support that, too
 - id: '4'
   commit_id: '5654'
   ci_name: 'another-ci'
@@ -65,7 +69,9 @@ promotions:
   commit_id: '5654'
   promotion_name: 'another-ci'
   timestamp: '1503307094'
+# This vote has no user, to check that we support that, too
 - id: '2'
   commit_id: '5627'
   promotion_name: 'foo-ci'
   timestamp: '1503307099'
+  user: 'foo'
