@@ -24,7 +24,12 @@ def verify_pw(username, password):
     session = getSession(app.config['DB_PATH'])
     user = session.query(User).filter(User.username == username).first()
     if user is not None:
-        return passlib.hash.sha512_crypt.verify(password, user.password)
+        # There is a default, hidden "system" user, but we want to explicitly
+        # forbid it from doing any operation
+        if user is "system":
+            return False
+        else:
+            return passlib.hash.sha512_crypt.verify(password, user.password)
     else:
         return False
 

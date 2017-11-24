@@ -135,7 +135,8 @@ def repo_status():
              'success': bool(vote.ci_vote),
              'in_progress': vote.ci_in_progress,
              'url': vote.ci_url,
-             'notes': vote.notes}
+             'notes': vote.notes,
+             'user': vote.user}
         data.append(d)
     session.close()
     return jsonify(data)
@@ -201,7 +202,8 @@ def last_tested_repo_GET():
               'timestamp': vote.timestamp,
               'job_id': vote.ci_name,
               'success': vote.ci_vote,
-              'in_progress': vote.ci_in_progress}
+              'in_progress': vote.ci_in_progress,
+              'user': vote.user}
     session.close()
     return jsonify(result), 200
 
@@ -261,7 +263,8 @@ def promotions_GET():
         d = {'timestamp': promotion.timestamp,
              'commit_hash': commit.commit_hash,
              'distro_hash': commit.distro_hash,
-             'promote_name': promotion.promotion_name}
+             'promote_name': promotion.promotion_name,
+             'user': promotion.user}
         data.append(d)
     session.close()
     return jsonify(data)
@@ -324,7 +327,8 @@ def last_tested_repo_POST():
 
     newvote = CIVote(commit_id=vote.commit_id, ci_name=my_job_id,
                      ci_url='', ci_vote=False, ci_in_progress=True,
-                     timestamp=int(time.time()), notes='')
+                     timestamp=int(time.time()), notes='',
+                     user=auth.username())
     session.add(newvote)
     session.commit()
 
@@ -337,7 +341,8 @@ def last_tested_repo_POST():
               'timestamp': newvote.timestamp,
               'job_id': newvote.ci_name,
               'success': newvote.ci_vote,
-              'in_progress': newvote.ci_in_progress}
+              'in_progress': newvote.ci_in_progress,
+              'user': newvote.user}
     session.close()
     return jsonify(result), 201
 
@@ -381,7 +386,8 @@ def report_result():
 
     vote = CIVote(commit_id=commit_id, ci_name=job_id, ci_url=url,
                   ci_vote=bool(strtobool(success)), ci_in_progress=False,
-                  timestamp=int(timestamp), notes=notes)
+                  timestamp=int(timestamp), notes=notes,
+                  user=auth.username())
     session.add(vote)
     session.commit()
 
@@ -392,7 +398,8 @@ def report_result():
               'success': bool(success),
               'in_progress': False,
               'url': url,
-              'notes': notes}
+              'notes': notes,
+              'user': auth.username()}
     session.close()
     return jsonify(result), 201
 
@@ -449,7 +456,7 @@ def promote():
 
     timestamp = time.mktime(datetime.now().timetuple())
     promotion = Promotion(commit_id=commit.id, promotion_name=promote_name,
-                          timestamp=timestamp)
+                          timestamp=timestamp, user=auth.username())
 
     session.add(promotion)
     session.commit()
@@ -457,7 +464,8 @@ def promote():
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
               'promote_name': promote_name,
-              'timestamp': timestamp}
+              'timestamp': timestamp,
+              'user': auth.username()}
     session.close()
     return jsonify(result), 201
 
