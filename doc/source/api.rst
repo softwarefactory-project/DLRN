@@ -76,6 +76,7 @@ success              boolean     whether the test was successful or not
 job_id               string      name of the CI sending the vote
 in_progress          boolean     is this CI job still in-progress?
 timestamp            integer     timestamp for the repo
+user                 string      user who created the CI vote
 ===================  ==========  ==============================================================
 
 
@@ -115,6 +116,7 @@ timestamp            integer     Timestamp (in seconds since the epoch)
 in_progress          boolean     False -> is this CI job still in-progress?
 success              boolean     Was the CI execution successful?
 notes                Text        Additional notes
+user                 string      user who created the CI vote
 ===================  ==========  ==============================================================
 
 GET /api/promotions
@@ -152,6 +154,7 @@ commit_hash     string      commit_hash of the promoted repo
 distro_hash     string      distro_hash of the promoted repo
 promote_name    string      name used for the promotion
 timestamp       integer     Timestamp (in seconds since the epoch)
+user            string      user who created the promotion
 ==============  ==========  ==============================================================
 
 The array will be sorted by the promotion timestamp, with the newest first.
@@ -218,6 +221,7 @@ success              boolean     whether the test was successful or not
 job_id               string      name of the CI sending the vote
 in_progress          boolean     True -> is this CI job still in-progress?
 timestamp            integer     Timestamp for this CI Vote (taken from the DLRN system time)
+user                 string      user who created the CI vote
 ===================  ==========  ==============================================================
 
 
@@ -257,6 +261,7 @@ timestamp       integer     Timestamp (in seconds since the epoch)
 in_progress     boolean     False -> is this CI job still in-progress?
 success         boolean     Was the CI execution successful?
 notes           Text        Additional notes
+user            string      user who created the CI vote
 ==============  ==========  ==============================================================
 
 POST /api/promote
@@ -292,6 +297,7 @@ commit_hash     string      commit_hash of the promoted repo
 distro_hash     string      distro_hash of the promoted repo
 promote_name    string      name used for the promotion
 timestamp       integer     Timestamp (in seconds since the epoch)
+user            string      user who created the promotion
 ==============  ==========  ==============================================================
 
 POST /api/remote/import
