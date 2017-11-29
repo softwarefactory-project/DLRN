@@ -144,6 +144,30 @@
     },
     {
       "key": {
+        "uuid": "dae975fb_b4dc6e47",
+        "filename": "dlrn/db.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-11-29T17:00:09Z",
+      "side": 1,
+      "message": "Mmmm... In general, having a default user sounds like a bad idea to me. For this specific case, we could consider it, as long as I make sure that this user cannot do anything by adding a special case to api/utils.py/verify_pw.\n\nThat said, we can only guarantee that the user is there if we run the alembic migrations, otherwise we\u0027d have to add some special checks in the code to make sure it is always there.\n\nLet me give it some thought and I will upload a new PS.\n\nFor integration testing we create a specific user, so that\u0027s not an issue.",
+      "parentUuid": "dae975fb_7420464a",
+      "range": {
+        "startLine": 102,
+        "startChar": 4,
+        "endLine": 102,
+        "endChar": 8
+      },
+      "revId": "bb268cf6fd8e2dbfbb952a08586ae9cbb740a0c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dae975fb_f40436c7",
         "filename": "dlrn/db.py",
         "patchSetId": 1
