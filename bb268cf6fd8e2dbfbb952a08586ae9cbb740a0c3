@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "dae975fb_341abe18",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2017-11-29T16:49:22Z",
+      "side": 1,
+      "message": "ack",
+      "parentUuid": "dae975fb_9413aa0d",
+      "range": {
+        "startLine": 331,
+        "startChar": 39,
+        "endLine": 331,
+        "endChar": 41
+      },
+      "revId": "bb268cf6fd8e2dbfbb952a08586ae9cbb740a0c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dae975fb_1469fa8b",
         "filename": "dlrn/db.py",
         "patchSetId": 1
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "So this is a tricky thing, and the reason why I didn\u0027t want to make it a primary key. For an existing database, we can\u0027t know which user did each promotion/vote, and there is no default user created. \n\nSo either we skip enforcing the relationship in the database (it is still done in code, though), or we pick a user at random and assign all existing promotions to it. None of the options looked great, so I chose to let user be null.\n\nAbout your side question: no, there is no \"id\" primary key for a user, the username field is the primary key.",
       "parentUuid": "dae975fb_1469fa8b",
+      "range": {
+        "startLine": 102,
+        "startChar": 4,
+        "endLine": 102,
+        "endChar": 8
+      },
+      "revId": "bb268cf6fd8e2dbfbb952a08586ae9cbb740a0c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae975fb_7420464a",
+        "filename": "dlrn/db.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2017-11-29T16:49:22Z",
+      "side": 1,
+      "message": "I don\u0027t want to explode the scope of the change, but I think it would be useful to have a default \"system\" user.\n\nWe wouldn\u0027t want the user to be able to do anything, though.. so maybe a null password (but I see password is nullable\u003dFalse) ? or maybe it could have a default password.\n\nThis user would only be used to trace actions back to \"system\" for things like migrations or other events that could occur.\n\nIt could also be used for doing integration testing in the gate ? I don\u0027t know.",
+      "parentUuid": "dae975fb_74f966c8",
       "range": {
         "startLine": 102,
         "startChar": 4,
