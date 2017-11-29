@@ -168,6 +168,30 @@
     },
     {
       "key": {
+        "uuid": "dae975fb_d48c9237",
+        "filename": "dlrn/db.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2017-11-29T17:21:55Z",
+      "side": 1,
+      "message": "I don\u0027t have a strong opinion about this, it\u0027s ok to leave the user null and then handle it accordingly.",
+      "parentUuid": "dae975fb_b4dc6e47",
+      "range": {
+        "startLine": 102,
+        "startChar": 4,
+        "endLine": 102,
+        "endChar": 8
+      },
+      "revId": "bb268cf6fd8e2dbfbb952a08586ae9cbb740a0c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dae975fb_f40436c7",
         "filename": "dlrn/db.py",
         "patchSetId": 1
