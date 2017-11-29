@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dae975fb_346cfe9b",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2017-11-29T16:19:19Z",
+      "side": 1,
+      "message": "I\u0027m not familiar with the code but is username an actual function ? Should this be auth.username ?",
+      "range": {
+        "startLine": 331,
+        "startChar": 39,
+        "endLine": 331,
+        "endChar": 41
+      },
+      "revId": "bb268cf6fd8e2dbfbb952a08586ae9cbb740a0c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae975fb_1469fa8b",
+        "filename": "dlrn/db.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2017-11-29T16:19:19Z",
+      "side": 1,
+      "message": "I think this should be a foreign key to User.id (side note, User doesn\u0027t have an \"id\" primary key?)",
+      "range": {
+        "startLine": 102,
+        "startChar": 4,
+        "endLine": 102,
+        "endChar": 8
+      },
+      "revId": "bb268cf6fd8e2dbfbb952a08586ae9cbb740a0c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae975fb_f40436c7",
+        "filename": "dlrn/db.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2017-11-29T16:19:19Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 112,
+        "startChar": 4,
+        "endLine": 112,
+        "endChar": 8
+      },
+      "revId": "bb268cf6fd8e2dbfbb952a08586ae9cbb740a0c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae975fb_d40932df",
+        "filename": "dlrn/migrations/versions/cab7697f6564_add_user_column_to_civote_and_promotion.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2017-11-29T16:19:19Z",
+      "side": 1,
+      "message": "Is there a default user in the database ? Should there be one ? Like \"system\" or something ?\nWe could have the migration default the user to that if we don\u0027t have one.",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 43
+      },
+      "revId": "bb268cf6fd8e2dbfbb952a08586ae9cbb740a0c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
