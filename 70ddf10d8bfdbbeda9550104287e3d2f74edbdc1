@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dae975fb_178d7c7b",
+        "filename": "scripts/recreate-promotion-symlinks.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-11-30T13:55:20Z",
+      "side": 1,
+      "message": "https://giphy.com/gifs/statefarm-ad-state-farm-3ohhwGpIOhPtQ5kALu",
+      "revId": "70ddf10d8bfdbbeda9550104287e3d2f74edbdc1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae975fb_f7e8b818",
+        "filename": "scripts/recreate-promotion-symlinks.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2017-11-30T13:55:20Z",
+      "side": 1,
+      "message": "change is ok, approved!",
+      "revId": "70ddf10d8bfdbbeda9550104287e3d2f74edbdc1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
