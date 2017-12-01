@@ -16,6 +16,24 @@
       "revId": "880535f75be8059ce58ac0dc4172ca64de789816",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad8896b_ae81b7fd",
+        "filename": "dlrn/migrations/versions/cab7697f6564_add_user_column_to_civote_and_promotion.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-01T09:36:53Z",
+      "side": 1,
+      "message": "This was the discussion we had on PS1. Since we cannot know which user created the previous promotions and votes, we have two options:\n\n- Allow having a null value for the user column, which mostly defeats the purpose of using a foreign key for them (and I\u0027d have to check if alembic lets us create that foreign key). In this case, we would keep consistency in code, as we did in PS1.\n\n- Create a default user, keep the foreign key and ensure the user column is not null. This is PS2.\n\nTo be honest, none of the options looks 100% good to me, so I ended up option for consistency and keeping the default user. But I\u0027m happy to revert to PS1 if needed.",
+      "parentUuid": "7ad8896b_eed21f34",
+      "revId": "880535f75be8059ce58ac0dc4172ca64de789816",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
