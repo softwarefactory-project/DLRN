@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad8896b_eed21f34",
+        "filename": "dlrn/migrations/versions/cab7697f6564_add_user_column_to_civote_and_promotion.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2017-12-01T00:47:05Z",
+      "side": 1,
+      "message": "That would not be true, existing CI votes where not done by this magical system user, they were done by _some_ concrete user (since vote API is authenticated) we just were not logging it, so NULL (i.e. unknown) is appropriate value to keep.",
+      "revId": "880535f75be8059ce58ac0dc4172ca64de789816",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
