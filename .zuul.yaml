@@ -1,0 +1,13 @@
+---
+- project:
+    name: DLRN
+    check:
+      jobs:
+        - tox-pep8
+        - tox-py27
+        - tox-py35-f27
+    gate:
+      jobs:
+        - tox-pep8
+        - tox-py27
+        - tox-py35-f27
