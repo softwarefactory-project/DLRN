@@ -1,0 +1,64 @@
+---
+- job:
+    name: dlrn-base
+    parent: base
+    pre-run: playbooks/prepare.yaml
+    post-run: playbooks/retrieve-logs.yaml
+    irrelevant-files:
+      - ^doc/.*$
+    nodeset:
+      nodes:
+        - name: test-node
+          label: dib-centos-7
+
+- job:
+    name: dlrn-rpmbuild
+    parent: dlrn-base
+    description: Run DLRN to build a package
+    run: playbooks/rpmbuild.yaml
+
+- job:
+    name: dlrn-rpmbuild-tripleo-ci
+    parent: dlrn-base
+    voting: false
+    description: Run DLRN to build a package using the tripleo.sh scripts from tripleo-ci
+    run: playbooks/tripleo-ci.yaml
+    post-run: playbooks/tripleo-ci-getlogs.yaml
+
+- job:
+    name: dlrn-rpmbuild-tripleo-ci-oooq
+    parent: dlrn-base
+    voting: false
+    description: Run DLRN to build a package using Tripleo-Quickstart playbooks
+    run: playbooks/tripleo-ci-oooq.yaml
+    post-run: playbooks/tripleo-ci-oooq-getlogs.yaml
+
+- job:
+    name: dlrn-api-functional
+    parent: dlrn-base
+    voting: false
+    description: Run a DLRN functional test, using the API and dlrnapi_client
+    run: playbooks/dlrn-api-functional.yaml
+    post-run: playbooks/dlrn-api-functional-getlogs.yaml
+    required-projects:
+      - DLRN
+      - dlrnapi_client
+
+- project:
+    name: DLRN
+    check:
+      jobs:
+# During tests, commenting out jobs that already work to save resources
+#        - tox-pep8
+#        - tox-py27
+#        - tox-py35-f27
+#        - dlrn-rpmbuild
+#        - dlrn-rpmbuild-tripleo-ci
+#        - dlrn-rpmbuild-tripleo-ci-oooq
+        - dlrn-api-functional
+    gate:
+      jobs:
+        - tox-pep8
+        - tox-py27
+        - tox-py35-f27
+        - dlrn-rpmbuild
