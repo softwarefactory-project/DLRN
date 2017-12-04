@@ -1,0 +1,7 @@
+---
+- hosts: test-node
+  tasks:
+    - name: Run pep8
+      command: tox -epep8
+      args:
+        chdir: "{{ zuul.project.src_dir }}/"

@@ -1,0 +1,7 @@
+---
+- hosts: test-node
+  tasks:
+    - name: Run py27
+      command: tox -epy27
+      args:
+        chdir: "{{ zuul.project.src_dir }}/"

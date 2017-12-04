@@ -1,0 +1,43 @@
+---
+- job:
+    name: DLRN-pep8
+    parent: base
+    description: Run pep8 tests for DLRN
+    run: playbooks/pep8.yaml
+    nodeset:
+      nodes:
+        - name: test-node
+          label: centos-oci
+
+- job:
+    name: DLRN-py27
+    parent: base
+    description: Run py27 tests for DLRN
+    run: playbooks/py27.yaml
+    nodeset:
+      nodes:
+        - name: test-node
+          label: centos-oci
+
+- job:
+    name: DLRN-py35
+    parent: base
+    description: Run py35 tests for DLRN
+    run: playbooks/py35.yaml
+    nodeset:
+      nodes:
+        - name: test-node
+          label: dib-fedora-25
+
+- project:
+    name: DLRN
+    check:
+      jobs:
+        - DLRN-pep8
+        - DLRN-py27
+        - DLRN-py35
+    gate:
+      jobs:
+        - DLRN-pep8
+        - DLRN-py27
+        - DLRN-py35
