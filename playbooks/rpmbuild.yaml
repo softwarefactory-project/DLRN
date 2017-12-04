@@ -1,0 +1,13 @@
+---
+- hosts: test-node
+  tasks:
+    - name: Build package
+      shell:
+        cmd: |
+          if [[ "${ZUUL_PIPELINE}" =~ "openstack-" ]]; then
+              timeout --signal=SIGKILL 3600 ./scripts/run_project_tests.sh http://review.rdoproject.org/r/p/rdoinfo.git
+          else
+              timeout --signal=SIGKILL 3600 ./scripts/run_tests.sh http://review.rdoproject.org/r/p/rdoinfo.git
+          fi        
+      args:
+        chdir: "{{ zuul.project.src_dir }}/"
