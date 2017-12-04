@@ -1,0 +1,91 @@
+---
+- hosts: test-node
+  tasks:
+    - name: Remove pre-installed software that could interfere
+      package: 
+        name: "{{ item }}"
+        state: absent
+      with_items:
+      - python-oslo-utils
+      become: true
+
+    - name: Prepare virtualenv
+        command: virtualenv "{{ zuul.project.src_dir }}/.venv"
+
+#    - name: Install updated pip
+#    pip:
+#        name: pip
+#        state: latest
+#        virtualenv: "{{ zuul.project.src_dir }}/.venv"
+
+# FIXME(jpena): using the pip module does not seem to work
+#    - name: Install updated pip
+#      shell:
+#        cmd: |
+#          . {{ zuul.project.src_dir }}/.venv/bin/activate
+#          pip install --upgrade pip
+
+    - name: Clone tripleo-quickstart
+      git:
+        repo: 'https://github.com/openstack/tripleo-quickstart'
+        dest: '{{ ansible_user_dir }}/tripleo-quickstart'
+
+    - name: Clone tripleo-quickstart-extras
+      git:
+        repo: 'https://github.com/openstack/tripleo-quickstart-extras'
+        dest: '{{ ansible_user_dir }}/tripleo-quickstart-extras'
+
+    - name: Install tripleo-quickstart in venv
+      shell:
+        cmd: |
+          . {{ zuul.project.src_dir }}/.venv/bin/activate
+          pip install .
+        chdir: '{{ ansible_user_dir }}/tripleo-quickstart'
+
+    - name: Install tripleo-quickstart-extras in venv
+      shell:
+        cmd: |
+          . {{ zuul.project.src_dir }}/.venv/bin/activate
+          pip install .
+        chdir: '{{ ansible_user_dir }}/tripleo-quickstart-extras'
+
+    - name: Copy ansible configuration file
+      copy:
+        src: '{{ ansible_user_dir }}/tripleo-quickstart/ansible.cfg'
+        dest: '{{ zuul.project.src_dir }}/ansible.cfg'
+        remote_src: yes
+
+    - name: Create Ansible hosts file
+      copy:
+        content: |
+          localhost ansible_connection=local
+        dest: '{{ zuul.project.src_dir }}/hosts'
+
+    - name: Create custom playbook
+      copy:
+        content: |
+          ---
+          - name: Build custom RPMs
+            hosts: localhost
+            roles:
+              - build-test-packages
+            vars:
+              artg_change_list:
+               - project: openstack/tripleo-heat-templates
+                 branch: master
+                 refspec: master
+                 host: https://review.openstack.org
+              artg_compressed_gating_repo: '/tmp/gating_repo.tar.gz'
+              build_repo_dir: $PWD
+              dlrn_pre_installed: true
+          EOF
+        dest: '{{ zuul.project.src_dir }}/build-packages.yaml'
+
+    - name: Execute oooq Ansible playbook
+      shell:
+        cmd: |
+          # Unset some Zuul-related variables, this confuses the playbook
+          unset ZUUL_HOST
+          unset ZUUL_CHANGES
+          ansible-playbook -i hosts build-packages.yaml
+        chdir: '{{ zuul.project.src_dir }}'
