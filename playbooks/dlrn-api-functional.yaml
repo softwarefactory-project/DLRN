@@ -1,0 +1,161 @@
+---
+- hosts: all
+  vars:
+    working_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/..'
+    dlrnapi_auth: "--username foo --password bar"
+    dlrnapi_url: "--url http://localhost:5000"
+    imported_repo: "https://trunk.rdoproject.org/centos7-master-head/93/c9/93c9c9c59166f0de447f999b6b261c04195097d5_65074788"
+    imported_commit_hash: "93c9c9c59166f0de447f999b6b261c04195097d5"
+    imported_distro_hash: "650747881b6af35e71245d41b733d6b3d3936133"
+  tasks:
+# FIXME(jpena): this should be done using the pip module, however there is
+# an issue with Ansible 2.3.1 that prevents this
+# See https://github.com/ansible/ansible-modules-core/issues/5458
+    - name: Prepare virtualenv
+      command: virtualenv -p python2 "{{ working_dir }}/.venv"
+
+    - name: Install updated pip
+      shell:
+        cmd: |
+          . {{ working_dir }}/.venv/bin/activate
+          pip install --upgrade pip
+
+    - name: Install requirements for DLRN
+      pip:
+        requirements: "{{ working_dir }}/DLRN/requirements.txt"
+        virtualenv:   "{{ working_dir }}/.venv"
+
+    - name: Install requirements for dlrnapi_client
+      pip:
+        requirements: "{{ working_dir }}/dlrnapi_client/requirements.txt"
+        virtualenv:   "{{ working_dir }}/.venv"
+
+    - name: Install DLRN in venv
+      shell:
+        cmd: |
+          . ../.venv/bin/activate
+          python setup.py install
+        chdir: "{{ working_dir }}/DLRN"
+
+    - name: Install dlrnapi_client in venv
+      shell:
+        cmd: |
+          . ../.venv/bin/activate
+          python setup.py install
+        chdir: "{{ working_dir }}/dlrnapi_client"
+
+    - name: Add user to DLRN DB
+      shell:
+        cmd: |
+          . ../.venv/bin/activate
+          alembic upgrade head
+          sqlite3 commits.sqlite "insert into users values('foo','\$6\$rounds=656000\$T678cDhCoMtxLlnq\$yXrpe.kJgiP8Y1JZpAYQ0.yCE12Qr6zv6nZY1VY7OP6bxhoZezlzWSitvoqkx26Z30pUBKM4kX/JZJPdMIv1a.');"
+        chdir: "{{ working_dir }}/DLRN"
+
+    - name: Start API server
+      shell:
+        cmd: |
+          . ../.venv/bin/activate
+          nohup scripts/api.py &
+        chdir: "{{ working_dir }}/DLRN"
+
+    - name: Build a package with DLRN
+      shell:
+        cmd: |
+          . ../.venv/bin/activate
+          dlrn --config-file projects.ini --package-name openstack-packstack --use-public
+        chdir: "{{ working_dir }}/DLRN"
+
+    - name: Import a package
+      shell:
+        cmd: |
+          . .venv/bin/activate
+          dlrnapi {{ dlrnapi_url }} {{ dlrnapi_auth }} commit-import --repo-url {{ imported_repo }}
+        chdir: "{{ working_dir }}"
+
+    - name: Report a result against a repo
+      shell:
+        cmd: |
+          . .venv/bin/activate
+          dlrnapi {{ dlrnapi_url }} {{ dlrnapi_auth }} report-result --job-id cijob --commit-hash {{ imported_commit_hash }} --distro-hash {{ imported_distro_hash }} --info-url http://localhost --timestamp 1508839537 --success true
+        chdir: "{{ working_dir }}"
+
+    - name: Get a repo
+      shell:
+        cmd: |
+          . .venv/bin/activate
+          dlrnapi {{ dlrnapi_url }} repo-get
+        chdir: "{{ working_dir }}"
+      register: repo_output
+
+    - name: Fail if we did not get the right repo
+      fail:
+        msg: Invalid commit "{{ (repo_output.stdout | from_json).commit_hash }}" received
+      when: (repo_output.stdout | from_json).commit_hash != imported_commit_hash
+
+    - name: Use a repo with a second CI name
+      shell:
+        cmd: |
+          . .venv/bin/activate
+          dlrnapi {{ dlrnapi_url }} {{ dlrnapi_auth }} repo-use --reporting-job-id another-ci
+        chdir: "{{ working_dir }}"
+      register: repo_output
+
+    - name: Get a repo after using it
+      shell:
+        cmd: |
+          . .venv/bin/activate
+          dlrnapi {{ dlrnapi_url }} repo-get
+        chdir: "{{ working_dir }}"
+      register: repo2_output
+
+    - name: Fail if we did not get the right repo
+      fail:
+        msg: Invalid job-id "{{ (repo2_output.stdout | from_json).job_id }}" received
+      when: (repo2_output.stdout | from_json).job_id != 'another-ci'
+
+    - name: Get repo status
+      shell:
+        cmd: |
+          . .venv/bin/activate
+          dlrnapi {{ dlrnapi_url }} repo-status --commit-hash {{ imported_commit_hash }} --distro-hash {{ imported_distro_hash }}
+        chdir: "{{ working_dir }}"
+      register: repo_status
+
+    - name: Show info on repo status
+      debug:
+        var: repo_status.stdout | from_json
+
+    - name: Promote repo
+      shell:
+        cmd: |
+          . .venv/bin/activate
+          dlrnapi {{ dlrnapi_url }} {{ dlrnapi_auth }} repo-promote --commit-hash {{ imported_commit_hash }} --distro-hash {{ imported_distro_hash }} --promote-name cipromotion
+        chdir: "{{ working_dir }}"
+
+    - name: Get promotions
+      shell:
+        cmd: |
+          . .venv/bin/activate
+          dlrnapi {{ dlrnapi_url }} promotion-get
+        chdir: "{{ working_dir }}"
+      register: repo_promotions
+
+    - name: Show info on repo promotions
+      debug:
+        var: repo_promotions.stdout | from_json
+
+    - name: Fail if we did not promote the right commit
+      fail:
+        msg: Did not promote the right commit
+      when: (repo_promotions.stdout | from_json | first).commit_hash != imported_commit_hash
+
+    - name: Check if symlink was created by promotion
+      stat:
+        path: "{{ working_dir }}/DLRN/data/repos/cipromotion"
+      register: link
+
+    - name: Fail if symlink was not created
+      fail:
+        msg: Promotion did not create symlink cipromotion
+      when: link.stat.islnk is not defined or not link.stat.islnk

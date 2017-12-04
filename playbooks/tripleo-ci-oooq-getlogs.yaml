@@ -1,0 +1,14 @@
+---
+- hosts: all
+  tasks:
+    - name: Ensure log directory is created
+      file:
+        path: '{{ zuul.project.src_dir }}/logs'
+        state: directory
+
+    - name: Fetch oooq logs
+      shell:
+        cmd: |
+          cp -p /tmp/gating_repo.tar.gz logs
+          cp -pr data/repos logs
+        chdir: '{{ zuul.project.src_dir }}'
