@@ -1,0 +1,36 @@
+---
+- hosts: all
+  tasks:
+    - name: Create directory for tripleo data
+      file:
+        path: '{{ ansible_user_dir }}/tripleo'
+        state: directory
+
+    - name: Copy contents of DLRN to tripleo data directory
+      shell:
+        cmd: |
+          cp -pr {{ zuul.project.src_dir }} {{ ansible_user_dir }}/tripleo
+          mv {{ ansible_user_dir }}/tripleo/DLRN {{ ansible_user_dir }}/tripleo/delorean
+
+    - name: Clone tripleo-ci repository
+      git:
+        repo: 'https://github.com/openstack-infra/tripleo-ci'
+        dest: '{{ ansible_user_dir }}/tripleo-ci'
+
+    - name: Execute tripleo.sh
+      shell:
+        cmd: |
+          export TRIPLEO_ROOT="{{ ansible_user_dir }}/tripleo"
+          scripts/tripleo.sh --delorean-setup
+          scripts/tripleo.sh --delorean-build openstack/tripleo-heat-templates
+        chdir: "{{ ansible_user_dir }}/tripleo-ci"
+
+    - name: Test, see if the DLRN repos are created
+      shell:
+        cmd: |
+          ls -lR {{ ansible_user_dir }}/tripleo/delorean/data
+
+    - name: List RPM files, fail if there is an error
+      shell:
+        cmd: |
+            ls {{ ansible_user_dir }}/tripleo/delorean/data/repos/current/*.rpm | grep -v src.rpm

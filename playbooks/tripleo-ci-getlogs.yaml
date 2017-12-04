@@ -1,0 +1,12 @@
+---
+- hosts: all
+  tasks:
+    - name: Ensure log directory is created
+      file:
+        path: '{{ zuul.project.src_dir }}/logs'
+        state: directory
+
+    - name: Move artifacts to the log directory
+      shell:
+        cmd: |
+            cp -pr {{ ansible_user_dir }}/tripleo/delorean/data/repos {{ zuul.project.src_dir }}/logs

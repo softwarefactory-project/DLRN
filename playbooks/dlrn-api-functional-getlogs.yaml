@@ -1,0 +1,16 @@
+---
+- hosts: all
+  vars:
+    working_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/..'
+
+  tasks:
+    - name: Ensure log directory is created
+      file:
+        path: '{{ zuul.project.src_dir }}/logs'
+        state: directory
+
+    - name: Copy logs
+      shell:
+        cmd: |
+            rsync -avL {{ working_dir }}/DLRN/data/repos {{ zuul.project.src_dir }}/logs/DLRN
+            cp -p {{ working_dir }}/DLRN/commits.sqlite {{ zuul.project.src_dir }}/logs
