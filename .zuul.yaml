@@ -1,0 +1,45 @@
+---
+- job:
+    name: dlrn-rpmbuild
+    parent: base
+    description: Run DLRN to build a package
+    pre-run: playbooks/prepare.yaml
+    run: playbooks/rpmbuild.yaml
+    post-run: playbooks/retrieve-logs.yaml
+    irrelevant-files:
+      - ^doc/.*$
+    nodeset:
+      nodes:
+        - name: test-node
+          label: dib-centos-7
+
+- job:
+    name: dlrn-rpmbuild-tripleo-ci
+    parent: base
+    voting: false
+    description: Run DLRN to build a package using the tripleo.sh scripts from tripleo-ci
+    pre-run: playbooks/prepare.yaml
+    run: playbooks/tripleo-ci.yaml
+    post-run: playbooks/retrieve-logs.yaml
+    irrelevant-files:
+      - ^doc/.*$
+    nodeset:
+      nodes:
+        - name: test-node
+          label: dib-centos-7
+
+- project:
+    name: DLRN
+    check:
+      jobs:
+        - tox-pep8
+        - tox-py27
+        - tox-py35-f27
+        - dlrn-rpmbuild
+        - dlrn-rpmbuild-tripleo-ci
+    gate:
+      jobs:
+        - tox-pep8
+        - tox-py27
+        - tox-py35-f27
+        - dlrn-rpmbuild
