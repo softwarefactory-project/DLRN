@@ -1,0 +1,45 @@
+---
+- hosts: test-node
+  tasks:
+    - name: Create directory for tripleo data
+      file:
+        path: '{{ ansible_user_dir }}/tripleo'
+        state: directory
+
+    - name: Create directory to copy DLRN
+      file:
+        path: '{{ ansible_user_dir }}/tripleo/delorean'
+        state: directory
+
+    - name: Copy contents of DLRN to tripleo data directory
+      shell:
+        cmd: |
+          cp -pr {{ zuul.project.src_dir }}/ {{ ansible_user_dir }}/tripleo
+          mv {{ ansible_user_dir }}/tripleo/DLRN {{ ansible_user_dir }}/tripleo/delorean
+
+    - name: Clone tripleo-ci repository
+      git:
+        repo: 'https://github.com/openstack-infra/tripleo-ci'
+        dest: '{{ ansible_user_dir }}/tripleo/tripleo-ci'
+
+    - name: Ensure log directory is created
+      file:
+        path: '{{ zuul.project.src_dir }}/logs'
+        state: directory
+
+    - name: Execute tripleo.sh
+      shell:
+        cmd: |
+          scripts/tripleo.sh --delorean-setup
+          scripts/tripleo.sh --delorean-build openstack/tripleo-heat-templates
+        chdir: "{{ ansible_user_dir }}/tripleo/tripleo-ci"
+
+    - name: List RPM files, fail if there is an error
+      shell:
+        cmd: |
+            ls "{{ ansible_user_dir }}/tripleo/delorean/data/repos/current/*.rpm | grep -v src.rpm"
+
+    - name: Move artifacts to the log directory
+      synchronize:
+        src: '{{ ansible_user_dir }}/tripleo/delorean/data/repos'
+        dest: '{{ zuul.project.src_dir }}/logs'
