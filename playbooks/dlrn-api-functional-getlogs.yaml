@@ -1,0 +1,22 @@
+---
+- hosts: test-node
+  vars:
+    working_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/..'
+
+  tasks:
+    - name: Ensure log directory is created
+      file:
+        path: '{{ zuul.project.src_dir }}/logs'
+        state: directory
+
+    - name: Copy logs
+      synchronize:
+        src: "{{ working_dir }}/DLRN/data/repos"
+        dest: "{{ working_dir }}/logs/DLRN"
+        mode: pull
+        copy_links: true
+
+    - synchronize:
+        src: "{{ working_dir }}/DLRN/commits.sqlite"
+        dest: "{{ working_dir }}/logs"
+        mode: pull
