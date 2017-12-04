@@ -1,0 +1,7 @@
+---
+- hosts: test-node
+  tasks:
+    - name: Run py35
+      command: tox -epy35
+      args:
+        chdir: "{{ zuul.project.src_dir }}/"
