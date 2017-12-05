@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5ad58531_53f67cd8",
+        "filename": "playbooks/dlrn-api-functional-getlogs.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ad58531_53931ca4",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ad58531_f3e8c818",
         "filename": "playbooks/prepare.yaml",
         "patchSetId": 48
@@ -30,6 +48,24 @@
       "writtenOn": "2017-12-05T12:42:55Z",
       "side": 1,
       "message": "maybe \u0027present\u0027 is enough, like that you don\u0027t spend time updating if they are already available.",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_3303f0ba",
+        "filename": "playbooks/prepare.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ad58531_f3e8c818",
       "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5ad58531_f32b2832",
+        "filename": "playbooks/rpmbuild.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:00:27Z",
+      "side": 1,
+      "message": "Ok. Actually, in sf-io we are not building anything from the openstack-* pipeline (it\u0027s happening in review.rdo though), so I\u0027ll remove it from the playbook.",
+      "parentUuid": "5ad58531_b3f24005",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ad58531_d3edcc26",
         "filename": "playbooks/rpmbuild.yaml",
         "patchSetId": 48
@@ -64,6 +118,24 @@
       "writtenOn": "2017-12-05T12:42:55Z",
       "side": 1,
       "message": "trailing spaces",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_1300f4a9",
+        "filename": "playbooks/rpmbuild.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ad58531_d3edcc26",
       "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "5ad58531_932aa42b",
+        "filename": "playbooks/tripleo-ci-getlogs.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:00:27Z",
+      "side": 1,
+      "message": "Let me try. When running in Zuul, synchronize is quite picky about the directories it allows syncing from, and fails it I try it from outside {{ zuul.project.src_dir }}",
+      "parentUuid": "5ad58531_93f744f5",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ad58531_73ddf86f",
         "filename": "playbooks/tripleo-ci-oooq.yaml",
         "patchSetId": 48
@@ -98,6 +188,24 @@
       "writtenOn": "2017-12-05T12:42:55Z",
       "side": 1,
       "message": "trailing space",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_331ad018",
+        "filename": "playbooks/tripleo-ci-oooq.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ad58531_73ddf86f",
       "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "5ad58531_7320584a",
+        "filename": "playbooks/tripleo-ci-oooq.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ad58531_53dafc79",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ad58531_33e77042",
         "filename": "playbooks/tripleo-ci-oooq.yaml",
         "patchSetId": 48
@@ -138,6 +264,24 @@
     },
     {
       "key": {
+        "uuid": "5ad58531_531d5c0e",
+        "filename": "playbooks/tripleo-ci-oooq.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ad58531_33e77042",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ad58531_13e47439",
         "filename": "playbooks/tripleo-ci.yaml",
         "patchSetId": 48
@@ -149,6 +293,24 @@
       "writtenOn": "2017-12-05T12:42:55Z",
       "side": 1,
       "message": "trailing spaces",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_b3dc8047",
+        "filename": "playbooks/tripleo-ci.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ad58531_13e47439",
       "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
