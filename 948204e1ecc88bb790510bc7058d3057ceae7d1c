@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ad58531_53931ca4",
+        "filename": "playbooks/dlrn-api-functional-getlogs.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-12-05T12:42:55Z",
+      "side": 1,
+      "message": "I think you can use \"hosts: all\" here, it would make playbook more simple to reuse.",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_f3e8c818",
+        "filename": "playbooks/prepare.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-12-05T12:42:55Z",
+      "side": 1,
+      "message": "maybe \u0027present\u0027 is enough, like that you don\u0027t spend time updating if they are already available.",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_b3f24005",
+        "filename": "playbooks/rpmbuild.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-12-05T12:42:55Z",
+      "side": 1,
+      "message": "you could express those conditions with two ansible task,  and condition like when: \"{{zuul.pipeline}}.startswith(\u0027openstack\u0027)\"",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_d3edcc26",
+        "filename": "playbooks/rpmbuild.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-12-05T12:42:55Z",
+      "side": 1,
+      "message": "trailing spaces",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_93f744f5",
+        "filename": "playbooks/tripleo-ci-getlogs.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-12-05T12:42:55Z",
+      "side": 1,
+      "message": "why not using synchronize?",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_73ddf86f",
+        "filename": "playbooks/tripleo-ci-oooq.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-12-05T12:42:55Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_53dafc79",
+        "filename": "playbooks/tripleo-ci-oooq.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-12-05T12:42:55Z",
+      "side": 1,
+      "message": "you could avoid the source of activate and directly call \".venv/bin/pip install --upgrade pip\"",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_33e77042",
+        "filename": "playbooks/tripleo-ci-oooq.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-12-05T12:42:55Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ad58531_13e47439",
+        "filename": "playbooks/tripleo-ci.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-12-05T12:42:55Z",
+      "side": 1,
+      "message": "trailing spaces",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
