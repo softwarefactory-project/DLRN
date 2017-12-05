@@ -177,6 +177,24 @@
     },
     {
       "key": {
+        "uuid": "5ad58531_73ce1885",
+        "filename": "playbooks/tripleo-ci-getlogs.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-05T15:29:18Z",
+      "side": 1,
+      "message": "Yep, this is what I expected:\n\n\"Syncing files from outside the working dir /tmp/1725d87dbf6f4eaba51bf7579ffa5e65/work is prohibited\"",
+      "parentUuid": "5ad58531_932aa42b",
+      "revId": "948204e1ecc88bb790510bc7058d3057ceae7d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ad58531_73ddf86f",
         "filename": "playbooks/tripleo-ci-oooq.yaml",
         "patchSetId": 48
