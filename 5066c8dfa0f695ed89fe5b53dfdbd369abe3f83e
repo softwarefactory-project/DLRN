@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ae2911b_8c45e718",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-12-06T14:47:54Z",
+      "side": 1,
+      "message": "no reason to itearate the rest when the package is found, even when package[\u0027upstream\u0027] !\u003d \u0027Unknown\u0027, no?\n\nif package[\u0027name\u0027] \u003d\u003d updated_pkg[\u0027name\u0027]:\n    if package[\u0027upstream\u0027] \u003d\u003d \u0027Unknown\u0027:\n        # update\n    break",
+      "revId": "5066c8dfa0f695ed89fe5b53dfdbd369abe3f83e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ae2911b_ac40a308",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2017-12-06T14:47:54Z",
+      "side": 1,
+      "message": "getinfo() doesn\u0027t seem to be changed in this patch or the ones referenced in commit message and it only returns single value project_toprocess in master so I don\u0027t quite understand the signature change here.",
+      "revId": "5066c8dfa0f695ed89fe5b53dfdbd369abe3f83e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
