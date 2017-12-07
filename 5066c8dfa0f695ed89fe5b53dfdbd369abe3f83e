@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3ae2911b_6c775bd5",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-07T14:40:00Z",
+      "side": 1,
+      "message": "Right, it makes more sense that way. I\u0027ll fix it, thanks!!",
+      "parentUuid": "3ae2911b_8c45e718",
+      "revId": "5066c8dfa0f695ed89fe5b53dfdbd369abe3f83e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3ae2911b_ac40a308",
         "filename": "dlrn/shell.py",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-12-06T14:47:54Z",
       "side": 1,
       "message": "getinfo() doesn\u0027t seem to be changed in this patch or the ones referenced in commit message and it only returns single value project_toprocess in master so I don\u0027t quite understand the signature change here.",
+      "revId": "5066c8dfa0f695ed89fe5b53dfdbd369abe3f83e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ae2911b_8c7167e3",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-07T14:40:00Z",
+      "side": 1,
+      "message": "It is changed in this patch, see line 662.",
+      "parentUuid": "3ae2911b_ac40a308",
       "revId": "5066c8dfa0f695ed89fe5b53dfdbd369abe3f83e",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
