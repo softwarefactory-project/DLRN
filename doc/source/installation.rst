@@ -57,6 +57,7 @@ The configuration file looks like this:
     distro=rpm-master
     source=master
     target=centos
+    project_name=RDO
     smtpserver=
     reponame=delorean
     templatedir=./dlrn/templates
@@ -88,6 +89,9 @@ The configuration file looks like this:
 
 * ``target`` is the distribution to use for building the packages (``centos``
   or ``fedora``).
+
+* ``project_name`` name of the project for which DLRN is building RPMs.
+  This name is used to render various templates (emails, web pages).
 
 * ``smtpserver`` is the address of the mail server for sending out notification
   emails.  If this is empty no emails will be sent out. If you are running DLRN
