@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ae2911b_326c089c",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-11T18:09:21Z",
+      "side": 1,
+      "message": "This should be config_options.project_name",
+      "range": {
+        "startLine": 609,
+        "startChar": 40,
+        "endLine": 609,
+        "endChar": 53
+      },
+      "revId": "d4cdc8aa01cce9c1513e8bb1b67f32e3fa6b5d36",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
