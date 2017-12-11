@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ae2911b_526554df",
+        "filename": "projects.ini",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-11T12:14:14Z",
+      "side": 1,
+      "message": "Can we document the option in https://github.com/softwarefactory-project/DLRN/blob/master/doc/source/installation.rst#configuration ?\n\nAlso, it\u0027s probably nitpicking, but pname could be not too descriptive (?).",
+      "revId": "0b4c7079273de907df01b740e4a586e056e8fd6a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
