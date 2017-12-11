@@ -606,6 +606,7 @@ def get_report():
                            reponame='Detailed build report',
                            target=config_options.target,
                            src=config_options.source,
+                           project_name=project_name,
                            commits=commits,
                            count=count,
                            limit=pagination_limit)
