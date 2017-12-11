@@ -59,6 +59,7 @@ default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
                    'templatedir': os.path.join(
                        os.path.dirname(os.path.realpath(__file__)),
                        "templates"),
+                   'pname': 'DLRN',
                    'rsyncdest': '', 'rsyncport': '22',
                    'pkginfo_driver': 'dlrn.drivers.rdoinfo.RdoInfoDriver',
                    'workers': '1',

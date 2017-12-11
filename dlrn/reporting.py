@@ -74,6 +74,7 @@ def genreports(packages, head_only, session, all_commits):
     src = config_options.source
     reponame = config_options.reponame
     templatedir = config_options.templatedir
+    pname = config_options.pname
     datadir = config_options.datadir
     repodir = os.path.join(datadir, "repos")
 
@@ -95,6 +96,7 @@ def genreports(packages, head_only, session, all_commits):
     jinja_template = jinja_env.get_template("report.j2")
     content = jinja_template.render(reponame=reponame,
                                     src=src,
+                                    pname=pname,
                                     target=target,
                                     commits=commits)
     shutil.copy2(css_file, os.path.join(repodir, "styles.css"))
@@ -154,6 +156,7 @@ def genreports(packages, head_only, session, all_commits):
     content = jinja_template.render(msg=msg,
                                     reponame=reponame,
                                     src=src,
+                                    pname=pname,
                                     target=target,
                                     pkgs=pkgs)
 
