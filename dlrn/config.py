@@ -30,6 +30,7 @@ class ConfigOptions(object):
         self.rsyncport = cp.get('DEFAULT', 'rsyncport')
         self.scriptsdir = cp.get('DEFAULT', 'scriptsdir')
         self.templatedir = cp.get('DEFAULT', 'templatedir')
+        self.project_name = cp.get('DEFAULT', 'project_name')
         self.pkginfo_driver = cp.get('DEFAULT', 'pkginfo_driver')
         self.workers = cp.getint('DEFAULT', 'workers')
         self.gerrit_topic = cp.get('DEFAULT', 'gerrit_topic')
