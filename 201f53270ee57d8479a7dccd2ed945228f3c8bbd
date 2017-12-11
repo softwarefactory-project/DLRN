@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ae2911b_92a97ce2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2017-12-11T12:25:22Z",
+      "side": 1,
+      "message": "This should be TG-792 :)",
+      "revId": "201f53270ee57d8479a7dccd2ed945228f3c8bbd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
