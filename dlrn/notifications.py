@@ -11,6 +11,7 @@
 # under the License.
 
 import copy
+import jinja2
 import logging
 import os
 import sh
@@ -23,23 +24,6 @@ logging.basicConfig(level=logging.ERROR,
                     format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-notifications")
 logger.setLevel(logging.INFO)
-
-notification_email = """
-A build of the package %(name)s has failed against the current master[1] of
-the upstream project, please see log[2] and update the packaging[3].
-
-You are receiving this email because you are listed as one of the
-maintainers for the %(name)s package[4].
-
-If you have any questions please see the RDO master packaging guide[5] and
-feel free to ask questions on the RDO irc channel (#rdo on Freenode).
-
-[1] - %(upstream)s
-[2] - %(logurl)s
-[3] - %(master-distgit)s
-[4] - https://github.com/redhat-openstack/rdoinfo/blob/master/rdo.yml
-[5] - https://www.rdoproject.org/packaging/rdo-packaging.html#master-pkg-guide
-"""
 
 
 def submit_review(commit, env_vars):
@@ -64,12 +48,16 @@ def submit_review(commit, env_vars):
 
 def sendnotifymail(packages, commit):
     config_options = getConfigOptions()
-    error_details = copy.copy(
+    details = copy.copy(
         [package for package in packages
             if package["name"] == commit.project_name][0])
-    error_details["logurl"] = "%s/%s" % (config_options.baseurl,
-                                         commit.getshardedcommitdir())
-    error_body = notification_email % error_details
+    details["logurl"] = "%s/%s" % (config_options.baseurl,
+                                   commit.getshardedcommitdir())
+    # Render the notification template
+    jinja_env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader([config_options.templatedir]))
+    jinja_template = jinja_env.get_template("notification_email.j2")
+    error_body = jinja_template.render(details=details)
 
     msg = MIMEText(error_body)
     msg['Subject'] = '[dlrn] %s master package build failed' % \
