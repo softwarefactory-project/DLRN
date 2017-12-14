@@ -17,8 +17,12 @@
            {% if request.args.get('success') != None %}
              <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
            {% endif %}
-           <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
-           <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           {% if request.args.get('ci_name') != None %}
+             <input type="hidden" name="ci_name" value="{{ request.args.get('ci_name') }}" />
+           {% else %}
+             <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
+             <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           {% endif %}
            <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
           <button type="submit" class="button"><h4>Previous</h4></button>
         </form>
@@ -30,8 +34,12 @@
            {% if request.args.get('success') != None %}
              <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
            {% endif %}
-           <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
-           <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           {% if request.args.get('ci_name') != None %}
+             <input type="hidden" name="ci_name" value="{{ request.args.get('ci_name') }}" />
+           {% else %}
+             <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
+             <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           {% endif %}
            <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
           <button type="submit" class="button"><h4>Next</h4></button>
         </form>    </td>
@@ -51,13 +59,13 @@
       {% for vote in votes %}
         <tr {% if vote.ci_vote == True %}class="success"{% endif %}>
           <td>
-            <form action="civotes.html" method="get">
-               <input type="hidden" name="ciname" value="{{ vote.ci_name }}" />
+            <form action="civotes_detail.html" method="get">
+               <input type="hidden" name="ci_name" value="{{ vote.ci_name }}" />
               <button type="submit" class="button">{{ vote.ci_name }}</button>
             </form>
           </td>
           <td>
-            <form action="civotes.html" method="get">
+            <form action="civotes_detail.html" method="get">
                <input type="hidden" name="commit_hash" value="{{ vote.commit_hash }}" />
                <input type="hidden" name="distro_hash" value="{{ vote.distro_hash }}" />
               <button type="submit" class="button">{{ vote.commit_hash }}_{{ vote.distro_hash_short }}</button>
@@ -97,8 +105,12 @@
            {% if request.args.get('success') != None %}
              <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
            {% endif %}
-           <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
-           <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           {% if request.args.get('ci_name') != None %}
+             <input type="hidden" name="ci_name" value="{{ request.args.get('ci_name') }}" />
+           {% else %}
+             <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
+             <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           {% endif %}
            <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
           <button type="submit" class="button"><h4>Previous</h4></button>
         </form>
@@ -110,8 +122,12 @@
            {% if request.args.get('success') != None %}
              <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
            {% endif %}
-           <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
-           <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           {% if request.args.get('ci_name') != None %}
+             <input type="hidden" name="ci_name" value="{{ request.args.get('ci_name') }}" />
+           {% else %}
+             <input type="hidden" name="commit_hash" value="{{ request.args.get('commit_hash') }}" />
+             <input type="hidden" name="distro_hash" value="{{ request.args.get('distro_hash') }}" />
+           {% endif %}
            <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
           <button type="submit" class="button"><h4>Next</h4></button>
         </form>    </td>

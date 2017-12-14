@@ -527,8 +527,13 @@ def get_civotes():
 
     repolist = sorted(repolist, key=lambda repo: repo.timestamp, reverse=True)
     session.close()
+
+    cp = configparser.RawConfigParser(default_options)
+    cp.read(app.config['CONFIG_FILE'])
+    config_options = ConfigOptions(cp)
+
     return render_template('votes_general.j2',
-                           target='master',
+                           target=config_options.target,
                            repodetail=repolist,
                            count=count,
                            limit=pagination_limit)
@@ -538,13 +543,13 @@ def get_civotes():
 def get_civotes_detail():
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
+    ci_name = request.args.get('ci_name', None)
     success = request.args.get('success', None)
     offset = request.args.get('offset', 0)
 
     session = getSession(app.config['DB_PATH'])
     votes = session.query(CIVote)
     votes = votes.filter(CIVote.ci_name != 'consistent')
-    votes = votes.offset(offset).limit(pagination_limit)
 
     if commit_hash and distro_hash:
         commit = session.query(Commit).filter(
@@ -552,9 +557,13 @@ def get_civotes_detail():
             Commit.commit_hash == commit_hash,
             Commit.distro_hash == distro_hash).first()
         votes = votes.from_self().filter(CIVote.commit_id == commit.id)
+    elif ci_name:
+        votes = votes.filter(CIVote.ci_name == ci_name)
     else:
-        raise InvalidUsage("Please specify commit_hash and distro_hash as "
-                           "parameters", status_code=400)
+        raise InvalidUsage("Please specify either commit_hash+distro_hash or "
+                           "ci_name as parameters.", status_code=400)
+
+    votes = votes.offset(offset).limit(pagination_limit)
 
     if success is not None:
         votes = votes.from_self().filter(
@@ -570,8 +579,13 @@ def get_civotes_detail():
         votelist[i].distro_hash = commit.distro_hash
         votelist[i].distro_hash_short = commit.distro_hash[:8]
     session.close()
+
+    cp = configparser.RawConfigParser(default_options)
+    cp.read(app.config['CONFIG_FILE'])
+    config_options = ConfigOptions(cp)
+
     return render_template('votes.j2',
-                           target='master',
+                           target=config_options.target,
                            votes=votelist,
                            count=count,
                            limit=pagination_limit)
