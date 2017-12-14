@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tasks:
+    - name: Build package
+      shell:
+        cmd: |
+          timeout --signal=SIGKILL 3600 ./scripts/run_tests.sh http://review.rdoproject.org/r/p/rdoinfo.git
+      args:
+        chdir: "{{ zuul.project.src_dir }}/"
