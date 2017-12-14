@@ -51,6 +51,7 @@ if [[ "${ZUUL_BRANCH}" =~ stable/ ]]; then
     branch=$(sed "s#stable/##" <<< "${ZUUL_BRANCH}")
     baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
     src=${ZUUL_BRANCH}
+    PROJECT_DISTRO_BRANCH="${branch}-rdo"
 fi
 
 # Update the configuration
