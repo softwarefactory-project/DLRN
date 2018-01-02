@@ -93,6 +93,29 @@
       "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da1255d7_0c00d7a9",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2018-01-02T17:52:34Z",
+      "side": 1,
+      "message": "I\u0027m curious -- does this mean we would have on set of git repositories for all workers and releases ?\n\nRight now each worker clones and refreshes it\u0027s own copy of the repositories, right ?\n\nI can see it as a good thing since it means less resource utilization (both cpu and disk space) but it might break some assumptions (i.e, checking out specific commits/branches)",
+      "range": {
+        "startLine": 74,
+        "startChar": 34,
+        "endLine": 74,
+        "endChar": 62
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
