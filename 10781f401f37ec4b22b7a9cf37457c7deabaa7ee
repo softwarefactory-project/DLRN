@@ -45,6 +45,30 @@
       "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da1255d7_ac40ab08",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-01-02T13:54:46Z",
+      "side": 1,
+      "message": "I\u0027m not found of using a database as an IPC. It\u0027s not suited to manage jobs queues.\n\nIf people worry about using ZMQ, we can switch to mere REST API but ZMQ provides reliable and flexible communication layer. Redis might be an alternative with pub/sub feature, too.",
+      "parentUuid": "da1255d7_8ca967e2",
+      "range": {
+        "startLine": 51,
+        "startChar": 1,
+        "endLine": 53,
+        "endChar": 7
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
