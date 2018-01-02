@@ -69,6 +69,30 @@
       "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da1255d7_4cf6cfd8",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2018-01-02T17:39:12Z",
+      "side": 1,
+      "message": "I think the general idea is to have a queue of builds *somewhere* (even if that doesn\u0027t end up being zeromq) and then have workers pick up builds from that queue instead of the current architecture where each worker sequentially scans and builds packages.\n\nLet\u0027s not bikeshed on zeromq but instead agree whether or not this general direction makes sense.",
+      "parentUuid": "da1255d7_0cbb3710",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
