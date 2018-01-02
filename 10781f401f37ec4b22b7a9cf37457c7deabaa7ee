@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "da1255d7_ecb903ee",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-01-02T19:56:49Z",
+      "side": 1,
+      "message": "Agreed that ZeroMQ should not be explicitly mentioned in the spec.\n\nI wonder though if this is not reimplementing Zuul, could we consider https://github.com/openstack-infra/zuul/blob/feature/zuulv3/doc/source/admin/drivers/git.rst probably sub-classed  to take rdoinfo into account.",
+      "parentUuid": "da1255d7_4cf6cfd8",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_0c00d7a9",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
