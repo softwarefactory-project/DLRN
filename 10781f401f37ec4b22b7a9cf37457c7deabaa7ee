@@ -185,6 +185,30 @@
     },
     {
       "key": {
+        "uuid": "da1255d7_ec30e309",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-01-03T17:38:15Z",
+      "side": 1,
+      "message": "Then proposal should be reworked to not mention explicit tech.choice.\nzmq even as inprocess is an infra we\u0027d need to debug and practical experience from openstack-infra is not positive hence it was abandoned.\nGearman is part of Zuul/SF so we\u0027d reuse it since DLRN is a part of SoftwareFactory.\nAt the same time, as already emphasized in the proposal, we\u0027d need to keep simple local case CLI, which works without any of the msg infra.",
+      "parentUuid": "da1255d7_2c815b90",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_0c00d7a9",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
@@ -242,6 +266,23 @@
       "writtenOn": "2018-01-03T14:27:38Z",
       "side": 1,
       "message": "As mentioned by Alan there is now a Git driver in Zuul. I think it worth to think a bit about how to run DLRN on top of zuul in order to adjust some pieces of DLRN during this spec implementation like maybe adding ansible roles to build packages, to export build to the repo manager (so consumable by zuul) and use them in DLRN if possible. wdyt ?",
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da1255d7_0cc5775a",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-01-03T17:38:15Z",
+      "side": 1,
+      "message": "ZMQ is only available for \"free\" while SoftwareFactory keeps ZuulV2, long-term it will be gone.",
       "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
