@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "da1255d7_ec622316",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-01-03T14:27:38Z",
+      "side": 1,
+      "message": "Just for my understanding: I understood that builds should be done in sequence for build dep requirements between rpm. So in which case we can run build in parallel ? or is there a mechanism in DLRN to check the build deps we can then use to decide if some package can be built in parallel ?",
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_8ca967e2",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
@@ -120,6 +137,30 @@
     },
     {
       "key": {
+        "uuid": "da1255d7_6cdbd3ee",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-01-03T14:27:38Z",
+      "side": 1,
+      "message": "I think avoiding dependencies from components that require system rights in order to be installed and managed (like zmq or mariadb) is better to keep DLRN easy to conf and run. Gearman is a protocol designed to be a task exchange (zuul mainly relies on it). A gearman server can be easily run in full python using the lib developed by openstack infra https://github.com/openstack-infra/gear/. http://gearman.org/\nRunning a gearman server (started by DLRN) could be completely transparent to the user for the single node use case.",
+      "parentUuid": "da1255d7_4cf6cfd8",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_0c00d7a9",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
@@ -137,6 +178,46 @@
         "endLine": 74,
         "endChar": 62
       },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da1255d7_ccf2bf6f",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-01-03T14:27:38Z",
+      "side": 1,
+      "message": "In case wokers are not in the same node than the scheduler, workers will access scheduler repositories via git+ssh ?",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 22
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da1255d7_8c7167e3",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-01-03T14:27:38Z",
+      "side": 1,
+      "message": "As mentioned by Alan there is now a Git driver in Zuul. I think it worth to think a bit about how to run DLRN on top of zuul in order to adjust some pieces of DLRN during this spec implementation like maybe adding ansible roles to build packages, to export build to the repo manager (so consumable by zuul) and use them in DLRN if possible. wdyt ?",
       "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
