@@ -415,6 +415,24 @@
     },
     {
       "key": {
+        "uuid": "ba076199_0bf9e14d",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-01-08T21:35:07Z",
+      "side": 1,
+      "message": "My concern was more operational overhead, even in-process it\u0027s infrastructure which needs to be monitored and troubleshooted, experience from upstream openstack-infra was not that good.",
+      "parentUuid": "ba076199_eb5fad73",
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_0c7e97ae",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
