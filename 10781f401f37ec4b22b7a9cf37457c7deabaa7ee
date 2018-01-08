@@ -380,6 +380,24 @@
     },
     {
       "key": {
+        "uuid": "ba076199_cb998921",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-01-08T21:37:49Z",
+      "side": 1,
+      "message": "Is your concern scale of adding Zuul job definitions or Zuul handling them?",
+      "parentUuid": "ba076199_8b5ef174",
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_0cc5775a",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
