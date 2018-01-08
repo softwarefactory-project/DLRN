@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ba076199_2b4945d1",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-01-08T18:00:28Z",
+      "side": 1,
+      "message": "Right now, we could use two build modes:\n\n- sequential (the default when using the --order command-line switch) computes the right build order between dependent packages, and ensures they are built in the right order. Typically, this is only needed for the initial repo bootstrap.\n\n- parallel (the default mode, although we currently set up only 1 worker) does not ensure a 100% correct order when we run with more than 1 worker, but it\u0027s usually enough. The only corner case we could have is when two commits in two separate projects are merged at about the same time, and we really need one of them to depend on the other.",
+      "parentUuid": "da1255d7_ec622316",
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_8ca967e2",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
@@ -209,6 +227,30 @@
     },
     {
       "key": {
+        "uuid": "ba076199_ab0bf57c",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-01-08T18:00:28Z",
+      "side": 1,
+      "message": "I\u0027m replying globally, but this looks like the most important point to discuss so we can also arrange a session on it:\n\n- Using the DB as a synchronization layer could work, but we\u0027d need to add some locking stuff. I\u0027m not sure if SELECT ... FOR UPDATE works with SQLite3, would that work? If so, we could use a pending_commits table, and have each worker pick the first unbuilt commit.\n\n- About the reasons to choose ZeroMQ: it does not require any broker setup, so no additional infra (it\u0027s just a library). In fact, it could be any other library that allows us to set up message passing between different processes, regardless of the server they\u0027re running on (to handle the simple and complex use cases). I preferred to specify a library to provide a more concrete design, tbh, but we could change that.\n\n- About gearman: I\u0027ve had a look at https://github.com/openstack-infra/gear/, and it still looks a bit more complex than a ZeroMQ-based implementation. In the best case, using the geard python implementation could work, but it\u0027s labeled as \"not designed for production use under load\". If we use a standalone gearman, we\u0027d be in a similar situation to Rabbit or other broker.\n\n- About the Zuul reimplementation and Git driver: this is handled later on in the \"Alternatives\" section. Zuul is way more generic than what DLRN aims to be, and of course the simple use case is completely lost.",
+      "parentUuid": "da1255d7_ec30e309",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_0c00d7a9",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
@@ -220,6 +262,30 @@
       "writtenOn": "2018-01-02T17:52:34Z",
       "side": 1,
       "message": "I\u0027m curious -- does this mean we would have on set of git repositories for all workers and releases ?\n\nRight now each worker clones and refreshes it\u0027s own copy of the repositories, right ?\n\nI can see it as a good thing since it means less resource utilization (both cpu and disk space) but it might break some assumptions (i.e, checking out specific commits/branches)",
+      "range": {
+        "startLine": 74,
+        "startChar": 34,
+        "endLine": 74,
+        "endChar": 62
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba076199_2b770504",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-01-08T18:00:28Z",
+      "side": 1,
+      "message": "That\u0027s a good point, I hadn\u0027t thought of that. My idea was that each worker would be specific to one scheduler, so it would not build Pike _and_ Ocata packages, for example.\n\nOne alternative would be to make this scheduler work with multiple different releases, and then each worker could build packages for any of them... but I think this would make it more complex than it is already.",
+      "parentUuid": "da1255d7_0c00d7a9",
       "range": {
         "startLine": 74,
         "startChar": 34,
@@ -255,6 +321,30 @@
     },
     {
       "key": {
+        "uuid": "ba076199_0b7441fb",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-01-08T18:00:28Z",
+      "side": 1,
+      "message": "I had not thought of this. My initial thought is that it should get the repos itself, although it would defeat some use cases (--dev and --local).\n\nWe need to consider if we want to add the setup complexity of allowing access via git+ssh to the scheduler, or reduce the scope of supported options for the complex use case.",
+      "parentUuid": "da1255d7_ccf2bf6f",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 22
+      },
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_8c7167e3",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
@@ -272,6 +362,24 @@
     },
     {
       "key": {
+        "uuid": "ba076199_8b5ef174",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-01-08T18:00:28Z",
+      "side": 1,
+      "message": "My biggest fear for this kind of setup is scale. With the Git driver for Zuulv3, we could do something like:\n\n- Create a post job for all distgit repos, that builds the package on every merged commit.\n- Create a configuration for all source repos, using the Git driver. Then, for all repos supported by rdoinfo, add the same post job to build the package.\n\nThat job could easily export the build using the DLRN API (all the code bits are there, and we\u0027d just need to use a credential for the API).\n\nWe would need to set up a fair amount of automation to make sure each new project gets built... It\u0027s doable, and the Git driver makes it feasible once it\u0027s in review.rdoproject.org. However, I still think that the scale is quite big.",
+      "parentUuid": "da1255d7_8c7167e3",
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_0cc5775a",
         "filename": "doc/specs/new-architecture-sched-worker.rst",
         "patchSetId": 2
@@ -283,6 +391,24 @@
       "writtenOn": "2018-01-03T17:38:15Z",
       "side": 1,
       "message": "ZMQ is only available for \"free\" while SoftwareFactory keeps ZuulV2, long-term it will be gone.",
+      "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba076199_eb5fad73",
+        "filename": "doc/specs/new-architecture-sched-worker.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-01-08T18:00:28Z",
+      "side": 1,
+      "message": "Not really, it does not require a broker. You can have a look at [1] for some simple examples of how to use the library in Python.\n\n[1] - https://www.digitalocean.com/community/tutorials/how-to-work-with-the-zeromq-messaging-library",
+      "parentUuid": "da1255d7_0cc5775a",
       "revId": "10781f401f37ec4b22b7a9cf37457c7deabaa7ee",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
