@@ -389,7 +389,7 @@ def report_result():
               'distro_hash': distro_hash,
               'timestamp': timestamp,
               'job_id': job_id,
-              'success': bool(success),
+              'success': bool(strtobool(success)),
               'in_progress': False,
               'url': url,
               'notes': notes}
