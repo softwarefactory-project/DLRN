@@ -657,6 +657,8 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
                 logger.info("Last commit belongs to another branch, but"
                             " we're ok with that")
                 since = "--after=%d" % (commit.dt_commit)
+                # In any case, we just want to build the last commit, if any
+                head_only = True
 
     project_toprocess = pkginfo.getinfo(project=project, package=package,
                                         since=since, local=local,
