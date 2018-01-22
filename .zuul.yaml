@@ -61,3 +61,6 @@
         - tox-py27
         - tox-py35-f27
         - dlrn-rpmbuild
+    release:
+      jobs:
+        - upload-pypi
