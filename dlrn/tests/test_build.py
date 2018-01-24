@@ -55,13 +55,15 @@ class TestBuild(base.TestCase):
         with open(os.path.join(self.config.datadir,
                   "delorean-deps.repo"), "w") as fp:
             fp.write("[test]\nname=test\nenabled=0\n")
-        self.session = db.getSession(new=True)
+        self.db_fd, filepath = tempfile.mkstemp()
+        self.session = db.getSession("sqlite:///%s" % filepath)
         utils.loadYAML(self.session, './dlrn/tests/samples/commits_1.yaml')
 
     def tearDown(self):
         super(TestBuild, self).tearDown()
         shutil.rmtree(self.config.datadir)
         shutil.rmtree(self.config.scriptsdir)
+        os.close(self.db_fd)
 
     def test_build_rpm_wrapper(self, sh_mock):
         commit = db.getCommits(self.session)[-1]

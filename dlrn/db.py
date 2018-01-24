@@ -29,9 +29,9 @@ from sqlalchemy import Text
 
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import scoped_session
+from sqlalchemy.pool import NullPool
 
 Base = sqlalchemy.ext.declarative.declarative_base()
-_sessions = {}
 
 
 class Commit(Base):
@@ -118,14 +118,16 @@ class User(Base):
 
 
 # Return a db session
-def getSession(url='sqlite://', new=False):
-    if _sessions.get(url) and new is False:
-        return _sessions.get(url)
-
-    engine = sqlalchemy.create_engine(url, pool_recycle=300)
+def getSession(url='sqlite://'):
+    engine = sqlalchemy.create_engine(url, poolclass=NullPool)
     Base.metadata.create_all(engine)
-    _sessions[url] = scoped_session(sqlalchemy.orm.sessionmaker(bind=engine))
-    return _sessions[url]
+    Session = scoped_session(sqlalchemy.orm.sessionmaker(bind=engine))
+    return Session
+
+
+# Close a db session
+def closeSession(session):
+    session.remove()
 
 
 # Get the most recently processed commit for project_name, we ignore commits
