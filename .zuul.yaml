@@ -50,7 +50,11 @@
       jobs:
         - tox-pep8
         - tox-py27
-        - tox-py35-f27
+        - tox-py35:
+            nodeset:
+              nodes:
+                - name: testrunner
+                  label: fedora-oci
         - dlrn-rpmbuild
         - dlrn-rpmbuild-tripleo-ci
         - dlrn-rpmbuild-tripleo-ci-oooq
@@ -59,7 +63,11 @@
       jobs:
         - tox-pep8
         - tox-py27
-        - tox-py35-f27
+        - tox-py35:
+            nodeset:
+              nodes:
+                - name: testrunner
+                  label: fedora-oci
         - dlrn-rpmbuild
     release:
       jobs:
