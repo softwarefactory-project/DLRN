@@ -498,6 +498,7 @@ def get_civotes():
 
     votes = session.query(CIVote)
     votes = votes.filter(CIVote.ci_name != 'consistent')
+    votes = votes.order_by(desc(CIVote.timestamp))
     votes = votes.offset(offset).limit(pagination_limit)
     count = votes.count()
     # Let's find all individual commit_hash + distro_hash combinations
