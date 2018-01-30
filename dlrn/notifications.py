@@ -18,6 +18,7 @@ import sh
 import smtplib
 
 from dlrn.config import getConfigOptions
+from dlrn.reporting import get_commit_url
 from email.mime.text import MIMEText
 
 logging.basicConfig(level=logging.ERROR,
@@ -26,13 +27,33 @@ logger = logging.getLogger("dlrn-notifications")
 logger.setLevel(logging.INFO)
 
 
-def submit_review(commit, env_vars):
+def submit_review(commit, packages, env_vars):
     config_options = getConfigOptions()
     datadir = os.path.realpath(config_options.datadir)
     scriptsdir = os.path.realpath(config_options.scriptsdir)
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
 
     project_name = commit.project_name
+
+    for pkg in packages:
+        if project_name == pkg['name']:
+            break
+    else:
+        logger.error('Unable to find info for project'
+                     ' %s' % project)
+        return
+
+    url = (get_commit_url(commit, pkg) + commit.commit_hash)
+    env_vars.append('GERRIT_URL=%s' % url)
+    env_vars.append('GERRIT_LOG=%s/%s' % (config_options.baseurl,
+                                          commit.getshardedcommitdir()))
+    maintainers = ','.join(pkg['maintainers'])
+    env_vars.append('GERRIT_MAINTAINERS=%s' % maintainers)
+    env_vars.append('GERRIT_TOPIC=%s' % config_options.gerrit_topic)
+    logger.info('Creating a gerrit review using '
+                'GERRIT_URL=%s '
+                'GERRIT_MAINTAINERS=%s ' %
+                (url, maintainers))
 
     run_cmd = []
     if env_vars:

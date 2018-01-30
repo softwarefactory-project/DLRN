@@ -51,6 +51,8 @@ def sync_repo(commit):
         except Exception as e:
             logger.warn('Failed to rsync content to %s ,'
                         'got error %s' % (rsyncdest, e))
+            # Raise exception, so it can be treated as an error
+            raise e
 
         # We want to sync the symlinks in a second pass, once all content
         # has been copied, to avoid a race condition it they are copied first
@@ -64,5 +66,7 @@ def sync_repo(commit):
                      '-e', rsh_command,
                      rsyncpaths, rsyncdest)
         except Exception as e:
+            # We are not raising exceptions for symlink rsyncs, these will
+            # be fixed after another build
             logger.warn('Failed to rsync symlinks to %s ,'
                         'got error %s' % (rsyncdest, e))
