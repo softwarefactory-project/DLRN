@@ -39,7 +39,6 @@ from dlrn.db import Project
 from dlrn.notifications import sendnotifymail
 from dlrn.notifications import submit_review
 from dlrn.reporting import genreports
-from dlrn.reporting import get_commit_url
 from dlrn.repositories import getsourcebranch
 from dlrn.rpmspecfile import RpmSpecCollection
 from dlrn.rpmspecfile import RpmSpecFile
@@ -493,35 +492,11 @@ def process_build_result(status, packages, session, packages_to_process,
                     env_vars = []
                 last_build = getLastProcessedCommit(session, project)
                 if not last_build or last_build.status == 'SUCCESS':
-                    for pkg in packages:
-                        if project == pkg['name']:
-                            break
-                    else:
-                        pkg = None
-                    if pkg:
-                        url = (get_commit_url(commit, pkg) +
-                               commit.commit_hash)
-                        env_vars.append('GERRIT_URL=%s' % url)
-                        env_vars.append('GERRIT_LOG=%s/%s' %
-                                        (config_options.baseurl,
-                                         commit.getshardedcommitdir()))
-                        maintainers = ','.join(pkg['maintainers'])
-                        env_vars.append('GERRIT_MAINTAINERS=%s' %
-                                        maintainers)
-                        env_vars.append('GERRIT_TOPIC=%s' %
-                                        config_options.gerrit_topic)
-                        logger.info('Creating a gerrit review using '
-                                    'GERRIT_URL=%s '
-                                    'GERRIT_MAINTAINERS=%s ' %
-                                    (url, maintainers))
-                        try:
-                            submit_review(commit, env_vars)
-                        except Exception:
-                            logger.error('Unable to create review '
-                                         'see review.log')
-                    else:
-                        logger.error('Unable to find info for project'
-                                     ' %s' % project)
+                    try:
+                        submit_review(commit, packages, env_vars)
+                    except Exception:
+                        logger.error('Unable to create review '
+                                     'see review.log')
                 else:
                     logger.info('Last build not successful '
                                 'for %s' % project)
@@ -534,7 +509,32 @@ def process_build_result(status, packages, session, packages_to_process,
         commit.status = "SUCCESS"
         commit.notes = notes
         commit.rpms = ",".join(built_rpms)
+
+    genreports(packages, head_only, session, packages_to_process)
+    # Export YAML file containing commit metadata
+    export_commit_yaml(commit)
+    try:
+        sync_repo(commit)
         session.add(commit)
+    except Exception as e:
+        if exit_code == 0:  # The commit was ok, so marking as failed
+            logger.error('Repo sync failed for project %s' % project)
+            exit_code = 1
+            # We need to make the commit status be "failed"
+            commit.status = "FAILED"
+            commit.notes = getattr(e, "message", notes)
+            session.add(commit)
+            # And open a review if needed
+            if build_env:
+                env_vars = list(build_env)
+            else:
+                env_vars = []
+            try:
+                submit_review(commit, packages, env_vars)
+            except Exception:
+                logger.error('Unable to create review '
+                             'see review.log')
+
     if dev_mode is False:
         session.commit()
         if consistent:
@@ -544,11 +544,6 @@ def process_build_result(status, packages, session, packages_to_process,
                           timestamp=int(commit.dt_build), notes='')
             session.add(vote)
             session.commit()
-    genreports(packages, head_only, session, packages_to_process)
-    # Export YAML file containing commit metadata
-    export_commit_yaml(commit)
-    # TODO(jpena): could we launch this asynchronously?
-    sync_repo(commit)
     return exit_code
 
 

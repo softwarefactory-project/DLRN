@@ -44,7 +44,7 @@ class TestNotifications(base.TestCase):
                                 distgit_dir='/home/dlrn/data/foo_distro',
                                 commit_branch='master', dt_build=1441245153)
         self.packages = [{'upstream': 'https://github.com/openstack/foo',
-                          'name': 'foo', 'maintainers': 'test@test.com',
+                          'name': 'foo', 'maintainers': ['test@test.com'],
                           'master-distgit':
                           'https://github.com/rdo-packages/foo-distgit.git'}]
 
@@ -55,11 +55,19 @@ class TestNotifications(base.TestCase):
 
     @mock.patch('sh.env', create=True)
     def test_submit_review(self, sh_mock):
-        notifications.submit_review(self.commit, ['FOO=BAR'])
+        notifications.submit_review(self.commit, self.packages, ['FOO=BAR'])
         yumdir = os.path.join(self.config.datadir, 'repos',
                               self.commit.getshardedcommitdir())
 
-        expected = [mock.call(['FOO=BAR',
+        expected = [mock.call(['FOO=BAR', 'GERRIT_URL=https://github.com/'
+                                          'openstack/foo/commit/' +
+                                          self.commit.commit_hash,
+                               'GERRIT_LOG=%s/%s' % (
+                                   self.config.baseurl,
+                                   self.commit.getshardedcommitdir()
+                               ),
+                               'GERRIT_MAINTAINERS=test@test.com',
+                               'GERRIT_TOPIC=rdo-FTBFS',
                                os.path.join(self.config.scriptsdir,
                                             "submit_review.sh"),
                     self.commit.project_name, yumdir, self.config.datadir,
