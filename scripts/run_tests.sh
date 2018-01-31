@@ -139,8 +139,8 @@ fi
 # If the commands below throws an error we still want the logs
 function copy_logs() {
     mkdir -p logs
-    rsync -avzr data/repos logs/centos
-    rsync -avzrL data/repos/current logs/centos
+    rsync -avzr data/repos logs/$target
+    rsync -avzrL data/repos/current logs/$target
 }
 trap copy_logs ERR EXIT
 
