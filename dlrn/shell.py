@@ -13,6 +13,7 @@
 
 from __future__ import print_function
 import argparse
+import fcntl
 import logging
 import multiprocessing
 import os
@@ -349,21 +350,26 @@ def main():
                                   order=options.order, sequential=True)
             exception = status[3]
             consistent = False
-            session = getSession(config_options.database_connection)
-            if exception is not None:
-                logger.error("Received exception %s" % exception)
-            else:
-                if not options.run:
-                    consistent = post_build(status, packages, session)
-            exit_value = process_build_result(status, packages, session,
-                                              toprocess,
-                                              dev_mode=options.dev,
-                                              run_cmd=options.run,
-                                              stop=options.stop,
-                                              build_env=options.build_env,
-                                              head_only=options.head_only,
-                                              consistent=consistent)
-            closeSession(session)
+            datadir = os.path.realpath(config_options.datadir)
+            with open(os.path.join(datadir, 'remote.lck'), 'a') as lock_fp:
+                fcntl.flock(lock_fp, fcntl.LOCK_EX)
+                session = getSession(config_options.database_connection)
+                if exception is not None:
+                    logger.error("Received exception %s" % exception)
+                else:
+                    if not options.run:
+                        consistent = post_build(status, packages, session)
+                exit_value = process_build_result(status, packages, session,
+                                                  toprocess,
+                                                  dev_mode=options.dev,
+                                                  run_cmd=options.run,
+                                                  stop=options.stop,
+                                                  build_env=options.build_env,
+                                                  head_only=options.head_only,
+                                                  consistent=consistent)
+                closeSession(session)
+                fcntl.flock(lock_fp, fcntl.LOCK_UN)
+
             if exit_value != 0:
                 exit_code = exit_value
             if options.stop and exit_code != 0:
@@ -386,23 +392,29 @@ def main():
                 status = iterator.next()
                 exception = status[3]
                 consistent = False
-                session = getSession(config_options.database_connection)
-                if exception is not None:
-                    logger.info("Received exception %s" % exception)
-                else:
-                    # Create repo, build versions.csv file.
-                    # This needs to be sequential
-                    if not options.run:
-                        consistent = post_build(status, packages, session)
-                exit_value = process_build_result(status, packages,
-                                                  session, toprocess,
-                                                  dev_mode=options.dev,
-                                                  run_cmd=options.run,
-                                                  stop=options.stop,
-                                                  build_env=options.build_env,
-                                                  head_only=options.head_only,
-                                                  consistent=consistent)
-                closeSession(session)
+                datadir = os.path.realpath(config_options.datadir)
+                with open(os.path.join(datadir, 'remote.lck'), 'a') as lock_fp:
+                    fcntl.flock(lock_fp, fcntl.LOCK_EX)
+
+                    session = getSession(config_options.database_connection)
+                    if exception is not None:
+                        logger.info("Received exception %s" % exception)
+                    else:
+                        # Create repo, build versions.csv file.
+                        # This needs to be sequential
+                        if not options.run:
+                            consistent = post_build(status, packages, session)
+                    exit_value = process_build_result(
+                        status, packages,
+                        session, toprocess,
+                        dev_mode=options.dev,
+                        run_cmd=options.run,
+                        stop=options.stop,
+                        build_env=options.build_env,
+                        head_only=options.head_only,
+                        consistent=consistent)
+                    closeSession(session)
+                    fcntl.flock(lock_fp, fcntl.LOCK_UN)
                 if exit_value != 0:
                     exit_code = exit_value
                 if options.stop and exit_code != 0:
