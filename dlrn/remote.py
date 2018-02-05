@@ -12,7 +12,6 @@
 
 
 import argparse
-import fcntl
 import logging
 import os
 import sys
@@ -31,6 +30,8 @@ from dlrn.shell import post_build
 from dlrn.shell import process_build_result
 from dlrn.utils import import_object
 from dlrn.utils import loadYAML_list
+from dlrn.utils import lock_file
+
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-remote")
@@ -63,67 +64,66 @@ def import_commit(repo_url, config_file, db_connection=None,
     if not os.path.exists(datadir):
         os.makedirs(datadir)
 
-    with open(os.path.join(datadir, 'remote.lck'), 'a') as lock_fp:
-        for commit in commits:
-            commit.id = None
-            if commit.rpms == 'None':
-                commit.rpms = None
-            commit.dt_build = int(commit.dt_build)
-            commit.dt_commit = float(commit.dt_commit)
-            commit.dt_distro = int(commit.dt_distro)
-            # Check if the latest built commit for this project is newer
-            # than this one. In that case, we should ignore it
-            if db_connection:
-                session = getSession(db_connection)
-            else:
-                session = getSession(config_options.database_connection)
-            package = commit.project_name
-            old_commit = getLastProcessedCommit(session, package)
-            if old_commit:
-                if old_commit.dt_commit >= commit.dt_commit:
-                    if old_commit.dt_distro >= commit.dt_distro:
-                        logger.info('Skipping commit %s, a newer commit is '
-                                    'already built\n'
-                                    'Old: %s %s, new: %s %s' %
-                                    (commit.commit_hash, old_commit.dt_commit,
-                                     old_commit.dt_distro, commit.dt_commit,
-                                     commit.dt_distro))
-                        continue    # Skip
+    for commit in commits:
+        commit.id = None
+        if commit.rpms == 'None':
+            commit.rpms = None
+        commit.dt_build = int(commit.dt_build)
+        commit.dt_commit = float(commit.dt_commit)
+        commit.dt_distro = int(commit.dt_distro)
+        # Check if the latest built commit for this project is newer
+        # than this one. In that case, we should ignore it
+        if db_connection:
+            session = getSession(db_connection)
+        else:
+            session = getSession(config_options.database_connection)
+        package = commit.project_name
+        old_commit = getLastProcessedCommit(session, package)
+        if old_commit:
+            if old_commit.dt_commit >= commit.dt_commit:
+                if old_commit.dt_distro >= commit.dt_distro:
+                    logger.info('Skipping commit %s, a newer commit is '
+                                'already built\n'
+                                'Old: %s %s, new: %s %s' %
+                                (commit.commit_hash, old_commit.dt_commit,
+                                 old_commit.dt_distro, commit.dt_commit,
+                                 commit.dt_distro))
+                    continue    # Skip
 
-            yumrepodir = os.path.join(datadir, "repos",
-                                      commit.getshardedcommitdir())
-            if not os.path.exists(yumrepodir):
-                os.makedirs(yumrepodir)
+        yumrepodir = os.path.join(datadir, "repos",
+                                  commit.getshardedcommitdir())
+        if not os.path.exists(yumrepodir):
+            os.makedirs(yumrepodir)
 
-            for logfile in ['build.log', 'installed', 'mock.log', 'root.log',
-                            'rpmbuild.log', 'state.log']:
-                logfile_url = repo_url + '/' + logfile
+        for logfile in ['build.log', 'installed', 'mock.log', 'root.log',
+                        'rpmbuild.log', 'state.log']:
+            logfile_url = repo_url + '/' + logfile
+            try:
+                r = urlopen(logfile_url)
+                contents = map(lambda x: x.decode('utf8'), r.readlines())
+                with open(os.path.join(yumrepodir, logfile), "w") as fp:
+                    fp.writelines(contents)
+            except urllib.error.HTTPError:
+                # Ignore errors, if the remote build failed there may be
+                # some missing files
+                pass
+
+        if commit.rpms:
+            for rpm in commit.rpms.split(","):
+                rpm_url = repo_url + '/' + rpm.split('/')[-1]
                 try:
-                    r = urlopen(logfile_url)
-                    contents = map(lambda x: x.decode('utf8'), r.readlines())
-                    with open(os.path.join(yumrepodir, logfile), "w") as fp:
-                        fp.writelines(contents)
+                    r = urlopen(rpm_url)
+                    contents = r.read()
+                    with open(os.path.join(datadir, rpm), "wb") as fp:
+                        fp.write(contents)
                 except urllib.error.HTTPError:
-                    # Ignore errors, if the remote build failed there may be
-                    # some missing files
-                    pass
-
-            if commit.rpms:
-                for rpm in commit.rpms.split(","):
-                    rpm_url = repo_url + '/' + rpm.split('/')[-1]
-                    try:
-                        r = urlopen(rpm_url)
-                        contents = r.read()
-                        with open(os.path.join(datadir, rpm), "wb") as fp:
-                            fp.write(contents)
-                    except urllib.error.HTTPError:
-                        if rpm != 'None':
-                            logger.warning("Failed to download rpm file %s"
-                                           % rpm_url)
-            # Get remote update lock, to prevent any other remote operation
-            # while we are creating the repo and updating the database
-            logger.debug("Acquiring remote update lock")
-            fcntl.flock(lock_fp, fcntl.LOCK_EX)
+                    if rpm != 'None':
+                        logger.warning("Failed to download rpm file %s"
+                                       % rpm_url)
+        # Get remote update lock, to prevent any other remote operation
+        # while we are creating the repo and updating the database
+        logger.debug("Acquiring remote update lock")
+        with lock_file(os.path.join(datadir, 'remote.lck')):
             logger.debug("Acquired lock")
             if commit.status == 'SUCCESS':
                 built_rpms = []
@@ -135,8 +135,7 @@ def import_commit(repo_url, config_file, db_connection=None,
                 status = [commit, '', '', commit.notes]
             process_build_result(status, packages, session, [])
             closeSession(session)   # Keep one session per commit
-            fcntl.flock(lock_fp, fcntl.LOCK_UN)
-            logger.debug("Released lock")
+        logger.debug("Released lock")
     return 0
 
 
