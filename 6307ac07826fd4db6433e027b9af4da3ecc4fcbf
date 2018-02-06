@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a016987_e98e9126",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-06T14:40:47Z",
+      "side": 1,
+      "message": "I suggest writing a small context manager instead \u003d\u003e\n\nfrom contextlib import contextmanager\n\n@contextmanager\ndef lock_file(filename, mode\u003d\u0027a\u0027):\n  with open(filename, mode) as lock_fp):\n    fcntl.flock(lock_fp, fcntl.LOCK_EX)\n    yield lock_fp\n    fcntl.flock(lock_fp, fcntl.LOCK_UN)",
+      "revId": "6307ac07826fd4db6433e027b9af4da3ecc4fcbf",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
