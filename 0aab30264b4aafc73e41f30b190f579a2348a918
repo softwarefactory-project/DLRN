@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a016987_c98cf537",
+        "filename": "dlrn/migrations/versions/cab7697f6564_add_user_column_to_civote_and_promotion.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-06T14:35:29Z",
+      "side": 1,
+      "message": "Migrations \\o/",
+      "revId": "0aab30264b4aafc73e41f30b190f579a2348a918",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
