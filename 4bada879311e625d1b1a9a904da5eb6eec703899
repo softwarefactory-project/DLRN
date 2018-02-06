@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a016987_a95779c9",
+        "filename": "dlrn/notifications.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-06T10:41:11Z",
+      "side": 1,
+      "message": "ack",
+      "revId": "4bada879311e625d1b1a9a904da5eb6eec703899",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a016987_895cbdee",
+        "filename": "dlrn/rsync.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-06T10:41:11Z",
+      "side": 1,
+      "message": "ack",
+      "revId": "4bada879311e625d1b1a9a904da5eb6eec703899",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a016987_6972a17e",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-06T10:41:11Z",
+      "side": 1,
+      "message": "This is much better.",
+      "revId": "4bada879311e625d1b1a9a904da5eb6eec703899",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a016987_496fe592",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 537,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-06T10:41:11Z",
+      "side": 1,
+      "message": "ack",
+      "revId": "4bada879311e625d1b1a9a904da5eb6eec703899",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a016987_296ca99b",
+        "filename": "dlrn/tests/test_notifications.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-06T10:41:11Z",
+      "side": 1,
+      "message": "ack",
+      "revId": "4bada879311e625d1b1a9a904da5eb6eec703899",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
