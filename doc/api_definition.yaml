@@ -495,6 +495,9 @@ definitions:
       timestamp:
         type: integer
         description: Timestamp for this CI Vote (taken from the DLRN system time)
+      user:
+        type: string
+        description: User who created this CI vote
   Promotion:
     type: object
     properties:
@@ -510,6 +513,9 @@ definitions:
       timestamp:
         type: integer
         description: Timestamp for this CI Vote (taken from the DLRN system time)
+      user:
+        type: string
+        description: User who created this promotion
   PromotionQuery:
     type: object
     properties:
