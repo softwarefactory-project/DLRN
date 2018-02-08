@@ -9,6 +9,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import fcntl
 import os
 import re
 import sys
@@ -16,6 +17,7 @@ import yaml
 
 import sqlalchemy
 
+from contextlib import contextmanager
 from dlrn.db import CIVote
 from dlrn.db import Commit
 from dlrn.db import getSession
@@ -234,6 +236,15 @@ def timesretried(project, session, commit_hash, distro_hash):
                                         Commit.distro_hash == distro_hash,
                                         Commit.status == "RETRY").\
         count()
+
+
+# Context manager to ensure locking for a file
+@contextmanager
+def lock_file(filename, mode='a'):
+    with open(filename, mode) as lock_fp:
+        fcntl.flock(lock_fp, fcntl.LOCK_EX)
+        yield lock_fp
+        fcntl.flock(lock_fp, fcntl.LOCK_UN)
 
 
 if __name__ == '__main__':

@@ -46,6 +46,7 @@ from dlrn.rsync import sync_repo
 from dlrn.utils import dumpshas2file
 from dlrn.utils import import_object
 from dlrn.utils import isknownerror
+from dlrn.utils import lock_file
 from dlrn.utils import saveYAML_commit
 from dlrn.utils import timesretried
 from dlrn import version
@@ -351,21 +352,24 @@ def main():
                                   order=options.order, sequential=True)
             exception = status[3]
             consistent = False
-            session = getSession(config_options.database_connection)
-            if exception is not None:
-                logger.error("Received exception %s" % exception)
-            else:
-                if not options.run:
-                    consistent = post_build(status, packages, session)
-            exit_value = process_build_result(status, packages, session,
-                                              toprocess,
-                                              dev_mode=options.dev,
-                                              run_cmd=options.run,
-                                              stop=options.stop,
-                                              build_env=options.build_env,
-                                              head_only=options.head_only,
-                                              consistent=consistent)
-            closeSession(session)
+            datadir = os.path.realpath(config_options.datadir)
+            with lock_file(os.path.join(datadir, 'remote.lck')):
+                session = getSession(config_options.database_connection)
+                if exception is not None:
+                    logger.error("Received exception %s" % exception)
+                else:
+                    if not options.run:
+                        consistent = post_build(status, packages, session)
+                exit_value = process_build_result(status, packages, session,
+                                                  toprocess,
+                                                  dev_mode=options.dev,
+                                                  run_cmd=options.run,
+                                                  stop=options.stop,
+                                                  build_env=options.build_env,
+                                                  head_only=options.head_only,
+                                                  consistent=consistent)
+                closeSession(session)
+
             if exit_value != 0:
                 exit_code = exit_value
             if options.stop and exit_code != 0:
@@ -388,23 +392,26 @@ def main():
                 status = iterator.next()
                 exception = status[3]
                 consistent = False
-                session = getSession(config_options.database_connection)
-                if exception is not None:
-                    logger.info("Received exception %s" % exception)
-                else:
-                    # Create repo, build versions.csv file.
-                    # This needs to be sequential
-                    if not options.run:
-                        consistent = post_build(status, packages, session)
-                exit_value = process_build_result(status, packages,
-                                                  session, toprocess,
-                                                  dev_mode=options.dev,
-                                                  run_cmd=options.run,
-                                                  stop=options.stop,
-                                                  build_env=options.build_env,
-                                                  head_only=options.head_only,
-                                                  consistent=consistent)
-                closeSession(session)
+                datadir = os.path.realpath(config_options.datadir)
+                with lock_file(os.path.join(datadir, 'remote.lck')):
+                    session = getSession(config_options.database_connection)
+                    if exception is not None:
+                        logger.info("Received exception %s" % exception)
+                    else:
+                        # Create repo, build versions.csv file.
+                        # This needs to be sequential
+                        if not options.run:
+                            consistent = post_build(status, packages, session)
+                    exit_value = process_build_result(
+                        status, packages,
+                        session, toprocess,
+                        dev_mode=options.dev,
+                        run_cmd=options.run,
+                        stop=options.stop,
+                        build_env=options.build_env,
+                        head_only=options.head_only,
+                        consistent=consistent)
+                    closeSession(session)
                 if exit_value != 0:
                     exit_code = exit_value
                 if options.stop and exit_code != 0:
