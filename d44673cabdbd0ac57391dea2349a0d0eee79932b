@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a016987_7aaf01e4",
+        "filename": "doc/specs/zuul-based-architecture.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-02-09T11:12:21Z",
+      "side": 1,
+      "message": "What about the idea to decide that this deployment type should be implemented via sfconfig in SF ?\n\n* DLRN jobs installed by default in the SF config repo\n* A DLRN server deployed part of the SF architecture\n* The DLRN status page accessible via the SF topmenu\n\nIt can be a first step to the real rpm factory :).\nWe can also think to change the Software Factory dev worflow under DLRN, that\u0027s another subject, but it will force us to take into account multiple workflows (The downstream workflow too ?).",
+      "revId": "d44673cabdbd0ac57391dea2349a0d0eee79932b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
