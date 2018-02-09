@@ -519,13 +519,13 @@ def process_build_result(status, packages, session, packages_to_process,
         commit.status = "SUCCESS"
         commit.notes = notes
         commit.rpms = ",".join(built_rpms)
+        session.add(commit)
 
     genreports(packages, head_only, session, packages_to_process)
     # Export YAML file containing commit metadata
     export_commit_yaml(commit)
     try:
         sync_repo(commit)
-        session.add(commit)
     except Exception as e:
         logger.error('Repo sync failed for project %s' % project)
         if exit_code == 0:  # The commit was ok, so marking as failed
