@@ -59,7 +59,6 @@ target="${2:-centos}"
 baseurl="${3:-http://trunk.rdoproject.org/centos7/}"
 src="master"
 branch=""
-fallback_to_master="1"
 
 # If we're testing a commit on a specific branch, make sure we're using it
 if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
@@ -75,14 +74,12 @@ if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
         branch=""
     fi
     PROJECT_DISTRO_BRANCH=$ZUUL_BRANCH
-    fallback_to_master="0"
 # Add logic for new branches, *-rdo
 elif [[ "${ZUUL_BRANCH}" =~ -rdo ]]; then
     branch=$(sed "s/-rdo//" <<< "${ZUUL_BRANCH}")
     baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
     src="stable/${branch}"
     PROJECT_DISTRO_BRANCH=$ZUUL_BRANCH
-    fallback_to_master="0"
 fi
 
 # Update the configuration
@@ -90,7 +87,6 @@ sed -i "s%target=.*%target=${target}%" projects.ini
 sed -i "s%source=.*%source=${src}%" projects.ini
 sed -i "s%baseurl=.*%baseurl=${baseurl}%" projects.ini
 sed -i "s%tags=.*%tags=${branch}%" projects.ini
-sed -i "s%fallback_to_master=.*%fallback_to_master=${fallback_to_master}%" projects.ini
 
 # Prepare directories for distro repo
 mkdir -p data/repos
