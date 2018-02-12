@@ -18,6 +18,7 @@ import multiprocessing
 import os
 import sys
 
+from copy import deepcopy
 from functools import partial
 
 import sh
@@ -344,6 +345,7 @@ def main():
 
     exit_code = 0
     if options.sequential is True:
+        toprocess_copy = deepcopy(toprocess)
         for commit in toprocess:
             status = build_worker(packages, commit, run_cmd=options.run,
                                   build_env=options.build_env,
@@ -361,7 +363,7 @@ def main():
                     if not options.run:
                         consistent = post_build(status, packages, session)
                 exit_value = process_build_result(status, packages, session,
-                                                  toprocess,
+                                                  toprocess_copy,
                                                   dev_mode=options.dev,
                                                   run_cmd=options.run,
                                                   stop=options.stop,
