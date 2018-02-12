@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a016987_f581c24e",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-12T18:23:05Z",
+      "side": 1,
+      "message": "if we put that line in the if block below, we can drop the final else block.",
+      "revId": "2e5111b704e2ac5849057636ad4505995aa3ba48",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a016987_15b69e3d",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-12T18:23:05Z",
+      "side": 1,
+      "message": "Ack, but I suspect that we can reduce the cyclomatic complexity.\nThis code is supposed to be called in all paths.",
+      "revId": "2e5111b704e2ac5849057636ad4505995aa3ba48",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
