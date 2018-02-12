@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a016987_b56d8ace",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 662,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-02-12T17:07:25Z",
+      "side": 1,
+      "message": "Now that this is taken to a separate function, I think we may want to move it to the reporting.py module. What do you think?",
+      "range": {
+        "startLine": 619,
+        "startChar": 1,
+        "endLine": 662,
+        "endChar": 19
+      },
+      "revId": "6276ff56234c39ac880e137b0425915c3d705f98",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
