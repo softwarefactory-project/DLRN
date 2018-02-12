@@ -576,7 +576,49 @@ def post_build(status, packages, session):
     yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
-    shafile = open(os.path.join(yumrepodir_abs, "versions.csv"), "w")
+    with open(os.path.join(yumrepodir_abs, "versions.csv"), "w") as shafile:
+        failures = _dump_database(shafile, packages, project_name,
+                                  commit, built_rpms, session,
+                                  yumrepodir_abs, datadir)
+
+    # Use createrepo_c when available
+    try:
+        from sh import createrepo_c
+        sh.createrepo = createrepo_c
+    except ImportError:
+        pass
+    sh.createrepo(yumrepodir_abs)
+
+    with open(os.path.join(
+            yumrepodir_abs, "%s.repo" % config_options.reponame),
+            "w") as fp:
+        fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
+                 "gpgcheck=0\npriority=1" % (config_options.reponame,
+                                             config_options.reponame,
+                                             project_name, commit_hash,
+                                             config_options.baseurl,
+                                             commit.getshardedcommitdir()))
+
+    dirnames = ['current']
+
+    if failures == 0:
+        dirnames.append('consistent')
+    else:
+        logger.info('%d packages not built correctly: not updating'
+                    ' the consistent symlink' % failures)
+    for dirname in dirnames:
+        target_repo_dir = os.path.join(datadir, "repos", dirname)
+        os.symlink(os.path.relpath(yumrepodir_abs,
+                                   os.path.join(datadir, "repos")),
+                   target_repo_dir + "_")
+        os.rename(target_repo_dir + "_", target_repo_dir)
+
+    return (failures == 0)
+
+
+def _dump_database(shafile, packages, project_name,
+                   commit, built_rpms, session,
+                   yumrepodir_abs, datadir):
     shafile.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,"
                   "Status,Last Success Timestamp,Pkg NVR\n")
     failures = 0
@@ -617,41 +659,7 @@ def post_build(status, packages, session):
                 failures += 1
         else:
             failures += 1
-    shafile.close()
-
-    # Use createrepo_c when available
-    try:
-        from sh import createrepo_c
-        sh.createrepo = createrepo_c
-    except ImportError:
-        pass
-    sh.createrepo(yumrepodir_abs)
-
-    with open(os.path.join(
-            yumrepodir_abs, "%s.repo" % config_options.reponame),
-            "w") as fp:
-        fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
-                 "gpgcheck=0\npriority=1" % (config_options.reponame,
-                                             config_options.reponame,
-                                             project_name, commit_hash,
-                                             config_options.baseurl,
-                                             commit.getshardedcommitdir()))
-
-    dirnames = ['current']
-
-    if failures == 0:
-        dirnames.append('consistent')
-    else:
-        logger.info('%d packages not built correctly: not updating'
-                    ' the consistent symlink' % failures)
-    for dirname in dirnames:
-        target_repo_dir = os.path.join(datadir, "repos", dirname)
-        os.symlink(os.path.relpath(yumrepodir_abs,
-                                   os.path.join(datadir, "repos")),
-                   target_repo_dir + "_")
-        os.rename(target_repo_dir + "_", target_repo_dir)
-
-    return (failures == 0)
+    return failures
 
 
 def getinfo(package, local=False, dev_mode=False, head_only=False,
