@@ -33,6 +33,29 @@
       "revId": "2e5111b704e2ac5849057636ad4505995aa3ba48",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a016987_9545ee18",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-02-13T08:17:22Z",
+      "side": 1,
+      "message": "This block of code is only executed if there was no exception during the build process, while the code above handles different exception cases. \n\nWe could move the session.add(commit) line outside the if block, since it is always executed, but we cannot get rid of the else clause. Also, we could reorder this, so we get \"if exception is None\" first, then all exception handling.\n\nWhat do you think?",
+      "range": {
+        "startLine": 519,
+        "startChar": 0,
+        "endLine": 522,
+        "endChar": 27
+      },
+      "revId": "2e5111b704e2ac5849057636ad4505995aa3ba48",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
