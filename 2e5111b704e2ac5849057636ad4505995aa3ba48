@@ -56,6 +56,30 @@
       "revId": "2e5111b704e2ac5849057636ad4505995aa3ba48",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a016987_55cbf672",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-02-13T11:47:50Z",
+      "side": 1,
+      "message": "Sounds like a good plan to me.",
+      "parentUuid": "7a016987_9545ee18",
+      "range": {
+        "startLine": 519,
+        "startChar": 0,
+        "endLine": 522,
+        "endChar": 27
+      },
+      "revId": "2e5111b704e2ac5849057636ad4505995aa3ba48",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
