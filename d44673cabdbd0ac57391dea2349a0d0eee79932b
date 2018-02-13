@@ -34,6 +34,24 @@
       "revId": "d44673cabdbd0ac57391dea2349a0d0eee79932b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a016987_d51c8679",
+        "filename": "doc/specs/zuul-based-architecture.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-02-13T17:05:53Z",
+      "side": 1,
+      "message": "That\u0027s true. Maybe the time to think to a \"new format - distro-info :)\". We have rdoinfo, sfinfo, (what about modularity file desc format also ?) maybe we can smartly merge them ?",
+      "parentUuid": "7a016987_f530a209",
+      "revId": "d44673cabdbd0ac57391dea2349a0d0eee79932b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
