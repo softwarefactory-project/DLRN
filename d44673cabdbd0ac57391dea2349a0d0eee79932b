@@ -16,6 +16,24 @@
       "revId": "d44673cabdbd0ac57391dea2349a0d0eee79932b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a016987_f530a209",
+        "filename": "doc/specs/zuul-based-architecture.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-02-13T16:10:53Z",
+      "side": 1,
+      "message": "That sounds very interesting, it could be a great way to integrate DLRN easily. We should also integrate rdoinfo in the mix, otherwise we\u0027d be missing part of the solution.",
+      "parentUuid": "7a016987_7aaf01e4",
+      "revId": "d44673cabdbd0ac57391dea2349a0d0eee79932b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
