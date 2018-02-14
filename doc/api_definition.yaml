@@ -415,6 +415,10 @@ paths:
                 description: |
                   If set to a value, skip the initial <offset> promotions.
                 type: integer
+              limit:
+                description: |
+                  If set to a value, limit the returned promotions amount to <limit>.
+                type: integer
       # Expected responses for this operation:
       responses:
         # Response code

@@ -559,3 +559,12 @@ class TestGetPromotions(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
+
+    def test_get_promotions_with_limit(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(limit=1))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)

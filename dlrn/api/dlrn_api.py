@@ -42,6 +42,7 @@ import time
 
 
 pagination_limit = 100
+max_limit = 100
 
 
 @app.errorhandler(InvalidUsage)
@@ -223,6 +224,11 @@ def promotions_GET():
     distro_hash = request.json.get('distro_hash', None)
     promote_name = request.json.get('promote_name', None)
     offset = request.json.get('offset', 0)
+    limit = request.json.get('limit', 100)
+
+    # Make sure we do not exceed
+    if limit > max_limit:
+        limit = max_limit
 
     if ((commit_hash and not distro_hash) or
             (distro_hash and not commit_hash)):
@@ -253,7 +259,7 @@ def promotions_GET():
         promotions = promotions.filter(
             Promotion.promotion_name == promote_name)
 
-    promotions = promotions.order_by(desc(Promotion.timestamp)).limit(100).\
+    promotions = promotions.order_by(desc(Promotion.timestamp)).limit(limit).\
         offset(offset)
 
     # And format the output

@@ -143,6 +143,8 @@ promote_name         string      If set to a value, filter results by the specif
                      (optional)  name.
 offset               integer     If set to a value, skip the initial <offset> promotions.
                      (optional)  
+limit                integer     If set to a value, limit the returned promotions amount
+                     (optional)  to <limit>.
 ===================  ==========  ==============================================================
 
 The JSON output will contain an array where each item contains:
