@@ -65,6 +65,13 @@ class ConfigOptions(object):
                 self.use_version_from_spec = use_spec
             else:
                 self.use_version_from_spec = False
+            if cp.has_option('gitrepo_driver', 'allow_tarball'):
+                allow_tarball = cp.getboolean('gitrepo_driver',
+                                              'allow_tarball')
+                self.allow_tarball = allow_tarball
+            else:
+                self.allow_tarball = False
+
         global _config_options
         _config_options = self
 
