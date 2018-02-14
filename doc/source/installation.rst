@@ -194,6 +194,7 @@ options:
     directory=/openstack
     skip=openstack-macros,keystoneauth1
     use_version_from_spec=0
+    allow_tarball=0
 
 * ``repo`` is the single Git repository where all distgits are located.
 * ``directory`` is a directory inside the repo. DLRN will expect each
@@ -205,6 +206,13 @@ options:
   the package should not be built for any other reason.
 * ``use_version_from_spec`` If set to 1 (or true), the driver will parse the
   template spec file and set the source branch to the Version: tag in the spec.
+* ``allow_tarball`` If set to 1 (or true), and the spec template detects the
+  package version automatically using a tarball (see [1]_), DLRN will not
+  replace the Source0 file with a tarball generated fro the Git repo, but it
+  will use the same tarball used to detect the package version. This defeats
+  the purpose of following the commits from Git, but it is useful in certain
+  scenarios, such as CI testing, when the tarball or its tags may not be in
+  sync with the Git contents.
 
 The optional ``[rdoinfo_driver]`` section has the following configuration
 options:
@@ -374,3 +382,9 @@ supported MariaDB:
     $ alembic stamp head
 
 After that initial command, you will be able to run future migrations.
+
+References
+==========
+
+ .. [1] Version handling using renderspec templates
+    https://github.com/openstack/renderspec/blob/master/doc/source/usage.rst#handling-the-package-version
