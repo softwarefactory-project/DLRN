@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a016987_00bc1a6b",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-02-15T10:42:01Z",
+      "side": 1,
+      "message": "I just realized we can enable a DoS here, since we are not limiting the \"limit\" value to \u003c 100. So a user could set limit\u003d1000000 and eat too many resources.\n\nCan we add a check to ensure we don\u0027t go past 100?",
+      "range": {
+        "startLine": 226,
+        "startChar": 4,
+        "endLine": 226,
+        "endChar": 42
+      },
+      "revId": "40bba739e3b046d8bae7db9c0d54302664fbb657",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
