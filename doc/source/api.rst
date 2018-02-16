@@ -413,3 +413,64 @@ Where ``DB_PATH`` is the path to the SQLite database for your environment,
 ``REPO_PATH`` will point to the base directory for the generated repositories,
 and ``CONFIG_FILE`` will point to the projects.ini file used when running
 DLRN.
+
+***************
+User management
+***************
+
+There is a command-line tool to manage DLRN API users:
+
+.. code-block:: console
+    usage: dlrn-user [-h] [--config-file CONFIG_FILE] {create,delete,update} ...
+
+    arguments:
+      -h, --help            show this help message and exit
+      --config-file CONFIG_FILE
+                            Config file. Default: projects.ini
+
+    subcommands:
+      available subcommands
+
+      {create,delete,update}
+        create              Create a user
+        delete              Delete a user
+        update              Update a user
+
+User creation
+-------------
+
+Use the ``create`` subcommand to create a new user.
+
+.. code-block:: shell-session
+
+    $ dlrn-user create --username foo --password bar
+
+If you do not specify a password in the command-line, you will be prompted to
+enter one interactively.
+
+User update
+-----------
+
+You can use the ``update`` subcommand to change user data. Currently, only the
+password can be changed.
+
+.. code-block:: shell-session
+
+    $ dlrn-user update --username foo --password new
+
+User deletion
+-------------
+
+Use the  ``delete`` subcommand to delete a user.
+
+.. code-block:: shell-session
+
+    $ dlrn-user delete --username foo
+
+The command will ask for confirmation, and you have to type "YES" (without the
+quotes) in uppercase to delete the user. You can also avoid the confirmation
+request by adding the ``--force`` parameter.
+
+.. code-block:: shell-session
+
+    $ dlrn-user delete --username foo --force
