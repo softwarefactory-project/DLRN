@@ -49,7 +49,7 @@
         cmd: |
           . ../.venv/bin/activate
           alembic upgrade head
-          sqlite3 commits.sqlite "insert into users values('foo','\$6\$rounds=656000\$T678cDhCoMtxLlnq\$yXrpe.kJgiP8Y1JZpAYQ0.yCE12Qr6zv6nZY1VY7OP6bxhoZezlzWSitvoqkx26Z30pUBKM4kX/JZJPdMIv1a.');"
+          dlrn-user create --username foo --password bar
         chdir: "{{ working_dir }}/DLRN"
 
     - name: Start API server
