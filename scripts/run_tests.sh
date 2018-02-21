@@ -159,7 +159,13 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
         if [ -z "$NOT_EXTRACTED" ]; then
             # We cannot run git review -d because we don't have an
             # available account. So we do the same using curl, jq and git.
-            JSON=$(curl -s -L https://review.openstack.org/changes/$UPSTREAM_ID/revisions/current/review|sed 1d)
+            if [ "$branch" != "" ]; then
+                REVIEW_BRANCH="stable%2F$branch"
+            else
+                REVIEW_BRANCH="master"
+            fi
+
+            JSON=$(curl -s -L https://review.openstack.org/changes/openstack%2F${UPSTREAM_PROJECT_NAME}~$REVIEW_BRANCH~$UPSTREAM_ID/revisions/current/review|sed 1d)
             COMMIT=$(python -c 'import json;import sys; s = json.loads(sys.stdin.read(-1)); print s["revisions"].keys()[0]' <<< $JSON)
             REF=$(python -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print s['revisions']['$COMMIT']['ref']" <<< $JSON)
             pushd data/${PROJECT_TO_BUILD_MAPPED}
