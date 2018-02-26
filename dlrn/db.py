@@ -117,7 +117,7 @@ class Promotion(Base):
 class User(Base):
     __tablename__ = "users"
 
-    username = Column(String(256), primary_key=True)
+    username = Column(String(255), primary_key=True)
     password = Column(String(256), nullable=False)
 
 
