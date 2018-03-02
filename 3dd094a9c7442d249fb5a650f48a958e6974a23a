@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da37b569_21c4ce3e",
+        "filename": "dlrn/user.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-03-02T17:26:22Z",
+      "side": 1,
+      "message": "Thanks to this, the function isn\u0027t reusable.\n\nI suggest returning the exit code as integer or using exception and sys.exiting in the user_manager entry point function so this code can be used.",
+      "revId": "3dd094a9c7442d249fb5a650f48a958e6974a23a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da37b569_01e2ead5",
+        "filename": "dlrn/user.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-03-02T17:26:22Z",
+      "side": 1,
+      "message": "Same thing. This code is quite specific, but it could still be reused eventually... It sure won\u0027t with hardcoded exit.",
+      "revId": "3dd094a9c7442d249fb5a650f48a958e6974a23a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da37b569_c1eba2af",
+        "filename": "dlrn/user.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-03-02T17:26:22Z",
+      "side": 1,
+      "message": "I\u0027d expect two empty lines here.",
+      "revId": "3dd094a9c7442d249fb5a650f48a958e6974a23a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da37b569_61d176fb",
+        "filename": "dlrn/user.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-03-02T17:26:22Z",
+      "side": 1,
+      "message": "Nice attention to detail :)",
+      "revId": "3dd094a9c7442d249fb5a650f48a958e6974a23a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da37b569_81cefa58",
+        "filename": "doc/source/api.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-03-02T17:26:22Z",
+      "side": 1,
+      "message": "--config-file projects.ini is the default and this line would be significantly easier to read without it as well as not leading people to always specifying it even though they don\u0027t need to.\n\nIf you want do demonstrate howto specify the config for some reason, I\u0027d go with the simplest use case first\n\n$ dlrn-user create --username foo --password bar\n\nand demonstrate the --config-file usage in dedicated example.",
+      "revId": "3dd094a9c7442d249fb5a650f48a958e6974a23a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da37b569_41d8f21d",
+        "filename": "doc/source/api.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-03-02T17:26:22Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3dd094a9c7442d249fb5a650f48a958e6974a23a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da37b569_e1034675",
+        "filename": "doc/source/api.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-03-02T17:26:22Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3dd094a9c7442d249fb5a650f48a958e6974a23a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
