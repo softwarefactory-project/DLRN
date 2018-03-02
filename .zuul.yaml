@@ -1,7 +1,7 @@
 ---
 - job:
     name: dlrn-base
-    parent: base
+    parent: new-base
     pre-run: playbooks/prepare.yaml
     post-run: playbooks/retrieve-logs.yaml
     irrelevant-files:
@@ -32,6 +32,9 @@
     description: Run DLRN to build a package using Tripleo-Quickstart playbooks
     run: playbooks/tripleo-ci-oooq.yaml
     post-run: playbooks/tripleo-ci-oooq-getlogs.yaml
+    vars:
+      logclassify_logserver_dir: logs/
+      logclassify_model_pipeline: check
 
 - job:
     name: dlrn-api-functional
