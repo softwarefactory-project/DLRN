@@ -63,6 +63,7 @@ The configuration file looks like this:
     templatedir=./dlrn/templates
     maxretries=3
     pkginfo_driver=dlrn.drivers.rdoinfo.RdoInfoDriver
+    rdoinfo_repo=
     tags=
     rsyncdest=
     rsyncport=22
@@ -156,6 +157,8 @@ The configuration file looks like this:
     `RPM Packaging for OpenStack <https://github.com/openstack/rpm-packaging>`_
     project. This driver requires setting some optional configuration options
     in the ``[gitrepo_driver]`` section
+
+* ``rdoinfo_repo`` defines the rdoinfo repository to use.
 
 * ``coprid`` defines the Fedora Copr id to use to compile the packages
   instead of using mock. The ``copr-cli`` package needs to be
