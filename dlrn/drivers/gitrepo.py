@@ -161,6 +161,9 @@ class GitRepoDriver(PkgInfoDriver):
         dev_mode = kwargs.get('dev_mode')
         datadir = self.config_options.datadir
 
+        if project == "test":
+            raise RuntimeError("Oops, couldn't get test packages...")
+
         for url in base_urls:
             if check_url("%s/%s" % (url, module2upstream(package['name']))):
                 package['upstream'] = ("%s/%s" %
