@@ -202,9 +202,12 @@ it using pip.
 Then the username for the user creating the gerrit reviews when a
 build will fail needs to be configured like this::
 
-  $ git config --global --add gitreview.username "myaccount"
+  $ git config --global gitreview.username dlrnbot
+  $ git config --global user.email dlrn@dlrn.domain
 
-and authorized to connect to gerrit without password.
+and authorized to connect to Gerrit without password. Make sure
+the public SSH key of the user that run DLRN is defined in
+the Gerrit account linked to the DLRN user email.
 
 Configuring your httpd
 ----------------------
