@@ -8,6 +8,7 @@ Parameters
 .. code-block:: console
 
     usage: dlrn [-h] [--config-file CONFIG_FILE] [--info-repo INFO_REPO]
+                [--remote-info-repo REMOTE_INFO_REPO]
                 [--build-env BUILD_ENV] [--local] [--head-only]
                 [--project-name PROJECT_NAME | --package-name PACKAGE_NAME]
                 [--dev] [--log-commands] [--use-public] [--order] [--sequential]
@@ -20,6 +21,10 @@ Parameters
                             Config file. Default: projects.ini
       --info-repo INFO_REPO
                             use a local rdoinfo repo instead of fetching the
+                            default one using rdopkg. Only applies when
+                            pkginfo_driver is rdoinfo in projects.ini
+      --remote-info-repo REMOTE_INFO_REPO
+                            use a remote rdoinfo repo instead of fetching the
                             default one using rdopkg. Only applies when
                             pkginfo_driver is rdoinfo in projects.ini
       --build-env BUILD_ENV

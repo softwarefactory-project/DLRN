@@ -91,6 +91,11 @@ def main():
                              " fetching the default one using rdopkg. Only"
                              " applies when pkginfo_driver is rdoinfo in"
                              " projects.ini")
+    parser.add_argument('--remote-info-repo',
+                        help="use a remote rdoinfo repo instead of"
+                             " fetching the default one using rdopkg. Only"
+                             " applies when pkginfo_driver is rdoinfo in"
+                             " projects.ini")
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
     parser.add_argument('--local', action="store_true",
@@ -159,6 +164,7 @@ def main():
     global pkginfo
     pkginfo = import_object(pkginfo_driver, cfg_options=config_options)
     packages = pkginfo.getpackages(local_info_repo=options.info_repo,
+                                   remote_info_repo=options.remote_info_repo,
                                    tags=config_options.tags,
                                    dev_mode=options.dev)
 
