@@ -35,6 +35,17 @@ class TestConfigOptions(base.TestCase):
         config = ConfigOptions(self.config)
         self.assertEqual(config.skip_dirs, ["pkg1", "pkg2"])
 
+    def test_without_rdoinfo_driver(self):
+        self.config.remove_section("rdoinfo_driver")
+        ConfigOptions(self.config)
+
+    def test_with_rdoinfo_driver(self):
+        self.config.set(
+            "rdoinfo_driver", "repo", "https://test/test.git")
+        config = ConfigOptions(self.config)
+        self.assertEqual(
+            config.rdoinfo_repo, 'https://test/test.git')
+
     def test_get_config_option(self):
         config = ConfigOptions(self.config)
         self.assertEqual(config, getConfigOptions())

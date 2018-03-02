@@ -63,6 +63,7 @@ The configuration file looks like this:
     templatedir=./dlrn/templates
     maxretries=3
     pkginfo_driver=dlrn.drivers.rdoinfo.RdoInfoDriver
+    rdoinfo_repo=
     tags=
     rsyncdest=
     rsyncport=22
@@ -192,6 +193,17 @@ options:
   the package should not be built for any other reason.
 * ``use_version_from_spec`` If set to 1 (or true), the driver will parse the
   template spec file and set the source branch to the Version: tag in the spec.
+
+The optional ``[rdoinfo_driver]`` section has the following configuration
+options:
+
+.. code-block:: ini
+
+    [rdoinfo_driver]
+    repo=http://github.com/org/rdoinfo-fork
+
+* ``repo`` defines the rdoinfo repository to use. This setting
+    must be set if a fork of the rdoinfo repository must be used.
 
 Configuring for gerrit
 ++++++++++++++++++++++
