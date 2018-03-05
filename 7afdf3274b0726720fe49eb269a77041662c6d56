@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da37b569_042bd883",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-03-05T10:51:22Z",
+      "side": 1,
+      "message": "Besides setting the default here, we need to make sure the ConfigOptions object knows about it, see [1].\n\n[1] - https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/config.py#L18",
+      "range": {
+        "startLine": 66,
+        "startChar": 19,
+        "endLine": 66,
+        "endChar": 38
+      },
+      "revId": "7afdf3274b0726720fe49eb269a77041662c6d56",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da37b569_a41f8c5a",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-03-05T10:51:22Z",
+      "side": 1,
+      "message": "Since this option is specific to the rdoinfo driver, I think we should create a new [rdoinfo_driver] section with it, just like we do with the [gitrepo_driver] section.",
+      "range": {
+        "startLine": 160,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 65
+      },
+      "revId": "7afdf3274b0726720fe49eb269a77041662c6d56",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
