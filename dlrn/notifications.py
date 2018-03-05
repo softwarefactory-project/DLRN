@@ -96,6 +96,12 @@ def sendnotifymail(packages, commit):
     msg['To'] = "packagers"
 
     logger.info("Sending notify email to %r" % email_to)
-    s = smtplib.SMTP(config_options.smtpserver)
-    s.sendmail(email_from, email_to, msg.as_string())
-    s.quit()
+    try:
+        s = smtplib.SMTP(config_options.smtpserver)
+        s.sendmail(email_from, email_to, msg.as_string())
+        s.quit()
+    except smtplib.SMTPException as e:
+        logger.error("An issue occured when sending"
+                     "notify email to %r (%s)" % (email_to, e))
+    finally:
+        s.close()
