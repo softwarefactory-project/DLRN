@@ -69,9 +69,16 @@ def submit_review(commit, packages, env_vars):
 
 def sendnotifymail(packages, commit):
     config_options = getConfigOptions()
+
     details = copy.copy(
         [package for package in packages
             if package["name"] == commit.project_name][0])
+
+    email_to = details['maintainers']
+    if not config_options.smtpserver:
+        logger.info("Skipping notify email to %r" % email_to)
+        return
+
     details["logurl"] = "%s/%s" % (config_options.baseurl,
                                    commit.getshardedcommitdir())
     # Render the notification template
@@ -86,14 +93,9 @@ def sendnotifymail(packages, commit):
 
     email_from = 'no-reply@delorean.com'
     msg['From'] = email_from
-
-    email_to = details['maintainers']
     msg['To'] = "packagers"
 
-    if config_options.smtpserver:
-        logger.info("Sending notify email to %r" % email_to)
-        s = smtplib.SMTP(config_options.smtpserver)
-        s.sendmail(email_from, email_to, msg.as_string())
-        s.quit()
-    else:
-        logger.info("Skipping notify email to %r" % email_to)
+    logger.info("Sending notify email to %r" % email_to)
+    s = smtplib.SMTP(config_options.smtpserver)
+    s.sendmail(email_from, email_to, msg.as_string())
+    s.quit()
