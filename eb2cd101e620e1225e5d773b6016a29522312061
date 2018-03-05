@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da37b569_a4f22c05",
+        "filename": "dlrn/notifications.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-03-05T11:42:54Z",
+      "side": 1,
+      "message": "Python 3.3 added context manager support to smtplib.SMTP but we have to support python 2.7.\n\nSince constructor/sendmail method can raise exceptions, I\u0027d recommend to encapsulate all the calls in a try:/finally: to ensure it is closed.\n\nhttps://github.com/python/cpython/blob/2.7/Lib/smtplib.py#L259\nhttps://github.com/python/cpython/blob/2.7/Lib/smtplib.py#L737 (and few other later",
+      "revId": "eb2cd101e620e1225e5d773b6016a29522312061",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
