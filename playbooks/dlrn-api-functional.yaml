@@ -59,11 +59,18 @@
           nohup scripts/api.py &
         chdir: "{{ working_dir }}/DLRN"
 
-    - name: Build a package with DLRN
+    - name: Build some packages with DLRN, using --order
       shell:
         cmd: |
           . ../.venv/bin/activate
-          dlrn --config-file projects.ini --package-name openstack-packstack --use-public
+          dlrn --config-file projects.ini --package-name openstack-packstack --package-name openstack-macros --use-public --order
+        chdir: "{{ working_dir }}/DLRN"
+
+    - name: Build some more packages with DLRN
+      shell:
+        cmd: |
+          . ../.venv/bin/activate
+          dlrn --config-file projects.ini --package-name python-glanceclient --package-name python-cliff --use-public
         chdir: "{{ working_dir }}/DLRN"
 
     - name: Import a package
