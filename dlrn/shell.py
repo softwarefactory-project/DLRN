@@ -457,7 +457,11 @@ def process_build_result(status, packages, session, packages_to_process,
                 return exit_code
         return exit_code
 
-    if exception is not None:
+    if exception is None:
+        commit.status = "SUCCESS"
+        commit.notes = notes
+        commit.rpms = ",".join(built_rpms)
+    else:
         logger.error("Received exception %s" % exception)
 
         datadir = os.path.realpath(config_options.datadir)
@@ -472,7 +476,6 @@ def process_build_result(status, packages, session, packages_to_process,
                              " will retry later" % project)
             commit.status = "RETRY"
             commit.notes = getattr(exception, "message", notes)
-            session.add(commit)
             # do not switch from an error exit code to a retry
             # exit code
             if exit_code != 1:
@@ -512,20 +515,16 @@ def process_build_result(status, packages, session, packages_to_process,
                                 'for %s' % project)
             commit.status = "FAILED"
             commit.notes = getattr(exception, "message", notes)
-            session.add(commit)
         if stop:
             return exit_code
-    else:
-        commit.status = "SUCCESS"
-        commit.notes = notes
-        commit.rpms = ",".join(built_rpms)
+    # Add commit to the session
+    session.add(commit)
 
     genreports(packages, head_only, session, packages_to_process)
     # Export YAML file containing commit metadata
     export_commit_yaml(commit)
     try:
         sync_repo(commit)
-        session.add(commit)
     except Exception as e:
         logger.error('Repo sync failed for project %s' % project)
         if exit_code == 0:  # The commit was ok, so marking as failed
