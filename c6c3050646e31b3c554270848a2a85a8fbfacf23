@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da37b569_47e242a1",
+        "filename": "dlrn/user.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-03-07T16:44:52Z",
+      "side": 1,
+      "message": "I would have added that to display help if no command is given.\n\n    if not options.command:\n        parser.print_help()\n        return",
+      "revId": "c6c3050646e31b3c554270848a2a85a8fbfacf23",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
