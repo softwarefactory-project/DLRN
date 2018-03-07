@@ -16,6 +16,24 @@
       "revId": "c6c3050646e31b3c554270848a2a85a8fbfacf23",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da37b569_c7ec1292",
+        "filename": "dlrn/user.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-03-07T16:53:55Z",
+      "side": 1,
+      "message": "That code would never be executed, I think. If there is no command, the parser will automatically display help:\n\n$ dlrn-user \nusage: dlrn-user [-h] [--config-file CONFIG_FILE] {create,delete,update} ...\ndlrn-user: error: too few arguments",
+      "parentUuid": "da37b569_47e242a1",
+      "revId": "c6c3050646e31b3c554270848a2a85a8fbfacf23",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
