@@ -380,6 +380,7 @@ following is an example file, named ``/etc/httpd/conf.d/wsgi-dlrn.conf``:
             WSGIProcessGroup dlrn
             WSGIApplicationGroup %{GLOBAL}
             WSGIScriptReloading On
+            WSGIPassAuthorization On
             Order deny,allow
             Allow from all
         </Directory>
