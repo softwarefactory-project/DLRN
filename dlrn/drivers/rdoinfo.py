@@ -32,6 +32,7 @@ import sh
 
 from rdopkg.actionmods import rdoinfo
 import rdopkg.utils.log
+from rdopkg.conf import cfg as rdopkg_cfg
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-rdoinfo-driver")
@@ -64,6 +65,11 @@ class RdoInfoDriver(PkgInfoDriver):
         if local_info_repo:
             inforepo = rdoinfo.RdoinfoRepo(local_repo_path=local_info_repo,
                                            apply_tag=tags)
+        elif self.config_options.rdoinfo_repo:
+            inforepo = rdoinfo.RdoinfoRepo(
+                rdopkg_cfg['HOME_DIR'], self.config_options.rdoinfo_repo,
+                apply_tag=tags)
+            inforepo.init()
         else:
             inforepo = rdoinfo.get_default_inforepo(apply_tag=tags)
             # rdopkg will clone/pull rdoinfo repo as needed (~/.rdopkg/rdoinfo)
