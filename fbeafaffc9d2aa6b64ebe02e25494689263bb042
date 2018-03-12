@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da37b569_354e48c2",
+        "filename": "scripts/centos.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-03-12T10:04:19Z",
+      "side": 1,
+      "message": "Oops!!",
+      "range": {
+        "startLine": 42,
+        "startChar": 13,
+        "endLine": 42,
+        "endChar": 15
+      },
+      "revId": "fbeafaffc9d2aa6b64ebe02e25494689263bb042",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
