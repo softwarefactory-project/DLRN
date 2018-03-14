@@ -1,6 +1,6 @@
-######################
-API definition (draft)
-######################
+##############
+API definition
+##############
 
 *******************
 General information
@@ -154,6 +154,9 @@ Parameter         Type                             Description
 ==============  ==========  ==============================================================
 commit_hash     string      commit_hash of the promoted repo
 distro_hash     string      distro_hash of the promoted repo
+repo_hash       string      Repository hash, composed of the commit_hash and short
+                            distro_hash
+repo_url        string      Full URL of the promoted repository
 promote_name    string      name used for the promotion
 timestamp       integer     Timestamp (in seconds since the epoch)
 user            string      user who created the promotion
@@ -297,6 +300,9 @@ Parameter         Type                             Description
 ==============  ==========  ==============================================================
 commit_hash     string      commit_hash of the promoted repo
 distro_hash     string      distro_hash of the promoted repo
+repo_hash       string      Repository hash, composed of the commit_hash and short
+                            distro_hash
+repo_url        string      Full URL of the promoted repository
 promote_name    string      name used for the promotion
 timestamp       integer     Timestamp (in seconds since the epoch)
 user            string      user who created the promotion
