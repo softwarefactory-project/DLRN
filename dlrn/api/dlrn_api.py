@@ -226,6 +226,10 @@ def promotions_GET():
     offset = request.json.get('offset', 0)
     limit = request.json.get('limit', 100)
 
+    cp = configparser.RawConfigParser(default_options)
+    cp.read(app.config['CONFIG_FILE'])
+    config_options = ConfigOptions(cp)
+
     # Make sure we do not exceed
     if limit > max_limit:
         limit = max_limit
@@ -267,9 +271,16 @@ def promotions_GET():
     for promotion in promotions:
         commit = getCommits(session, limit=0).filter(
             Commit.id == promotion.commit_id).first()
+
+        repo_hash = "%s_%s" % (commit.commit_hash, commit.distro_hash[:8])
+        repo_url = "%s/%s" % (config_options.baseurl,
+                              commit.getshardedcommitdir())
+
         d = {'timestamp': promotion.timestamp,
              'commit_hash': commit.commit_hash,
              'distro_hash': commit.distro_hash,
+             'repo_hash': repo_hash,
+             'repo_url': repo_url,
              'promote_name': promotion.promotion_name,
              'user': promotion.user}
         data.append(d)
@@ -433,6 +444,10 @@ def promote():
         raise InvalidUsage('Invalid promote_name %s' % promote_name,
                            status_code=403)
 
+    cp = configparser.RawConfigParser(default_options)
+    cp.read(app.config['CONFIG_FILE'])
+    config_options = ConfigOptions(cp)
+
     session = getSession(app.config['DB_PATH'])
     commit = session.query(Commit).filter(
         Commit.status == 'SUCCESS',
@@ -468,8 +483,13 @@ def promote():
     session.add(promotion)
     session.commit()
 
+    repo_hash = "%s_%s" % (commit.commit_hash, commit.distro_hash[:8])
+    repo_url = "%s/%s" % (config_options.baseurl, yumrepodir)
+
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
+              'repo_hash': repo_hash,
+              'repo_url': repo_url,
               'promote_name': promote_name,
               'timestamp': timestamp,
               'user': auth.username()}
