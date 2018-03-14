@@ -63,26 +63,22 @@ class RdoInfoDriver(PkgInfoDriver):
         inforepo = None
 
         if local_info_repo:
-            inforepo = rdoinfo.RdoinfoRepo(local_repo_path=local_info_repo,
-                                           apply_tag=tags)
+            inforepo = rdoinfo.RdoinfoRepo(
+                local_repo_path=local_info_repo,
+                apply_tag=tags, include_fns=[])
         elif self.config_options.rdoinfo_repo:
             inforepo = rdoinfo.RdoinfoRepo(
                 rdopkg_cfg['HOME_DIR'], self.config_options.rdoinfo_repo,
-                apply_tag=tags)
+                apply_tag=tags, include_fns=[])
             inforepo.init()
         else:
-            inforepo = rdoinfo.get_default_inforepo(apply_tag=tags)
+            inforepo = rdoinfo.get_default_inforepo(
+                apply_tag=tags, include_fns=[])
             # rdopkg will clone/pull rdoinfo repo as needed (~/.rdopkg/rdoinfo)
             inforepo.init()
 
-        # FIXME(jpena): This should be removed once
-        # https://softwarefactory-project.io/r/9661 is merged, and replaced
-        # by adding include_fns when creating inforepo
-        with inforepo.repo_dir():
-            inforepo.ensure_rdoinfo()
-            pkginfo = inforepo.rdoinfo.parse_info_file(inforepo.info_file,
-                                                       apply_tag=tags,
-                                                       include_fns=[])
+        pkginfo = inforepo.get_info()
+
         self.packages = pkginfo["packages"]
         if tags:
             # FIXME allow list of tags?
