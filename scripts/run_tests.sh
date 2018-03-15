@@ -107,6 +107,12 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
     PROJECT_TO_BUILD=${PROJECT_DISTRO#*/}
     PROJECT_TO_BUILD=$(sed "s/-distgit//" <<< "${PROJECT_TO_BUILD}")
     # Map to rdoinfo
+    # We have a special situation with Gnocchi pre-Queens. To detect it properly, we need a hack
+    if [[ "$PROJECT_TO_BUILD" = "gnocchi" ]]; then
+        if [[ "${branch}" = "newton" || "${branch}" = "ocata" || "${branch}" = "pike" ]]; then
+            PROJECT_TO_BUILD="gnocchi-legacy"
+        fi
+    fi
     PROJECT_TO_BUILD_MAPPED=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^name | awk '{print $2}')
     PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
 
