@@ -296,10 +296,7 @@ def main():
     if options.order is True:
         # collect info from all spec files
         logger.info("Reading rpm spec files")
-        if pkg_names:
-            projects = sorted(pkg_names)
-        else:
-            projects = sorted([p['name'] for p in packages])
+        projects = sorted([c.project_name for c in toprocess])
 
         speclist = []
         bootstraplist = []
