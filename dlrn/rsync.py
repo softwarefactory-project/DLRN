@@ -54,6 +54,14 @@ def sync_repo(commit):
             # Raise exception, so it can be treated as an error
             raise e
 
+
+def sync_symlinks(commit):
+    config_options = getConfigOptions()
+    rsyncdest = config_options.rsyncdest
+    rsyncport = config_options.rsyncport
+    datadir = os.path.realpath(config_options.datadir)
+
+    if rsyncdest != '':
         # We want to sync the symlinks in a second pass, once all content
         # has been copied, to avoid a race condition it they are copied first
         rsyncpaths = []
@@ -61,6 +69,7 @@ def sync_repo(commit):
             filepath = os.path.join(datadir, "repos", ".", filename)
             rsyncpaths.append(filepath)
 
+        rsh_command = 'ssh -p %s -o StrictHostKeyChecking=no' % rsyncport
         try:
             sh.rsync('-avzR', '--delete-delay',
                      '-e', rsh_command,
