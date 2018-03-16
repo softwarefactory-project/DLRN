@@ -65,8 +65,14 @@ class TestSyncRepo(base.TestCase):
                                os.path.join(repodir, 'status_report.html'),
                                os.path.join(repodir, 'styles.css'),
                                os.path.join(repodir, 'queue.html')],
-                              'user@host:/directory'),
-                    mock.call('-avzR', '--delete-delay', '-e',
+                              'user@host:/directory')]
+        self.assertEqual(sh_mock.call_args_list, expected)
+
+    def test_sync_symlinks(self, sh_mock):
+        repodir = os.path.join(self.config.datadir, 'repos', '.')
+
+        rsync.sync_symlinks(self.commit)
+        expected = [mock.call('-avzR', '--delete-delay', '-e',
                               'ssh -p 30000 -o StrictHostKeyChecking=no',
                               [os.path.join(repodir, 'consistent'),
                                os.path.join(repodir, 'current')],

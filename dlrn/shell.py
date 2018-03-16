@@ -45,6 +45,7 @@ from dlrn.repositories import getsourcebranch
 from dlrn.rpmspecfile import RpmSpecCollection
 from dlrn.rpmspecfile import RpmSpecFile
 from dlrn.rsync import sync_repo
+from dlrn.rsync import sync_symlinks
 from dlrn.utils import dumpshas2file
 from dlrn.utils import import_object
 from dlrn.utils import isknownerror
@@ -364,7 +365,8 @@ def main():
                     logger.error("Received exception %s" % exception)
                 else:
                     if not options.run:
-                        consistent = post_build(status, packages, session)
+                        failures = post_build(status, packages, session)
+                        consistent = (failures == 0)
                 exit_value = process_build_result(status, packages, session,
                                                   toprocess_copy,
                                                   dev_mode=options.dev,
@@ -372,7 +374,8 @@ def main():
                                                   stop=options.stop,
                                                   build_env=options.build_env,
                                                   head_only=options.head_only,
-                                                  consistent=consistent)
+                                                  consistent=consistent,
+                                                  failures=failures)
                 closeSession(session)
 
             if exit_value != 0:
@@ -406,7 +409,8 @@ def main():
                         # Create repo, build versions.csv file.
                         # This needs to be sequential
                         if not options.run:
-                            consistent = post_build(status, packages, session)
+                            failures = post_build(status, packages, session)
+                            consistent = (failures == 0)
                     exit_value = process_build_result(
                         status, packages,
                         session, toprocess,
@@ -415,7 +419,8 @@ def main():
                         stop=options.stop,
                         build_env=options.build_env,
                         head_only=options.head_only,
-                        consistent=consistent)
+                        consistent=consistent,
+                        failures=failures)
                     closeSession(session)
                 if exit_value != 0:
                     exit_code = exit_value
@@ -444,7 +449,8 @@ def main():
 
 def process_build_result(status, packages, session, packages_to_process,
                          dev_mode=False, run_cmd=False, stop=False,
-                         build_env=None, head_only=False, consistent=False):
+                         build_env=None, head_only=False, consistent=False,
+                         failures=0):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
@@ -535,6 +541,7 @@ def process_build_result(status, packages, session, packages_to_process,
         sync_repo(commit)
     except Exception as e:
         logger.error('Repo sync failed for project %s' % project)
+        consistent = False  # If we were consistent before, we are not anymore
         if exit_code == 0:  # The commit was ok, so marking as failed
             exit_code = 1
             # We need to make the commit status be "failed"
@@ -554,6 +561,28 @@ def process_build_result(status, packages, session, packages_to_process,
                                  'see review.log')
 
     session.commit()
+
+    # Generate the current and consistent symlinks
+    dirnames = ['current']
+    datadir = os.path.realpath(config_options.datadir)
+    yumrepodir = os.path.join(datadir, "repos",
+                              commit.getshardedcommitdir())
+    yumrepodir_abs = os.path.join(datadir, yumrepodir)
+    if consistent:
+        dirnames.append('consistent')
+    else:
+        logger.info('%d packages not built correctly: not updating'
+                    ' the consistent symlink' % failures)
+    for dirname in dirnames:
+        target_repo_dir = os.path.join(datadir, "repos", dirname)
+        os.symlink(os.path.relpath(yumrepodir_abs,
+                                   os.path.join(datadir, "repos")),
+                   target_repo_dir + "_")
+        os.rename(target_repo_dir + "_", target_repo_dir)
+
+    # And synchronize them
+    sync_symlinks(commit)
+
     if dev_mode is False:
         if consistent:
             # We have a consistent repo. Let's create a CIVote entry in the DB
@@ -645,21 +674,7 @@ def post_build(status, packages, session):
                                              config_options.baseurl,
                                              commit.getshardedcommitdir()))
 
-    dirnames = ['current']
-
-    if failures == 0:
-        dirnames.append('consistent')
-    else:
-        logger.info('%d packages not built correctly: not updating'
-                    ' the consistent symlink' % failures)
-    for dirname in dirnames:
-        target_repo_dir = os.path.join(datadir, "repos", dirname)
-        os.symlink(os.path.relpath(yumrepodir_abs,
-                                   os.path.join(datadir, "repos")),
-                   target_repo_dir + "_")
-        os.rename(target_repo_dir + "_", target_repo_dir)
-
-    return (failures == 0)
+    return failures
 
 
 def getinfo(package, local=False, dev_mode=False, head_only=False,
