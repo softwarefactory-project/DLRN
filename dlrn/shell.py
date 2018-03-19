@@ -17,6 +17,7 @@ import logging
 import multiprocessing
 import os
 import sys
+import tempfile
 
 from copy import deepcopy
 from functools import partial
@@ -155,6 +156,11 @@ def main():
         options.sequential = True
 
     config_options = ConfigOptions(cp)
+    if options.dev:
+        tmpdb_fd, tmpdb_path = tempfile.mkstemp()
+        logger.info("Using file %s for temporary db" % tmpdb_path)
+        config_options.database_connection = "sqlite:///%s" % tmpdb_path
+
     session = getSession(config_options.database_connection)
     pkginfo_driver = config_options.pkginfo_driver
     global pkginfo
@@ -433,6 +439,9 @@ def main():
             session.commit()
     genreports(packages, options.head_only, session, [])
     closeSession(session)
+
+    if options.dev:
+        os.remove(tmpdb_path)
     return exit_code
 
 
@@ -546,8 +555,8 @@ def process_build_result(status, packages, session, packages_to_process,
                 logger.error('Unable to create review '
                              'see review.log')
 
+    session.commit()
     if dev_mode is False:
-        session.commit()
         if consistent:
             # We have a consistent repo. Let's create a CIVote entry in the DB
             vote = CIVote(commit_id=commit.id, ci_name='consistent',
