@@ -150,16 +150,20 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     try:
         r = urlopen(baseurl + "/delorean-deps.repo")
+        delorean_deps = True
     except Exception as e:
-        logger.error("Could not open %s/delorean-deps.repo. Check the baseurl"
-                     " value in projects.ini, and make sure the file can be "
-                     "downloaded." % baseurl)
-        raise e
+        logger.warning(
+            "Could not open %s/delorean-deps.repo. If some dependent"
+            " repositories must be included in the mock then check the"
+            " baseurl value in projects.ini, and make sure the file can be"
+            " downloaded." % baseurl)
+        delorean_deps = False
 
-    contents.extend(map(lambda x: x.decode('utf8'), r.readlines()))
-    contents = contents + ["\n\"\"\""]
-    with open(newcfg, "w") as fp:
-        fp.writelines(contents)
+    if delorean_deps:
+        contents.extend(map(lambda x: x.decode('utf8'), r.readlines()))
+        contents = contents + ["\n\"\"\""]
+        with open(newcfg, "w") as fp:
+            fp.writelines(contents)
 
     if dev_mode or use_public:
         with open(newcfg, "r") as fp:
