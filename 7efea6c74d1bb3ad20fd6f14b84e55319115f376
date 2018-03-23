@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a41bdd9_ffd43f48",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-03-23T15:52:10Z",
+      "side": 1,
+      "message": "In the near future:\n\ninfo \u003d rdoinfo.info.LocalInfo(\u0027rdo.yml\u0027, local_info\u003dlocal_info_repo)\ninfo.get_info()",
+      "revId": "7efea6c74d1bb3ad20fd6f14b84e55319115f376",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
