@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9a41bdd9_1f1a4318",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-03-23T16:51:22Z",
+      "side": 1,
+      "message": "Actually, we use that same snippet in some more places, so it makes sense to turn it into a function. Thanks!",
+      "parentUuid": "9a41bdd9_3fbb8710",
+      "revId": "35bf34f6ef12e70ac8e6bb1aef1e2a2c187ca480",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a41bdd9_df361bb4",
         "filename": "dlrn/api/dlrn_api.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2018-03-23T16:09:32Z",
       "side": 1,
       "message": "same code in two different places. Someone changes magical 8 to 7 and he only does it one place... Also consider moving this to _repo_hash(commit) for the sake of consistency.",
+      "revId": "35bf34f6ef12e70ac8e6bb1aef1e2a2c187ca480",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a41bdd9_7f1d8f0e",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-03-23T16:51:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a41bdd9_df361bb4",
       "revId": "35bf34f6ef12e70ac8e6bb1aef1e2a2c187ca480",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
