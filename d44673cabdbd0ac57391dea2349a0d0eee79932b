@@ -52,6 +52,24 @@
       "revId": "d44673cabdbd0ac57391dea2349a0d0eee79932b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a41bdd9_c2a964e1",
+        "filename": "doc/specs/zuul-based-architecture.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-03-26T17:43:20Z",
+      "side": 1,
+      "message": "and distroinfo is coming!\nhttps://review.rdoproject.org/r/13016",
+      "parentUuid": "7a016987_d51c8679",
+      "revId": "d44673cabdbd0ac57391dea2349a0d0eee79932b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
