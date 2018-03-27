@@ -44,7 +44,8 @@ def get_commit_url(commit, pkg):
                           "", "", "")
             commit_url = parse.urlunparse(commit_url)
         else:
-            commit_url = upstream_url
+            # Fallback when no cgit URL can be defined
+            commit_url = pkg["upstream"]
     except KeyError:
         # This should not happen, but pkg['upstream'] may not be present
         # after some error in the gitrepo driver
