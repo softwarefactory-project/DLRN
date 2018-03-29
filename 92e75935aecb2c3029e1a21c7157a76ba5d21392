@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a46c9f1_5e969595",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-03-29T16:41:39Z",
+      "side": 1,
+      "message": "tmpdb_fd seems unused, so it could be just\n\n_, tmpdb_path \u003d ...",
+      "revId": "92e75935aecb2c3029e1a21c7157a76ba5d21392",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
