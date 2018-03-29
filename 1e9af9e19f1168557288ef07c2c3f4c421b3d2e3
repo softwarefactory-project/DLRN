@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a46c9f1_be80f947",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-03-29T16:46:15Z",
+      "side": 1,
+      "message": "Yes good idea.",
+      "parentUuid": "7a46c9f1_fe9f61b2",
+      "revId": "1e9af9e19f1168557288ef07c2c3f4c421b3d2e3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a46c9f1_9ea41d09",
         "filename": "dlrn/reporting.py",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7a46c9f1_7e9351a4",
+        "filename": "dlrn/reporting.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-03-29T16:46:15Z",
+      "side": 1,
+      "message": "rdoinfo should raise an exception if that field that is mandatory is empty ?",
+      "parentUuid": "7a46c9f1_9ea41d09",
+      "revId": "1e9af9e19f1168557288ef07c2c3f4c421b3d2e3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a46c9f1_bea9d9e1",
         "filename": "dlrn/reporting.py",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2018-03-29T15:36:35Z",
       "side": 1,
       "message": "If I get it only git.openstack.org and github.com will work now? If the problem is ugly error when pkg[\"upstream\"] is missing, why not check if upstream is present and try some reasonable url default, I guess cgit one?",
+      "revId": "1e9af9e19f1168557288ef07c2c3f4c421b3d2e3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a46c9f1_feed2126",
+        "filename": "dlrn/reporting.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-03-29T16:46:15Z",
+      "side": 1,
+      "message": "even before that patch others netloc than both supported raised error. Yes we can guess something by assuming cgit on the same format than for git.openstack.org but that\u0027s true if get_commit_url can fetch the info from pkg[\"cgit\"] it will be better than hardcoded values :)",
+      "parentUuid": "7a46c9f1_bea9d9e1",
       "revId": "1e9af9e19f1168557288ef07c2c3f4c421b3d2e3",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
