@@ -104,6 +104,29 @@
       "revId": "1e9af9e19f1168557288ef07c2c3f4c421b3d2e3",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a46c9f1_beec7990",
+        "filename": "dlrn/reporting.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-03T15:51:23Z",
+      "side": 1,
+      "message": "Ok, so the issue is that upstream_url is not a string, but a tuple with the result from parse.urlsplit.\n\nMaybe a better approach would be to use pkg[\"upstream\"] as a fallback when the URL does not match any recognized pattern.\n\nIdeally, we would have some regexp defining the URL for a commit in rdoinfo, but I\u0027m not 100% sure this is needed, or a DLRN-specific detail.",
+      "range": {
+        "startLine": 47,
+        "startChar": 25,
+        "endLine": 47,
+        "endChar": 27
+      },
+      "revId": "1e9af9e19f1168557288ef07c2c3f4c421b3d2e3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
