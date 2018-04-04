@@ -22,6 +22,30 @@
       "revId": "6276ff56234c39ac880e137b0425915c3d705f98",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a43c5e1_3daaaf71",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 662,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-04-04T14:30:51Z",
+      "side": 1,
+      "message": "Yup, this isn\u0027t exactly shell(.py) related.",
+      "parentUuid": "7a016987_b56d8ace",
+      "range": {
+        "startLine": 619,
+        "startChar": 1,
+        "endLine": 662,
+        "endChar": 19
+      },
+      "revId": "6276ff56234c39ac880e137b0425915c3d705f98",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
