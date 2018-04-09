@@ -210,6 +210,47 @@ paths:
             type: array
             items:
               $ref: '#/definitions/CIVote'
+  /api/metrics/builds:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Retrieve statistics on the number of builds during a certain period,
+        optionally filtered by package name.
+      parameters:
+        - name: params
+          in: body
+          description: The JSON params to post
+          required: true
+          schema:
+            type: object
+            required:
+              - start_date
+              - end_date
+            properties:
+              start_date:
+                description: |
+                  Start date for the period, in YYYY-mm-dd format.
+                  The start date is included in the reference period. information for.
+                type: string
+              end_date:
+                description: |
+                  End date for the period, in YYYY-mm-dd format.
+                  The end date is not included in the period, so it is
+                  start_date <= date < end_date.
+                type: string
+              package_name:
+                description: |
+                  If set to a value, report metrics only for the specified
+                  package name.
+                type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Metrics for the period
+          schema:
+            $ref: '#/definitions/Metrics'
   /api/civotes.html:
     get:
       description: |
@@ -224,7 +265,7 @@ paths:
       responses:
         # Response code
         200:
-          description: An HTML page ith the CI votes.
+          description: An HTML page with the CI votes.
   /api/civotes_detail.html:
     get:
       description: |
@@ -249,6 +290,7 @@ paths:
           description: |
             Filter on this CI name.
             Either ci_name or a combination of commit_hash+distro_hash are required.
+          type: string
         - name: success
           in: query
           description: If set filter for successful/failed CI votes
@@ -541,3 +583,15 @@ definitions:
       repo_url:
         type: string
         description: Base repository URL for imported remote repo
+  Metrics:
+    type: object
+    properties:
+      succeeded:
+        type: integer
+        description: Number of commits that were built successfully in the period
+      failed:
+        type: integer
+        description: Number of commits that failed to build in the period
+      total:
+        type: integer
+        description: Total number of commits processed in the period
