@@ -568,3 +568,73 @@ class TestGetPromotions(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
+
+
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestMetrics(DLRNAPITestCase):
+    def test_metrics_json(self, db2_mock, db_mock):
+        response = self.app.get('/api/metrics/builds')
+        self.assertEqual(response.status_code, 415)
+
+    def test_metrics_missing_start_date(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(end_date='0'))
+        response = self.app.get('/api/metrics/builds',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_metrics_wrong_date_format(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(start_date='0', end_date='0'))
+        response = self.app.get('/api/metrics/builds',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_metrics_notindate(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(start_date='2011-09-07',
+                                   end_date='2011-09-09'))
+        response = self.app.get('/api/metrics/builds',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['total'], 0)
+        self.assertEqual(data['succeeded'], 0)
+        self.assertEqual(data['failed'], 0)
+
+    def test_metrics_success(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(start_date='2015-09-07',
+                                   end_date='2015-09-09'))
+        response = self.app.get('/api/metrics/builds',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['total'], 2)
+        self.assertEqual(data['succeeded'], 2)
+        self.assertEqual(data['failed'], 0)
+
+    def test_metrics_filtered(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(start_date='2015-09-07',
+                                   end_date='2015-09-09',
+                                   package_name='python-pysaml2'))
+        response = self.app.get('/api/metrics/builds',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['total'], 1)
+        self.assertEqual(data['succeeded'], 1)
+        self.assertEqual(data['failed'], 0)
+
+    def test_metrics_filtered_nopackage(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(start_date='2015-09-07',
+                                   end_date='2015-09-09',
+                                   package_name='python-pysaml'))
+        response = self.app.get('/api/metrics/builds',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['total'], 0)

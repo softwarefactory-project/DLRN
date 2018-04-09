@@ -277,6 +277,62 @@ def promotions_GET():
     return jsonify(data)
 
 
+@app.route('/api/metrics/builds', methods=['GET'])
+def get_metrics():
+    # start_date: start date for period, in YYYY-mm-dd format (UTC)
+    # end_date: end date for period, in YYYY-mm-dd format (UTC)
+    # package_name (optional): return metrics for package_name
+    if request.headers['Content-Type'] != 'application/json':
+        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
+
+    try:
+        start_date = request.json['start_date']
+        end_date = request.json['end_date']
+    except KeyError:
+        raise InvalidUsage('Missing parameters', status_code=400)
+    package_name = request.json.get('package_name', None)
+
+    # Convert dates to timestamp
+    fmt = '%Y-%m-%d'
+    try:
+        start_timestamp = int(time.mktime(time.strptime(start_date, fmt)))
+        end_timestamp = int(time.mktime(time.strptime(end_date, fmt)))
+    except ValueError:
+        raise InvalidUsage('Invalid date format, it must be YYYY-mm-dd',
+                           status_code=400)
+
+    # Find the commits count for each metric
+    session = getSession(app.config['DB_PATH'])
+    commits = session.query(Commit).filter(
+        Commit.status == 'SUCCESS',
+        Commit.dt_build >= start_timestamp,
+        Commit.dt_build < end_timestamp)
+
+    if package_name:
+        commits = commits.filter(
+            Commit.project_name == package_name)
+
+    successful_commits = commits.count()
+
+    commits = session.query(Commit).filter(
+        Commit.status == 'FAILED',
+        Commit.dt_build >= start_timestamp,
+        Commit.dt_build <= end_timestamp)
+
+    if package_name:
+        commits = commits.filter(
+            Commit.project_name == package_name)
+
+    failed_commits = commits.count()
+    total_commits = successful_commits + failed_commits
+
+    result = {'succeeded': successful_commits,
+              'failed': failed_commits,
+              'total': total_commits}
+    closeSession(session)
+    return jsonify(result), 200
+
+
 @app.route('/api/last_tested_repo', methods=['POST'])
 @auth.login_required
 def last_tested_repo_POST():
