@@ -120,7 +120,7 @@ user                 string      user who created the CI vote
 ===================  ==========  ==============================================================
 
 GET /api/promotions
---------------------
+-------------------
 
 Get all the promotions, optionally for a specific repository or promotion name.  The output
 will be sorted by the promotion timestamp, with the newest first, and limited to 100 results
@@ -163,6 +163,40 @@ user            string      user who created the promotion
 ==============  ==========  ==============================================================
 
 The array will be sorted by the promotion timestamp, with the newest first.
+
+GET /api/metrics/builds
+-----------------------
+
+Retrieve statistics on the number of builds during a certain period, optionally filtered by
+package name.
+
+Normal response codes: 200
+
+Error response codes: 400, 415
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+start_date           string      Start date for the period, in YYYY-mm-dd format. The start
+                                 date is included in the reference period.
+end_date             string      End date for the period, in YYYY-mm-dd format. The end date is
+                                 not included in the period, so it is
+                                 start_date <= date < end_date.
+package_name         string      If set to a value, report metrics only for the specified
+                     (optional)  package name.
+===================  ==========  ==============================================================
+
+
+Response:
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+succeeded            integer     Number of commits that were built successfully in the period
+failed               integer     Number of commits that failed to build in the period
+total                integer     Total number of commits processed in the period
+===================  ==========  ==============================================================
+
 
 POST /api/last_tested_repo
 --------------------------
