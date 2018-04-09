@@ -71,6 +71,7 @@
               artg_compressed_gating_repo: '/tmp/gating_repo.tar.gz'
               build_repo_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/..'
               dlrn_pre_installed: true
+              release: 'master'
         dest: '{{ ansible_user_dir }}/build-packages.yaml'
 
     - name: Execute oooq Ansible playbook
