@@ -520,7 +520,13 @@ definitions:
       user:
         type: string
         description: User who created this promotion
-  PromotionQuery:
+      repo_hash:
+        type: string
+        description: Repository hash, composed of the commit_hash and short distro_hash
+      repo_url:
+        type: string
+        description: Full URL of the promoted repository.
+PromotionQuery:
     type: object
     properties:
       commit_hash:
