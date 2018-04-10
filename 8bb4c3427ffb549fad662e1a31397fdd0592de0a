@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a43c5e1_ccebd7af",
+        "filename": "playbooks/dlrn-api-functional.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-04-10T16:43:31Z",
+      "side": 1,
+      "message": "Well, this sure is an improvement ;)",
+      "revId": "8bb4c3427ffb549fad662e1a31397fdd0592de0a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
