@@ -132,6 +132,12 @@ def import_commit(repo_url, config_file, db_connection=None,
                 status = [commit, built_rpms, commit.notes, None]
                 post_build(status, packages, session)
             else:
+                pkg = [p for p in packages if p['name'] == package][0]
+                pkginfo.getinfo(project=pkg["name"], package=pkg,
+                                since='-1', local=False, dev_mode=False)
+                commit.distgit_dir = pkginfo.distgit_dir(pkg['name'])
+                commit.repo_dir = os.path.join(
+                    config_options.datadir, pkg['name'])
                 status = [commit, '', '', commit.notes]
             process_build_result(status, packages, session, [])
             closeSession(session)   # Keep one session per commit
