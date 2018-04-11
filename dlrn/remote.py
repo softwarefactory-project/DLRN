@@ -78,6 +78,9 @@ def import_commit(repo_url, config_file, db_connection=None,
         else:
             session = getSession(config_options.database_connection)
         package = commit.project_name
+        pkg = [p for p in packages if p['name'] == package][0]
+        pkginfo.getinfo(project=pkg["name"], package=pkg,
+                        since='-1', dev_mode=False)
         old_commit = getLastProcessedCommit(session, package)
         if old_commit:
             if old_commit.dt_commit >= commit.dt_commit:
