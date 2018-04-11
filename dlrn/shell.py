@@ -542,15 +542,16 @@ def process_build_result(status, packages, session, packages_to_process,
             commit.notes = getattr(e, "message", notes)
             session.add(commit)
             # And open a review if needed
-            if build_env:
-                env_vars = list(build_env)
-            else:
-                env_vars = []
-            try:
-                submit_review(commit, packages, env_vars)
-            except Exception:
-                logger.error('Unable to create review '
-                             'see review.log')
+            if config_options.gerrit is not None:
+                if build_env:
+                    env_vars = list(build_env)
+                else:
+                    env_vars = []
+                try:
+                    submit_review(commit, packages, env_vars)
+                except Exception:
+                    logger.error('Unable to create review '
+                                 'see review.log')
 
     session.commit()
     if dev_mode is False:
