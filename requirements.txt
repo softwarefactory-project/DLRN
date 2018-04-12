@@ -14,3 +14,4 @@ requests
 Flask
 Flask-HTTPAuth
 passlib>=1.6.5
+distroinfo
