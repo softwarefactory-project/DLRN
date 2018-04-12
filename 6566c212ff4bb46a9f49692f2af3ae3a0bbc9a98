@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a50d1a3_5fc44f91",
+        "filename": "dlrn/remote.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-12T09:57:53Z",
+      "side": 1,
+      "message": "Some comment on why this is needed would be nice. I see the idea, but in the future someone will wonder why we do this.",
+      "revId": "6566c212ff4bb46a9f49692f2af3ae3a0bbc9a98",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a50d1a3_7fc10b80",
+        "filename": "dlrn/remote.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-12T09:57:53Z",
+      "side": 1,
+      "message": "So we\u0027re changing the distgit_dir and repo_dir here, because the Zuul worker\u0027s directories could be different to the master\u0027s ones, right? Again, some comment would help :).",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 56
+      },
+      "revId": "6566c212ff4bb46a9f49692f2af3ae3a0bbc9a98",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
