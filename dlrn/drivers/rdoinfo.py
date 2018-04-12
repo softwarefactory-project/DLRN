@@ -30,15 +30,13 @@ import logging
 import os
 import sh
 
-from rdopkg.actionmods import rdoinfo
-import rdopkg.utils.log
-from rdopkg.conf import cfg as rdopkg_cfg
+from distroinfo import query
+from distroinfo import info
+
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-rdoinfo-driver")
 logger.setLevel(logging.INFO)
-
-rdopkg.utils.log.set_colors('no')
 
 
 def buildtagsonly(package):
@@ -63,21 +61,22 @@ class RdoInfoDriver(PkgInfoDriver):
         inforepo = None
 
         if local_info_repo:
-            inforepo = rdoinfo.RdoinfoRepo(
-                local_repo_path=local_info_repo,
-                apply_tag=tags, include_fns=[])
+            inforepo = info.DistroInfo(
+                info_files='rdo.yml',
+                local_info=local_info_repo)
         elif self.config_options.rdoinfo_repo:
-            inforepo = rdoinfo.RdoinfoRepo(
-                rdopkg_cfg['HOME_DIR'], self.config_options.rdoinfo_repo,
-                apply_tag=tags, include_fns=[])
-            inforepo.init()
+            inforepo = info.DistroInfo(
+                info_files='rdo.yml',
+                remote_git_info=self.config_options.rdoinfo_repo)
         else:
-            inforepo = rdoinfo.get_default_inforepo(
-                apply_tag=tags, include_fns=[])
-            # rdopkg will clone/pull rdoinfo repo as needed (~/.rdopkg/rdoinfo)
-            inforepo.init()
+            # distroinfo will clone/pull the rdoinfo repo as needed, and
+            # store it under ~/.distroinfo/cache
+            inforepo = info.DistroInfo(
+                info_files='rdo.yml',
+                remote_info=('https://raw.githubusercontent.com/'
+                             'redhat-openstack/rdoinfo/master/'))
 
-        pkginfo = inforepo.get_info()
+        pkginfo = inforepo.get_info(apply_tag=tags)
 
         self.packages = pkginfo["packages"]
         if tags:
