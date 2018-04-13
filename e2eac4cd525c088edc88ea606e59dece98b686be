@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3a50d1a3_6220924a",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-13T11:33:08Z",
+      "side": 1,
+      "message": "A decorator looks like a good idea, but that should be in a separate patch (so it can be done for all methods).",
+      "parentUuid": "3a50d1a3_a2c9baae",
+      "range": {
+        "startLine": 305,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 79
+      },
+      "revId": "e2eac4cd525c088edc88ea606e59dece98b686be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a50d1a3_c2ce46b4",
         "filename": "dlrn/api/dlrn_api.py",
         "patchSetId": 3
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "3a50d1a3_221a8a18",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-13T11:33:08Z",
+      "side": 1,
+      "message": "I hadn\u0027t thought of that option. It looks ok to me, @David what do you think?\n\nIf we change this, I\u0027ll have to adapt a couple things in the documentation, and the dlrnapi_client review.",
+      "parentUuid": "3a50d1a3_c2ce46b4",
+      "range": {
+        "startLine": 309,
+        "startChar": 0,
+        "endLine": 310,
+        "endChar": 43
+      },
+      "revId": "e2eac4cd525c088edc88ea606e59dece98b686be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a50d1a3_62c41292",
         "filename": "dlrn/api/dlrn_api.py",
         "patchSetId": 3
@@ -59,6 +107,30 @@
       "writtenOn": "2018-04-13T10:34:33Z",
       "side": 1,
       "message": "Not sure how it works under the hound but does it trigger two sql queries ? If yes could we build a kwargs and add the Commit.project_name if package_name is specified. Then pass the kwargs once to filter ?",
+      "range": {
+        "startLine": 326,
+        "startChar": 0,
+        "endLine": 333,
+        "endChar": 48
+      },
+      "revId": "e2eac4cd525c088edc88ea606e59dece98b686be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a50d1a3_02d8ae52",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-13T11:33:08Z",
+      "side": 1,
+      "message": "That\u0027s pretty much handled transparently by SQLAlchemy, but I think there is no second query (based on what I\u0027ve read about it).",
+      "parentUuid": "3a50d1a3_62c41292",
       "range": {
         "startLine": 326,
         "startChar": 0,
