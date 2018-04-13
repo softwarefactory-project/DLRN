@@ -13,6 +13,7 @@
 from datetime import datetime
 from datetime import timedelta
 from distutils.util import strtobool
+from functools import wraps
 
 from dlrn.api import app
 from dlrn.api.utils import auth
@@ -54,6 +55,16 @@ def _get_config_options(config_file):
 
 def _repo_hash(commit):
     return "%s_%s" % (commit.commit_hash, commit.distro_hash[:8])
+
+
+def _json_media_type(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if request.headers.get('Content-Type') != 'application/json':
+            raise InvalidUsage('Unsupported Media Type, use JSON',
+                               status_code=415)
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 def _get_commit(session, commit_hash, distro_hash):
@@ -114,13 +125,11 @@ def getVote(session, timestamp, success=None, job_id=None, fallback=True):
 
 
 @app.route('/api/repo_status', methods=['GET'])
+@_json_media_type
 def repo_status():
     # commit_hash: commit hash
     # distro_hash: distro hash
     # success(optional): only report successful/unsuccessful votes
-    if request.headers['Content-Type'] != 'application/json':
-        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
-
     commit_hash = request.json.get('commit_hash', None)
     distro_hash = request.json.get('distro_hash', None)
     success = request.json.get('success', None)
@@ -162,6 +171,7 @@ def repo_status():
 
 
 @app.route('/api/last_tested_repo', methods=['GET'])
+@_json_media_type
 def last_tested_repo_GET():
     # max_age: Maximum age in hours, used as base for the search
     # success(optional): find repos with a successful/unsuccessful vote
@@ -171,9 +181,6 @@ def last_tested_repo_GET():
     #                            search for. Defaults to false
     # previous_job_id(optional): CI name to search for, if sequential_mode is
     #                            True
-    if request.headers['Content-Type'] != 'application/json':
-        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
-
     max_age = request.json.get('max_age', None)
     job_id = request.json.get('job_id', None)
     success = request.json.get('success', None)
@@ -228,15 +235,13 @@ def last_tested_repo_GET():
 
 
 @app.route('/api/promotions', methods=['GET'])
+@_json_media_type
 def promotions_GET():
     # commit_hash(optional): commit hash
     # distro_hash(optional): distro hash
     # promote_name(optional): only report promotions for promote_name
     # offset(optional): skip the first X promotions (only 100 are shown
     #                   per query)
-    if request.headers['Content-Type'] != 'application/json':
-        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
-
     commit_hash = request.json.get('commit_hash', None)
     distro_hash = request.json.get('distro_hash', None)
     promote_name = request.json.get('promote_name', None)
@@ -301,13 +306,11 @@ def promotions_GET():
 
 
 @app.route('/api/metrics/builds', methods=['GET'])
+@_json_media_type
 def get_metrics():
     # start_date: start date for period, in YYYY-mm-dd format (UTC)
     # end_date: end date for period, in YYYY-mm-dd format (UTC)
     # package_name (optional): return metrics for package_name
-    if request.headers['Content-Type'] != 'application/json':
-        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
-
     try:
         start_date = request.json['start_date']
         end_date = request.json['end_date']
@@ -358,6 +361,7 @@ def get_metrics():
 
 @app.route('/api/last_tested_repo', methods=['POST'])
 @auth.login_required
+@_json_media_type
 def last_tested_repo_POST():
     # max_age: Maximum age in hours, used as base for the search
     # success(optional): find repos with a successful/unsuccessful vote
@@ -368,9 +372,6 @@ def last_tested_repo_POST():
     #                            search for. Defaults to false
     # previous_job_id(optional): CI name to search for, if sequential_mode is
     #                            True
-    if request.headers['Content-Type'] != 'application/json':
-        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
-
     max_age = request.json.get('max_age', None)
     my_job_id = request.json.get('reporting_job_id', None)
     job_id = request.json.get('job_id', None)
@@ -435,6 +436,7 @@ def last_tested_repo_POST():
 
 @app.route('/api/report_result', methods=['POST'])
 @auth.login_required
+@_json_media_type
 def report_result():
     # job_id: name of CI
     # commit_hash: commit hash
@@ -443,10 +445,6 @@ def report_result():
     # timestamp: CI execution timestamp
     # success: boolean
     # notes(optional): notes
-
-    if request.headers['Content-Type'] != 'application/json':
-        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
-
     try:
         commit_hash = request.json['commit_hash']
         distro_hash = request.json['distro_hash']
@@ -489,14 +487,11 @@ def report_result():
 
 @app.route('/api/promote', methods=['POST'])
 @auth.login_required
+@_json_media_type
 def promote():
     # commit_hash: commit hash
     # distro_hash: distro hash
     # promote_name: symlink name
-
-    if request.headers['Content-Type'] != 'application/json':
-        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
-
     try:
         commit_hash = request.json['commit_hash']
         distro_hash = request.json['distro_hash']
@@ -559,11 +554,9 @@ def promote():
 
 @app.route('/api/remote/import', methods=['POST'])
 @auth.login_required
+@_json_media_type
 def remote_import():
     # repo_url: repository URL to import from
-    if request.headers['Content-Type'] != 'application/json':
-        raise InvalidUsage('Unsupported Media Type, use JSON', status_code=415)
-
     try:
         repo_url = request.json['repo_url']
     except KeyError:
