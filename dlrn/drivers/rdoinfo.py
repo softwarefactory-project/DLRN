@@ -47,6 +47,13 @@ def buildtagsonly(package):
             'build-tags-only' in package)
 
 
+def buildtagsfrom(package):
+    if 'tags-from' in package:
+        return package['tags-from']
+    else:
+        return None
+
+
 class RdoInfoDriver(PkgInfoDriver):
 
     def __init__(self, *args, **kwargs):
@@ -95,6 +102,7 @@ class RdoInfoDriver(PkgInfoDriver):
         repo = package['upstream']
         distro = package['master-distgit']
         tags_only = buildtagsonly(package)
+        tags_from = buildtagsfrom(package)
 
         distro_dir = self._distgit_clone_dir(package['name'])
         distro_dir_full = self.distgit_dir(package['name'])
@@ -157,6 +165,18 @@ class RdoInfoDriver(PkgInfoDriver):
                 lines = git.log("--pretty=format:'%ct %H'",
                                 since, "--first-parent",
                                 "--reverse")
+
+            if tags_from:
+                logger.info('Taking tags from %s' % tags_from)
+                git.merge('-s', 'ours', '-m', '"fake merge tags"', tags_from)
+                if local:
+                    # When using tags_from, we want to make sure the dummy
+                    # commit is ignored, even when calculating the short hash.
+                    # For this, we need to reset the branch to source_branch,
+                    # which requires us to know the commit hash for the local
+                    # commit.
+                    source_branch = str(git.log('-n1', '--format=format:%H',
+                                        'HEAD~1'))
 
             for line in lines:
                 dt, commit_hash = str(line).strip().strip("'").split(" ")[:2]

@@ -211,6 +211,10 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
         os.environ['ADDITIONAL_MOCK_OPTIONS'] = '-D repo_bootstrap 1'
     dlrn.shell.pkginfo.preprocess(package_name=commit.project_name)
 
+    # We may do some git repo manipulation, so we need to make sure the
+    # right branch is there
+    os.environ['SOURCE_BRANCH'] = commit.commit_branch
+
     run(os.path.join(scriptsdir, "build_rpm.sh"), commit, env_vars,
         dev_mode, use_public, bootstrap)
 

@@ -75,18 +75,19 @@ class TestGetLastProcessedCommit(TestsWithData):
 class TestGetLastBuiltCommit(TestsWithData):
     def test_noretry(self):
         commit = \
-            db.getLastBuiltCommit(self.session, 'python-pysaml2', None)
+            db.getLastBuiltCommit(self.session, 'python-pysaml2', 'master')
         self.assertEqual(commit.dt_build, 1444139517)
 
     def test_withretry(self):
         # In our sample data the most recent of these has status == RETRY
         commit = \
-            db.getLastBuiltCommit(self.session, 'python-tripleoclient', None)
+            db.getLastBuiltCommit(self.session, 'python-tripleoclient',
+                                  'master')
         self.assertEqual(commit.dt_build, 1444033941)
 
     def test_newproject(self):
         commit = \
-            db.getLastBuiltCommit(self.session, 'python-newproject', None)
+            db.getLastBuiltCommit(self.session, 'python-newproject', 'master')
         self.assertEqual(commit, None)
 
 
