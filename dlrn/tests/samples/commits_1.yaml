@@ -5,6 +5,7 @@ commits:
 - commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc
   distro_hash: c31d1b18eb5ab5aed6721fc4fad06c9bd242490c
   extended_hash:
+  commit_branch: 'master'
   dt_build: '1441245379'
   dt_commit: '1441245153'
   dt_distro: '1440598801'
@@ -18,6 +19,7 @@ commits:
 - commit_hash: 17234e9ab9dfab4cf5600f67f1d24db5064f1025
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
   extended_hash:
+  commit_branch: 'master'
   dt_build: '1441635089'
   dt_commit: '1441634092'
   dt_distro: '1431949433'
@@ -31,6 +33,7 @@ commits:
 - commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc
   distro_hash: 8170b8686c38bafb6021d998e2fb268ab26ccf65
   extended_hash: 'abcdef12345678'
+  commit_branch: 'master'
   dt_build: '1441669026'
   dt_commit: '1441245153'
   dt_distro: '1441668907'
@@ -44,6 +47,7 @@ commits:
 - commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc
   distro_hash: 885e80778edb6cbb8ee4d8909623be8062369a04
   extended_hash:
+  commit_branch: 'master'
   dt_build: '1441675005'
   dt_commit: '1441245153'
   dt_distro: '1441674764'
@@ -57,6 +61,7 @@ commits:
 - commit_hash: 12edde8a53c7299105bb8297c6f31d3a458615ab
   distro_hash: 354991d934d4217de5cfa447aabda684489544b5
   extended_hash:
+  commit_branch: 'master'
   dt_build: '1441808572'
   dt_commit: '1441722142'
   dt_distro: '1441806541'
@@ -69,6 +74,7 @@ commits:
   status: SUCCESS
 - commit_hash: 80f6969520b526b01c210b1c680565bef8a1f8ad
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  commit_branch: 'master'
   dt_build: '1441873940'
   dt_commit: '1441871809'
   dt_distro: '1431949433'
@@ -81,6 +87,7 @@ commits:
   status: FAILED
 - commit_hash: e4f71ada86ee4a42287cf401b77d48c9f98ca5aa
   distro_hash: 354991d934d4217de5cfa447aabda684489544b5
+  commit_branch: 'master'
   dt_build: '1442484380'
   dt_commit: '1442356365'
   dt_distro: '1441806541'
@@ -93,6 +100,7 @@ commits:
   status: SUCCESS
 - commit_hash: 459549c9ab7fef91b2dc8986bc0643bb2f6ec0c8
   distro_hash: 885e80778edb6cbb8ee4d8909623be8062369a04
+  commit_branch: 'master'
   dt_build: '1442487441'
   dt_commit: '1442426906'
   dt_distro: '1441674764'
@@ -105,6 +113,7 @@ commits:
   status: FAILED
 - commit_hash: ae9d27e5100f002f55ad6eb2b252a0aa5f16a336
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  commit_branch: 'master'
   dt_build: '1442559681'
   dt_commit: '1442559408'
   dt_distro: '1431949433'
@@ -117,6 +126,7 @@ commits:
   status: FAILED
 - commit_hash: 6abf557aa1d8fff0aa21f8eba6cd18302c2c86ff
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
+  commit_branch: 'master'
   dt_build: '1443443807'
   dt_commit: '1443426648'
   dt_distro: '1442515488'
@@ -129,6 +139,7 @@ commits:
   status: SUCCESS
 - commit_hash: b43d00e1a72187d5e82db4653cc39e3d6ac2788b
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
+  commit_branch: 'master'
   dt_build: '1443690411'
   dt_commit: '1443690340'
   dt_distro: '1442515488'
@@ -141,6 +152,7 @@ commits:
   status: SUCCESS
 - commit_hash: 688945fdcfc1d6cec45ee83843cd6c65bc3f0f43
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  commit_branch: 'master'
   dt_build: '1443697599'
   dt_commit: '1443697512'
   dt_distro: '1431949433'
@@ -153,6 +165,7 @@ commits:
   status: RETRY
 - commit_hash: 688945fdcfc1d6cec45ee83843cd6c65bc3f0f43
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  commit_branch: 'master'
   dt_build: '1443697899'
   dt_commit: '1443697512'
   dt_distro: '1431949433'
@@ -165,6 +178,7 @@ commits:
   status: RETRY
 - commit_hash: 688945fdcfc1d6cec45ee83843cd6c65bc3f0f43
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  commit_branch: 'master'
   dt_build: '1443698189'
   dt_commit: '1443697512'
   dt_distro: '1431949433'
@@ -177,6 +191,7 @@ commits:
   status: RETRY
 - commit_hash: 688945fdcfc1d6cec45ee83843cd6c65bc3f0f43
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  commit_branch: 'master'
   dt_build: '1443702231'
   dt_commit: '1443697512'
   dt_distro: '1431949433'
@@ -189,6 +204,7 @@ commits:
   status: SUCCESS
 - commit_hash: 39cc225c11e540bb8dfe8ff056296da75fa33c14
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
+  commit_branch: 'master'
   dt_build: '1443703325'
   dt_commit: '1443702747'
   dt_distro: '1442515488'
@@ -201,6 +217,7 @@ commits:
   status: SUCCESS
 - commit_hash: 38539fdfc44fa87f3034dac17606a435b6f438a7
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  commit_branch: 'master'
   dt_build: '1443727500'
   dt_commit: '1443724924'
   dt_distro: '1431949433'
@@ -213,6 +230,7 @@ commits:
   status: SUCCESS
 - commit_hash: 7d21bb1f4d9068b1ee5f2237d77496bb9afe63ac
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
+  commit_branch: 'master'
   dt_build: '1443870415'
   dt_commit: '1443870287'
   dt_distro: '1442515488'
@@ -225,6 +243,7 @@ commits:
   status: SUCCESS
 - commit_hash: a12cc2a979f5203e4c136684aa35741f4a73d1ce
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  commit_branch: 'master'
   dt_build: '1443968214'
   dt_commit: '1443968113'
   dt_distro: '1431949433'
@@ -237,6 +256,7 @@ commits:
   status: SUCCESS
 - commit_hash: 1da7b10e55abf8c518e8f61ee7966188f0405f59
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
+  commit_branch: 'master'
   dt_build: '1444033941'
   dt_commit: '1444033792'
   dt_distro: '1442515488'
@@ -249,6 +269,7 @@ commits:
   status: SUCCESS
 - commit_hash: 3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  commit_branch: 'master'
   dt_build: '1444139227'
   dt_commit: '1444139038'
   dt_distro: '1431949433'
@@ -262,6 +283,7 @@ commits:
 - commit_hash: 3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
   extended_hash: 'cafecafe'
+  commit_branch: 'master'
   dt_build: '1444139517'
   dt_commit: '1444139038'
   dt_distro: '1431949433'
@@ -274,6 +296,7 @@ commits:
   status: SUCCESS
 - commit_hash: 7ac2745f11522d46b8fed8c015922b93f68a6488
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
+  commit_branch: 'master'
   dt_build: '1444215992'
   dt_commit: '1444203303'
   dt_distro: '1442515488'
