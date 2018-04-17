@@ -90,7 +90,7 @@ class TestBuild(base.TestCase):
     def test_build(self, ld_mock, sh_mock, env_mock, rc_mock):
         commit = db.getCommits(self.session)[-1]
         try:
-            build(None, commit, None, False, False, False, True)
+            build([], commit, None, False, False, False, True)
         except Exception as e:
             self.assertIn("No rpms built for", str(e))
 
