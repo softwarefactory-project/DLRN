@@ -95,6 +95,10 @@ else
     if [ -z "$version" ]; then
         version=0.0.1
     fi
+
+    # Reset the git repository to the right commit
+    git checkout -f ${SOURCE_COMMIT}
+
     setversionandrelease "$version" $(git log --abbrev=7 -n1 --format=format:%h)
     if [ -r metadata.json ]; then
         # Detect if this is am OpenStack puppet module

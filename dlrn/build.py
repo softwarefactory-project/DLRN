@@ -57,6 +57,13 @@ def build_worker(packages, commit, run_cmd=False, build_env=None,
         return [commit, '', '', e]
 
 
+def get_version_from(packages, project_name):
+    for package in packages:
+        if package['name'] == project_name:
+            return package.get('version-from')
+    return None
+
+
 def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
           sequential):
     config_options = getConfigOptions()
@@ -67,10 +74,12 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
     datadir = os.path.realpath(config_options.datadir)
     yumrepodir = _get_yumrepodir(commit)
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
+    version_from = get_version_from(packages, project_name)
 
     try:
         build_rpm_wrapper(commit, dev_mode, use_public, bootstrap,
-                          env_vars, sequential)
+                          env_vars, sequential,
+                          version_from=version_from)
     except Exception as e:
         logger.error('Build failed. See logs at: %s/%s/' % (datadir,
                                                             yumrepodir))
@@ -100,7 +109,7 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
 
 
 def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
-                      sequential):
+                      sequential, version_from=None):
     config_options = getConfigOptions()
     # Get the worker id
     if sequential is True:
@@ -229,8 +238,12 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
             if 'DLRN_KEEP_TARBALL' in os.environ:
                 del os.environ['DLRN_KEEP_TARBALL']
 
+    # We may do some git repo manipulation, so we need to make sure the
+    # right commit is there
+    os.environ['SOURCE_COMMIT'] = commit.commit_hash
+
     run(os.path.join(scriptsdir, "build_srpm.sh"), commit, env_vars,
-        dev_mode, use_public, bootstrap)
+        dev_mode, use_public, bootstrap, version_from=version_from)
 
     # SRPM is built, now build the RPM using the driver
     build_driver = config_options.build_driver
@@ -244,7 +257,7 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
 
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
-        do_build=True):
+        do_build=True, version_from=None):
     config_options = getConfigOptions()
     datadir = os.path.realpath(config_options.datadir)
     yumrepodir = _get_yumrepodir(commit)
@@ -262,6 +275,10 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
 
     git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
     git.reset("--hard", commit_hash)
+
+    if version_from:
+        logger.info('Taking tags to define version from %s' % version_from)
+        git.merge('-s', 'ours', '-m', '"fake merge tags"', version_from)
 
     run_cmd = []
     if env_vars:
