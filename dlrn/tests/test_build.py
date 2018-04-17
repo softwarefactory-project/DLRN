@@ -67,7 +67,7 @@ class TestBuild(base.TestCase):
 
     def test_build_rpm_wrapper(self, sh_mock):
         commit = db.getCommits(self.session)[-1]
-        build_rpm_wrapper(commit, False, False, False, None, True)
+        build_rpm_wrapper(commit, False, False, False, None, True, False)
         # git and build_rpms has been called
         self.assertEqual(sh_mock.call_count, 2)
         self.assertTrue(os.path.exists(os.path.join(self.config.datadir,
@@ -76,6 +76,6 @@ class TestBuild(base.TestCase):
     def test_build(self, sh_mock):
         commit = db.getCommits(self.session)[-1]
         try:
-            build(None, commit, None, False, False, False, True)
+            build(None, commit, None, False, False, False, True, False)
         except Exception as e:
             self.assertIn("No rpms built for", str(e))

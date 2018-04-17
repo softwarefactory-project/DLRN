@@ -32,7 +32,7 @@ logger.setLevel(logging.INFO)
 
 def build_worker(packages, commit, run_cmd=False, build_env=None,
                  dev_mode=False, use_public=False, order=False,
-                 sequential=False):
+                 sequential=False, local=False):
 
     if run_cmd:
         try:
@@ -47,14 +47,14 @@ def build_worker(packages, commit, run_cmd=False, build_env=None,
     notes = ""
     try:
         built_rpms, notes = build(packages, commit, build_env, dev_mode,
-                                  use_public, order, sequential)
+                                  use_public, order, sequential, local)
         return [commit, built_rpms, notes, None]
     except Exception as e:
         return [commit, '', '', e]
 
 
 def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
-          sequential):
+          sequential, local):
     config_options = getConfigOptions()
     # Set the build timestamp to now
     commit.dt_build = int(time())
@@ -66,7 +66,7 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
 
     try:
         build_rpm_wrapper(commit, dev_mode, use_public, bootstrap,
-                          env_vars, sequential)
+                          env_vars, sequential, local)
     except Exception as e:
         raise Exception("Error in build_rpm_wrapper for %s: %s" %
                         (project_name, e))
@@ -94,7 +94,7 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
 
 
 def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
-                      sequential):
+                      sequential, local):
     config_options = getConfigOptions()
     # Get the worker id
     if sequential is True:
@@ -210,6 +210,10 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     if bootstrap is True:
         os.environ['ADDITIONAL_MOCK_OPTIONS'] = '-D repo_bootstrap 1'
     dlrn.shell.pkginfo.preprocess(package_name=commit.project_name)
+
+    # We may do some git repo manipulation, so we need to make sure the
+    # right branch is there
+    os.environ['SOURCE_BRANCH'] = commit.commit_branch
 
     run(os.path.join(scriptsdir, "build_rpm.sh"), commit, env_vars,
         dev_mode, use_public, bootstrap)
