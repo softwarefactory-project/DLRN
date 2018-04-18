@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a4dcd0f_5b7783d4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-04-18T10:04:20Z",
+      "side": 1,
+      "message": "tags-from: could be confused with rdoinfo tags: above\nmaybe better would be \"merge-from:\" since that\u0027s what\u0027s actually being done?",
+      "revId": "d366aa95db32c07715f920af7106bbdddfca5f4b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
