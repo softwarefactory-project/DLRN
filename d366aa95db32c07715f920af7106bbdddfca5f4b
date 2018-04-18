@@ -16,6 +16,24 @@
       "revId": "d366aa95db32c07715f920af7106bbdddfca5f4b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_7b5b5f55",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-04-18T10:07:59Z",
+      "side": 1,
+      "message": "otoh merge-from: is not descriptive about WHY part, and could imply source is merged, while this is ONLY for versioning...\n\nSo what about version-from: ?",
+      "parentUuid": "1a4dcd0f_5b7783d4",
+      "revId": "d366aa95db32c07715f920af7106bbdddfca5f4b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
