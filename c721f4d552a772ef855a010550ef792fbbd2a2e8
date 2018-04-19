@@ -16,6 +16,24 @@
       "revId": "c721f4d552a772ef855a010550ef792fbbd2a2e8",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa1b9901_9a0bcd7d",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-19T17:00:03Z",
+      "side": 1,
+      "message": "We don\u0027t want the extra commit id to be present in the project_toprocess list, otherwise we would always built a package using that fake commit.\n\nThat means that, when looking at the packages built for a project, we\u0027d get packages with commit ids that do not belong to the repository.",
+      "parentUuid": "fa1b9901_1a49fdd0",
+      "revId": "c721f4d552a772ef855a010550ef792fbbd2a2e8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
