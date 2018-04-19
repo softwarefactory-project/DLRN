@@ -34,6 +34,24 @@
       "revId": "c721f4d552a772ef855a010550ef792fbbd2a2e8",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa1b9901_5a545553",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-04-19T17:23:44Z",
+      "side": 1,
+      "message": "Ok make sense I understand, so after, in the process dlrn finds the last tag from the branch to compute the version from. Thanks for the explanation.",
+      "parentUuid": "fa1b9901_9a0bcd7d",
+      "revId": "c721f4d552a772ef855a010550ef792fbbd2a2e8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
