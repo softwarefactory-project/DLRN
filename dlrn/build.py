@@ -21,6 +21,7 @@ import shutil
 from six.moves.urllib.request import urlopen
 
 from dlrn.config import getConfigOptions
+from dlrn.utils import import_object
 from pbr.version import SemanticVersion
 from time import time
 
@@ -28,6 +29,10 @@ logging.basicConfig(level=logging.ERROR,
                     format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-build")
 logger.setLevel(logging.INFO)
+
+
+def _get_yumrepodir(commit):
+    return os.path.join("repos", commit.getshardedcommitdir())
 
 
 def build_worker(packages, commit, run_cmd=False, build_env=None,
@@ -61,13 +66,15 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
 
     project_name = commit.project_name
     datadir = os.path.realpath(config_options.datadir)
-    yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
+    yumrepodir = _get_yumrepodir(commit)
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
     try:
         build_rpm_wrapper(commit, dev_mode, use_public, bootstrap,
                           env_vars, sequential)
     except Exception as e:
+        logger.error('Build failed. See logs at: %s/%s/' % (datadir,
+                                                            yumrepodir))
         raise Exception("Error in build_rpm_wrapper for %s: %s" %
                         (project_name, e))
 
@@ -208,18 +215,31 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     # if bootstraping, set the appropriate mock config option
     if bootstrap is True:
-        os.environ['ADDITIONAL_MOCK_OPTIONS'] = '-D repo_bootstrap 1'
+        additional_mock_options = '-D repo_bootstrap 1'
+    else:
+        additional_mock_options = None
+
     dlrn.shell.pkginfo.preprocess(package_name=commit.project_name)
 
-    run(os.path.join(scriptsdir, "build_rpm.sh"), commit, env_vars,
+    run(os.path.join(scriptsdir, "build_srpm.sh"), commit, env_vars,
         dev_mode, use_public, bootstrap)
+
+    # SRPM is built, now build the RPM using the driver
+    build_driver = config_options.build_driver
+    buildrpm = import_object(build_driver, cfg_options=config_options)
+    datadir = os.path.realpath(config_options.datadir)
+    yumrepodir = _get_yumrepodir(commit)
+    yumrepodir_abs = os.path.join(datadir, yumrepodir)
+
+    buildrpm.build_package(output_directory=yumrepodir_abs,
+                           additional_mock_opts=additional_mock_options)
 
 
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         do_build=True):
     config_options = getConfigOptions()
     datadir = os.path.realpath(config_options.datadir)
-    yumrepodir = os.path.join("repos", commit.getshardedcommitdir())
+    yumrepodir = _get_yumrepodir(commit)
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
     commit_hash = commit.commit_hash
