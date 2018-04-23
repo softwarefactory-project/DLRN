@@ -29,7 +29,7 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 sys.path.append('dlrn')
-from db import Base
+from db import Base             # noqa
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
