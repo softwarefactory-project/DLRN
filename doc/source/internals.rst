@@ -113,10 +113,11 @@ driver-specific options have their own section.
 The dlrn/config.py file defines a ``ConfigOptions`` class, that will create an
 object including all parsed options.
 
-*******
-Drivers
-*******
-Drivers are derived from the ``PkgInfoDriver`` class
+********************
+Package Info Drivers
+********************
+
+Package info drivers are derived from the ``PkgInfoDriver`` class
 (see dlrn/drivers/pkginfo.py), and are used to:
 
 - Define a list of projects (packages) to be built
@@ -152,6 +153,26 @@ need to add the project name to the ``projects.ini`` configuration file, and
 if you need any new options, be sure to add them to a driver-specific section
 (see the `Configuration`_ section for details).
 
+*********************
+Package Build Drivers
+*********************
+
+Package build drivers are derived from the ``BuildRPMDriver`` class
+(see dlrn/drivers/buildrpm.py), and are used to perform the actual package
+build from an SRPM file.
+
+Each driver must provide the following method:
+
+- **build_package** This method will take an output directory, where the SRPM
+  is located, and build it using the driver-specific method.
+
+You can check the code of the existing
+`mock <https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/mockdriver.py>`_
+driver to see its implementation specifics. If you create a new driver, you
+need to add the project name to the ``projects.ini`` configuration file, and
+if you need any new options, be sure to add them to a driver-specific section
+(see the `Configuration`_ section for details).
+
 *****************
 Building packages
 *****************
@@ -166,13 +187,12 @@ functions:
 - **build_rpm_wrapper()**. This wrapper function prepares the mock configuration
   file to be used during the build using the configuration. It will also add
   the most current repository to the mock configuration, so we can use packages
-  in the current repository as dependencies during the build. Finally, it will
-  spawn a Bash script, ``build_rpm.sh``, which is in charge of the last step in
-  the build chain.
+  in the current repository as dependencies during the build. Then, it will
+  spawn a Bash script, ``build_srpm.sh`` to build the source RPM, and call the
+  appropriate build driver to generate the binary RPM.
 
-The ``build_rpm.sh`` script takes care of running the ``mock`` command to create
-the package(s) from source. Mock requires a source RPM (SRPM) as input, so some
-additional magic is done inside it. Specifically:
+The ``build_srpm.sh`` script takes care of creating the source RPM. Some magic is
+required to build it, specifically:
 
 - The script tries to determine a version and release number for the package.
   This version number should be compatible with the
@@ -180,8 +200,8 @@ additional magic is done inside it. Specifically:
   and allow upgrades **from** and **to** packages from stable releases, which is
   not always easy. We use the following algorithm:
 
-  * For Python projects, take the output from ``python setup.py version``. Most
-    OpenStack projects use PBR, which gives us proper pre-versioning after a
+  * For Python projects, take the output from ``python setup.py --version``.
+    Most OpenStack projects use PBR, which gives us proper pre-versioning after a
     tagged release.
   * For Puppet projects, we take the version from the ``metadata.json`` or
     ``Modulefile`` files, if available, and increase the .Z version if there are
@@ -191,10 +211,12 @@ additional magic is done inside it. Specifically:
   * The release number is always 0.<date>.<upstream source commit short hash>.
 
 - A tarball is generated using ``python setup.py sdist`` for Python projects,
-  and tar for any other project. Then, the spec file is updated to use this
-  tarball as ``Source0``, and a source RPM is created.
-- Finally, mock is executed to build the final RPM, using the configuration
-  created previously in ``build_rpm_wrapper``.
+  ``gem build`` for Ruby gems, and tar for any other project. Then, the spec file
+  is updated to use this tarball as ``Source0``, and a source RPM is created.
+
+The a binary RPM is built from the SRPM using a the build driver specified in
+``projects.ini``. This can be done using Mock, Copr, Brew, or any other tool,
+provided that the required driver is available.
 
 ***********************
 Hashed yum repositories

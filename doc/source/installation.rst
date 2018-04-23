@@ -63,6 +63,7 @@ The configuration file looks like this:
     templatedir=./dlrn/templates
     maxretries=3
     pkginfo_driver=dlrn.drivers.rdoinfo.RdoInfoDriver
+    build_driver=dlrn.drivers.mockdriver.MockBuildDriver
     tags=
     rsyncdest=
     rsyncport=22
@@ -157,6 +158,14 @@ The configuration file looks like this:
     project. This driver requires setting some optional configuration options
     in the ``[gitrepo_driver]`` section
 
+* ``build_driver`` defines the driver used to build the packages. Source RPMs
+  are always created using Mock, but the actual RPM build process can use the
+  following drivers:
+
+  * ``dlrn.drivers.mockdriver.MockBuildDriver``, which uses Mock to build the
+    package. There are some optionsl configuration options in the
+    ``[mockbuild_driver]`` section.
+
 * ``coprid`` defines the Fedora Copr id to use to compile the packages
   instead of using mock. The ``copr-cli`` package needs to be
   installed. Configure only one target architecture per COPR builder
@@ -203,6 +212,18 @@ options:
 
 * ``repo`` defines the rdoinfo repository to use. This setting
     must be set if a fork of the rdoinfo repository must be used.
+
+The optional ``[mockbuild_driver]`` section has the following configuration
+options:
+
+.. code-block:: ini
+
+    [mockbuild_driver]
+    install_after_build=1
+
+* The ``install_after_build`` boolean option defines whether mock should
+  try to install the newly created package in the same buildroot or not.
+  If not specified, the default is ``True``.
 
 Configuring for gerrit
 ++++++++++++++++++++++
