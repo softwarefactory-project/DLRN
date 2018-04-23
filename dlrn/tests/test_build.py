@@ -39,6 +39,12 @@ class FakePkgInfo(object):
 dlrn.shell.pkginfo = FakePkgInfo()
 
 
+def mocked_listdir(directory):
+    return ['python-pysaml2-3.0-1a.el7.centos.src.rpm']
+
+
+@mock.patch('sh.restorecon', create=True)
+@mock.patch('sh.mock', create=True)
 @mock.patch.object(sh.Command, '__call__', autospec=True)
 class TestBuild(base.TestCase):
     def setUp(self):
@@ -65,15 +71,23 @@ class TestBuild(base.TestCase):
         shutil.rmtree(self.config.scriptsdir)
         os.close(self.db_fd)
 
-    def test_build_rpm_wrapper(self, sh_mock):
+    @mock.patch('os.listdir', side_effect=mocked_listdir)
+    def test_build_rpm_wrapper(self, ld_mock, sh_mock, mock_mock, rc_mock):
         commit = db.getCommits(self.session)[-1]
         build_rpm_wrapper(commit, False, False, False, None, True)
-        # git and build_rpms has been called
+        # 4 sh calls:
+        # 1- git reset --hard
+        # 2- build_srpm.sh
+        # 3- mock (handled by mock_mock)
+        # 4- restorecon (handled by rc_mock)
+        self.assertEqual(mock_mock.call_count, 1)
+        self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(sh_mock.call_count, 2)
         self.assertTrue(os.path.exists(os.path.join(self.config.datadir,
                                                     "dlrn-1.cfg")))
 
-    def test_build(self, sh_mock):
+    @mock.patch('os.listdir', side_effect=mocked_listdir)
+    def test_build(self, ld_mock, sh_mock, mock_mock, rc_mock):
         commit = db.getCommits(self.session)[-1]
         try:
             build(None, commit, None, False, False, False, True)
