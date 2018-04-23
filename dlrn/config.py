@@ -32,6 +32,7 @@ class ConfigOptions(object):
         self.templatedir = cp.get('DEFAULT', 'templatedir')
         self.project_name = cp.get('DEFAULT', 'project_name')
         self.pkginfo_driver = cp.get('DEFAULT', 'pkginfo_driver')
+        self.build_driver = cp.get('DEFAULT', 'build_driver')
         self.workers = cp.getint('DEFAULT', 'workers')
         self.gerrit_topic = cp.get('DEFAULT', 'gerrit_topic')
         self.database_connection = cp.get('DEFAULT', 'database_connection')
@@ -67,6 +68,15 @@ class ConfigOptions(object):
                 self.use_version_from_spec = use_spec
             else:
                 self.use_version_from_spec = False
+        if cp.has_section('mockbuild_driver'):
+            if cp.has_option('mockbuild_driver', 'install_after_build'):
+                self.install_after_build = cp.getboolean(
+                    'mockbuild_driver', 'install_after_build')
+            else:
+                self.install_after_build = True
+        else:
+            self.install_after_build = True
+
         global _config_options
         _config_options = self
 
