@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "da20952f_ff999720",
+        "filename": "dlrn/build.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-25T13:04:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da20952f_3f1dcfbd",
+      "revId": "d0dfb7006940f6c7d9df9f2467de92f175a54b60",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da20952f_df7853fb",
         "filename": "dlrn/drivers/mockdriver.py",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2018-04-25T11:09:47Z",
       "side": 1,
       "message": "that\u0027s too much code duplicated in two places. Consider something like this:\n\nmock_opts \u003d [\u0027-v\u0027, \u0027-r\u0027, ...]\nif additional_mock_opts:\n    mock_opts +\u003d additional_mock_opts\nmock_opts +\u003d [\u0027--rebuild\u0027, src_rpm, ...]\nsh.mock(*mock_opts)",
+      "revId": "d0dfb7006940f6c7d9df9f2467de92f175a54b60",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da20952f_5f020340",
+        "filename": "dlrn/drivers/mockdriver.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-25T13:04:23Z",
+      "side": 1,
+      "message": "Thanks for the suggestion! I\u0027ve fixed that.",
+      "parentUuid": "da20952f_df7853fb",
       "revId": "d0dfb7006940f6c7d9df9f2467de92f175a54b60",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "da20952f_3ff94f4e",
+        "filename": "dlrn/drivers/mockdriver.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-25T13:04:23Z",
+      "side": 1,
+      "message": "It just looks cleaner to me, and gives me a visual hint if I want to do some smarter exception handling in the future.",
+      "parentUuid": "da20952f_ff7d17e8",
+      "revId": "d0dfb7006940f6c7d9df9f2467de92f175a54b60",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da20952f_9f82dbc7",
         "filename": "dlrn/drivers/mockdriver.py",
         "patchSetId": 8
@@ -64,6 +118,24 @@
       "writtenOn": "2018-04-25T11:09:47Z",
       "side": 1,
       "message": "FYI re uses internal catching for last N rexes so there is no performance boost to this as compared to using re.match() with this string directly bellow.\n\nNo reason to change this, but worth noting.",
+      "revId": "d0dfb7006940f6c7d9df9f2467de92f175a54b60",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da20952f_df94d3e9",
+        "filename": "dlrn/drivers/mockdriver.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-25T13:04:23Z",
+      "side": 1,
+      "message": "Good to know :)",
+      "parentUuid": "da20952f_9f82dbc7",
       "revId": "d0dfb7006940f6c7d9df9f2467de92f175a54b60",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
