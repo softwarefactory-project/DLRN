@@ -34,13 +34,14 @@ if [ -r setup.py -a ! -r metadata.json ]; then
     SOURCETYPE='tarball'
     mkdir ${MOCKDIR}/var/tmp/pkgsrc
     cp -pr . ${MOCKDIR}/var/tmp/pkgsrc
-    /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && python setup.py sdist"
-    /usr/bin/mock $MOCKOPTS --copyout /var/tmp/pkgsrc/dist ./dist
 
     # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
     # so only look at the last line for version
-    setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && python setup.py --version"| tail -n 1) \
+    setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && rm -rf *.egg-info && python setup.py --version"| tail -n 1) \
                          $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && git log --abbrev=7 -n1 --format=format:%h")
+
+    /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && python setup.py sdist"
+    /usr/bin/mock $MOCKOPTS --copyout /var/tmp/pkgsrc/dist ./dist
 elif [ -r *.gemspec ]; then
     SOURCETYPE='gem'
     GEMSPEC=$(ls -l | grep gemspec | awk '{print $9}')
