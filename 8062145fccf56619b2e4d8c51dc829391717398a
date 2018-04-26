@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba15a1d1_98aaf584",
+        "filename": "dlrn/drivers/mockdriver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-04-26T14:41:01Z",
+      "side": 1,
+      "message": "These simple comments make the code real easy to read/navigate.\n\nI\u0027m taking a note here on the extra newline that gives the comments the feeling of a description of following code until an empty line which gives them kind of scope... nice semantic trick, I\u0027ll consider assimilation :)",
+      "revId": "8062145fccf56619b2e4d8c51dc829391717398a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba15a1d1_d8b94dee",
+        "filename": "doc/source/internals.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-04-26T14:41:01Z",
+      "side": 1,
+      "message": "DLRN is smoothly transitioning into a generic tool with proper interfaces. It could have ended as yet another local  packaging script in the sea of thousands, but instead with your relentless guidande it becomes a real project that is useful to increasing amount of users.\n\nGood stuff, Javier!",
+      "revId": "8062145fccf56619b2e4d8c51dc829391717398a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba15a1d1_18c82574",
+        "filename": "doc/source/internals.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-04-26T14:41:01Z",
+      "side": 1,
+      "message": "I especially like this factorization. A single magical script is used to build SRPM which is a normalized format. One can reuse this script or the resulting SRPM in any way (s)he see fit.\n\nThe most useful (for us :]) building methods are going to be available separately in a reusable and extensible way.\n\nIMHO splitting the SRPM build from the RPM build itself and making the builders modular is a huge improvement.",
+      "revId": "8062145fccf56619b2e4d8c51dc829391717398a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
