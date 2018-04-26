@@ -49,7 +49,8 @@ The DLRN codebase is structured as follows:
   * *submit_review.sh*: script to open a Gerrit review after a build failure (see
     the `Error reporting`_ section).
   * *centos.cfg* and *fedora.cfg*: base mock configurations for CentOS and Fedora
-    builders.
+    builders. These base configurations can be located in a separate directory,
+    defined by the ``configdir`` option in projects.ini.
 
 - **dlrn/**: main DLRN code
 
