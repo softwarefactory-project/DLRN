@@ -110,9 +110,10 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     mock_config = "dlrn-" + str(worker_id) + ".cfg"
     scriptsdir = os.path.realpath(config_options.scriptsdir)
+    configdir = os.path.realpath(config_options.configdir)
     datadir = os.path.realpath(config_options.datadir)
     baseurl = config_options.baseurl
-    templatecfg = os.path.join(scriptsdir, config_options.target + ".cfg")
+    templatecfg = os.path.join(configdir, config_options.target + ".cfg")
     newcfg = os.path.join(datadir, mock_config + ".new")
     oldcfg = os.path.join(datadir, mock_config)
     shutil.copyfile(templatecfg, newcfg)
