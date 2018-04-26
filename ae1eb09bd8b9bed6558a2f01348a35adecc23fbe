@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba15a1d1_d8870d11",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-04-26T14:55:41Z",
+      "side": 1,
+      "message": "typo: configuratio_n_",
+      "revId": "ae1eb09bd8b9bed6558a2f01348a35adecc23fbe",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
