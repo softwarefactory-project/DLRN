@@ -53,6 +53,7 @@ The configuration file looks like this:
     [DEFAULT]
     datadir=./data
     scriptsdir=./scripts
+    configdir=
     baseurl=http://trunk.rdoproject.org/centos7/
     distro=rpm-master
     source=master
@@ -79,6 +80,10 @@ The configuration file looks like this:
 
 * ``scriptsdir`` is the directory where scripts utilized during the build and
   test process are located.
+
+* ``configdir`` is the directory where additional configuration files used by
+  the build process are located, such as base mock configurations. If not set,
+  it defaults to the value of ``scriptsdir``.
 
 * ``baseurl`` is the URL to the data-directory, as hosted by your web-server.
   Unless you are installing DLRN for local use only, this must be a publicly
@@ -382,6 +387,28 @@ supported MariaDB:
     $ alembic stamp head
 
 After that initial command, you will be able to run future migrations.
+
+Adding a custom mock base configuration
++++++++++++++++++++++++++++++++++++++++
+
+The source RPM build operations, and the binary RPM build by default, are performed
+using ``mock``. Mock uses a configuration file, and DLRN provides sample files for
+CentOS and Fedora in the ``scripts/`` directory.
+
+You may want to use a different base mock configuration, if you need to specify a
+different base package set or an alternative yum repository. The procedure to do so
+is the following:
+
+* Edit the ``configdir`` variable in your projects.ini file, and make it point to
+  a configuration directory.
+
+* In that new directory, create the configuration file. It should be named
+  ``<target>.cfg``, where ``<target>`` is the value of the target option in
+  projects.ini.
+
+* For the mock configuration file syntax, refer to the `mock documentation`_.
+
+.. _mock documentation: https://github.com/rpm-software-management/mock/wiki#generate-custom-config-file
 
 References
 ==========
