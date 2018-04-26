@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ba15a1d1_b802596e",
+        "filename": "dlrn/drivers/mockdriver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-26T15:55:14Z",
+      "side": 1,
+      "message": "I\u0027ll do that for additional_mock_opts, it makes sense. For mock_config, we still need it in build_srpm.sh, so I\u0027d rather reuse the same option.",
+      "parentUuid": "ba15a1d1_38c1692f",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 51
+      },
+      "revId": "8062145fccf56619b2e4d8c51dc829391717398a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba15a1d1_98aaf584",
         "filename": "dlrn/drivers/mockdriver.py",
         "patchSetId": 11
@@ -71,6 +95,30 @@
       "writtenOn": "2018-04-26T15:36:36Z",
       "side": 1,
       "message": "You can put it in the if install_after_build statement.",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 45
+      },
+      "revId": "8062145fccf56619b2e4d8c51dc829391717398a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba15a1d1_98fd1571",
+        "filename": "dlrn/drivers/mockdriver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-04-26T15:55:14Z",
+      "side": 1,
+      "message": "True. I think I moved it outside in a previous iteration, but I had to add it to the finally: part anyway. I\u0027ll fix that.",
+      "parentUuid": "ba15a1d1_78c7e145",
       "range": {
         "startLine": 74,
         "startChar": 0,
