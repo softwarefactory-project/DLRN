@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "ba15a1d1_38c1692f",
+        "filename": "dlrn/drivers/mockdriver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-04-26T15:36:36Z",
+      "side": 1,
+      "message": "Could it be passed as init argument maybe ? It\u0027s weird to set env var to get it back in the same python process.",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 51
+      },
+      "revId": "8062145fccf56619b2e4d8c51dc829391717398a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba15a1d1_98aaf584",
         "filename": "dlrn/drivers/mockdriver.py",
         "patchSetId": 11
@@ -31,6 +54,29 @@
       "side": 1,
       "message": "Now that you tell me, I didn\u0027t realize that I was adding that extra newline, it was a kind of subconscious thing. I\u0027m glad it worked :).",
       "parentUuid": "ba15a1d1_98aaf584",
+      "revId": "8062145fccf56619b2e4d8c51dc829391717398a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba15a1d1_78c7e145",
+        "filename": "dlrn/drivers/mockdriver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-04-26T15:36:36Z",
+      "side": 1,
+      "message": "You can put it in the if install_after_build statement.",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 45
+      },
       "revId": "8062145fccf56619b2e4d8c51dc829391717398a",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
