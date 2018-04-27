@@ -21,7 +21,6 @@ import shutil
 from six.moves.urllib.request import urlopen
 
 from dlrn.config import getConfigOptions
-from pbr.version import SemanticVersion
 from time import time
 
 logging.basicConfig(level=logging.ERROR,
@@ -249,13 +248,7 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         logger.info('Running %s' % ' '.join(run_cmd))
 
     try:
-        sh_version = SemanticVersion.from_pip_string(sh.__version__)
-        min_sh_version = SemanticVersion.from_pip_string('1.09')
-        if sh_version > min_sh_version:
-            sh.env(run_cmd, _err=process_mock_output, _out=process_mock_output)
-        else:
-            sh.env_(run_cmd, _err=process_mock_output,
-                    _out=process_mock_output)
+        sh.env(run_cmd, _err=process_mock_output, _out=process_mock_output)
     except Exception as e:
         logger.error('cmd failed. See logs at: %s/%s/' % (datadir,
                                                           yumrepodir))
