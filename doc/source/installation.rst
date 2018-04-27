@@ -163,8 +163,13 @@ The configuration file looks like this:
   following drivers:
 
   * ``dlrn.drivers.mockdriver.MockBuildDriver``, which uses Mock to build the
-    package. There are some optionsl configuration options in the
+    package. There are some optional configuration options in the
     ``[mockbuild_driver]`` section.
+  * ``dlrn.drivers.kojidriver.KojiBuildDriver``, which uses `koji <https://fedoraproject.org/wiki/Koji>`_
+    to build the package. There are some mandatory configuration options in the
+    ``[kojibuild_driver]`` section. To use this driver, you need to make sure
+    the ``koji`` command (or any alternative if you use a different binary)
+    is installed on the system.
 
 * ``coprid`` defines the Fedora Copr id to use to compile the packages
   instead of using mock. The ``copr-cli`` package needs to be
@@ -225,6 +230,35 @@ options:
   try to install the newly created package in the same buildroot or not.
   If not specified, the default is ``True``.
 
+The optional ``[kojibuild_driver]`` section is only taken into account if the
+build_driver option is set to ``dlrn.drivers.kojidriver.KojiBuildDriver``. The
+following configuration options are included:
+
+.. code-block:: ini
+
+    [kojibuild_driver]
+    koji_exe=koji
+    krb_principal=user@EXAMPLE.COM
+    krb_keytab=/home/user/user.keytab
+    scratch_build=True
+    build_target=koji-target-build
+
+* ``koji_exe`` defines the executable to use. Some Koji instances create their
+  own client packages to add their default configuration, such as
+  `CBS <https://wiki.centos.org/HowTos/CommunityBuildSystem>`_ or Brew.
+  If not specified, it will default to ``koji``.
+* ``krb_principal`` defines the Kerberos principal to use for the Koji builds.
+  If not specified, DLRN will assume that authentication is performed using SSL
+  certificates.
+* ``krb_keytab`` is the full path to a Kerberos keytab file, which contains the
+  Kerberos credentials for the principal defined in the ``krb_principal``
+  option.
+* ``scratch_build`` defines if a scratch build should be used. By default, it
+  is set to ``True``.
+* ``build_target`` defines the build target to use. This defines the buildroot
+  and base repositories to be used for the build.
+
+
 Configuring for gerrit
 ++++++++++++++++++++++
 
@@ -232,7 +266,7 @@ You first need ``git-review`` installed. You can use a package or install
 it using pip.
 
 Then the username for the user creating the gerrit reviews when a
-build will fail needs to be configured like this::
+build will fail needs to be configured like this:
 
   $ git config --global gitreview.username dlrnbot
   $ git config --global user.email dlrn@dlrn.domain
