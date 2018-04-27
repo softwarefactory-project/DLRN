@@ -77,6 +77,42 @@ class ConfigOptions(object):
         else:
             self.install_after_build = True
 
+        if cp.has_section('kojibuild_driver'):
+            if cp.has_option('kojibuild_driver', 'krb_principal'):
+                self.koji_krb_principal = cp.get('kojibuild_driver',
+                                                 'krb_principal')
+                if cp.has_option('kojibuild_driver', 'krb_keytab'):
+                    self.koji_keytab = cp.get('kojibuild_driver',
+                                              'krb_keytab')
+                else:
+                    self.koji_krb_keytab = None
+
+            else:
+                self.koji_krb_principal = None
+                self.koji_krb_keytab = None
+
+            if cp.has_option('kojibuild_driver', 'scratch_build'):
+                self.koji_scratch_build = cp.getboolean('kojibuild_driver',
+                                                        'scratch_build')
+            else:
+                self.koji_scratch_build = True
+            if cp.has_option('kojibuild_driver', 'build_target'):
+                self.koji_build_target = cp.get('kojibuild_driver',
+                                                'build_target')
+            else:
+                self.koji_krb_build_target = None
+            if cp.has_option('kojibuild_driver', 'koji_exe'):
+                self.koji_exe = cp.get('kojibuild_driver',
+                                       'koji_exe')
+            else:
+                self.koji_exe = 'koji'
+        else:
+            self.koji_krb_principal = None
+            self.koji_krb_keytab = None
+            self.koji_scratch_build = True
+            self.koji_build_target = None
+            self.koji_exe = 'koji'
+
         global _config_options
         _config_options = self
 
