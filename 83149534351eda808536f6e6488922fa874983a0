@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a1a9d01_f7bea0d3",
+        "filename": "dlrn/config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-03T15:35:04Z",
+      "side": 1,
+      "message": "Same, let\u0027s remove the old option.",
+      "range": {
+        "startLine": 41,
+        "startChar": 7,
+        "endLine": 41,
+        "endChar": 49
+      },
+      "revId": "83149534351eda808536f6e6488922fa874983a0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_97b3a40a",
+        "filename": "dlrn/drivers/coprdriver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-03T15:35:04Z",
+      "side": 1,
+      "message": "copr :)",
+      "range": {
+        "startLine": 37,
+        "startChar": 40,
+        "endLine": 37,
+        "endChar": 44
+      },
+      "revId": "83149534351eda808536f6e6488922fa874983a0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_57ce6c84",
+        "filename": "dlrn/drivers/coprdriver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-03T15:35:04Z",
+      "side": 1,
+      "message": "copr :)",
+      "range": {
+        "startLine": 57,
+        "startChar": 12,
+        "endLine": 57,
+        "endChar": 43
+      },
+      "revId": "83149534351eda808536f6e6488922fa874983a0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_d7b91cee",
+        "filename": "projects.ini",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-03T15:35:04Z",
+      "side": 1,
+      "message": "Let\u0027s remove this option from the DEFAULT section, if it moved to its own section.",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 23
+      },
+      "revId": "83149534351eda808536f6e6488922fa874983a0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
