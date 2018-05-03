@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9a1a9d01_b72a682b",
+        "filename": "dlrn/config.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-03T15:17:31Z",
+      "side": 1,
+      "message": "Makes sense, I\u0027ll update it.",
+      "parentUuid": "9a1a9d01_97c964af",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 39
+      },
+      "revId": "c7cb7c130d2e28ae805dee56da1dca910bdac730",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a1a9d01_f7d46048",
         "filename": "dlrn/drivers/kojidriver.py",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "9a1a9d01_9725e45d",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-03T15:17:31Z",
+      "side": 1,
+      "message": "Mmmm... I have only tested this with brew, where a principal and keytab file are mandatory. I\u0027ll update the review to cover both cases.",
+      "parentUuid": "9a1a9d01_f7d46048",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 41
+      },
+      "revId": "c7cb7c130d2e28ae805dee56da1dca910bdac730",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a1a9d01_b7cee8b2",
         "filename": "dlrn/drivers/kojidriver.py",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2018-05-03T13:14:33Z",
       "side": 1,
       "message": "Should we remove kojibuild.log before in case of previous build ?",
+      "range": {
+        "startLine": 80,
+        "startChar": 12,
+        "endLine": 80,
+        "endChar": 66
+      },
+      "revId": "c7cb7c130d2e28ae805dee56da1dca910bdac730",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_f730e0a0",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-03T15:17:31Z",
+      "side": 1,
+      "message": "This is not needed, because DLRN will previously delete the whole output directory. See https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/build.py#L229-L233",
+      "parentUuid": "9a1a9d01_b7cee8b2",
       "range": {
         "startLine": 80,
         "startChar": 12,
