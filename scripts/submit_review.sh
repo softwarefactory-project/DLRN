@@ -28,6 +28,7 @@ if [ -n "$GERRIT_URL" -a -n "$GERRIT_LOG" -a -n "$GERRIT_MAINTAINERS" -a -n "$GE
     SHORTSHA1=$(git rev-parse --short HEAD)
     cd ${DISTGIT_DIR}
     CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
+    git branch -D branch-$SHORTSHA1 || true
     git checkout -b branch-$SHORTSHA1
     git review -s
     # we need to inject a pseudo-modification to the spec file to have a
