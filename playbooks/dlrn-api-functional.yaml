@@ -166,3 +166,17 @@
       fail:
         msg: Promotion did not create symlink cipromotion
       when: link.stat.islnk is not defined or not link.stat.islnk
+
+    - name: Get the number of packages that were built from the API
+      shell:
+        cmd: |
+          . .venv/bin/activate
+          TOMORROW=$(date --date="next day" +%Y-%m-%d)
+          dlrnapi {{ dlrnapi_url }} {{ dlrnapi_auth }} build-metrics --start-date 2010-01-01 --end-date $TOMORROW
+        chdir: "{{ working_dir }}"
+      register: build_metrics
+
+    - name: Fail if the number of successfully built commits does not match
+      fail:
+        msg: Did not get 5 successfully built packages
+      when: (build_metrics.stdout | from_json).succeeded != 5
