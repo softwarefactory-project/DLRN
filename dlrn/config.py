@@ -110,6 +110,12 @@ class ConfigOptions(object):
             self.koji_build_target = None
             self.koji_exe = 'koji'
 
+        if cp.has_section('coprbuild_driver'):
+            if cp.has_option('coprbuild_driver', 'coprid'):
+                self.coprid = cp.get('coprbuild_driver', 'coprid')
+            else:
+                self.coprid = None
+
         global _config_options
         _config_options = self
 
