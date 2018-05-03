@@ -170,12 +170,11 @@ The configuration file looks like this:
     ``[kojibuild_driver]`` section. To use this driver, you need to make sure
     the ``koji`` command (or any alternative if you use a different binary)
     is installed on the system.
-
-* ``coprid`` defines the Fedora Copr id to use to compile the packages
-  instead of using mock. The ``copr-cli`` package needs to be
-  installed. Configure only one target architecture per COPR builder
-  else it would confuse DLRN. Details on Fedora Copr at
-  https://copr.fedorainfracloud.org/
+  * ``dlrn.drivers.coprdriver.CoprBuildDriver``, which uses `copr <https://fedoraproject.org/wiki/Category:Copr>`_
+    to build the package. The mandatory configuration ``coprid`` option in the
+    ``[coprbuild_driver]`` section must be set to use this driver. You need to
+    make sure the ``copr-cli`` command is installed on the system. Configure
+    only one target architecture per COPR builder else it would confuse DLRN.
 
 * ``release_numbering`` defines the algorithm used by DLRN to assign release
   numbers to packages. The release number is created from the current date and
@@ -258,6 +257,15 @@ following configuration options are included:
 * ``build_target`` defines the build target to use. This defines the buildroot
   and base repositories to be used for the build.
 
+The optional ``[coprbuild_driver]`` section has the following configuration
+options:
+
+.. code-block:: ini
+
+    [coprbuild_driver]
+    coprid=account/repo
+
+* The ``coprid`` option defines Copr id to use to compile the packages.
 
 Configuring for gerrit
 ++++++++++++++++++++++
