@@ -38,7 +38,6 @@ class ConfigOptions(object):
         self.database_connection = cp.get('DEFAULT', 'database_connection')
         self.fallback_to_master = cp.getboolean('DEFAULT',
                                                 'fallback_to_master')
-        self.coprid = cp.get('DEFAULT', 'coprid')
         self.release_numbering = cp.get('DEFAULT', 'release_numbering')
 
         # Handling for optional sections, driver-based
@@ -112,6 +111,14 @@ class ConfigOptions(object):
             self.koji_scratch_build = True
             self.koji_build_target = None
             self.koji_exe = 'koji'
+
+        if cp.has_section('coprbuild_driver'):
+            if cp.has_option('coprbuild_driver', 'coprid'):
+                self.coprid = cp.get('coprbuild_driver', 'coprid')
+            else:
+                self.coprid = None
+        else:
+            self.coprid = None
 
         global _config_options
         _config_options = self
