@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a1a9d01_baf7adf4",
+        "filename": "dlrn/drivers/coprdriver.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-04T16:29:51Z",
+      "side": 1,
+      "message": "We need to do the same with this file, actually it is here where I found the issue",
+      "range": {
+        "startLine": 96,
+        "startChar": 12,
+        "endLine": 96,
+        "endChar": 79
+      },
+      "revId": "dcd4ce7975bfbaeed7476d38e9586cd7ed6a7caa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
