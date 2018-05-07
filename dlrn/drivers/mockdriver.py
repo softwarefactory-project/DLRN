@@ -33,7 +33,7 @@ logger.setLevel(logging.INFO)
 class MockBuildDriver(BuildRPMDriver):
     # We are using this method to "tee" mock output to mock.log and stdout
     def _process_mock_output(self, line):
-        if dlrn.shell.verbose_mock:
+        if dlrn.shell.verbose_build:
             logger.info(line[:-1])
         self.mock_fp.write(line)
 

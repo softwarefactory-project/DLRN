@@ -37,7 +37,7 @@ class CoprBuildDriver(BuildRPMDriver):
 
     # We are using this method to "tee" copr output to a log file and stdout
     def _process_copr_output(self, line):
-        if dlrn.shell.verbose_mock:
+        if dlrn.shell.verbose_build:
             logger.info(line[:-1])
         self.copr_fp.write(line)
 

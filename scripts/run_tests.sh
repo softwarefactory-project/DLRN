@@ -175,7 +175,7 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
 done
 
 # Run DLRN
-dlrn --head-only $PACKAGE_BUILD_LIST --dev --local --info-repo /tmp/rdoinfo --verbose-mock --order
+dlrn --head-only $PACKAGE_BUILD_LIST --dev --local --info-repo /tmp/rdoinfo --verbose-build --order
 copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn-1.cfg --scrub=all

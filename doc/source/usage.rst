@@ -12,7 +12,7 @@ Parameters
                 [--project-name PROJECT_NAME | --package-name PACKAGE_NAME]
                 [--dev] [--log-commands] [--use-public] [--order] [--sequential]
                 [--status] [--recheck] [--version] [--run RUN] [--stop]
-                [--verbose-mock]
+                [--verbose-build]
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -50,7 +50,7 @@ Parameters
       --run RUN             Run a program instead of trying to build. Implies
                             --head-only
       --stop                Stop on error.
-      --verbose-mock        Show verbose mock output during build.
+      --verbose-build       Show versobe output during the package build.
 
 
 Quickstart single package build
