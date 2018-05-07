@@ -37,7 +37,7 @@ class KojiBuildDriver(BuildRPMDriver):
 
     # We are using this method to "tee" koji output to a log file and stdout
     def _process_koji_output(self, line):
-        if dlrn.shell.verbose_mock:
+        if dlrn.shell.verbose_build:
             logger.info(line[:-1])
         self.koji_fp.write(line)
 

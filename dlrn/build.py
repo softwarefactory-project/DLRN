@@ -283,5 +283,5 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
 
 
 def process_mock_output(line):
-    if dlrn.shell.verbose_mock:
+    if dlrn.shell.verbose_build:
         logger.info(line[:-1])
