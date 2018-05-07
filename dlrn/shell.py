@@ -141,13 +141,19 @@ def main():
                              "Implies --head-only")
     parser.add_argument('--stop', action="store_true",
                         help="Stop on error.")
+    parser.add_argument('--verbose-build', action="store_true",
+                        help="Show verbose output during the package build.")
     parser.add_argument('--verbose-mock', action="store_true",
-                        help="Show verbose mock output during build.")
+                        help=argparse.SUPPRESS)
 
     options = parser.parse_args(sys.argv[1:])
 
-    global verbose_mock
-    verbose_mock = options.verbose_mock
+    if options.verbose_mock:
+        logger.warning('The --verbose-mock command-line option is deprecated.'
+                       ' Please use --verbose-build instead.')
+        options.verbose_build = options.verbose_mock
+    global verbose_build
+    verbose_build = options.verbose_build
 
     cp = configparser.RawConfigParser(default_options)
     cp.read(options.config_file)
