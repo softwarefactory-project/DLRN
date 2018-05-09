@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a1a9d01_dd813b4f",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-05-09T14:59:22Z",
+      "side": 1,
+      "message": "I think \"verbose\" implies an output on itself.\n\nConsider shorter --verbose-build for the sake of reasonably long command line options and alignment with s/verbose_output/verbose_build/ I suggest bellow.",
+      "revId": "826c4d9124015957c9ac62da592eafaa6adcb314",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_da170153",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-05-09T14:59:22Z",
+      "side": 1,
+      "message": "It says \"verbose output during package build\" in accordance  with code where it\u0027s used so I wonder if \u0027verbose_build\u0027 isn\u0027t more appropriate name?",
+      "revId": "826c4d9124015957c9ac62da592eafaa6adcb314",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_fd867f64",
+        "filename": "doc/source/usage.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-05-09T14:59:22Z",
+      "side": 1,
+      "message": "yup, this is **the** longest option... extra point for --verbose-build ;)",
+      "revId": "826c4d9124015957c9ac62da592eafaa6adcb314",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
