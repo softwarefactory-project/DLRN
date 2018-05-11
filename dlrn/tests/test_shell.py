@@ -63,10 +63,13 @@ class TestProcessBuildResult(base.TestCase):
         shutil.rmtree(self.config.scriptsdir)
         os.close(self.db_fd)
 
+    @mock.patch('os.rename')
+    @mock.patch('os.symlink')
     @mock.patch('dlrn.shell.export_commit_yaml')
     @mock.patch('dlrn.shell.genreports')
     @mock.patch('dlrn.shell.sync_repo')
-    def test_successful_build(self, rs_mock, gr_mock, ec_mock):
+    def test_successful_build(self, rs_mock, gr_mock, ec_mock, sl_mock,
+                              rn_mock):
         built_rpms = ['foo-1.2.3.rpm']
         status = [self.commit, built_rpms, 'OK', None]
         output = shell.process_build_result(status, self.packages,
@@ -75,6 +78,8 @@ class TestProcessBuildResult(base.TestCase):
         self.assertEqual(gr_mock.call_count, 1)
         self.assertEqual(rs_mock.call_count, 1)
         self.assertEqual(ec_mock.call_count, 1)
+        self.assertEqual(sl_mock.call_count, 1)
+        self.assertEqual(rn_mock.call_count, 1)
 
     @mock.patch('dlrn.shell.export_commit_yaml')
     @mock.patch('dlrn.shell.sendnotifymail')
@@ -167,11 +172,9 @@ class TestPostBuild(base.TestCase):
 
         expected = [mock.call(yumdir)]
         self.assertEqual(sh_mock.call_args_list, expected)
-        self.assertEqual(output, False)
+        self.assertEqual(output, 1)     # 1 non-successfully built package
 
-    @mock.patch('os.rename')
-    @mock.patch('os.symlink')
-    def test_successful_build_no_failures(self, sl_mock, rn_mock, sh_mock):
+    def test_successful_build_no_failures(self, sh_mock):
         packages = [{'upstream': 'https://github.com/openstack/foo',
                      'name': 'foo', 'maintainers': 'test@test.com',
                      'master-distgit':
@@ -190,5 +193,4 @@ class TestPostBuild(base.TestCase):
         expected = [mock.call(yumdir)]
 
         self.assertEqual(sh_mock.call_args_list, expected)
-        self.assertEqual(output, True)
-        self.assertEqual(sl_mock.call_count, 2)
+        self.assertEqual(output, 0)
