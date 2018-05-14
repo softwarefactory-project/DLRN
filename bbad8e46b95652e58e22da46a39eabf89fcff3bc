@@ -22,6 +22,30 @@
       "revId": "bbad8e46b95652e58e22da46a39eabf89fcff3bc",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_00942c35",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-14T11:11:30Z",
+      "side": 1,
+      "message": "we need it as global so we can read it in the drivers (see mockdriver.py for example).",
+      "parentUuid": "9a1a9d01_806fdc91",
+      "range": {
+        "startLine": 154,
+        "startChar": 4,
+        "endLine": 154,
+        "endChar": 24
+      },
+      "revId": "bbad8e46b95652e58e22da46a39eabf89fcff3bc",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
