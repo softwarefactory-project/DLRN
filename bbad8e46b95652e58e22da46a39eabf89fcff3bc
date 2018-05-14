@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a1a9d01_806fdc91",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-05-14T08:34:31Z",
+      "side": 1,
+      "message": "Why do we need this var as global ? maybe you should add a comment to explain ?",
+      "range": {
+        "startLine": 154,
+        "startChar": 4,
+        "endLine": 154,
+        "endChar": 24
+      },
+      "revId": "bbad8e46b95652e58e22da46a39eabf89fcff3bc",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
