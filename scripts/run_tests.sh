@@ -83,10 +83,11 @@ elif [[ "${ZUUL_BRANCH}" =~ -rdo ]]; then
 fi
 
 # Update the configuration
+tag=${4:-$branch}
 sed -i "s%target=.*%target=${target}%" projects.ini
 sed -i "s%source=.*%source=${src}%" projects.ini
 sed -i "s%baseurl=.*%baseurl=${baseurl}%" projects.ini
-sed -i "s%tags=.*%tags=${branch}%" projects.ini
+sed -i "s%tags=.*%tags=${tag}%" projects.ini
 
 # Prepare directories for distro repo
 mkdir -p data/repos
