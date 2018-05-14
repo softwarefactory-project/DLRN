@@ -3,7 +3,7 @@ set -ex
 
 # TODO(hguemar): have proper arguments parsing
 # Usage with all supported arguments
-# ./run_tests.sh <path_to_rdoinfo> <distro (either centos or fedora)> <baseurl to trunk repo>
+# ./run_tests.sh <path_to_rdoinfo> <distro (either centos or fedora)> <baseurl to trunk repo> <tag (optional)>
 
 # Simple script to test that DLRN works either locally or in a zuul environment
 GIT_BASE_URL="https://review.rdoproject.org/r/p"
@@ -83,10 +83,11 @@ elif [[ "${ZUUL_BRANCH}" =~ -rdo ]]; then
 fi
 
 # Update the configuration
+tag=${4:-$branch}
 sed -i "s%target=.*%target=${target}%" projects.ini
 sed -i "s%source=.*%source=${src}%" projects.ini
 sed -i "s%baseurl=.*%baseurl=${baseurl}%" projects.ini
-sed -i "s%tags=.*%tags=${branch}%" projects.ini
+sed -i "s%tags=.*%tags=${tag}%" projects.ini
 
 # Prepare directories for distro repo
 mkdir -p data/repos
