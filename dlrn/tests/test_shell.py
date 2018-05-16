@@ -170,7 +170,7 @@ class TestPostBuild(base.TestCase):
                                      self.commit.getshardedcommitdir(),
                                      "versions.csv")))
 
-        expected = [mock.call(yumdir)]
+        expected = [mock.call('-x', '*.src.rpm', yumdir)]
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(output, 1)     # 1 non-successfully built package
 
@@ -190,7 +190,7 @@ class TestPostBuild(base.TestCase):
                               self.commit.getshardedcommitdir())
         os.makedirs(yumdir)
         output = shell.post_build(status, packages, self.session)
-        expected = [mock.call(yumdir)]
+        expected = [mock.call('-x', '*.src.rpm', yumdir)]
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(output, 0)
