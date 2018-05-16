@@ -676,7 +676,11 @@ def post_build(status, packages, session, build_repo=True):
             sh.createrepo = createrepo_c
         except ImportError:
             pass
-        sh.createrepo(yumrepodir_abs)
+
+        if config_options.include_srpm_in_repo:
+            sh.createrepo(yumrepodir_abs)
+        else:
+            sh.createrepo('-x', '*.src.rpm', yumrepodir_abs)
 
         with open(os.path.join(
                 yumrepodir_abs, "%s.repo" % config_options.reponame),
