@@ -363,6 +363,7 @@ def main():
                 session = getSession(config_options.database_connection)
                 if exception is not None:
                     logger.error("Received exception %s" % exception)
+                    failures = 1
                 else:
                     if not options.run:
                         failures = post_build(status, packages, session)
@@ -405,6 +406,7 @@ def main():
                     session = getSession(config_options.database_connection)
                     if exception is not None:
                         logger.info("Received exception %s" % exception)
+                        failures = 1
                     else:
                         # Create repo, build versions.csv file.
                         # This needs to be sequential
@@ -563,25 +565,26 @@ def process_build_result(status, packages, session, packages_to_process,
     session.commit()
 
     # Generate the current and consistent symlinks
-    dirnames = ['current']
-    datadir = os.path.realpath(config_options.datadir)
-    yumrepodir = os.path.join(datadir, "repos",
-                              commit.getshardedcommitdir())
-    yumrepodir_abs = os.path.join(datadir, yumrepodir)
-    if consistent:
-        dirnames.append('consistent')
-    else:
-        logger.info('%d packages not built correctly: not updating'
-                    ' the consistent symlink' % failures)
-    for dirname in dirnames:
-        target_repo_dir = os.path.join(datadir, "repos", dirname)
-        os.symlink(os.path.relpath(yumrepodir_abs,
-                                   os.path.join(datadir, "repos")),
-                   target_repo_dir + "_")
-        os.rename(target_repo_dir + "_", target_repo_dir)
+    if exception is None:
+        dirnames = ['current']
+        datadir = os.path.realpath(config_options.datadir)
+        yumrepodir = os.path.join(datadir, "repos",
+                                  commit.getshardedcommitdir())
+        yumrepodir_abs = os.path.join(datadir, yumrepodir)
+        if consistent:
+            dirnames.append('consistent')
+        else:
+            logger.info('%d packages not built correctly: not updating'
+                        ' the consistent symlink' % failures)
+        for dirname in dirnames:
+            target_repo_dir = os.path.join(datadir, "repos", dirname)
+            os.symlink(os.path.relpath(yumrepodir_abs,
+                                       os.path.join(datadir, "repos")),
+                       target_repo_dir + "_")
+            os.rename(target_repo_dir + "_", target_repo_dir)
 
-    # And synchronize them
-    sync_symlinks(commit)
+        # And synchronize them
+        sync_symlinks(commit)
 
     if dev_mode is False:
         if consistent:
