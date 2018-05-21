@@ -363,6 +363,7 @@ def main():
                 session = getSession(config_options.database_connection)
                 if exception is not None:
                     logger.error("Received exception %s" % exception)
+                    failures = 1
                 else:
                     if not options.run:
                         failures = post_build(status, packages, session)
@@ -405,6 +406,7 @@ def main():
                     session = getSession(config_options.database_connection)
                     if exception is not None:
                         logger.info("Received exception %s" % exception)
+                        failures = 1
                     else:
                         # Create repo, build versions.csv file.
                         # This needs to be sequential
@@ -570,7 +572,7 @@ def process_build_result(status, packages, session, packages_to_process,
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
     if consistent:
         dirnames.append('consistent')
-    else:
+    elif exception is None:
         logger.info('%d packages not built correctly: not updating'
                     ' the consistent symlink' % failures)
     for dirname in dirnames:
