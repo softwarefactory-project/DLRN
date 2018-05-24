@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_3d34f0dc",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-05-24T17:55:29Z",
+      "side": 1,
+      "message": "in this case, it\u0027s using remote_info and direct GET rather than [git] clone/pull so maybe I\u0027d be more exact with\n\n# distroinfo will fetch info files from rdoinfo repo as needed, ...\n\nto avoid implication that git is used and whole repo is cloned/pulled as it used to be.",
+      "revId": "2b3bd2af3f3893b30cb364893f698b86fcc08221",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_7d410839",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-05-24T17:55:29Z",
+      "side": 1,
+      "message": "First, I\u0027d store this magical URL string in a variable - it might be useful.\n\nSecond, I suggest an alignment with distroinfo.\n\nIf multiple *_info parameters are passed to DistroInfo constructor, it selects the fastest one available which results in this precedence:\n\nlocal_info \u003e remote_info \u003e remote_git_info\n\nlocal_info is called local_info_repo here.\nlocat_git_info is called rdoinfo_repo here.\nso if you put the remote_info URL into a config option such as rdoinfo_raw or such, you can simply grab the opts from config and feed them directly to DistroInfo() - effectively replacing this block with\n\ninforepo \u003d info.DistroInfo(\n    info_files\u003d\u0027rdo.yml\u0027,\n    local_info\u003dlocal_info_repo,\n    remote_info\u003drdoinfo_raw,\n    remote_git_info\u003drdoinfo_repo)\n\nas long as you like the builtin precedence of direct remote_info to remote_git_info (it\u0027s the other way around in this code).\n\nIf none of the strings are supplied, DistroInfo will throw\ndistroinfo.exception.InfoFetcherRequired() back at you ;)",
+      "revId": "2b3bd2af3f3893b30cb364893f698b86fcc08221",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
