@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_bd0ec0e3",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-05-25T12:39:59Z",
+      "side": 1,
+      "message": "now I noticed \u0027rdo.yml\u0027 is duplicated 3 times, but I\u0027m not even sure if having\n\n    info_files\u003d\u0027rdo.yml\u0027\n\nat the top and passing\n\n    info_files\u003dinfo_files\n\nto DistroInfo constructor is really worth it... it\u0027s the usual consitency vs readability struggle.\n\nHowever, in the case where someone wants to change the info_files, this is in serious danger of only being updated on some and not all the lines.",
+      "revId": "40173d902518f5befcd7505e4c725128189676ba",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
