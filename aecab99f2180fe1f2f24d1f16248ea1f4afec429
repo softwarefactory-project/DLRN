@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_9113ab5c",
+        "filename": "dlrn/drivers/coprdriver.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-30T16:20:32Z",
+      "side": 1,
+      "message": "After running some more tests, I\u0027ve realized this does not work as we want.\n\nkoji download-task gets the rpm files and logs in the current directory, however \"copr download-build\" works differently, and creates the following structure under the destination directory:\n\ntarget/*.rpm\ntarget/*.log\ntarget/var/...\n\nThe downloaded package is not moved to the repo directory, it is never included in the repository, and we are adding a lot of unnecessary files.\n\nWe should improve that by only fetching the rpms and required logs to output_dir, then remove the whole output_dir/build_di directory.",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 27
+      },
+      "revId": "aecab99f2180fe1f2f24d1f16248ea1f4afec429",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
