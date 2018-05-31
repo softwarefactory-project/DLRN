@@ -22,6 +22,30 @@
       "revId": "aecab99f2180fe1f2f24d1f16248ea1f4afec429",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_7174cffc",
+        "filename": "dlrn/drivers/coprdriver.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-05-31T13:07:31Z",
+      "side": 1,
+      "message": "Ok, I\u0027ll write a fix, let me know Javier, given https://copr-be.cloud.fedoraproject.org/results/flepied/systemd-pr-x86_64/fedora-rawhide-x86_64/00761119-systemd/ which log file do I need to move back in the output_dir ?",
+      "parentUuid": "7a2fa921_9113ab5c",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 27
+      },
+      "revId": "aecab99f2180fe1f2f24d1f16248ea1f4afec429",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
