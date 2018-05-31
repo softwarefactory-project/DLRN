@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_4c1d7865",
+        "filename": "dlrn/drivers/coprdriver.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-31T16:13:41Z",
+      "side": 1,
+      "message": "I think the src.rpm should also be there.",
+      "range": {
+        "startLine": 109,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 32
+      },
+      "revId": "0a1d2b0cc51ae3582e84861174490167a9481fa9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_6c1ab470",
+        "filename": "dlrn/drivers/coprdriver.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-05-31T16:13:41Z",
+      "side": 1,
+      "message": "Why don\u0027t we use output_dir/build_id, instead of looking at the directories inside output_dir?",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 49
+      },
+      "revId": "0a1d2b0cc51ae3582e84861174490167a9481fa9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
