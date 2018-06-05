@@ -146,6 +146,18 @@ class TestCommit(TestsWithData):
         commit.distro_hash = None
         self.assertIn(commit.commit_hash, commit.getshardedcommitdir())
 
+    def test_commit_getshardedcommitdir_extended_hash(self):
+        commit = db.getLastProcessedCommit(self.session, 'python-pysaml2')
+        commit.extended_hash = 'abc'
+        directory1 = commit.getshardedcommitdir()
+        self.assertEqual(directory1,
+                         '3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_'
+                         '024e24f0_abc')
+        commit.extended_hash = 'abcdef123456'
+        directory2 = commit.getshardedcommitdir()
+        self.assertEqual(directory2,
+                         '3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_'
+                         '024e24f0_abcdef12')
 
 class TestProject(TestsWithData):
     def test_email(self):
