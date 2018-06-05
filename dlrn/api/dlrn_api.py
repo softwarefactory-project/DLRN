@@ -56,6 +56,14 @@ def _repo_hash(commit):
     return "%s_%s" % (commit.commit_hash, commit.distro_hash[:8])
 
 
+def _get_commit(session, commit_hash, distro_hash):
+    commit = session.query(Commit).filter(
+        Commit.status == 'SUCCESS',
+        Commit.commit_hash == commit_hash,
+        Commit.distro_hash == distro_hash).order_by(desc(Commit.id)).first()
+    return commit
+
+
 @app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
@@ -124,10 +132,8 @@ def repo_status():
 
     # Find the commit id for commit_hash/distro_hash
     session = getSession(app.config['DB_PATH'])
-    commit = session.query(Commit).filter(
-        Commit.status == 'SUCCESS',
-        Commit.commit_hash == commit_hash,
-        Commit.distro_hash == distro_hash).first()
+    commit = _get_commit(session, commit_hash, distro_hash)
+
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash combination not found',
                            status_code=404)
@@ -253,10 +259,7 @@ def promotions_GET():
     # Find the commit id for commit_hash/distro_hash
     session = getSession(app.config['DB_PATH'])
     if commit_hash and distro_hash:
-        commit = session.query(Commit).filter(
-            Commit.status == 'SUCCESS',
-            Commit.commit_hash == commit_hash,
-            Commit.distro_hash == distro_hash).first()
+        commit = _get_commit(session, commit_hash, distro_hash)
         if commit is None:
             raise InvalidUsage('commit_hash+distro_hash combination not found',
                                status_code=404)
@@ -457,10 +460,7 @@ def report_result():
     notes = request.json.get('notes', '')
 
     session = getSession(app.config['DB_PATH'])
-    commit = session.query(Commit).filter(
-        Commit.status == 'SUCCESS',
-        Commit.commit_hash == commit_hash,
-        Commit.distro_hash == distro_hash).first()
+    commit = _get_commit(session, commit_hash, distro_hash)
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash combination not found',
                            status_code=404)
@@ -512,10 +512,7 @@ def promote():
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     session = getSession(app.config['DB_PATH'])
-    commit = session.query(Commit).filter(
-        Commit.status == 'SUCCESS',
-        Commit.commit_hash == commit_hash,
-        Commit.distro_hash == distro_hash).first()
+    commit = _get_commit(session, commit_hash, distro_hash)
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash combination not found',
                            status_code=404)
@@ -650,10 +647,7 @@ def get_civotes_detail():
     votes = votes.filter(CIVote.ci_name != 'consistent')
 
     if commit_hash and distro_hash:
-        commit = session.query(Commit).filter(
-            Commit.status == 'SUCCESS',
-            Commit.commit_hash == commit_hash,
-            Commit.distro_hash == distro_hash).first()
+        commit = _get_commit(session, commit_hash, distro_hash)
         votes = votes.from_self().filter(CIVote.commit_id == commit.id)
     elif ci_name:
         votes = votes.filter(CIVote.ci_name == ci_name)
