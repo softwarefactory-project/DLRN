@@ -16,6 +16,75 @@
       "revId": "616ade6136c05eb6f5432ae23b02b2912dbf248b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_f5cbf81c",
+        "filename": "dlrn/db.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 442
+      },
+      "writtenOn": "2018-06-05T17:44:36Z",
+      "side": 1,
+      "message": "It might be nice to have a comment that shows the format of the extended hash so the list splicing is a little more clear.",
+      "range": {
+        "startLine": 69,
+        "startChar": 13,
+        "endLine": 75,
+        "endChar": 72
+      },
+      "revId": "616ade6136c05eb6f5432ae23b02b2912dbf248b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_55dbcced",
+        "filename": "dlrn/migrations/versions/ade85b2396bc_add_extended_hash_and_dt_extended_columns_to_.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 442
+      },
+      "writtenOn": "2018-06-05T17:44:36Z",
+      "side": 1,
+      "message": "Thank you for setting a limit here, that is a common mistake I see.",
+      "range": {
+        "startLine": 33,
+        "startChar": 66,
+        "endLine": 33,
+        "endChar": 69
+      },
+      "revId": "616ade6136c05eb6f5432ae23b02b2912dbf248b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_75d848f0",
+        "filename": "dlrn/migrations/versions/ade85b2396bc_add_extended_hash_and_dt_extended_columns_to_.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 442
+      },
+      "writtenOn": "2018-06-05T17:44:36Z",
+      "side": 1,
+      "message": "Consider setting a default here to 0, I believe that will make it so you don\u0027t have to run the update after.",
+      "range": {
+        "startLine": 34,
+        "startChar": 4,
+        "endLine": 34,
+        "endChar": 66
+      },
+      "revId": "616ade6136c05eb6f5432ae23b02b2912dbf248b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
