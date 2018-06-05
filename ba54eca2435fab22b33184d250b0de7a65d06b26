@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a2ca52d_55e74c12",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-05T14:22:34Z",
+      "side": 1,
+      "message": "Yes, this id is automatically incremented on every new commit.",
+      "parentUuid": "5a2ca52d_f530d8a0",
+      "revId": "ba54eca2435fab22b33184d250b0de7a65d06b26",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_151a3418",
         "filename": "dlrn/api/dlrn_api.py",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "5a2ca52d_35ee50ed",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 658,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-05T14:22:34Z",
+      "side": 1,
+      "message": "Yes, it makes sense. I\u0027ll add that",
+      "parentUuid": "5a2ca52d_151a3418",
+      "revId": "ba54eca2435fab22b33184d250b0de7a65d06b26",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_751da80e",
         "filename": "dlrn/db.py",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2018-06-05T13:56:28Z",
       "side": 1,
       "message": "Consider putting the concatenation on a separate line to make this lighter/easily readable. Something like\n\n    dir_hash \u003d self.commit_hash + distro_hash_suffix + extended_hash_suffix\n    return os.path.join(self.commit_hash[:2], self.commit_hash[2:4],\n    dir_hash)",
+      "revId": "ba54eca2435fab22b33184d250b0de7a65d06b26",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_d5b91cee",
+        "filename": "dlrn/db.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-05T14:22:34Z",
+      "side": 1,
+      "message": "Ok, I will",
+      "parentUuid": "5a2ca52d_751da80e",
       "revId": "ba54eca2435fab22b33184d250b0de7a65d06b26",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
