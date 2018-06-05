@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_f530d8a0",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-05T13:56:28Z",
+      "side": 1,
+      "message": "This assumes that new ID \u003e previously created IDs.\n\n    class Commit(Base):\n        id \u003d Column(Integer, primary_key\u003dTrue)\n\nIs this guaranteed by the DB with this definition?",
+      "revId": "ba54eca2435fab22b33184d250b0de7a65d06b26",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_151a3418",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 658,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-05T13:56:28Z",
+      "side": 1,
+      "message": "NOTE: this filter seems to be duplicated all over the place, might be worth eventually factoring out to a dedicated function/whatever magic. It could be something like \n\n    ???.get_commit(commit_hash, distro_hash)\n\ninstead of these 4 lines.",
+      "revId": "ba54eca2435fab22b33184d250b0de7a65d06b26",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_751da80e",
+        "filename": "dlrn/db.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-05T13:56:28Z",
+      "side": 1,
+      "message": "Consider putting the concatenation on a separate line to make this lighter/easily readable. Something like\n\n    dir_hash \u003d self.commit_hash + distro_hash_suffix + extended_hash_suffix\n    return os.path.join(self.commit_hash[:2], self.commit_hash[2:4],\n    dir_hash)",
+      "revId": "ba54eca2435fab22b33184d250b0de7a65d06b26",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
