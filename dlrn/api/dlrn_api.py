@@ -127,7 +127,7 @@ def repo_status():
     commit = session.query(Commit).filter(
         Commit.status == 'SUCCESS',
         Commit.commit_hash == commit_hash,
-        Commit.distro_hash == distro_hash).first()
+        Commit.distro_hash == distro_hash).order_by(desc(Commit.id)).first()
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash combination not found',
                            status_code=404)
@@ -256,7 +256,8 @@ def promotions_GET():
         commit = session.query(Commit).filter(
             Commit.status == 'SUCCESS',
             Commit.commit_hash == commit_hash,
-            Commit.distro_hash == distro_hash).first()
+            Commit.distro_hash == distro_hash).\
+            order_by(desc(Commit.id)).first()
         if commit is None:
             raise InvalidUsage('commit_hash+distro_hash combination not found',
                                status_code=404)
@@ -460,7 +461,7 @@ def report_result():
     commit = session.query(Commit).filter(
         Commit.status == 'SUCCESS',
         Commit.commit_hash == commit_hash,
-        Commit.distro_hash == distro_hash).first()
+        Commit.distro_hash == distro_hash).order_by(desc(Commit.id)).first()
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash combination not found',
                            status_code=404)
@@ -515,7 +516,7 @@ def promote():
     commit = session.query(Commit).filter(
         Commit.status == 'SUCCESS',
         Commit.commit_hash == commit_hash,
-        Commit.distro_hash == distro_hash).first()
+        Commit.distro_hash == distro_hash).order_by(desc(Commit.id)).first()
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash combination not found',
                            status_code=404)
@@ -653,7 +654,8 @@ def get_civotes_detail():
         commit = session.query(Commit).filter(
             Commit.status == 'SUCCESS',
             Commit.commit_hash == commit_hash,
-            Commit.distro_hash == distro_hash).first()
+            Commit.distro_hash == distro_hash).\
+            order_by(desc(Commit.id)).first()
         votes = votes.from_self().filter(CIVote.commit_id == commit.id)
     elif ci_name:
         votes = votes.filter(CIVote.ci_name == ci_name)
