@@ -218,7 +218,8 @@ class GitRepoDriver(PkgInfoDriver):
                                 commit_hash=commit_hash, repo_dir=repo_dir,
                                 distro_hash=distro_hash, dt_distro=dt_distro,
                                 distgit_dir=distro_dir,
-                                commit_branch=source_branch)
+                                commit_branch=source_branch,
+                                dt_extended=0, extended_hash=None)
                 project_toprocess.append(commit)
 
         return project_toprocess

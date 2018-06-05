@@ -267,6 +267,8 @@ def main():
                         (not session.query(Commit).filter(
                             Commit.commit_hash == commit_toprocess.commit_hash,
                             Commit.distro_hash == commit_toprocess.distro_hash,
+                            Commit.extended_hash ==
+                            commit_toprocess.extended_hash,
                             Commit.status != "RETRY")
                             .all())):
                         toprocess.append(commit_toprocess)
@@ -288,6 +290,8 @@ def main():
                         (not session.query(Commit).filter(
                             Commit.commit_hash == commit_toprocess.commit_hash,
                             Commit.distro_hash == commit_toprocess.distro_hash,
+                            Commit.extended_hash ==
+                            commit_toprocess.extended_hash,
                             Commit.status != "RETRY")
                             .all())):
                         toprocess.append(commit_toprocess)
