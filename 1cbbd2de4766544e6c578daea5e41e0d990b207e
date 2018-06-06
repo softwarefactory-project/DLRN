@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_f87d2de8",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-06T15:04:36Z",
+      "side": 1,
+      "message": "Isn\u0027t this equivalent to\n\n    return package.get(\u0027version-from\u0027)\n\n?",
+      "revId": "1cbbd2de4766544e6c578daea5e41e0d990b207e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
