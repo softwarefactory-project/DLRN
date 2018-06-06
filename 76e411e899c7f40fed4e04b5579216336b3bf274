@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "5a2ca52d_f8a52db5",
+        "filename": "dlrn/db.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-06T12:17:32Z",
+      "side": 1,
+      "message": "Good idea, I\u0027ll add that.",
+      "parentUuid": "5a2ca52d_b8b815e7",
+      "revId": "76e411e899c7f40fed4e04b5579216336b3bf274",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_38ee45ed",
         "filename": "dlrn/migrations/versions/ade85b2396bc_add_extended_hash_and_dt_extended_columns_to_.py",
         "patchSetId": 4
@@ -82,6 +100,30 @@
     },
     {
       "key": {
+        "uuid": "5a2ca52d_b8afb593",
+        "filename": "dlrn/migrations/versions/ade85b2396bc_add_extended_hash_and_dt_extended_columns_to_.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-06T12:17:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a2ca52d_d8b951ee",
+      "range": {
+        "startLine": 38,
+        "startChar": 50,
+        "endLine": 38,
+        "endChar": 60
+      },
+      "revId": "76e411e899c7f40fed4e04b5579216336b3bf274",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_f8be8dd3",
         "filename": "dlrn/shell.py",
         "patchSetId": 4
@@ -93,6 +135,24 @@
       "writtenOn": "2018-06-06T10:53:53Z",
       "side": 1,
       "message": "any specific reason for the line break here ?",
+      "revId": "76e411e899c7f40fed4e04b5579216336b3bf274",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_98aaf984",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-06T12:17:32Z",
+      "side": 1,
+      "message": "To avoid going beyond the 80-char limit :-/",
+      "parentUuid": "5a2ca52d_f8be8dd3",
       "revId": "76e411e899c7f40fed4e04b5579216336b3bf274",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
