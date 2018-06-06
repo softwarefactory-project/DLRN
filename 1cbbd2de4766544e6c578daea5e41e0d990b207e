@@ -16,6 +16,24 @@
       "revId": "1cbbd2de4766544e6c578daea5e41e0d990b207e",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_78511d62",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-06T16:35:35Z",
+      "side": 1,
+      "message": "Good catch, I\u0027ll fix that.",
+      "parentUuid": "5a2ca52d_f87d2de8",
+      "revId": "1cbbd2de4766544e6c578daea5e41e0d990b207e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
