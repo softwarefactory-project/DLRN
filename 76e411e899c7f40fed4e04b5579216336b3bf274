@@ -16,6 +16,86 @@
       "revId": "76e411e899c7f40fed4e04b5579216336b3bf274",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_b8b815e7",
+        "filename": "dlrn/db.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-06-06T10:53:53Z",
+      "side": 1,
+      "message": "maybe a quick test in test_db.py for this change ?",
+      "revId": "76e411e899c7f40fed4e04b5579216336b3bf274",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_38ee45ed",
+        "filename": "dlrn/migrations/versions/ade85b2396bc_add_extended_hash_and_dt_extended_columns_to_.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-06-06T10:53:53Z",
+      "side": 1,
+      "message": "dt_extended",
+      "range": {
+        "startLine": 38,
+        "startChar": 32,
+        "endLine": 38,
+        "endChar": 41
+      },
+      "revId": "76e411e899c7f40fed4e04b5579216336b3bf274",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_d8b951ee",
+        "filename": "dlrn/migrations/versions/ade85b2396bc_add_extended_hash_and_dt_extended_columns_to_.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-06-06T10:53:53Z",
+      "side": 1,
+      "message": "extended_hash",
+      "range": {
+        "startLine": 38,
+        "startChar": 50,
+        "endLine": 38,
+        "endChar": 60
+      },
+      "revId": "76e411e899c7f40fed4e04b5579216336b3bf274",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_f8be8dd3",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-06-06T10:53:53Z",
+      "side": 1,
+      "message": "any specific reason for the line break here ?",
+      "revId": "76e411e899c7f40fed4e04b5579216336b3bf274",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
