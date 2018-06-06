@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a2ca52d_f8cbed1c",
+        "filename": "dlrn/config.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-06T16:46:29Z",
+      "side": 1,
+      "message": "Mmm... Indeed, I don\u0027t know why I put it like that.",
+      "parentUuid": "5a2ca52d_b887b5d6",
+      "revId": "f0f83784034c7d56b2d271f748b66390096e650f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_387405fc",
         "filename": "doc/source/installation.rst",
         "patchSetId": 4
@@ -64,6 +82,24 @@
       "writtenOn": "2018-06-06T15:19:41Z",
       "side": 1,
       "message": "You use KEEP here -\u003e keep_tarball option?",
+      "revId": "f0f83784034c7d56b2d271f748b66390096e650f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_98d0b9cb",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-06T16:46:29Z",
+      "side": 1,
+      "message": "Ok, let\u0027s go for keep_tarball",
+      "parentUuid": "5a2ca52d_d85f1174",
       "revId": "f0f83784034c7d56b2d271f748b66390096e650f",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
