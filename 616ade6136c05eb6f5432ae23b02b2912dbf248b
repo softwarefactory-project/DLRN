@@ -66,6 +66,30 @@
     },
     {
       "key": {
+        "uuid": "5a2ca52d_781d9d0e",
+        "filename": "dlrn/db.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-06-06T09:23:52Z",
+      "side": 1,
+      "message": "https://softwarefactory-project.io/r/#/c/12440/3/dlrn/db.py\n\nextended hash is assumed to be git hash like, based on sha1[1] and :8 is standard short form.\nFull Trunk repo path with extended hash is formed as it is now in RDO Trunk[2] appending short extended_hash:\n/UP/ST/UPSTREAMLONG_DISTSHORT_EXTENDEDSHORT\n\nFor downstream use-case extended_hash would be downstream distgit hash, which in\ncludes RPM patches on top of UPSTREAM source hash and merged changes from RDO Tr\nunk distgit.\n\n[1] if curious \"How is git commit sha1 formed \" https://gist.github.com/masak/2415865\n[2] e.g. recent one https://trunk.rdoproject.org/centos7-master/a8/30/a8304701af13a34dc77021d7650774811a1cec0d_75c5197e/",
+      "parentUuid": "5a2ca52d_380085aa",
+      "range": {
+        "startLine": 69,
+        "startChar": 13,
+        "endLine": 75,
+        "endChar": 72
+      },
+      "revId": "616ade6136c05eb6f5432ae23b02b2912dbf248b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_55dbcced",
         "filename": "dlrn/migrations/versions/ade85b2396bc_add_extended_hash_and_dt_extended_columns_to_.py",
         "patchSetId": 3
