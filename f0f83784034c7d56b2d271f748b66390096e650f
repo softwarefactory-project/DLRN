@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_b887b5d6",
+        "filename": "dlrn/config.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-06T15:19:41Z",
+      "side": 1,
+      "message": "This variable seems unneeded. I\u0027d go directly with\n\n    self.allow_tarball \u003d cp.getboolean(\n        \u0027gitrepo_driver\u0027, \u0027gitrepo_tarball\u0027)\n\nor one-parameter-per-line version.",
+      "revId": "f0f83784034c7d56b2d271f748b66390096e650f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_387405fc",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-06T15:19:41Z",
+      "side": 1,
+      "message": "I\u0027d expect an `allow_*` option to enable extra features, but in fact this one quite drastically changes default behavior to a pretty weird one for a specific case.\n\nTo make this clear, I\u0027d go with something like\n\n    keep_tarball\n    reuse_tarball\n    use_tarball",
+      "revId": "f0f83784034c7d56b2d271f748b66390096e650f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_586d4131",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-06T15:19:41Z",
+      "side": 1,
+      "message": "I noticed renderspec is actually quite integrated in DRLN already and this improves the integration further - good stuff!",
+      "revId": "f0f83784034c7d56b2d271f748b66390096e650f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_d85f1174",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-06T15:19:41Z",
+      "side": 1,
+      "message": "You use KEEP here -\u003e keep_tarball option?",
+      "revId": "f0f83784034c7d56b2d271f748b66390096e650f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
