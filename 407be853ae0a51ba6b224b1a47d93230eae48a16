@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_091d3973",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-11T16:05:27Z",
+      "side": 1,
+      "message": "Unneeded? We\u0027re using urlopen directly.",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 15
+      },
+      "revId": "407be853ae0a51ba6b224b1a47d93230eae48a16",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_e930fd09",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-11T16:05:27Z",
+      "side": 1,
+      "message": "Doing a quick test, I see that the csv file exported by DLRN includes a header, and it is retrieved by the call. Is there a way we can remove it?\n\nIn theory, we could assume that the first row in the CSV file is always a header.",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 19
+      },
+      "revId": "407be853ae0a51ba6b224b1a47d93230eae48a16",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_e9179d52",
+        "filename": "projects.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-11T16:05:27Z",
+      "side": 1,
+      "message": "Let\u0027s also add the \"repo\" config option, to mimic the rdoinfo driver setup. We should not take the option from rdoinfo_driver, since this could be confusing.",
+      "revId": "407be853ae0a51ba6b224b1a47d93230eae48a16",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
