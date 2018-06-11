@@ -7,6 +7,8 @@ SQLAlchemy
 PyMySQL
 PyYAML
 rdopkg>=0.45.0
+# XXX: enable CI for now, this will be added by distroinfo patch
+distroinfo
 alembic>=0.7.0
 renderspec
 pymod2pkg>=0.5.5
