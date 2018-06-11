@@ -41,13 +41,19 @@ class ConfigOptions(object):
         self.release_numbering = cp.get('DEFAULT', 'release_numbering')
 
         # Handling for optional sections, driver-based
+        self.rdoinfo_repo = None
         if cp.has_section('rdoinfo_driver'):
             if cp.has_option('rdoinfo_driver', 'repo'):
                 self.rdoinfo_repo = cp.get('rdoinfo_driver', 'repo')
+
+        if cp.has_section('downstream_driver'):
+            if cp.has_option('downstream_driver', 'repo'):
+                self.rdoinfo_repo = cp.get('downstream_driver', 'repo')
+            if cp.has_option('downstream_driver', 'versions_url'):
+                self.versions_url = cp.get('downstream_driver',
+                                           'versions_url')
             else:
-                self.rdoinfo_repo = None
-        else:
-            self.rdoinfo_repo = None
+                self.versions_url = None
 
         if cp.has_section('gitrepo_driver'):
             if cp.has_option('gitrepo_driver', 'repo'):
