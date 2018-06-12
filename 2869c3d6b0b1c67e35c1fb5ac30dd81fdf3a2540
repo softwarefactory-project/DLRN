@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_0f3c5992",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-12T17:23:16Z",
+      "side": 1,
+      "message": "typo warning!",
+      "range": {
+        "startLine": 133,
+        "startChar": 39,
+        "endLine": 133,
+        "endChar": 46
+      },
+      "revId": "2869c3d6b0b1c67e35c1fb5ac30dd81fdf3a2540",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
