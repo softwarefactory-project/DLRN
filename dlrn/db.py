@@ -40,12 +40,14 @@ class Commit(Base):
     id = Column(Integer, primary_key=True)
     dt_commit = Column(Integer)
     dt_distro = Column(Integer)
+    dt_extended = Column(Integer)
     dt_build = Column(Integer)
     project_name = Column(String(256))
     repo_dir = Column(String(1024))
     distgit_dir = Column(String(1024))
     commit_hash = Column(String(64))
     distro_hash = Column(String(64))
+    extended_hash = Column(String(64))
     commit_branch = Column(String(256))
     status = Column(String(64))
     rpms = Column(Text)
@@ -65,8 +67,16 @@ class Commit(Base):
         distro_hash_suffix = ""
         if self.distro_hash:
             distro_hash_suffix = "_%s" % self.distro_hash[:8]
+        if self.extended_hash:
+            # The extended hash is assumed to be a git-like hash, however
+            # there is nothing preventing pkginfo drivers from using a
+            # different format (such as YYYYMMDD).
+            extended_hash_suffix = "_%s" % self.extended_hash[:8]
+        else:
+            extended_hash_suffix = ''
+        hash_dir = self.commit_hash + distro_hash_suffix + extended_hash_suffix
         return os.path.join(self.commit_hash[:2], self.commit_hash[2:4],
-                            self.commit_hash + distro_hash_suffix)
+                            hash_dir)
 
 
 class Project(Base):
