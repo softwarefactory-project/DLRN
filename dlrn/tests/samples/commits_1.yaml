@@ -4,6 +4,7 @@ projects:
 commits:
 - commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc
   distro_hash: c31d1b18eb5ab5aed6721fc4fad06c9bd242490c
+  extended_hash:
   dt_build: '1441245379'
   dt_commit: '1441245153'
   dt_distro: '1440598801'
@@ -16,6 +17,7 @@ commits:
   status: FAILED
 - commit_hash: 17234e9ab9dfab4cf5600f67f1d24db5064f1025
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  extended_hash:
   dt_build: '1441635089'
   dt_commit: '1441634092'
   dt_distro: '1431949433'
@@ -28,6 +30,7 @@ commits:
   status: SUCCESS
 - commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc
   distro_hash: 8170b8686c38bafb6021d998e2fb268ab26ccf65
+  extended_hash: 'abcdef12345678'
   dt_build: '1441669026'
   dt_commit: '1441245153'
   dt_distro: '1441668907'
@@ -40,6 +43,7 @@ commits:
   status: SUCCESS
 - commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc
   distro_hash: 885e80778edb6cbb8ee4d8909623be8062369a04
+  extended_hash:
   dt_build: '1441675005'
   dt_commit: '1441245153'
   dt_distro: '1441674764'
@@ -52,6 +56,7 @@ commits:
   status: FAILED
 - commit_hash: 12edde8a53c7299105bb8297c6f31d3a458615ab
   distro_hash: 354991d934d4217de5cfa447aabda684489544b5
+  extended_hash:
   dt_build: '1441808572'
   dt_commit: '1441722142'
   dt_distro: '1441806541'
@@ -256,6 +261,7 @@ commits:
   status: RETRY
 - commit_hash: 3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  extended_hash: 'cafecafe'
   dt_build: '1444139517'
   dt_commit: '1444139038'
   dt_distro: '1431949433'
