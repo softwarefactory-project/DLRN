@@ -142,7 +142,9 @@ sed -i -e "s/UPSTREAMVERSION/$UPSTREAMVERSION/g" *.spec
 VERSION=${VERSION/-/.}
 sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
 sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
-sed -i -e "s/^\(Source\|Source0\):.*/\1: $SOURCEWITHREL/" *.spec
+if [ "$DLRN_KEEP_TARBALL" != "1" ]; then
+    sed -i -e "s/^\(Source\|Source0\):.*/\1: $SOURCEWITHREL/" *.spec
+fi
 sed -i -e '/^%changelog.*/q' *.spec
 cat *.spec
 spectool -g -C ${TOP_DIR}/SOURCES *.spec

@@ -220,6 +220,14 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     dlrn.shell.pkginfo.preprocess(package_name=commit.project_name)
 
+    if config_options.keep_tarball:
+        if commit.commit_branch == config_options.source:
+            # We are following the master tarball here, use it
+            os.environ['DLRN_KEEP_TARBALL'] = '1'
+        else:
+            if 'DLRN_KEEP_TARBALL' in os.environ:
+                del os.environ['DLRN_KEEP_TARBALL']
+
     run(os.path.join(scriptsdir, "build_srpm.sh"), commit, env_vars,
         dev_mode, use_public, bootstrap)
 
