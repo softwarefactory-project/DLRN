@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_e42a64e7",
+        "filename": "dlrn/tests/test_db.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-06-12T10:43:43Z",
+      "side": 1,
+      "message": "dlrn/tests/samples/ do not have any examples with extended_hash but this can be follow up",
+      "revId": "540f03166ee8e114a2628c6ccf1e75d0105cfd99",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
