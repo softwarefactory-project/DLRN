@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_2faa751a",
+        "filename": "dlrn/config.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-13T09:59:30Z",
+      "side": 1,
+      "message": "We need to fetch versions_url, too.",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 71
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_cfbae16e",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-13T09:59:30Z",
+      "side": 1,
+      "message": "To answer this comment: not necessarily. If there is no line for the package in the csv file, no commits will be returned for it.",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 43
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_af3a05e6",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-13T09:59:30Z",
+      "side": 1,
+      "message": "This is actually reversed. [1] is the source hash, [3] the distro hash.",
+      "range": {
+        "startLine": 134,
+        "startChar": 56,
+        "endLine": 134,
+        "endChar": 58
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_4fa7b14f",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-13T09:59:30Z",
+      "side": 1,
+      "message": "This part is actually not needed. \"lines\" is used to get all the latest commits from the package, but we already know what we want to build, and that is in versions[package[\u0027name\u0027]]",
+      "range": {
+        "startLine": 170,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 44
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_ef623d16",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-13T09:59:30Z",
+      "side": 1,
+      "message": "Same here: we only want to build the commit in versions.csv, so we do not need to iterate through lines. Actually, if we did so in a live system, we may see the same package trying to be built several times if there are multiple commits since the last one.",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 30
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_cf3f41d5",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-06-13T09:59:30Z",
+      "side": 1,
+      "message": "Same as above, it should be [1]",
+      "range": {
+        "startLine": 190,
+        "startChar": 55,
+        "endLine": 190,
+        "endChar": 58
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
