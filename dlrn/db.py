@@ -109,7 +109,7 @@ class CIVote(Base):
     ci_in_progress = Column(Boolean)
     timestamp = Column(Integer)
     notes = Column(Text)
-    user = Column(String(256),
+    user = Column(String(255),
                   ForeignKey('users.username', name='civ_user_fk'))
 
 
@@ -120,14 +120,14 @@ class Promotion(Base):
     commit_id = Column(Integer, ForeignKey('commits.id'), nullable=False)
     promotion_name = Column(String(256), nullable=False)
     timestamp = Column(Integer, nullable=False)
-    user = Column(String(256),
+    user = Column(String(255),
                   ForeignKey('users.username', name='prom_user_fk'))
 
 
 class User(Base):
     __tablename__ = "users"
 
-    username = Column(String(256), primary_key=True)
+    username = Column(String(255), primary_key=True)
     password = Column(String(256), nullable=False)
 
 
