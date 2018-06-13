@@ -71,6 +71,30 @@
     },
     {
       "key": {
+        "uuid": "5a2ca52d_6a4b7b2c",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-13T13:52:37Z",
+      "side": 1,
+      "message": "ooops :)",
+      "parentUuid": "5a2ca52d_af3a05e6",
+      "range": {
+        "startLine": 134,
+        "startChar": 56,
+        "endLine": 134,
+        "endChar": 58
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_4fa7b14f",
         "filename": "dlrn/drivers/downstream.py",
         "patchSetId": 5
@@ -82,6 +106,30 @@
       "writtenOn": "2018-06-13T09:59:30Z",
       "side": 1,
       "message": "This part is actually not needed. \"lines\" is used to get all the latest commits from the package, but we already know what we want to build, and that is in versions[package[\u0027name\u0027]]",
+      "range": {
+        "startLine": 170,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 44
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_4a48ff5b",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-13T13:52:37Z",
+      "side": 1,
+      "message": "I wasn\u0027t very clear about that so I left it untouched - thanks for claryfing.",
+      "parentUuid": "5a2ca52d_4fa7b14f",
       "range": {
         "startLine": 170,
         "startChar": 0,
@@ -117,6 +165,30 @@
     },
     {
       "key": {
+        "uuid": "5a2ca52d_ea730bb3",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-13T13:52:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a2ca52d_ef623d16",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 30
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_cf3f41d5",
         "filename": "dlrn/drivers/downstream.py",
         "patchSetId": 5
@@ -128,6 +200,30 @@
       "writtenOn": "2018-06-13T09:59:30Z",
       "side": 1,
       "message": "Same as above, it should be [1]",
+      "range": {
+        "startLine": 190,
+        "startChar": 55,
+        "endLine": 190,
+        "endChar": 58
+      },
+      "revId": "db17b2b0593c8541bea3c018dbf1e3ba1a9e1ace",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_0a79a793",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-13T13:52:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a2ca52d_cf3f41d5",
       "range": {
         "startLine": 190,
         "startChar": 55,
