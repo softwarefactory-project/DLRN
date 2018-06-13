@@ -16,6 +16,24 @@
       "revId": "65467d15c7ba8c893f159f8802ca5fe8f53e2950",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_aa3af3e5",
+        "filename": "dlrn/config.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-13T17:01:16Z",
+      "side": 1,
+      "message": "Right!",
+      "parentUuid": "5a2ca52d_6a205b4a",
+      "revId": "65467d15c7ba8c893f159f8802ca5fe8f53e2950",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
