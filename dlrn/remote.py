@@ -132,6 +132,19 @@ def import_commit(repo_url, config_file, db_connection=None,
                 status = [commit, built_rpms, commit.notes, None]
                 post_build(status, packages, session)
             else:
+                pkg = [p for p in packages if p['name'] == package][0]
+                # Here we fire a refresh of the repositories
+                # (upstream and distgit) to be sure to have them in the
+                # data directory. We need that in the case the worker
+                # is running on another host mainly for the
+                # submit_review.sh script.
+                pkginfo.getinfo(project=pkg["name"], package=pkg,
+                                since='-1', local=False, dev_mode=False)
+                # Paths on the worker might differ so we overwrite them
+                # to reflect data path on the local API host.
+                commit.distgit_dir = pkginfo.distgit_dir(pkg['name'])
+                commit.repo_dir = os.path.join(
+                    config_options.datadir, pkg['name'])
                 status = [commit, '', '', commit.notes]
             process_build_result(status, packages, session, [])
             closeSession(session)   # Keep one session per commit
