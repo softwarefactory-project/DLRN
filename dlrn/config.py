@@ -106,8 +106,8 @@ class ConfigOptions(object):
                 self.koji_krb_principal = cp.get('kojibuild_driver',
                                                  'krb_principal')
                 if cp.has_option('kojibuild_driver', 'krb_keytab'):
-                    self.koji_keytab = cp.get('kojibuild_driver',
-                                              'krb_keytab')
+                    self.koji_krb_keytab = cp.get('kojibuild_driver',
+                                                  'krb_keytab')
                 else:
                     self.koji_krb_keytab = None
 
