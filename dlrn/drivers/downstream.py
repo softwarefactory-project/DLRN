@@ -23,6 +23,7 @@ import os
 import sh
 
 from distroinfo import info
+from distroinfo import query
 from six.moves.urllib.request import urlopen
 
 
@@ -69,7 +70,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
         self.packages = pkginfo["packages"]
         if tags:
             # FIXME allow list of tags?
-            self.packages = rdoinfo.filter_pkgs(self.packages, {'tags': tags})
+            self.packages = query.filter_pkgs(self.packages, {'tags': tags})
         return self.packages
 
     def getversions(self):
