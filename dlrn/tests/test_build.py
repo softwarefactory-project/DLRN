@@ -93,3 +93,19 @@ class TestBuild(base.TestCase):
             build(None, commit, None, False, False, False, True)
         except Exception as e:
             self.assertIn("No rpms built for", str(e))
+
+    @mock.patch('os.listdir', side_effect=mocked_listdir)
+    def test_build_configdir(self, ld_mock, sh_mock, env_mock, rc_mock):
+        self.config.configdir = tempfile.mkdtemp()
+        shutil.copyfile(os.path.join("scripts", "centos.cfg"),
+                        os.path.join(self.config.configdir, "centos.cfg"))
+        commit = db.getCommits(self.session)[-1]
+        expected = [mock.call('%s/centos.cfg' % self.config.configdir,
+                              '%s/dlrn-1.cfg.new' % self.config.datadir),
+                    mock.call('%s/dlrn-1.cfg.new' % self.config.datadir,
+                              '%s/dlrn-1.cfg' % self.config.datadir)]
+
+        with mock.patch('shutil.copyfile',
+                        side_effect=shutil.copyfile) as cp_mock:
+            build_rpm_wrapper(commit, False, False, False, None, True)
+            self.assertEqual(expected, cp_mock.call_args_list)
