@@ -259,8 +259,8 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
             shutil.rmtree(yumrepodir_abs)
         os.makedirs(yumrepodir_abs)
 
-    sh.git("--git-dir", "%s/.git" % repo_dir,
-           "--work-tree=%s" % repo_dir, "reset", "--hard", commit_hash)
+    git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
+    git.reset("--hard", commit_hash)
 
     run_cmd = []
     if env_vars:
