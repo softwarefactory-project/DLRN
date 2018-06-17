@@ -1,7 +1,5 @@
-# UUID Group Name
-global:Registered-Users	Registered Users
-3e9524ec5161dc0bc28a7343d1c54bb9ae4d6d35	Administrators
-global:Anonymous-Users	Anonymous Users
+# UUID                                  	Group Name
+#
 679cff8574418a025be325e8b863267195dc3c7e	DLRN-ptl
 bfb21f7dc15eb1aa8c8c6d51a8c4d5cff356a607	DLRN-core
-9562193e1f1647ee1c2004b4fb7996e84ae7e717	Non-Interactive Users
+global:Registered-Users                 	Registered Users
