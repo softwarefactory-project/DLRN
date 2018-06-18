@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "408229ba_0b7686f6",
+        "filename": "dlrn/build.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-06-18T12:45:12Z",
+      "side": 1,
+      "message": "nit to keep function naming consistent: get_version_from\n\ns/build/get/ since the body of the function shows that the intention is to solely retrieve the content of version-from: tag.",
+      "revId": "128a98e66999bf7c0b211f462f3f41200f0ecdb9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
