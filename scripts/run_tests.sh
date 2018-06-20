@@ -143,19 +143,14 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
         UPSTREAM_URL=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^upstream | awk '{print $2}')
         UPSTREAM_PROJECT_NAME=$(basename ${UPSTREAM_URL})
         rm -rf data/${PROJECT_TO_BUILD_MAPPED}
-        if type -p zuul-cloner; then
-            # Only build in the check pipeline to avoid merging a change
-            # in packaging that is dependent of an non merged upstream
-            # change
-            if [ "${ZUUL_PIPELINE}" = "check" ]; then
-                zuul-cloner --workspace data/ $OPENSTACK_GIT_URL openstack/${UPSTREAM_PROJECT_NAME}
-                mv data/openstack/${UPSTREAM_PROJECT_NAME} data/${PROJECT_TO_BUILD_MAPPED}
-            else
-                NOT_EXTRACTED=1
-            fi
-         else
-            git clone ${UPSTREAM_URL} "data/${PROJECT_TO_BUILD_MAPPED}"
+        # Only build in the check pipeline to avoid merging a change
+        # in packaging that is dependent of an non merged upstream
+        # change
+        git clone ${UPSTREAM_URL} "data/${PROJECT_TO_BUILD_MAPPED}"
+        if [ "${ZUUL_PIPELINE}" != "check" ]; then
+            NOT_EXTRACTED=1
         fi
+
         if [ -z "$NOT_EXTRACTED" ]; then
             # We cannot run git review -d because we don't have an
             # available account. So we do the same using curl, jq and git.
