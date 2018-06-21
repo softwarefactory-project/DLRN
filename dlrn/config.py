@@ -58,8 +58,16 @@ class ConfigOptions(object):
             if cp.has_option('downstream_driver', 'versions_url'):
                 self.versions_url = cp.get('downstream_driver',
                                            'versions_url')
+            if cp.has_option('downstream_driver', 'downstream_distgit_base'):
+                self.downstream_distgit_base = cp.get(
+                    'downstream_driver', 'downstream_distgit_base')
+            if cp.has_option('downstream_driver', 'downstream_distro_branch'):
+                self.downstream_distro_branch = cp.get(
+                    'downstream_driver', 'downstream_distro_branch')
             else:
                 self.versions_url = None
+                self.downstream_distro_branch = None
+                self.downstream_distgit_base = None
 
         if cp.has_section('gitrepo_driver'):
             if cp.has_option('gitrepo_driver', 'repo'):
