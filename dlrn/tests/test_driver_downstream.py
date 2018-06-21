@@ -28,6 +28,10 @@ def _mocked_versions(*args, **kwargs):
     return open(fn, 'rb')
 
 
+def _mocked_refreshrepo(*args, **kwargs):
+    return 'a', 'b', 'c'
+
+
 @mock.patch('dlrn.drivers.downstream.urlopen', side_effect=_mocked_versions)
 class TestDriverDownstream(base.TestCase):
     def setUp(self):
@@ -37,6 +41,8 @@ class TestDriverDownstream(base.TestCase):
         self.config = ConfigOptions(config)
         self.config.versions_url = \
             'https://trunk.rdoproject.org/centos7-master/current/versions.csv'
+        self.config.downstream_distro_branch = 'testbranch'
+        self.config.downstream_distgit_base = 'git://git.example.com/rpms'
         self.temp_dir = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -50,7 +56,9 @@ class TestDriverDownstream(base.TestCase):
         assert nv[1] == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', nv[1]
         assert nv[3] == '8fce438abdd12cba33bd9fa4f7d16c098e10094f', nv[3]
 
-    def test_getinfo(self, uo_mock):
+    @mock.patch('dlrn.drivers.downstream.refreshrepo',
+                side_effect=_mocked_refreshrepo)
+    def test_getinfo(self, rr_mock, uo_mock):
         driver = DownstreamInfoDriver(cfg_options=self.config)
         package = {
             'name': 'openstack-nova',
@@ -58,9 +66,9 @@ class TestDriverDownstream(base.TestCase):
             'conf': 'rpmfactory-core',
             'upstream': 'git://git.openstack.org/openstack/nova',
             'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
-            'distgit': 'https://github.com/rdo-packages/nova-distgit.git',
+            'distgit': 'git://git.example.com/rpms/nova',
             'master-distgit':
-                'https://github.com/rdo-packages/nova-distgit.git',
+                'git://git.example.com/rpms/nova',
             'name': 'openstack-nova',
             'buildsys-tags': [
                 'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
@@ -71,8 +79,18 @@ class TestDriverDownstream(base.TestCase):
         }
         pkginfo = driver.getinfo(
             package=package,
-            project='test',
+            project='nova',
             dev_mode=True)
+
+        expected = [mock.call('git://git.example.com/rpms/nova',
+                              './data/openstack-nova_distro',
+                              'testbranch',
+                              full_path='./data/openstack-nova_distro/',
+                              local=None),
+                    mock.call('git://git.openstack.org/openstack/nova',
+                              './data/nova', 'master', local=None)]
+        self.assertEqual(rr_mock.call_args_list, expected)
+
         pi = pkginfo[0]
         assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
             pi.commit_hash
