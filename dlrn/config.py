@@ -55,11 +55,30 @@ class ConfigOptions(object):
         if cp.has_section('downstream_driver'):
             if cp.has_option('downstream_driver', 'repo'):
                 self.rdoinfo_repo = cp.get('downstream_driver', 'repo')
+            if cp.has_option('downstream_driver', 'info_files'):
+                self.info_files = cp.get('downstream_driver', 'info_files')
+            else:
+                self.info_files = None
             if cp.has_option('downstream_driver', 'versions_url'):
                 self.versions_url = cp.get('downstream_driver',
                                            'versions_url')
             else:
                 self.versions_url = None
+            if cp.has_option('downstream_driver', 'downstream_distro_branch'):
+                self.downstream_distro_branch = cp.get(
+                    'downstream_driver', 'downstream_distro_branch')
+            else:
+                self.downstream_distro_branch = None
+            if cp.has_option('downstream_driver', 'downstream_prefix'):
+                self.downstream_prefix = cp.get(
+                    'downstream_driver', 'downstream_prefix')
+            else:
+                self.downstream_prefix = None
+            if cp.has_option('downstream_driver', 'downstream_prefix_filter'):
+                self.downstream_prefix_filter = cp.get(
+                    'downstream_driver', 'downstream_prefix_filter')
+            else:
+                self.downstream_prefix_filter = None
 
         if cp.has_section('gitrepo_driver'):
             if cp.has_option('gitrepo_driver', 'repo'):
