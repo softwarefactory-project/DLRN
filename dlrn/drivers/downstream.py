@@ -13,7 +13,6 @@
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
-from dlrn.repositories import getdistrobranch
 from dlrn.repositories import getsourcebranch
 from dlrn.repositories import refreshrepo
 
@@ -30,8 +29,19 @@ from six.moves.urllib.request import urlopen
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-downstream-driver")
 logger.setLevel(logging.INFO)
-rdoinfo_repo = ('https://raw.githubusercontent.com/'
-                'redhat-openstack/rdoinfo/master/')
+
+
+def fail_req_attr_missing(attr_name, package):
+    raise Exception(
+        "Missing required attribute '%s' "
+        "for package: %s (project: %s)" % (
+            attr_name, package['project'], package['name']))
+
+
+def fail_req_config_missing(opt_name):
+    raise Exception(
+        "Missing required config option '%s' "
+        "for dlrn.drivers.downstream driver." % opt_name)
 
 
 class DownstreamInfoDriver(PkgInfoDriver):
@@ -48,29 +58,35 @@ class DownstreamInfoDriver(PkgInfoDriver):
         """
         local_info_repo = kwargs.get('local_info_repo')
         tags = kwargs.get('tags')
-        inforepo = None
 
+        info_files = self.config_options.info_files
+        if not info_files:
+            fail_req_config_missing('info_file')
+
+        inforepo = None
         if local_info_repo:
             inforepo = info.DistroInfo(
-                info_files='rdo.yml',
+                info_files=info_files,
                 local_info=local_info_repo)
         elif self.config_options.rdoinfo_repo:
             inforepo = info.DistroInfo(
-                info_files='rdo.yml',
+                info_files=info_files,
                 remote_git_info=self.config_options.rdoinfo_repo)
         else:
-            # distroinfo will fetch info files from the rdoinfo repo as needed
-            # and store them under ~/.distroinfo/cache
-            inforepo = info.DistroInfo(
-                info_files='rdo.yml',
-                remote_info=rdoinfo_repo)
-
+            fail_req_config_missing('repo')
         pkginfo = inforepo.get_info(apply_tag=tags)
+
 
         self.packages = pkginfo["packages"]
         if tags:
             # FIXME allow list of tags?
             self.packages = query.filter_pkgs(self.packages, {'tags': tags})
+        if self.config_options.downstream_prefix_filter:
+            # filter out packages missing parameters with downstream_prefix prefix
+            downstream_prefix = self.config_options.downstream_prefix or ''
+            self.packages = query.filter_pkgs(
+                self.packages,
+                {downstream_prefix + 'distgit': '.+'})
         return self.packages
 
     def getversions(self):
@@ -81,9 +97,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
         """
         versions_url = self.config_options.versions_url
         if not versions_url:
-            raise Exception(
-                "Missing required versions_url config option"
-                "for dlrn.drivers.downstream driver.")
+            fail_req_config_missing('versions_url')
 
         # return versions.csv as a dict with package name as a key
         vers = {}
@@ -99,13 +113,19 @@ class DownstreamInfoDriver(PkgInfoDriver):
         package = kwargs.get('package')
         local = kwargs.get('local')
         dev_mode = kwargs.get('dev_mode')
+
+        ds_prefix = self.config_options.downstream_prefix or ''
         datadir = self.config_options.datadir
         repo = package['upstream']
-        distro = package['master-distgit']
-
+        distgit_attr = ds_prefix + 'distgit'
+        distro = package.get(distgit_attr)
+        if not distro:
+            fail_req_attr_missing(distgit_attr, package)
         distro_dir = self._distgit_clone_dir(package['name'])
         distro_dir_full = self.distgit_dir(package['name'])
-        distro_branch = getdistrobranch(package)
+        distro_branch = self.config_options.downstream_distro_branch
+        if not distro_branch:
+            fail_req_config_missing('downstream_distro_branch')
         source_branch = getsourcebranch(package)
         versions = self.getversions()
 
@@ -116,9 +136,11 @@ class DownstreamInfoDriver(PkgInfoDriver):
             return []
         version = versions[package['name']]
 
+        dt_distro = 0  # In this driver we do not care about dt_distro
+
         if dev_mode is False:
             try:
-                distro_branch, _, dt_distro = refreshrepo(
+                distro_branch, extended_hash, dt_extended = refreshrepo(
                     distro, distro_dir, distro_branch, local=local,
                     full_path=distro_dir_full)
                 # extract distro_hash from versions.csv
@@ -130,7 +152,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 return []
         else:
             distro_hash = "dev"
-            dt_distro = 0  # Doesn't get used in dev mode
+            extended_hash = "dev"
+            dt_extended = 0
             if not os.path.isdir(distro_dir):
                 # We should fail in this case, since we are running
                 # in dev mode, so no try/except
@@ -157,13 +180,13 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 # list of commits to be processed, so we can ignore it and
                 # move on to the next repo
                 continue
-
             dt = version[5]
             commit_hash = version[1]
             commit = Commit(dt_commit=float(dt), project_name=project,
                             commit_hash=commit_hash, repo_dir=repo_dir,
                             distro_hash=distro_hash, dt_distro=dt_distro,
-                            extended_hash=None, dt_extended=0,
+                            extended_hash=extended_hash,
+                            dt_extended=dt_extended,
                             distgit_dir=self.distgit_dir(package['name']),
                             commit_branch=source_branch)
             project_toprocess.append(commit)
