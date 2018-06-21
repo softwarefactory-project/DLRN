@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "033bf9f1_43fbb3f3",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-21T16:49:20Z",
+      "side": 1,
+      "message": "\u0027rdoinfo git repo\u0027 -\u003e \u0027distgit repo\u0027/\u0027project distgit\u0027/...",
+      "revId": "61f1a0e726ceb4df61613b18a4bc03293a19cddc",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
