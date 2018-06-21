@@ -6,8 +6,8 @@ set -ex
 # ./run_tests.sh <path_to_rdoinfo> <distro (either centos or fedora)> <baseurl to trunk repo>
 
 # Simple script to test that DLRN works either locally or in a zuul environment
-GIT_BASE_URL="https://review.rdoproject.org/r/p"
-OPENSTACK_GIT_URL="git://git.openstack.org"
+GIT_BASE="review.rdoproject.org"
+GIT_BASE_URL="https://${GIT_BASE}/r/p"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
 
 function filterref(){
@@ -46,11 +46,11 @@ else
   PROJECTS_TO_BUILD=${PROJECT_DISTRO}
 fi
 
-# Fetch rdoinfo using zuul_cloner, if available
-if type -p zuul-cloner; then
-    zuul-cloner --workspace /tmp ${GIT_BASE_URL} rdoinfo
+# If we are running under Zuul v3, we can find the rdoinfo git repo under /home/zuul
+rm -rf /tmp/rdoinfo
+if [ -d ~/src/${GIT_BASE}/rdoinfo ] ; then
+    cp -dRl ~/src/${GIT_BASE}/rdoinfo/. /tmp/rdoinfo
 else
-    rm -rf /tmp/rdoinfo
     git clone ${RDOINFO} /tmp/rdoinfo
 fi
 
@@ -120,8 +120,10 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
     rm -rf data/$PROJECT_DISTRO_DIR
 
     # Clone distro repo
-    if type -p zuul-cloner; then
-        zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
+    # If we are running under Zuul v3, we can find the distgit under /home/zuul
+    if [ -d ~/src/${GIT_BASE}/${PROJECT_DISTRO} ] ; then
+        mkdir -p data/$PROJECT_DISTRO
+        cp -dRl ~/src/${GIT_BASE}/${PROJECT_DISTRO}/. data/${PROJECT_DISTRO}
         mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
     else
         # We're outside the gate, just do a regular git clone
