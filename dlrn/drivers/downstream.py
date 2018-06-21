@@ -13,7 +13,6 @@
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
-from dlrn.repositories import getdistrobranch
 from dlrn.repositories import getsourcebranch
 from dlrn.repositories import refreshrepo
 
@@ -101,11 +100,11 @@ class DownstreamInfoDriver(PkgInfoDriver):
         dev_mode = kwargs.get('dev_mode')
         datadir = self.config_options.datadir
         repo = package['upstream']
-        distro = package['master-distgit']
+        distro = self.config_options.downstream_distgit_base + '/' + project
 
         distro_dir = self._distgit_clone_dir(package['name'])
         distro_dir_full = self.distgit_dir(package['name'])
-        distro_branch = getdistrobranch(package)
+        distro_branch = self.config_options.downstream_distro_branch
         source_branch = getsourcebranch(package)
         versions = self.getversions()
 
@@ -116,9 +115,11 @@ class DownstreamInfoDriver(PkgInfoDriver):
             return []
         version = versions[package['name']]
 
+        dt_distro = 0  # In this driver we do not care about dt_distro
+
         if dev_mode is False:
             try:
-                distro_branch, _, dt_distro = refreshrepo(
+                distro_branch, extended_hash, dt_extended = refreshrepo(
                     distro, distro_dir, distro_branch, local=local,
                     full_path=distro_dir_full)
                 # extract distro_hash from versions.csv
@@ -130,7 +131,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 return []
         else:
             distro_hash = "dev"
-            dt_distro = 0  # Doesn't get used in dev mode
+            extended_hash = "dev"
+            dt_extended = 0
             if not os.path.isdir(distro_dir):
                 # We should fail in this case, since we are running
                 # in dev mode, so no try/except
@@ -157,13 +159,13 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 # list of commits to be processed, so we can ignore it and
                 # move on to the next repo
                 continue
-
             dt = version[5]
             commit_hash = version[1]
             commit = Commit(dt_commit=float(dt), project_name=project,
                             commit_hash=commit_hash, repo_dir=repo_dir,
                             distro_hash=distro_hash, dt_distro=dt_distro,
-                            extended_hash=None, dt_extended=0,
+                            extended_hash=extended_hash,
+                            dt_extended=dt_extended,
                             distgit_dir=self.distgit_dir(package['name']),
                             commit_branch=source_branch)
             project_toprocess.append(commit)
