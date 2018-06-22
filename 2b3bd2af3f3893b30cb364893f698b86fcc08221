@@ -69,6 +69,24 @@
       "revId": "2b3bd2af3f3893b30cb364893f698b86fcc08221",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_1d0a54d3",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-06-22T13:16:06Z",
+      "side": 1,
+      "message": "Yup, it has multiple advantages to have the logic here (easier read, more control and more resistance to distroinfo logic changes which are unlikely but possiblee), it was just worth mentioning ;)",
+      "parentUuid": "7a2fa921_fd3678b3",
+      "revId": "2b3bd2af3f3893b30cb364893f698b86fcc08221",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
