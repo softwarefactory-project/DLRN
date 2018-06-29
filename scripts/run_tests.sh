@@ -56,7 +56,7 @@ fi
 
 # Prepare config
 target="${2:-centos}"
-baseurl="${3:-http://trunk.rdoproject.org/centos7/}"
+baseurl="${3:-http://mirror.regionone.rdo-cloud.rdoproject.org:8080/rdo/centos7/}"
 src="master"
 branch=""
 
@@ -64,11 +64,11 @@ branch=""
 if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
     branch=$(sed "s/rpm-//" <<< "${ZUUL_BRANCH}")
     if [[ "${branch}" = "liberty" || "${branch}" = "mitaka" ]]; then
-        baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
+        baseurl="http://mirror.regionone.rdo-cloud.rdoproject.org:8080/rdo/${branch}/centos7/"
         src="stable/${branch}"
     else
         # assume feature branch targeting master
-        baseurl="http://trunk.rdoproject.org/centos7-master/"
+        baseurl="http://mirror.regionone.rdo-cloud.rdoproject.org:8080/rdo/centos7-master/"
         src="${branch}"
         # for rdoinfo tags filter
         branch=""
@@ -77,7 +77,7 @@ if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
 # Add logic for new branches, *-rdo
 elif [[ "${ZUUL_BRANCH}" =~ -rdo ]]; then
     branch=$(sed "s/-rdo//" <<< "${ZUUL_BRANCH}")
-    baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
+    baseurl="http://mirror.regionone.rdo-cloud.rdoproject.org:8080/rdo/${branch}/centos7/"
     src="stable/${branch}"
     PROJECT_DISTRO_BRANCH=$ZUUL_BRANCH
 fi
