@@ -46,14 +46,6 @@ else
   PROJECTS_TO_BUILD=${PROJECT_DISTRO}
 fi
 
-# Fetch rdoinfo using zuul_cloner, if available
-if type -p zuul-cloner; then
-    zuul-cloner --workspace /tmp ${GIT_BASE_URL} rdoinfo
-else
-    rm -rf /tmp/rdoinfo
-    git clone ${RDOINFO} /tmp/rdoinfo
-fi
-
 # Prepare config
 target="${2:-centos}"
 baseurl="${3:-http://trunk.rdoproject.org/centos7/}"
@@ -113,7 +105,7 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
             PROJECT_TO_BUILD="gnocchi-legacy"
         fi
     fi
-    PROJECT_TO_BUILD_MAPPED=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^name | awk '{print $2}')
+    PROJECT_TO_BUILD_MAPPED=$(rdopkg findpkg $PROJECT_TO_BUILD -l $RDOINFO | grep ^name | awk '{print $2}')
     PROJECT_DISTRO_DIR=${PROJECT_TO_BUILD_MAPPED}_distro
 
     # Remove distro dir first for idempotency
@@ -140,7 +132,7 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
 
     if [ -n "$UPSTREAM_ID" ]; then
         # Get upstream URL
-        UPSTREAM_URL=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^upstream | awk '{print $2}')
+        UPSTREAM_URL=$(rdopkg findpkg $PROJECT_TO_BUILD -l $RDOINFO | grep ^upstream | awk '{print $2}')
         UPSTREAM_PROJECT_NAME=$(basename ${UPSTREAM_URL})
         rm -rf data/${PROJECT_TO_BUILD_MAPPED}
         # Only build in the check pipeline to avoid merging a change
@@ -176,7 +168,7 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
 done
 
 # Run DLRN
-dlrn --head-only $PACKAGE_BUILD_LIST --dev --local --info-repo /tmp/rdoinfo --verbose-build --order
+dlrn --head-only $PACKAGE_BUILD_LIST --dev --local --info-repo $RDOINFO --verbose-build --order
 copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn-1.cfg --scrub=all
