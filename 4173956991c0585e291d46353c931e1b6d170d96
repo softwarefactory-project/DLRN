@@ -1,0 +1,11 @@
+Code-Review+1: Jason Joyce <fuzzball81@gmail.com>
+Code-Review+1: Jakub Ružička <jruzicka@redhat.com>
+Code-Review+2: Haïkel Guémar <hguemar@fedoraproject.org>
+Code-Review+2: Alan Pevec <alan.pevec@redhat.com>
+Workflow+1: Alan Pevec <alan.pevec@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Mon, 16 Jul 2018 15:27:42 +0000
+Reviewed-on: https://softwarefactory-project.io/r/12686
+Project: DLRN
+Branch: refs/heads/master
