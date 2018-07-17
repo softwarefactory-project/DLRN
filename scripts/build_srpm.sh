@@ -2,7 +2,11 @@
 
 set -o pipefail
 
-shift   # First parameter is TARGET, not needed here
+# FIXME(hguemar): we need to document all parameters passed to this script
+TARGET=$1
+# FIXME(hguemar): do not hardcode architecture
+ARCH="x86_64"
+shift
 
 source $(dirname $0)/common-functions
 
@@ -20,6 +24,12 @@ done
 
 cleanup_sdist
 
+# special case for RHEL
+if [[ $TARGET == "rhel" ]]; then
+    BUILD_TARGET=$(awk -F= '/build_target/ { print $2 }' projects.ini)
+    brew mock-config --arch=$ARCH --target > rhel.cfg
+    MOCK_CONFIG=$PWD/rhel.cfg
+fi
 MOCKOPTS="-v -r ${DATA_DIR}/${MOCK_CONFIG} --resultdir $OUTPUT_DIRECTORY"
 
 # Cleanup mock directory and copy sources there, so we can run python setup.py
