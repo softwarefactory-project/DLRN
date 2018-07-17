@@ -155,6 +155,12 @@ class ConfigOptions(object):
                                        'koji_exe')
             else:
                 self.koji_exe = 'koji'
+
+            if cp.has_option('kojibuild_driver', 'fetch_mock_config'):
+                self.fetch_mock_config = cp.get('kojibuild_driver',
+                                                'fetch_mock_config')
+            else:
+                self.fetch_mock_config = False
         else:
             self.koji_krb_principal = None
             self.koji_krb_keytab = None
@@ -162,6 +168,7 @@ class ConfigOptions(object):
             self.koji_build_target = None
             self.koji_arch = 'x86_64'
             self.koji_exe = 'koji'
+            self.fetch_mock_config = False
 
         if cp.has_section('coprbuild_driver'):
             if cp.has_option('coprbuild_driver', 'coprid'):
