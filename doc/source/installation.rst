@@ -293,6 +293,7 @@ following configuration options are included:
     krb_keytab=/home/user/user.keytab
     scratch_build=True
     build_target=koji-target-build
+    fetch_mock_config=False
 
 * ``koji_exe`` defines the executable to use. Some Koji instances create their
   own client packages to add their default configuration, such as
@@ -308,6 +309,10 @@ following configuration options are included:
   is set to ``True``.
 * ``build_target`` defines the build target to use. This defines the buildroot
   and base repositories to be used for the build.
+* ``fetch_mock_config``, if set to ``true``, will instruct DLRN to download the
+  mock configuration for the build target from Koji, and use it when building
+  the source RPM. If set to ``false``, DLRN will use its internally defined mock
+  configuration, based on the ``DEFAULT/target`` configuration option.
 
 The optional ``[coprbuild_driver]`` section has the following configuration
 options:
