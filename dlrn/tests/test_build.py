@@ -109,3 +109,13 @@ class TestBuild(base.TestCase):
                         side_effect=shutil.copyfile) as cp_mock:
             build_rpm_wrapper(commit, False, False, False, None, True)
             self.assertEqual(expected, cp_mock.call_args_list)
+
+    @mock.patch('os.listdir', side_effect=mocked_listdir)
+    @mock.patch('dlrn.drivers.mockdriver.MockBuildDriver.write_mock_config',
+                create=True)
+    def test_build_rpm_wrapper_mock_config(self, wm_mock, ld_mock, sh_mock,
+                                           env_mock, rc_mock):
+        self.config.fetch_mock_config = True
+        commit = db.getCommits(self.session)[-1]
+        build_rpm_wrapper(commit, False, False, False, None, True)
+        self.assertEqual(wm_mock.call_count, 1)
