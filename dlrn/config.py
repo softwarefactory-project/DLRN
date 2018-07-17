@@ -144,6 +144,12 @@ class ConfigOptions(object):
                                                 'build_target')
             else:
                 self.koji_krb_build_target = None
+            # set default arch to x86_64 if not defined
+            if cp.has_option('kojibuild_driver', 'arch'):
+                self.koji_arch = cp.get('kojibuild_driver',
+                                        'arch')
+            else:
+                self.koji_arch = 'x86_64'
             if cp.has_option('kojibuild_driver', 'koji_exe'):
                 self.koji_exe = cp.get('kojibuild_driver',
                                        'koji_exe')
@@ -154,6 +160,7 @@ class ConfigOptions(object):
             self.koji_krb_keytab = None
             self.koji_scratch_build = True
             self.koji_build_target = None
+            self.koji_arch = 'x86_64'
             self.koji_exe = 'koji'
 
         if cp.has_section('coprbuild_driver'):
