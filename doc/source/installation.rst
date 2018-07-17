@@ -294,6 +294,7 @@ following configuration options are included:
     scratch_build=True
     build_target=koji-target-build
     arch=aarch64
+    fetch_mock_config=False
 
 * ``koji_exe`` defines the executable to use. Some Koji instances create their
   own client packages to add their default configuration, such as
@@ -311,6 +312,10 @@ following configuration options are included:
   and base repositories to be used for the build.
 * ``arch`` allows to override default architecture (x86_64) in some cases (e.g
   retrieving mock configuration from Koji instance).
+* ``fetch_mock_config``, if set to ``true``, will instruct DLRN to download the
+  mock configuration for the build target from Koji, and use it when building
+  the source RPM. If set to ``false``, DLRN will use its internally defined mock
+  configuration, based on the ``DEFAULT/target`` configuration option.
 
 The optional ``[coprbuild_driver]`` section has the following configuration
 options:
