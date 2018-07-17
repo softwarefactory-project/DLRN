@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ab380a06_5ead567a",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-17T16:29:24Z",
+      "side": 1,
+      "message": "YES",
+      "revId": "82429636f3b5868768223bfff2e6895f49f57f7e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
