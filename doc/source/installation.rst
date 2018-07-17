@@ -293,6 +293,7 @@ following configuration options are included:
     krb_keytab=/home/user/user.keytab
     scratch_build=True
     build_target=koji-target-build
+    arch=aarch64
 
 * ``koji_exe`` defines the executable to use. Some Koji instances create their
   own client packages to add their default configuration, such as
@@ -308,6 +309,8 @@ following configuration options are included:
   is set to ``True``.
 * ``build_target`` defines the build target to use. This defines the buildroot
   and base repositories to be used for the build.
+* ``arch`` allows to override default architecture (x86_64) in some cases (e.g
+  retrieving mock configuration from Koji instance).
 
 The optional ``[coprbuild_driver]`` section has the following configuration
 options:
