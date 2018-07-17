@@ -2,6 +2,7 @@
 
 set -o pipefail
 
+# FIXME(hguemar): we need to document all parameters passed to this script
 shift   # First parameter is TARGET, not needed here
 
 source $(dirname $0)/common-functions
