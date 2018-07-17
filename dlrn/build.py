@@ -117,7 +117,16 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     else:
         worker_id = multiprocessing.current_process()._identity[0]
 
+    # Retrieve build driver
+    build_driver = config_options.build_driver
+    buildrpm = import_object(build_driver, cfg_options=config_options)
+
     mock_config = "dlrn-" + str(worker_id) + ".cfg"
+    try:
+        buildrpm.write_mock_config(mock_config)
+    except AttributeError as err:
+        logger.info("Driver {} does not provide "
+                    "custom mock configuration".format(build_driver))
     scriptsdir = os.path.realpath(config_options.scriptsdir)
     configdir = os.path.realpath(config_options.configdir)
     datadir = os.path.realpath(config_options.datadir)
@@ -204,7 +213,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     # don't change dlrn.cfg if the content hasn't changed to prevent
     # mock from rebuilding its cache.
     try:
-        if not filecmp.cmp(newcfg, oldcfg):
+        if not filecmp.cmp(newcfg, oldcfg) and \
+           not hasattr(buildrpm, 'write_mock_config'):
             shutil.copyfile(newcfg, oldcfg)
     except OSError:
         shutil.copyfile(newcfg, oldcfg)
@@ -246,8 +256,6 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
         dev_mode, use_public, bootstrap, version_from=version_from)
 
     # SRPM is built, now build the RPM using the driver
-    build_driver = config_options.build_driver
-    buildrpm = import_object(build_driver, cfg_options=config_options)
     datadir = os.path.realpath(config_options.datadir)
     yumrepodir = _get_yumrepodir(commit)
     yumrepodir_abs = os.path.join(datadir, yumrepodir)

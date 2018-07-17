@@ -41,6 +41,20 @@ class KojiBuildDriver(BuildRPMDriver):
             logger.info(line[:-1])
         self.koji_fp.write(line)
 
+    def write_mock_config(self, filename):
+        """Retrieve mock config from Koji instance
+
+        :param filename: output filename to write mock config
+        """
+        target = self.config_options.koji_build_target
+        arch = self.config_options.koji_arch
+        run_cmd = [self.exe_name]
+        self.extend(['--arch', arch, '--target', target, '-o', filename])
+        # FIXME(hguemar): add proper exception management
+        sh.env(run_cmd, _err=self._process_koji_output,
+               _out=self._process_koji_output,
+               _env={'PATH': '/usr/bin/'})
+
     def build_package(self, **kwargs):
         """Valid parameters:
 
