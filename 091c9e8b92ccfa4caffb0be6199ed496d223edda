@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "941e0581_7554467d",
+        "filename": "dlrn/build.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-17T16:29:24Z",
+      "side": 1,
+      "message": "doesn\u0027t provide",
+      "revId": "091c9e8b92ccfa4caffb0be6199ed496d223edda",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4da96c2d_385b2e94",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-17T16:29:24Z",
+      "side": 1,
+      "message": "From get_ prefix I\u0027d assume this function to return the mock config but there is not return.",
+      "revId": "091c9e8b92ccfa4caffb0be6199ed496d223edda",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ff4c6fd_e5b482e7",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-17T16:29:24Z",
+      "side": 1,
+      "message": "YES",
+      "revId": "091c9e8b92ccfa4caffb0be6199ed496d223edda",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
