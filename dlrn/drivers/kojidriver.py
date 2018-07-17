@@ -41,6 +41,34 @@ class KojiBuildDriver(BuildRPMDriver):
             logger.info(line[:-1])
         self.koji_fp.write(line)
 
+    def write_mock_config(self, filename):
+        """Retrieve mock config from Koji instance
+
+        :param filename: output filename to write mock config
+        """
+        target = self.config_options.koji_build_target
+        arch = self.config_options.koji_arch
+        run_cmd = [self.exe_name]
+        run_cmd.extend(['mock-config',
+                        '--arch', arch, '--target', target, '-o', filename])
+        # FIXME(hguemar): add proper exception management
+        sh.env(run_cmd,
+               _env={'PATH': '/usr/bin/'})
+        # FIXME(hguemar): needs to be configurable
+        lines = []
+        with open(filename, 'r') as fp:
+            for line in fp.readlines()
+                if line.startswith("config_opts['chroot_setup_cmd']"):
+                    lines.append("config_opts['chroot_setup_cmd'] = basesystem " \
+                        "rpm-build python2-devel gcc make python-sqlalchemy " \
+                        "python-webob ghostscript graphviz python-sphinx " \
+                        "python-eventlet python-six python-pbr " \
+                        "openstack-macros git yum-plugin-priorities rubygems")
+                else:
+                    lines.append(line)
+        with open(filename, 'w') as fp:
+            fp.write(''.join(lines))
+
     def build_package(self, **kwargs):
         """Valid parameters:
 
