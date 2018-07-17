@@ -41,6 +41,18 @@ class KojiBuildDriver(BuildRPMDriver):
             logger.info(line[:-1])
         self.koji_fp.write(line)
 
+    def get_mock_config(self, filename):
+        """Retrieve mock config from Koji instance
+
+        :param filename: output filename to write mock config
+        """
+        target = self.config_options.koji_build_target
+        arch = self.config_options.koji_arch
+
+        run_cmd = [self.exe_name]
+        self.extend(['--arch', arch,'--target', target,
+                     '-o', filename])
+
     def build_package(self, **kwargs):
         """Valid parameters:
 
