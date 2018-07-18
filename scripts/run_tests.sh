@@ -8,6 +8,7 @@ set -ex
 # Simple script to test that DLRN works either locally or in a zuul environment
 GIT_BASE_URL="https://review.rdoproject.org/r/p"
 OPENSTACK_GIT_URL="git://git.openstack.org"
+ZUUL_CLONES_DIR="~/src/review.rdoproject.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
 
 function filterref(){
@@ -120,7 +121,9 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
     rm -rf data/$PROJECT_DISTRO_DIR
 
     # Clone distro repo
-    if type -p zuul-cloner; then
+    if [ -d "/home/zuul" ]; then
+        cp -pr $ZUUL_CLONES_DIR/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
+    elif type -p zuul-cloner; then
         zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
         mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
     else
