@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "74a5d1a0_172d2d70",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 267
+      },
+      "writtenOn": "2018-07-18T14:14:32Z",
+      "side": 1,
+      "message": "This is the standard check we are using to check if job is running in zuulv3 in different scripts and jobs. I think that modify the script and the job to add a new parameter seems overcomplicating it needlessly.",
+      "parentUuid": "5fb07144_053c2395",
+      "revId": "9a29f808e40e34e61d6a0205df5e0c3117a4a8f8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ef98b20_f3f020a3",
         "filename": "scripts/run_tests.sh",
         "patchSetId": 3
