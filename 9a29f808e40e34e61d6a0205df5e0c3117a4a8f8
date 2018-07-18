@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46a861a8_441649db",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-18T12:36:07Z",
+      "side": 1,
+      "message": "rely on",
+      "revId": "9a29f808e40e34e61d6a0205df5e0c3117a4a8f8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ab02fe8_7b53e6b6",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-18T12:36:07Z",
+      "side": 1,
+      "message": "By putting this into a variable such a ZUUL_HOME, this can be disabled by ZUUL_HOME\u003d when /home/zuul exists but you just want to do regular clone as well as configure this.",
+      "revId": "9a29f808e40e34e61d6a0205df5e0c3117a4a8f8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f809a05_57adefba",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-18T12:36:07Z",
+      "side": 1,
+      "message": "Feels hardcoded.\n    \n    GIT_BASE_URL\u003d\"https://review.rdoproject.org/r/p\"\n    ZUUL_CLONES_DIR\u003d~/src/review.rdoproject.org\n\n    ...\n\n    cp -pr $ZUUL_CLONES_DIR/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR\n\nor a more meaningful name, for example the one DLRN/zuul uses in code if any...",
+      "revId": "9a29f808e40e34e61d6a0205df5e0c3117a4a8f8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
