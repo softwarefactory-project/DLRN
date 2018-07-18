@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "324172d3_bf5b7346",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 136
+      },
+      "writtenOn": "2018-07-18T14:38:47Z",
+      "side": 1,
+      "message": "Doing a cp here, could result in a hit to IO on the node, what would it take to update DLRN to use this new directory structure for git clones?\n\nCouldn\u0027t we just point DLRN to now use /home/zuul/src/review.rdoproject.org as the data directory?",
+      "revId": "cc1067542e8a363b82e11110cee5e85353c53e82",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
