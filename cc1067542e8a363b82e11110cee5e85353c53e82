@@ -34,6 +34,24 @@
       "revId": "cc1067542e8a363b82e11110cee5e85353c53e82",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffbbd44_8e6ea375",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 136
+      },
+      "writtenOn": "2018-07-18T14:59:43Z",
+      "side": 1,
+      "message": "I think symlinks are okay to start with yes, but sounds like we might need to whiteboard how DLRN would look under this new format. If we now assume ~/src/review.r.o is where git repos now are cloned from, I am assuming we can tell mock to change the location of where logs are stored too.\n\nIf we can avoid moving data during a job build, we\u0027ll get fast run time. We also have the ability now for much smarter log collection",
+      "parentUuid": "76ba0806_e9717933",
+      "revId": "cc1067542e8a363b82e11110cee5e85353c53e82",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
