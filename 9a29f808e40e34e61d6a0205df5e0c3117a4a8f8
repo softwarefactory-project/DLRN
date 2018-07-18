@@ -36,6 +36,41 @@
     },
     {
       "key": {
+        "uuid": "5fb07144_053c2395",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-07-18T13:02:59Z",
+      "side": 1,
+      "message": "Agree, better here to detect if this is zuul3 and that can be done by passing an env var like suggested by Jakub ZUUL3_HOME. The env var should be set by the job from {{ ansible_user_dir }}.",
+      "parentUuid": "4ab02fe8_7b53e6b6",
+      "revId": "9a29f808e40e34e61d6a0205df5e0c3117a4a8f8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ef98b20_f3f020a3",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-07-18T13:02:59Z",
+      "side": 1,
+      "message": "Why the script is already run set -ex line 2.",
+      "revId": "9a29f808e40e34e61d6a0205df5e0c3117a4a8f8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2f809a05_57adefba",
         "filename": "scripts/run_tests.sh",
         "patchSetId": 3
@@ -47,6 +82,29 @@
       "writtenOn": "2018-07-18T12:36:07Z",
       "side": 1,
       "message": "Feels hardcoded.\n    \n    GIT_BASE_URL\u003d\"https://review.rdoproject.org/r/p\"\n    ZUUL_CLONES_DIR\u003d~/src/review.rdoproject.org\n\n    ...\n\n    cp -pr $ZUUL_CLONES_DIR/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR\n\nor a more meaningful name, for example the one DLRN/zuul uses in code if any...",
+      "revId": "9a29f808e40e34e61d6a0205df5e0c3117a4a8f8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7b33b510_ded229c5",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-07-18T13:02:59Z",
+      "side": 1,
+      "message": "Then better to use ZUUL3_HOME",
+      "range": {
+        "startLine": 125,
+        "startChar": 15,
+        "endLine": 125,
+        "endChar": 16
+      },
       "revId": "9a29f808e40e34e61d6a0205df5e0c3117a4a8f8",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
