@@ -16,6 +16,24 @@
       "revId": "cc1067542e8a363b82e11110cee5e85353c53e82",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "76ba0806_e9717933",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 267
+      },
+      "writtenOn": "2018-07-18T14:52:57Z",
+      "side": 1,
+      "message": "Moving data would also move the created repositories so we\u0027d have to move them later for logs.\n\nWe could create symlinks instead of copying it. Would that be ok?",
+      "parentUuid": "324172d3_bf5b7346",
+      "revId": "cc1067542e8a363b82e11110cee5e85353c53e82",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
