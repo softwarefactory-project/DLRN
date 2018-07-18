@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2b380d4b_abcd93e7",
+        "filename": "scripts/fedora.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 136
+      },
+      "writtenOn": "2018-07-18T01:07:19Z",
+      "side": 0,
+      "message": "I\u0027m guessing we also need to setup fedora 28 mirrors here?",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 3
+      },
+      "revId": "deb26375bf21d9308f76b9f3c609228a4cca2527",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}

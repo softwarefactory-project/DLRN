@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2817ff70_d3e5bab8",
+        "filename": "scripts/fedora.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 136
+      },
+      "writtenOn": "2018-07-18T01:07:19Z",
+      "side": 1,
+      "message": "why do we add tmpfs here and not for centos?  Can this be removed?",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 63
+      },
+      "revId": "1cf6c5ad4dd870e425578940b9d78c4028986eb3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
