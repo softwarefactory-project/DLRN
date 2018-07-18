@@ -120,7 +120,11 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
     rm -rf data/$PROJECT_DISTRO_DIR
 
     # Clone distro repo
-    if type -p zuul-cloner; then
+    if [ -d "/home/zuul" ]; then
+        set -x
+        cp -pr ~/review.rdoproject.org/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
+        set +x
+    elif type -p zuul-cloner
         zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
         mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
     else
