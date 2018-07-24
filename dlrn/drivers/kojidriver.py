@@ -71,13 +71,36 @@ class KojiBuildDriver(BuildRPMDriver):
         with open(filename, 'w') as fp:
             fp.write(''.join(lines))
 
+    def _build_with_rhpkg(self, package_name, output_dir, src_rpm, scratch):
+        distgit_dir = os.path.join(
+            self.config_options.datadir,
+            package_name + "_distro")
+
+        rhpkg = sh.rhpkg.bake(_cwd=distgit_dir, _tty_out=False,
+                              _timeout=3600, 
+                              _err=self._process_koji_output,
+                              _out=self._process_koji_output,
+                              _env={'PATH': '/usr/bin/'})
+
+        with io.open("%s/rhpkgimport.log" % output_dir, 'a',
+                     encoding='utf-8', errors='replace') as self.koji_fp:  
+            rhpkg('import', '--skip-diff', src_rpm)
+            rhpkg('push')
+
+        with io.open("%s/rhpkgbuild.log" % output_dir, 'a',
+                     encoding='utf-8', errors='replace') as self.koji_fp:  
+            rhpkg('build', scratch=scratch)
+
     def build_package(self, **kwargs):
         """Valid parameters:
 
         :param output_directory: directory where the SRPM is located,
                                  and the built packages will be.
+        :param package_name: name of a package to build
         """
         output_dir = kwargs.get('output_directory')
+        package_name = kwargs.get('package_name')
+
         krb_principal = self.config_options.koji_krb_principal
         keytab_file = self.config_options.koji_krb_keytab
         scratch = self.config_options.koji_scratch_build
@@ -86,56 +109,62 @@ class KojiBuildDriver(BuildRPMDriver):
         # Find src.rpm
         for rpm in os.listdir(output_dir):
             if rpm.endswith(".src.rpm"):
-                src_rpm = '%s/%s' % (output_dir, rpm)
+                src_rpm = os.path.realpath('%s/%s' % (output_dir, rpm))
         try:
-            # Build package using koji/brew
-            run_cmd = [self.exe_name]
-            if krb_principal:
-                run_cmd.extend(['--principal', krb_principal,
-                                '--keytab', keytab_file])
-            run_cmd.extend(['build', '--wait',
-                            target, src_rpm])
-
             build_exception = None
-            with io.open("%s/kojibuild.log" % output_dir, 'a',
-                         encoding='utf-8', errors='replace') as self.koji_fp:
-                try:
-                    sh.env(run_cmd, _err=self._process_koji_output,
-                           _out=self._process_koji_output,
-                           _cwd=output_dir, scratch=scratch,
-                           _env={'PATH': '/usr/bin/'})
-                except Exception as e:
-                    build_exception = e
+            # TODO(jpena): of course, this will be an option in projects.ini
+            if True:
+                self._build_with_rhpkg(package_name, output_dir, src_rpm,
+                                       scratch)
+            else:
+                # Build package using koji/brew
+                run_cmd = [self.exe_name]
+                if krb_principal:
+                    run_cmd.extend(['--principal', krb_principal,
+                                    '--keytab', keytab_file])
+                run_cmd.extend(['build', '--wait',
+                                target, src_rpm])
 
-            # Find task id to download logs
-            with open("%s/kojibuild.log" % output_dir, 'r') as fp:
-                log_content = fp.readlines()
-            task_id = None
-            for line in log_content:
-                m = re.search("^Created task: (\d+)$", line)
-                if m:
-                    logger.info("Created task id %s" % m.group(1))
-                    task_id = m.group(1)
-                    break
+                build_exception = None
+                with io.open("%s/kojibuild.log" % output_dir, 'a',
+                             encoding='utf-8', errors='replace') as self.koji_fp:
+                    try:
+                        sh.env(run_cmd, _err=self._process_koji_output,
+                               _out=self._process_koji_output,
+                               _cwd=output_dir, scratch=scratch,
+                               _env={'PATH': '/usr/bin/'})
+                    except Exception as e:
+                        build_exception = e
 
-            if not task_id:
-                raise Exception('Failed to find task id for the koji build')
+                # Find task id to download logs
+                with open("%s/kojibuild.log" % output_dir, 'r') as fp:
+                    log_content = fp.readlines()
+                task_id = None
+                for line in log_content:
+                    m = re.search("^Created task: (\d+)$", line)
+                    if m:
+                        logger.info("Created task id %s" % m.group(1))
+                        task_id = m.group(1)
+                        break
 
-            # Download build artifacts and logs
-            run_cmd = []
-            run_cmd.extend(
-                [self.exe_name,
-                 'download-task', '--logs',
-                 task_id])
+                if not task_id:
+                    raise Exception('Failed to find task id for the koji build')
 
-            with io.open("%s/kojidownload.log" % output_dir, 'a',
-                         encoding='utf-8', errors='replace') as self.koji_fp:
-                try:
-                    sh.env(run_cmd, _err=self._process_koji_output,
-                           _out=self._process_koji_output,
-                           _cwd=output_dir, _env={'PATH': '/usr/bin/'})
-                except Exception as e:
-                    raise e
+                # Download build artifacts and logs
+                run_cmd = []
+                run_cmd.extend(
+                    [self.exe_name,
+                     'download-task', '--logs',
+                     task_id])
+
+                with io.open("%s/kojidownload.log" % output_dir, 'a',
+                             encoding='utf-8', errors='replace') as self.koji_fp:
+                    try:
+                        sh.env(run_cmd, _err=self._process_koji_output,
+                               _out=self._process_koji_output,
+                               _cwd=output_dir, _env={'PATH': '/usr/bin/'})
+                    except Exception as e:
+                        raise e
 
             # All went fine, create the $OUTPUT_DIRECTORY/installed file
             open('%s/installed' % output_dir, 'a').close()
