@@ -24,6 +24,10 @@ import os
 import re
 import sh
 
+from time import localtime
+from time import strftime
+from time import time
+
 logging.basicConfig(level=logging.ERROR,
                     format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-build-koji")
@@ -71,44 +75,86 @@ class KojiBuildDriver(BuildRPMDriver):
         with open(filename, 'w') as fp:
             fp.write(''.join(lines))
 
-    def build_package(self, **kwargs):
-        """Valid parameters:
+    def _build_with_rhpkg(self, package_name, output_dir, src_rpm, scratch):
+        distgit_dir = os.path.join(
+            self.config_options.datadir,
+            package_name + "_distro")
 
-        :param output_directory: directory where the SRPM is located,
-                                 and the built packages will be.
-        """
-        output_dir = kwargs.get('output_directory')
+        build_exception = None
+
+        rhpkg = sh.rhpkg.bake(_cwd=distgit_dir, _tty_out=False,
+                              _timeout=3600,
+                              _err=self._process_koji_output,
+                              _out=self._process_koji_output,
+                              _env={'PATH': '/usr/bin/'})
+
+        with io.open("%s/rhpkgimport.log" % output_dir, 'a',
+                     encoding='utf-8', errors='replace') as self.koji_fp:
+            rhpkg('import', '--skip-diff', src_rpm)
+            pkg_date = strftime("%Y-%m-%d-%H%M%S", localtime(time()))
+            rhpkg('commit', '-p', '-m', 'DLRN build at %s' % pkg_date)
+
+        with io.open("%s/rhpkgbuild.log" % output_dir, 'a',
+                     encoding='utf-8', errors='replace') as self.koji_fp:
+            try:
+                rhpkg('build', scratch=scratch)
+            except Exception as e:
+                build_exception = e
+
+        return build_exception, "%s/rhpkgbuild.log" % output_dir
+
+    def _build_with_exe(self, package_name, output_dir, src_rpm, scratch):
         krb_principal = self.config_options.koji_krb_principal
         keytab_file = self.config_options.koji_krb_keytab
         scratch = self.config_options.koji_scratch_build
         target = self.config_options.koji_build_target
 
+        # Build package using koji/brew
+        run_cmd = [self.exe_name]
+        if krb_principal:
+            run_cmd.extend(['--principal', krb_principal,
+                            '--keytab', keytab_file])
+        run_cmd.extend(['build', '--wait',
+                        target, src_rpm])
+
+        build_exception = None
+        with io.open("%s/kojibuild.log" % output_dir, 'a',
+                     encoding='utf-8', errors='replace') as self.koji_fp:
+            try:
+                sh.env(run_cmd, _err=self._process_koji_output,
+                       _out=self._process_koji_output,
+                       _cwd=output_dir, scratch=scratch,
+                       _env={'PATH': '/usr/bin/'})
+            except Exception as e:
+                build_exception = e
+
+        return build_exception, "%s/kojibuild.log" % output_dir
+
+    def build_package(self, **kwargs):
+        """Valid parameters:
+
+        :param output_directory: directory where the SRPM is located,
+                                 and the built packages will be.
+        :param package_name: name of a package to build
+        """
+        output_dir = kwargs.get('output_directory')
+        package_name = kwargs.get('package_name')
+        scratch = self.config_options.koji_scratch_build
+
         # Find src.rpm
         for rpm in os.listdir(output_dir):
             if rpm.endswith(".src.rpm"):
-                src_rpm = '%s/%s' % (output_dir, rpm)
+                src_rpm = os.path.realpath('%s/%s' % (output_dir, rpm))
         try:
-            # Build package using koji/brew
-            run_cmd = [self.exe_name]
-            if krb_principal:
-                run_cmd.extend(['--principal', krb_principal,
-                                '--keytab', keytab_file])
-            run_cmd.extend(['build', '--wait',
-                            target, src_rpm])
-
-            build_exception = None
-            with io.open("%s/kojibuild.log" % output_dir, 'a',
-                         encoding='utf-8', errors='replace') as self.koji_fp:
-                try:
-                    sh.env(run_cmd, _err=self._process_koji_output,
-                           _out=self._process_koji_output,
-                           _cwd=output_dir, scratch=scratch,
-                           _env={'PATH': '/usr/bin/'})
-                except Exception as e:
-                    build_exception = e
+            if self.config_options.koji_use_rhpkg:
+                build_exception, logfile = self._build_with_rhpkg(
+                    package_name, output_dir, src_rpm, scratch)
+            else:
+                build_exception, logfile = self._build_with_exe(
+                    package_name, output_dir, src_rpm, scratch)
 
             # Find task id to download logs
-            with open("%s/kojibuild.log" % output_dir, 'r') as fp:
+            with open(logfile, 'r') as fp:
                 log_content = fp.readlines()
             task_id = None
             for line in log_content:
@@ -128,7 +174,7 @@ class KojiBuildDriver(BuildRPMDriver):
                  'download-task', '--logs',
                  task_id])
 
-            with io.open("%s/kojidownload.log" % output_dir, 'a',
+            with io.open("%s/build_download.log" % output_dir, 'a',
                          encoding='utf-8', errors='replace') as self.koji_fp:
                 try:
                     sh.env(run_cmd, _err=self._process_koji_output,
