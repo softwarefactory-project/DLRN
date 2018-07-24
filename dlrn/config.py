@@ -120,6 +120,16 @@ class ConfigOptions(object):
         else:
             self.install_after_build = True
 
+        # KojiBuildDriver options
+        self.koji_krb_principal = None
+        self.koji_krb_keytab = None
+        self.koji_scratch_build = True
+        self.koji_build_target = None
+        self.koji_arch = 'x86_64'
+        self.koji_exe = 'koji'
+        self.fetch_mock_config = False
+        self.koji_use_rhpkg = False
+
         if cp.has_section('kojibuild_driver'):
             if cp.has_option('kojibuild_driver', 'krb_principal'):
                 self.koji_krb_principal = cp.get('kojibuild_driver',
@@ -127,48 +137,30 @@ class ConfigOptions(object):
                 if cp.has_option('kojibuild_driver', 'krb_keytab'):
                     self.koji_krb_keytab = cp.get('kojibuild_driver',
                                                   'krb_keytab')
-                else:
-                    self.koji_krb_keytab = None
-
-            else:
-                self.koji_krb_principal = None
-                self.koji_krb_keytab = None
 
             if cp.has_option('kojibuild_driver', 'scratch_build'):
                 self.koji_scratch_build = cp.getboolean('kojibuild_driver',
                                                         'scratch_build')
-            else:
-                self.koji_scratch_build = True
+
             if cp.has_option('kojibuild_driver', 'build_target'):
                 self.koji_build_target = cp.get('kojibuild_driver',
                                                 'build_target')
-            else:
-                self.koji_krb_build_target = None
-            # set default arch to x86_64 if not defined
+
             if cp.has_option('kojibuild_driver', 'arch'):
                 self.koji_arch = cp.get('kojibuild_driver',
                                         'arch')
-            else:
-                self.koji_arch = 'x86_64'
+
             if cp.has_option('kojibuild_driver', 'koji_exe'):
                 self.koji_exe = cp.get('kojibuild_driver',
                                        'koji_exe')
-            else:
-                self.koji_exe = 'koji'
 
             if cp.has_option('kojibuild_driver', 'fetch_mock_config'):
                 self.fetch_mock_config = cp.getboolean('kojibuild_driver',
                                                        'fetch_mock_config')
-            else:
-                self.fetch_mock_config = False
-        else:
-            self.koji_krb_principal = None
-            self.koji_krb_keytab = None
-            self.koji_scratch_build = True
-            self.koji_build_target = None
-            self.koji_arch = 'x86_64'
-            self.koji_exe = 'koji'
-            self.fetch_mock_config = False
+
+            if cp.has_option('kojibuild_driver', 'use_rhpkg'):
+                self.koji_use_rhpkg = cp.getboolean('kojibuild_driver',
+                                                    'use_rhpkg')
 
         if cp.has_section('coprbuild_driver'):
             if cp.has_option('coprbuild_driver', 'coprid'):
