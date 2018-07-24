@@ -253,7 +253,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
     buildrpm.build_package(output_directory=yumrepodir_abs,
-                           additional_mock_opts=additional_mock_options)
+                           additional_mock_opts=additional_mock_options,
+                           package_name=commit.project_name)
 
 
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
