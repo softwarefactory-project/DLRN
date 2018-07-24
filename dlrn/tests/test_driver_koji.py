@@ -13,6 +13,7 @@
 # under the License.
 
 import mock
+import sh
 import shutil
 import tempfile
 
@@ -25,6 +26,10 @@ from six.moves import configparser
 
 def _mocked_listdir(directory):
     return ['python-pysaml2-3.0-1a.el7.centos.src.rpm']
+
+
+def _mocked_time():
+    return float(1533293385.545039)
 
 
 @mock.patch('sh.restorecon', create=True)
@@ -44,6 +49,8 @@ class TestDriverKoji(base.TestCase):
         # Create fake build log
         with open("%s/kojibuild.log" % self.temp_dir, 'a') as fp:
             fp.write("Created task: 1234")
+        with open("%s/rhpkgbuild.log" % self.temp_dir, 'a') as fp:
+            fp.write("Created task: 5678")
 
     def tearDown(self):
         super(TestDriverKoji, self).tearDown()
@@ -162,3 +169,36 @@ class TestDriverKoji(base.TestCase):
         self.assertEqual(env_mock.call_count, 2)
         self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(env_mock.call_args_list, expected)
+
+    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('dlrn.drivers.kojidriver.time', side_effect=_mocked_time)
+    def test_build_package_rhpkg(self, tm_mock, rh_mock, ld_mock, env_mock,
+                                 rc_mock):
+        self.config.koji_use_rhpkg = True
+        driver = KojiBuildDriver(cfg_options=self.config)
+        driver.build_package(output_directory=self.temp_dir,
+                             package_name='python-pysaml2')
+
+        expected_env = [mock.call(['koji', 'download-task', '--logs', '5678'],
+                                  _err=driver._process_koji_output,
+                                  _out=driver._process_koji_output,
+                                  _cwd=self.temp_dir,
+                                  _env={'PATH': '/usr/bin/'})]
+
+        expected_rh = [mock.call('/usr/bin/rhpkg', 'import', '--skip-diff',
+                                 '%s/python-pysaml2-3.0-1a.el7.centos.src'
+                                 '.rpm' % self.temp_dir),
+                       mock.call('/usr/bin/rhpkg', 'commit', '-p', '-m',
+                                 'DLRN build at 2018-08-03-124945'),
+                       mock.call('/usr/bin/rhpkg', 'build', scratch=True)]
+
+        # 1- rhpkg import (handled by rh_mock)
+        # 2- rhpkg commit (handled by rh_mock)
+        # 3- rhpkg build (handled by rh_mock)
+        # 4- koji download (handled by env_mock)
+        # 5- restorecon (handled by rc_mock)
+        self.assertEqual(rh_mock.call_count, 3)
+        self.assertEqual(env_mock.call_count, 1)
+        self.assertEqual(rc_mock.call_count, 1)
+        self.assertEqual(env_mock.call_args_list, expected_env)
+        self.assertEqual(rh_mock.call_args_list, expected_rh)
