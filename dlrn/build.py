@@ -242,8 +242,15 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     # right commit is there
     os.environ['SOURCE_COMMIT'] = commit.commit_hash
 
-    run(os.path.join(scriptsdir, "build_srpm.sh"), commit, env_vars,
-        dev_mode, use_public, bootstrap, version_from=version_from)
+    if config_options.custom_srpm_driver:
+        # use custom SRPMDriver to prepare SRPM instead of build_srpm.sh
+        srpm_driver = import_object(config_options.custom_srpm_driver,
+                                    cfg_options=config_options)
+        srpm_driver.prepare_srpm()
+    else:
+        # if custom_srpm_driver isn't specified, use built-in build_srpm.sh
+        run(os.path.join(scriptsdir, "build_srpm.sh"), commit, env_vars,
+            dev_mode, use_public, bootstrap, version_from=version_from)
 
     # SRPM is built, now build the RPM using the driver
     build_driver = config_options.build_driver
