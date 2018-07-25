@@ -169,6 +169,13 @@ class ConfigOptions(object):
         else:
             self.coprid = None
 
+        if cp.has_section('fetchsrpm_driver'):
+            if cp.has_option('fetchsrpm_driver', 'srpm_base_url'):
+                self.srpm_base_url = cp.get(
+                    'fetchsrpm_driver', 'srpm_base_url')
+            else:
+                self.srpm_base_url = None
+
         global _config_options
         _config_options = self
 
