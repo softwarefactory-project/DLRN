@@ -39,6 +39,11 @@ class ConfigOptions(object):
         self.project_name = cp.get('DEFAULT', 'project_name')
         self.pkginfo_driver = cp.get('DEFAULT', 'pkginfo_driver')
         self.build_driver = cp.get('DEFAULT', 'build_driver')
+        if cp.has_option('DEFAULT', 'custom_srpm_driver'):
+            self.custom_srpm_driver = cp.get('DEFAULT',
+                                             'custom_srpm_driver')
+        else:
+            self.custom_srpm_driver = None
         self.workers = cp.getint('DEFAULT', 'workers')
         self.gerrit_topic = cp.get('DEFAULT', 'gerrit_topic')
         self.database_connection = cp.get('DEFAULT', 'database_connection')
