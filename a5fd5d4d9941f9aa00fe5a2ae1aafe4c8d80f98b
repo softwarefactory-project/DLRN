@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "825f8592_39de66dd",
+        "filename": "dlrn/config.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 535
+      },
+      "writtenOn": "2018-07-27T10:31:33Z",
+      "side": 1,
+      "message": "Is this needed a second time? (cf. L41)",
+      "range": {
+        "startLine": 47,
+        "startChar": 8,
+        "endLine": 47,
+        "endChar": 61
+      },
+      "revId": "a5fd5d4d9941f9aa00fe5a2ae1aafe4c8d80f98b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
