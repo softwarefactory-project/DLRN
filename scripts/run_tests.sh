@@ -49,10 +49,14 @@ else
 fi
 
 # Fetch rdoinfo using zuul_cloner, if available
-if type -p zuul-cloner; then
+
+# If we are running under Zuul v3, we can find the rdoinfo git repo under /home/zuul
+rm -rf /tmp/rdoinfo
+if [ -d $ZUUL3_HOME ]; then
+    ln -s $ZUUL_CLONES_DIR/rdoinfo /tmp/rdoinfo
+elif type -p zuul-cloner; then
     zuul-cloner --workspace /tmp ${GIT_BASE_URL} rdoinfo
 else
-    rm -rf /tmp/rdoinfo
     git clone ${RDOINFO} /tmp/rdoinfo
 fi
 
