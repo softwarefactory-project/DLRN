@@ -10,15 +10,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-# BuildRPMDriver derived classes expose the following methods:
-#
-# build_package(). This method will perform the actual package build using
-#                  the driver-specific approach.
-
 
 class BuildRPMDriver(object):
+    """Abstract base class for Build RPM drivers
+
+    """
     def __init__(self, *args, **kwargs):
         self.config_options = kwargs.get('cfg_options')
 
     def build_package(self):
+        """Perform package build
+
+        """
         return False
