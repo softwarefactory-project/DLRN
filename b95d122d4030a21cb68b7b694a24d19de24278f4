@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0b203df4_f3e30927",
+        "filename": "dlrn/drivers/brewdriver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-07-30T13:40:27Z",
+      "side": 1,
+      "message": "So this driver requires using the downstream_driver for pkginfo. Once the review is more complete, it should be stated in the documentation.",
+      "range": {
+        "startLine": 66,
+        "startChar": 8,
+        "endLine": 66,
+        "endChar": 69
+      },
+      "revId": "b95d122d4030a21cb68b7b694a24d19de24278f4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08c1a17f_96e6516a",
+        "filename": "dlrn/drivers/brewdriver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-07-30T13:40:27Z",
+      "side": 1,
+      "message": "This is used during tests, I guess?",
+      "range": {
+        "startLine": 69,
+        "startChar": 19,
+        "endLine": 69,
+        "endChar": 29
+      },
+      "revId": "b95d122d4030a21cb68b7b694a24d19de24278f4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4fabe4aa_d0503342",
+        "filename": "dlrn/drivers/brewdriver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-07-30T13:40:27Z",
+      "side": 1,
+      "message": "We should get the output from these actions and pipe them into a log file, like we do for other drivers.",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 22
+      },
+      "revId": "b95d122d4030a21cb68b7b694a24d19de24278f4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fe969f2_782e8362",
+        "filename": "dlrn/drivers/brewdriver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-07-30T13:40:27Z",
+      "side": 1,
+      "message": "Yes, this should go to https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/utils.py",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 43
+      },
+      "revId": "b95d122d4030a21cb68b7b694a24d19de24278f4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
