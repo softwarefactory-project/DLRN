@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c53fc77_2c90775c",
+        "filename": "dlrn/drivers/fetchsrpmdriver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-07-30T14:00:05Z",
+      "side": 1,
+      "message": "Not the best idea. We are working to remove source RPMs from repos, see [1].\n\n[1] - https://softwarefactory-project.io/r/12233",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 39
+      },
+      "revId": "6130bc49fc18b252524956c55d43e1f17f29283d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
