@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7994edb7_b3a327dd",
+        "filename": "dlrn/config.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-31T13:00:30Z",
+      "side": 1,
+      "message": "Same default is duplicated two times. This file is too verbose and redundant, I think there should be a config interface and modules should define their config options in some uniform and not so redundant/manual way.\n\nI\u0027ll try to prepare a draft for this.",
+      "revId": "b4fc1f80e1a87adc8cd8074d92868d7ec7fb3f4a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
