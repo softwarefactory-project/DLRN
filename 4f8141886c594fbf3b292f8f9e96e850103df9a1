@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "f1020c89_de5b0d19",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-07-31T14:43:55Z",
+      "side": 1,
+      "message": "As a starter, we could use a global variable in the driver to specify the packages required, so this lines.append() call is shorter. Long-term, we may want to expose it as a configuration... but I\u0027m not sure how.",
+      "parentUuid": "249d0245_c78c5ccd",
+      "revId": "4f8141886c594fbf3b292f8f9e96e850103df9a1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b39c42e5_3c39da28",
         "filename": "dlrn/tests/test_build.py",
         "patchSetId": 11
