@@ -16,7 +16,6 @@ import sh
 
 from dlrn.config import ConfigOptions
 from dlrn import repositories
-from dlrn.shell import default_options
 from dlrn.tests import base
 
 from six.moves import configparser
@@ -70,7 +69,7 @@ class TestRefreshRepo(base.TestCase):
         self.assertEqual(sh_mock.call_args_list, expected)
 
     def test_clone_no_fallback(self, sh_mock):
-        config = configparser.RawConfigParser(default_options)
+        config = configparser.RawConfigParser()
         config.read("projects.ini")
         config.set('DEFAULT', 'fallback_to_master', '0')
         self.config = ConfigOptions(config)

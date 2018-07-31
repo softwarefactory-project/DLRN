@@ -21,7 +21,6 @@ from dlrn.config import ConfigOptions
 from dlrn.db import closeSession
 from dlrn.db import getSession
 from dlrn.db import User
-from dlrn.shell import default_options
 
 
 def create_user(options, db_connection):
@@ -141,7 +140,7 @@ def user_manager():
 
     options = parser.parse_args(sys.argv[1:])
 
-    cp = configparser.RawConfigParser(default_options)
+    cp = configparser.RawConfigParser()
     cp.read(options.config_file)
     config_options = ConfigOptions(cp)
 
