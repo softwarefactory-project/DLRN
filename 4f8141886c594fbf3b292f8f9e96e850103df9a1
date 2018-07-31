@@ -19,6 +19,41 @@
     },
     {
       "key": {
+        "uuid": "249d0245_c78c5ccd",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-07-31T14:26:18Z",
+      "side": 1,
+      "message": "Yes, I\u0027m open to ideas where to put this kind of configuration.\nI didn\u0027t want to clutter project.ini",
+      "parentUuid": "ac23e95d_d0d18d81",
+      "revId": "4f8141886c594fbf3b292f8f9e96e850103df9a1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b39c42e5_3c39da28",
+        "filename": "dlrn/tests/test_build.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-07-31T14:26:18Z",
+      "side": 1,
+      "message": "Excellent :)",
+      "revId": "4f8141886c594fbf3b292f8f9e96e850103df9a1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a497c47_3dbb12ea",
         "filename": "scripts/build_srpm.sh",
         "patchSetId": 11
