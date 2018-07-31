@@ -19,7 +19,6 @@ import tempfile
 
 from dlrn.config import ConfigOptions
 from dlrn.drivers.mockdriver import MockBuildDriver
-from dlrn.shell import default_options
 from dlrn.tests import base
 from six.moves import configparser
 
@@ -34,7 +33,7 @@ def _mocked_listdir(directory):
 class TestDriverMock(base.TestCase):
     def setUp(self):
         super(TestDriverMock, self).setUp()
-        config = configparser.RawConfigParser(default_options)
+        config = configparser.RawConfigParser()
         config.read("projects.ini")
         self.config = ConfigOptions(config)
         self.temp_dir = tempfile.mkdtemp()

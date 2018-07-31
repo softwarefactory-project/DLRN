@@ -30,7 +30,6 @@ from dlrn.db import Promotion
 from dlrn.config import ConfigOptions
 
 from dlrn.remote import import_commit
-from dlrn.shell import default_options
 
 from flask import jsonify
 from flask import render_template
@@ -48,7 +47,7 @@ max_limit = 100
 
 
 def _get_config_options(config_file):
-    cp = configparser.RawConfigParser(default_options)
+    cp = configparser.RawConfigParser()
     cp.read(config_file)
     return ConfigOptions(cp)
 
