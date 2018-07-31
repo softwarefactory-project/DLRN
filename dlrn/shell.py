@@ -59,23 +59,6 @@ logging.basicConfig(level=logging.ERROR,
 logger = logging.getLogger("dlrn")
 logger.setLevel(logging.INFO)
 
-default_options = {'maxretries': '3', 'tags': None, 'gerrit': None,
-                   'templatedir': os.path.join(
-                       os.path.dirname(os.path.realpath(__file__)),
-                       "templates"),
-                   'project_name': 'RDO',
-                   'rsyncdest': '', 'rsyncport': '22',
-                   'pkginfo_driver': 'dlrn.drivers.rdoinfo.RdoInfoDriver',
-                   'build_driver': 'dlrn.drivers.mockdriver.MockBuildDriver',
-                   'workers': '1',
-                   'gerrit_topic': 'rdo-FTBFS',
-                   'database_connection': 'sqlite:///commits.sqlite',
-                   'fallback_to_master': '1',
-                   'coprid': None,
-                   'release_numbering': '0.date.hash',
-                   }
-
-
 def deprecation():
     # We will still call main, but will indicate that this way of calling
     # the application will be deprecated.
@@ -155,7 +138,7 @@ def main():
     global verbose_build
     verbose_build = options.verbose_build
 
-    cp = configparser.RawConfigParser(default_options)
+    cp = configparser.RawConfigParser()
     cp.read(options.config_file)
 
     if options.log_commands is True:
