@@ -17,13 +17,12 @@ from six.moves import configparser
 
 from dlrn.config import ConfigOptions
 from dlrn.config import getConfigOptions
-from dlrn.shell import default_options
 
 
 class TestConfigOptions(base.TestCase):
     def setUp(self):
         super(TestConfigOptions, self).setUp()
-        self.config = configparser.RawConfigParser(default_options)
+        self.config = configparser.RawConfigParser()
         self.config.read("projects.ini")
 
     def test_without_gitrepo_driver(self):

@@ -18,7 +18,6 @@ import tempfile
 from dlrn.config import ConfigOptions
 from dlrn import db
 from dlrn import rsync
-from dlrn.shell import default_options
 from dlrn.tests import base
 from six.moves import configparser
 
@@ -27,7 +26,7 @@ from six.moves import configparser
 class TestSyncRepo(base.TestCase):
     def setUp(self):
         super(TestSyncRepo, self).setUp()
-        config = configparser.RawConfigParser(default_options)
+        config = configparser.RawConfigParser()
         config.read("projects.ini")
         config.set('DEFAULT', 'datadir', tempfile.mkdtemp())
         config.set('DEFAULT', 'scriptsdir', tempfile.mkdtemp())

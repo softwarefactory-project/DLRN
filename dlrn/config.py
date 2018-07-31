@@ -9,177 +9,138 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import os
 
 _config_options = None
+
+DLRN_CORE_CONFIG = {
+    'DEFAULT': {
+        'tags': {},
+        'datadir': {},
+        'gerrit': {},
+        'maxretries': {'type': 'int', 'default': 3},
+        'baseurl': {},
+        'smtpserver': {},
+        'distro': {},
+        'source': {},
+        'target': {},
+        'reponame': {},
+        'rsyncdest': {},
+        'rsyncport': {'default': 22},
+        'scriptsdir': {},
+        'configdir': {},
+        'templatedir': {},
+        'project_name': {'default': 'RDO'},
+        'pkginfo_driver': {'default': 'dlrn.drivers.rdoinfo.RdoInfoDriver'},
+        'build_driver': {'default': 'dlrn.drivers.mockdriver.MockBuildDriver'},
+        'workers': {'type': 'int', 'default': 1},
+        'gerrit_topic': {'default': 'rdo-FTBFS'},
+        'database_connection': {'default': 'sqlite:///commits.sqlite'},
+        'fallback_to_master': {'type': 'boolean', 'default': True},
+        'release_numbering': {'default': '0.date.hash'},
+    }
+}
+
+MODULES_CONFIG = {
+    'rdoinfo_driver': {
+        'rdoinfo_repo': {'name': 'repo', 'ignore_missing': True},
+    },
+    'downstream_driver': {
+        'rdoinfo_repo': {'name': 'repo', 'ignore_missing': True},
+        'info_files': {},
+        'versions_url': {},
+        'downstream_distro_branch': {},
+        'downstream_prefix': {},
+        'downstream_prefix_filter': {},
+    },
+    'gitrepo_driver': {
+        'gitrepo_repo': {'name': 'repo'},
+        'gitrepo_dir': {'name': 'directory'},
+        'skip_dirs': {'name': 'skip', 'type': 'list'},
+        'use_version_from_spec': {'type': 'boolean'},
+        'keep_tarball': {'type': 'boolean'},
+    },
+    'mockbuild_driver': {
+        'install_after_build': {'type': 'boolean', 'default': True},
+    },
+    'kojibuild_driver': {
+        'krb_principal': {},
+        'krb_keytab': {},
+        'scratch_build': {'type': 'boolean'},
+        'build_target': {},
+        'koji_arch': {'default': 'x86_64'},
+        'koji_exe': {'default': 'koji'},
+        'fetch_mock_config': {'type': 'boolean'}
+    },
+    'coprbuild_driver': {
+        'coprid': {},
+    }
+}
 
 
 class ConfigOptions(object):
 
     def __init__(self, cp):
-        self.tags = cp.get('DEFAULT', 'tags')
-        self.datadir = cp.get('DEFAULT', 'datadir')
-        self.gerrit = cp.get('DEFAULT', 'gerrit')
-        self.maxretries = cp.getint('DEFAULT', 'maxretries')
-        self.baseurl = cp.get('DEFAULT', 'baseurl')
-        self.smtpserver = cp.get('DEFAULT', 'smtpserver')
-        self.distro = cp.get('DEFAULT', 'distro')
-        self.source = cp.get('DEFAULT', 'source')
-        self.target = cp.get('DEFAULT', 'target')
-        self.reponame = cp.get('DEFAULT', 'reponame')
-        self.rsyncdest = cp.get('DEFAULT', 'rsyncdest')
-        self.rsyncport = cp.get('DEFAULT', 'rsyncport')
-        self.scriptsdir = cp.get('DEFAULT', 'scriptsdir')
-        if cp.has_option('DEFAULT', 'configdir'):
-            self.configdir = cp.get('DEFAULT', 'configdir')
-            if self.configdir == '':
-                self.configdir = self.scriptsdir
-        else:
+        self.parse_config(DLRN_CORE_CONFIG, cp)
+        # dynamic directory defaults
+        if not self.configdir:
             self.configdir = self.scriptsdir
-        self.templatedir = cp.get('DEFAULT', 'templatedir')
-        self.project_name = cp.get('DEFAULT', 'project_name')
-        self.pkginfo_driver = cp.get('DEFAULT', 'pkginfo_driver')
-        self.build_driver = cp.get('DEFAULT', 'build_driver')
-        self.workers = cp.getint('DEFAULT', 'workers')
-        self.gerrit_topic = cp.get('DEFAULT', 'gerrit_topic')
-        self.database_connection = cp.get('DEFAULT', 'database_connection')
-        self.fallback_to_master = cp.getboolean('DEFAULT',
-                                                'fallback_to_master')
-        self.release_numbering = cp.get('DEFAULT', 'release_numbering')
+        if not self.templatedir:
+            self.templatedir = \
+                os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                             "templates"),
 
-        # Handling for optional sections, driver-based
+        # handling for optional sections, driver-based
         self.rdoinfo_repo = None
-        if cp.has_section('rdoinfo_driver'):
-            if cp.has_option('rdoinfo_driver', 'repo'):
-                self.rdoinfo_repo = cp.get('rdoinfo_driver', 'repo')
-
-        if cp.has_section('downstream_driver'):
-            if cp.has_option('downstream_driver', 'repo'):
-                self.rdoinfo_repo = cp.get('downstream_driver', 'repo')
-            if cp.has_option('downstream_driver', 'info_files'):
-                self.info_files = cp.get('downstream_driver', 'info_files')
-            else:
-                self.info_files = None
-            if cp.has_option('downstream_driver', 'versions_url'):
-                self.versions_url = cp.get('downstream_driver',
-                                           'versions_url')
-            else:
-                self.versions_url = None
-            if cp.has_option('downstream_driver', 'downstream_distro_branch'):
-                self.downstream_distro_branch = cp.get(
-                    'downstream_driver', 'downstream_distro_branch')
-            else:
-                self.downstream_distro_branch = None
-            if cp.has_option('downstream_driver', 'downstream_prefix'):
-                self.downstream_prefix = cp.get(
-                    'downstream_driver', 'downstream_prefix')
-            else:
-                self.downstream_prefix = None
-            if cp.has_option('downstream_driver', 'downstream_prefix_filter'):
-                self.downstream_prefix_filter = cp.get(
-                    'downstream_driver', 'downstream_prefix_filter')
-            else:
-                self.downstream_prefix_filter = None
-
-        if cp.has_section('gitrepo_driver'):
-            if cp.has_option('gitrepo_driver', 'repo'):
-                self.gitrepo_repo = cp.get('gitrepo_driver', 'repo')
-            else:
-                self.gitrepo_repo = None
-            if cp.has_option('gitrepo_driver', 'directory'):
-                self.gitrepo_dir = cp.get('gitrepo_driver', 'directory')
-            else:
-                self.gitrepo_dir = None
-            if cp.has_option('gitrepo_driver', 'skip'):
-                self.skip_dirs = cp.get('gitrepo_driver', 'skip').split(',')
-            else:
-                self.skip_dirs = None
-            if cp.has_option('gitrepo_driver', 'use_version_from_spec'):
-                use_spec = cp.getboolean('gitrepo_driver',
-                                         'use_version_from_spec')
-                self.use_version_from_spec = use_spec
-            else:
-                self.use_version_from_spec = False
-            if cp.has_option('gitrepo_driver', 'keep_tarball'):
-                self.keep_tarball = cp.getboolean('gitrepo_driver',
-                                                  'keep_tarball')
-            else:
-                self.keep_tarball = False
-        else:
-            self.keep_tarball = False
-            self.use_version_from_spec = False
-            self.skip_dirs = None
-            self.gitrepo_dir = None
-            self.gitrepo_repo = None
-
-        if cp.has_section('mockbuild_driver'):
-            if cp.has_option('mockbuild_driver', 'install_after_build'):
-                self.install_after_build = cp.getboolean(
-                    'mockbuild_driver', 'install_after_build')
-            else:
-                self.install_after_build = True
-        else:
-            self.install_after_build = True
-
-        if cp.has_section('kojibuild_driver'):
-            if cp.has_option('kojibuild_driver', 'krb_principal'):
-                self.koji_krb_principal = cp.get('kojibuild_driver',
-                                                 'krb_principal')
-                if cp.has_option('kojibuild_driver', 'krb_keytab'):
-                    self.koji_krb_keytab = cp.get('kojibuild_driver',
-                                                  'krb_keytab')
-                else:
-                    self.koji_krb_keytab = None
-
-            else:
-                self.koji_krb_principal = None
-                self.koji_krb_keytab = None
-
-            if cp.has_option('kojibuild_driver', 'scratch_build'):
-                self.koji_scratch_build = cp.getboolean('kojibuild_driver',
-                                                        'scratch_build')
-            else:
-                self.koji_scratch_build = True
-            if cp.has_option('kojibuild_driver', 'build_target'):
-                self.koji_build_target = cp.get('kojibuild_driver',
-                                                'build_target')
-            else:
-                self.koji_krb_build_target = None
-            # set default arch to x86_64 if not defined
-            if cp.has_option('kojibuild_driver', 'arch'):
-                self.koji_arch = cp.get('kojibuild_driver',
-                                        'arch')
-            else:
-                self.koji_arch = 'x86_64'
-            if cp.has_option('kojibuild_driver', 'koji_exe'):
-                self.koji_exe = cp.get('kojibuild_driver',
-                                       'koji_exe')
-            else:
-                self.koji_exe = 'koji'
-
-            if cp.has_option('kojibuild_driver', 'fetch_mock_config'):
-                self.fetch_mock_config = cp.get('kojibuild_driver',
-                                                'fetch_mock_config')
-            else:
-                self.fetch_mock_config = False
-        else:
-            self.koji_krb_principal = None
-            self.koji_krb_keytab = None
-            self.koji_scratch_build = True
-            self.koji_build_target = None
-            self.koji_arch = 'x86_64'
-            self.koji_exe = 'koji'
-            self.fetch_mock_config = False
-
-        if cp.has_section('coprbuild_driver'):
-            if cp.has_option('coprbuild_driver', 'coprid'):
-                self.coprid = cp.get('coprbuild_driver', 'coprid')
-            else:
-                self.coprid = None
-        else:
-            self.coprid = None
+        self.parse_config(MODULES_CONFIG, cp)
 
         global _config_options
         _config_options = self
+
+    def parse_config(self, config_rules, config_parser):
+        for section, rules in config_rules.items():
+            if section == 'DEFAULT' or config_parser.has_section(section):
+                for option, rule in rules.items():
+                    ini_option = rule.get('name', option)
+                    if config_parser.has_option(section, ini_option):
+                        _type = rule.get('type', '')
+                        if _type == 'list' or _type == 'str':
+                            cp_get_method_name = 'get'
+                        else:
+                            cp_get_method_name = 'get' + _type
+                        cp_get_method = getattr(config_parser,
+                                                cp_get_method_name)
+                        val = cp_get_method(section, ini_option)
+                        if _type == 'list':
+                            # comma separated list
+                            val = val.split(',')
+                        setattr(self, option, val)
+                    else:
+                        self.set_default(option, rule)
+            else:
+                # section is missing, fill in defaults
+                for option, rule in rules.items():
+                    self.set_default(option, rule)
+
+    def set_default(self, option, rule):
+        if rule.get('ignore_missing'):
+            # ignore_missing prevents setting default value
+            return
+        if 'default' in rule:
+            val = rule['default']
+        else:
+            val = None
+            _type = rule.get('type')
+            if _type:
+                if _type == 'boolean':
+                    val = False
+                elif _type == 'int':
+                    val = 0
+                elif _type == 'str':
+                    val = ''
+                elif _type == 'list':
+                    val = []
+        setattr(self, option, val)
 
 
 def getConfigOptions():

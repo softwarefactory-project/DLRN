@@ -19,7 +19,6 @@ import tempfile
 
 from dlrn.config import ConfigOptions
 from dlrn.drivers.coprdriver import CoprBuildDriver
-from dlrn.shell import default_options
 from dlrn.tests import base
 from six.moves import configparser
 
@@ -29,7 +28,7 @@ from six.moves import configparser
 class TestDriverCopr(base.TestCase):
     def setUp(self):
         super(TestDriverCopr, self).setUp()
-        config = configparser.RawConfigParser(default_options)
+        config = configparser.RawConfigParser()
         config.read("projects.ini")
         self.config = ConfigOptions(config)
         self.config.coprid = 'account/repo'
