@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ac23e95d_d0d18d81",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-31T12:51:47Z",
+      "side": 1,
+      "message": "Hardcoding specific packages directly into .py code doesn\u0027t feel right, this should be configurable indeed.",
+      "revId": "4f8141886c594fbf3b292f8f9e96e850103df9a1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a497c47_3dbb12ea",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-07-31T12:51:47Z",
+      "side": 1,
+      "message": "yes we do",
+      "revId": "4f8141886c594fbf3b292f8f9e96e850103df9a1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
