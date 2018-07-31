@@ -18,7 +18,6 @@ import tempfile
 
 from dlrn.config import ConfigOptions
 from dlrn.drivers.downstream import DownstreamInfoDriver
-from dlrn.shell import default_options
 from dlrn.tests import base
 from six.moves import configparser
 
@@ -36,7 +35,7 @@ def _mocked_refreshrepo(*args, **kwargs):
 class TestDriverDownstream(base.TestCase):
     def setUp(self):
         super(TestDriverDownstream, self).setUp()
-        config = configparser.RawConfigParser(default_options)
+        config = configparser.RawConfigParser()
         config.read("projects.ini")
         self.config = ConfigOptions(config)
         self.config.versions_url = \

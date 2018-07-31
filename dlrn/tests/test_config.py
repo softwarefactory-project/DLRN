@@ -17,13 +17,12 @@ from six.moves import configparser
 
 from dlrn.config import ConfigOptions
 from dlrn.config import getConfigOptions
-from dlrn.shell import default_options
 
 
 class TestConfigOptions(base.TestCase):
     def setUp(self):
         super(TestConfigOptions, self).setUp()
-        self.config = configparser.RawConfigParser(default_options)
+        self.config = configparser.RawConfigParser()
         self.config.read("projects.ini")
 
     def test_without_gitrepo_driver(self):
@@ -49,3 +48,9 @@ class TestConfigOptions(base.TestCase):
     def test_get_config_option(self):
         config = ConfigOptions(self.config)
         self.assertEqual(config, getConfigOptions())
+
+    def test_dynamic_dirs(self):
+        config = ConfigOptions(self.config)
+        self.assertEqual(config.scriptsdir, './scripts')
+        self.assertEqual(config.configdir, './scripts')
+        self.assertEqual(config.templatedir, './dlrn/templates')
