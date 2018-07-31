@@ -25,7 +25,6 @@ from dlrn.config import ConfigOptions
 from dlrn.db import closeSession
 from dlrn.db import getLastProcessedCommit
 from dlrn.db import getSession
-from dlrn.shell import default_options
 from dlrn.shell import post_build
 from dlrn.shell import process_build_result
 from dlrn.utils import import_object
@@ -40,7 +39,7 @@ logger.setLevel(logging.INFO)
 
 def import_commit(repo_url, config_file, db_connection=None,
                   local_info_repo=None):
-    cp = configparser.RawConfigParser(default_options)
+    cp = configparser.RawConfigParser()
     cp.read(config_file)
     config_options = ConfigOptions(cp)
     pkginfo_driver = config_options.pkginfo_driver
