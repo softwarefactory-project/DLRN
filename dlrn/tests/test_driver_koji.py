@@ -21,7 +21,6 @@ import tempfile
 
 from dlrn.config import ConfigOptions
 from dlrn.drivers.kojidriver import KojiBuildDriver
-from dlrn.shell import default_options
 from dlrn.tests import base
 from six.moves import configparser
 from time import localtime
@@ -42,7 +41,7 @@ def _mocked_time():
 class TestDriverKoji(base.TestCase):
     def setUp(self):
         super(TestDriverKoji, self).setUp()
-        config = configparser.RawConfigParser(default_options)
+        config = configparser.RawConfigParser()
         config.read("projects.ini")
         self.config = ConfigOptions(config)
         self.config.koji_krb_principal = 'test@example.com'
