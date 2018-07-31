@@ -12,10 +12,50 @@
 
 _config_options = None
 
+# This is how config interface could look - compare with replaced code.
+# It might even be moved to individual modules!
+# Furthermore, projects.ini can be generated from this.
+MODULES_CONFIG = {
+    'rdoinfo_driver': {
+        'rdoinfo_repo': {'name': 'repo', 'optional': True},
+    },
+    'downstream_driver': {
+        'rdoinfo_repo': {'name': 'repo', 'optional': True},
+        'info_files': {},
+        'versions_url': {},
+        'downstream_distro_branch': {},
+        'downstream_prefix': {},
+        'downstream_prefix_filter': {},
+    },
+    'gitrepo_driver': {
+        'gitrepo_repo': {'name': 'repo'},
+        'gitrepo_dir': {'name': 'directory'},
+        'skip_dirs': {'name': 'skip'},
+        'use_version_from_spec': {'type': 'boolean'},
+        'keep_tarball': {'type': 'boolean'},
+    },
+    'mockbuild_driver': {
+        'install_after_build': {'type': 'boolean', 'default': True},
+    },
+    'kojibuild_driver': {
+        'krb_principal': {},
+        'krb_keytab': {},
+        'scratch_build': {'type': 'boolean'},
+        'build_target': {},
+        'koji_arch': {'default': 'x86_64'},
+        'koji_exe': {'default': 'koji'},
+    },
+    'coprbuild_driver': {
+        'coprid': {},
+    }
+}
+
 
 class ConfigOptions(object):
 
     def __init__(self, cp):
+        # TODO(jruzicka): store this in DEFAULT_CONFIG
+        # a la MODULES_CONFIG above
         self.tags = cp.get('DEFAULT', 'tags')
         self.datadir = cp.get('DEFAULT', 'datadir')
         self.gerrit = cp.get('DEFAULT', 'gerrit')
@@ -48,131 +88,31 @@ class ConfigOptions(object):
 
         # Handling for optional sections, driver-based
         self.rdoinfo_repo = None
-        if cp.has_section('rdoinfo_driver'):
-            if cp.has_option('rdoinfo_driver', 'repo'):
-                self.rdoinfo_repo = cp.get('rdoinfo_driver', 'repo')
-
-        if cp.has_section('downstream_driver'):
-            if cp.has_option('downstream_driver', 'repo'):
-                self.rdoinfo_repo = cp.get('downstream_driver', 'repo')
-            if cp.has_option('downstream_driver', 'info_files'):
-                self.info_files = cp.get('downstream_driver', 'info_files')
-            else:
-                self.info_files = None
-            if cp.has_option('downstream_driver', 'versions_url'):
-                self.versions_url = cp.get('downstream_driver',
-                                           'versions_url')
-            else:
-                self.versions_url = None
-            if cp.has_option('downstream_driver', 'downstream_distro_branch'):
-                self.downstream_distro_branch = cp.get(
-                    'downstream_driver', 'downstream_distro_branch')
-            else:
-                self.downstream_distro_branch = None
-            if cp.has_option('downstream_driver', 'downstream_prefix'):
-                self.downstream_prefix = cp.get(
-                    'downstream_driver', 'downstream_prefix')
-            else:
-                self.downstream_prefix = None
-            if cp.has_option('downstream_driver', 'downstream_prefix_filter'):
-                self.downstream_prefix_filter = cp.get(
-                    'downstream_driver', 'downstream_prefix_filter')
-            else:
-                self.downstream_prefix_filter = None
-
-        if cp.has_section('gitrepo_driver'):
-            if cp.has_option('gitrepo_driver', 'repo'):
-                self.gitrepo_repo = cp.get('gitrepo_driver', 'repo')
-            else:
-                self.gitrepo_repo = None
-            if cp.has_option('gitrepo_driver', 'directory'):
-                self.gitrepo_dir = cp.get('gitrepo_driver', 'directory')
-            else:
-                self.gitrepo_dir = None
-            if cp.has_option('gitrepo_driver', 'skip'):
-                self.skip_dirs = cp.get('gitrepo_driver', 'skip').split(',')
-            else:
-                self.skip_dirs = None
-            if cp.has_option('gitrepo_driver', 'use_version_from_spec'):
-                use_spec = cp.getboolean('gitrepo_driver',
-                                         'use_version_from_spec')
-                self.use_version_from_spec = use_spec
-            else:
-                self.use_version_from_spec = False
-            if cp.has_option('gitrepo_driver', 'keep_tarball'):
-                self.keep_tarball = cp.getboolean('gitrepo_driver',
-                                                  'keep_tarball')
-            else:
-                self.keep_tarball = False
-        else:
-            self.keep_tarball = False
-            self.use_version_from_spec = False
-            self.skip_dirs = None
-            self.gitrepo_dir = None
-            self.gitrepo_repo = None
-
-        if cp.has_section('mockbuild_driver'):
-            if cp.has_option('mockbuild_driver', 'install_after_build'):
-                self.install_after_build = cp.getboolean(
-                    'mockbuild_driver', 'install_after_build')
-            else:
-                self.install_after_build = True
-        else:
-            self.install_after_build = True
-
-        if cp.has_section('kojibuild_driver'):
-            if cp.has_option('kojibuild_driver', 'krb_principal'):
-                self.koji_krb_principal = cp.get('kojibuild_driver',
-                                                 'krb_principal')
-                if cp.has_option('kojibuild_driver', 'krb_keytab'):
-                    self.koji_krb_keytab = cp.get('kojibuild_driver',
-                                                  'krb_keytab')
-                else:
-                    self.koji_krb_keytab = None
-
-            else:
-                self.koji_krb_principal = None
-                self.koji_krb_keytab = None
-
-            if cp.has_option('kojibuild_driver', 'scratch_build'):
-                self.koji_scratch_build = cp.getboolean('kojibuild_driver',
-                                                        'scratch_build')
-            else:
-                self.koji_scratch_build = True
-            if cp.has_option('kojibuild_driver', 'build_target'):
-                self.koji_build_target = cp.get('kojibuild_driver',
-                                                'build_target')
-            else:
-                self.koji_krb_build_target = None
-            # set default arch to x86_64 if not defined
-            if cp.has_option('kojibuild_driver', 'arch'):
-                self.koji_arch = cp.get('kojibuild_driver',
-                                        'arch')
-            else:
-                self.koji_arch = 'x86_64'
-            if cp.has_option('kojibuild_driver', 'koji_exe'):
-                self.koji_exe = cp.get('kojibuild_driver',
-                                       'koji_exe')
-            else:
-                self.koji_exe = 'koji'
-        else:
-            self.koji_krb_principal = None
-            self.koji_krb_keytab = None
-            self.koji_scratch_build = True
-            self.koji_build_target = None
-            self.koji_arch = 'x86_64'
-            self.koji_exe = 'koji'
-
-        if cp.has_section('coprbuild_driver'):
-            if cp.has_option('coprbuild_driver', 'coprid'):
-                self.coprid = cp.get('coprbuild_driver', 'coprid')
-            else:
-                self.coprid = None
-        else:
-            self.coprid = None
+        self.parse_config(MODULES_CONFIG, cp)
 
         global _config_options
         _config_options = self
+
+    def parse_config(self, config_rules, config_parser):
+        for section, rules in config_rules.items():
+            if config_parser.has_section(section):
+                for option, rule in rules.items():
+                    ini_option = rule.get('name', option)
+                    if config_parser.has_option(section, ini_option):
+                        cp_get_method_name = 'get' + rule.get('type', '')
+                        cp_get_method = getattr(config_parser,
+                                                cp_get_method_name)
+                        val = cp_get_method(section, ini_option)
+                        setattr(self, option, val)
+                    else:
+                        # TODO(jruzicka): assign default depending on
+                        # 'default' rule value or 'type' or
+                        # leave this unset if 'optional': True
+                        raise NotImplemented("TODO")
+            else:
+                # Section is missing in the config file:
+                # TODO(jruzicka): assign defaults the same way as above
+                raise NotImplemented("TODO")
 
 
 def getConfigOptions():
