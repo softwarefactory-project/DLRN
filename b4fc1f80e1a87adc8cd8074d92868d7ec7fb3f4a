@@ -16,6 +16,24 @@
       "revId": "b4fc1f80e1a87adc8cd8074d92868d7ec7fb3f4a",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "75dbdc0c_c03f4c5e",
+        "filename": "dlrn/config.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-07-31T13:02:05Z",
+      "side": 1,
+      "message": "Agreed, the number of configuration options is growing, and we should find a better way to handle them... But I\u0027m wary of moving to oslo.config, it could be too complex for our use case.",
+      "parentUuid": "7994edb7_b3a327dd",
+      "revId": "b4fc1f80e1a87adc8cd8074d92868d7ec7fb3f4a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
