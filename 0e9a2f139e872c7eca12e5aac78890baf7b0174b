@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8fc160c1_829fea98",
+        "filename": "dlrn/config.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 442
+      },
+      "writtenOn": "2018-08-01T11:12:42Z",
+      "side": 1,
+      "message": "Consider setting self.fetch_mock_config to false by default. Then you only need lines 159 - 161.",
+      "range": {
+        "startLine": 163,
+        "startChar": 16,
+        "endLine": 171,
+        "endChar": 42
+      },
+      "revId": "0e9a2f139e872c7eca12e5aac78890baf7b0174b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
