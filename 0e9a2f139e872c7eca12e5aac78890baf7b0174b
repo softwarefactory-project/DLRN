@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "073283b7_749805e8",
+        "filename": "dlrn/build.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-01T13:43:11Z",
+      "side": 1,
+      "message": "I\u0027d check config_options.fetch_mock_config first in order to prevent unneeded file comparison (system calls) when it is True. (when `a \u003d\u003d True` in `if a and b:`, then b won\u0027t be evaluated)",
+      "revId": "0e9a2f139e872c7eca12e5aac78890baf7b0174b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8fc160c1_829fea98",
         "filename": "dlrn/config.py",
         "patchSetId": 15
@@ -19,6 +36,47 @@
         "endLine": 171,
         "endChar": 42
       },
+      "revId": "0e9a2f139e872c7eca12e5aac78890baf7b0174b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b2c881f_3bf196d3",
+        "filename": "dlrn/config.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-01T13:43:11Z",
+      "side": 1,
+      "message": "Note I try to fix this config redundancy in unrelated https://softwarefactory-project.io/r/#/c/13251/",
+      "parentUuid": "8fc160c1_829fea98",
+      "range": {
+        "startLine": 163,
+        "startChar": 16,
+        "endLine": 171,
+        "endChar": 42
+      },
+      "revId": "0e9a2f139e872c7eca12e5aac78890baf7b0174b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d369369_6a2c8ac7",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-01T13:43:11Z",
+      "side": 1,
+      "message": "Yes, but it\u0027s at least isolated in a variable and thus ready to be made properly configurable in future patches.\n\nIt might be preferred to make this configurable this after https://softwarefactory-project.io/r/#/c/13251/ is merged.",
       "revId": "0e9a2f139e872c7eca12e5aac78890baf7b0174b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
