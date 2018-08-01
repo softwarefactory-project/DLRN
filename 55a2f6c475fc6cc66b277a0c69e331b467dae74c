@@ -22,6 +22,30 @@
       "revId": "55a2f6c475fc6cc66b277a0c69e331b467dae74c",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "507c4b26_e2ed11af",
+        "filename": "dlrn/config.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-01T17:04:45Z",
+      "side": 1,
+      "message": "yes, that is the plan and half of the motivation for this patch :) but let me do that in a separate patch as ensuring new format doesn\u0027t break anything is big enough task on it\u0027s own.\n\nThen we just move these to a driver class variable I guess:\n\nclass DownstreamInfoDriver(PkgInfoDriver):\n    config_options \u003d {\n        \u0027downstream_driver\u0027: {\n            ... (above code)\n        }\n    }\n\nAnd make sure to _config_options.parse_config(driver.config_options) for all drivers.",
+      "parentUuid": "277b1fe9_7b0d4f62",
+      "range": {
+        "startLine": 48,
+        "startChar": 25,
+        "endLine": 54,
+        "endChar": 20
+      },
+      "revId": "55a2f6c475fc6cc66b277a0c69e331b467dae74c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
