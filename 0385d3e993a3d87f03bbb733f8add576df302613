@@ -1,0 +1,8 @@
+Code-Review+2: Jakub Ružička <jruzicka@redhat.com>
+Workflow+1: Jakub Ružička <jruzicka@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Wed, 01 Aug 2018 14:12:04 +0000
+Reviewed-on: https://softwarefactory-project.io/r/13085
+Project: DLRN
+Branch: refs/heads/master
