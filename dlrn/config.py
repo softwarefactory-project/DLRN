@@ -157,8 +157,8 @@ class ConfigOptions(object):
                 self.koji_exe = 'koji'
 
             if cp.has_option('kojibuild_driver', 'fetch_mock_config'):
-                self.fetch_mock_config = cp.get('kojibuild_driver',
-                                                'fetch_mock_config')
+                self.fetch_mock_config = cp.getboolean('kojibuild_driver',
+                                                       'fetch_mock_config')
             else:
                 self.fetch_mock_config = False
         else:
