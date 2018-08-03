@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "03e5a6c5_1cf13871",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-03T13:40:53Z",
+      "side": 1,
+      "message": "cool, no new driver needed in the end :)",
+      "revId": "021931c274a7f0f37944b8e6392730c4a5831681",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "db76dd44_2c0d676f",
+        "filename": "dlrn/tests/test_driver_koji.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-03T13:40:53Z",
+      "side": 1,
+      "message": "Aha, a fake binary is indeed needed for this test.",
+      "revId": "021931c274a7f0f37944b8e6392730c4a5831681",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a1115887_c62afced",
+        "filename": "dlrn/tests/test_driver_koji.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-03T13:40:53Z",
+      "side": 1,
+      "message": "Pretty thorough test, I learned something here.",
+      "revId": "021931c274a7f0f37944b8e6392730c4a5831681",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
