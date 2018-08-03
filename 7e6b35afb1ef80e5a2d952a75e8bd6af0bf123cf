@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "003da7c5_eb382595",
+        "filename": "dlrn/config.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-08-03T15:54:04Z",
+      "side": 1,
+      "message": "Previously, we had some options defaulting to None (tags, gerrit) and some others defaulting to \u0027\u0027 (rsyncdest). I see we are not explicitly defining any default for them, what would be the received value?",
+      "range": {
+        "startLine": 18,
+        "startChar": 8,
+        "endLine": 18,
+        "endChar": 19
+      },
+      "revId": "7e6b35afb1ef80e5a2d952a75e8bd6af0bf123cf",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "87b8ca75_f8a8159d",
+        "filename": "dlrn/config.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-08-03T15:54:04Z",
+      "side": 1,
+      "message": "we have lost the default here. I see we are setting it later in the file, but for some reason it is breaking one of the non-voting jobs.",
+      "range": {
+        "startLine": 32,
+        "startChar": 8,
+        "endLine": 32,
+        "endChar": 26
+      },
+      "revId": "7e6b35afb1ef80e5a2d952a75e8bd6af0bf123cf",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
