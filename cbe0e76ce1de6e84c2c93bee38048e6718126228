@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9e025ef4_bff78792",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-06T14:34:15Z",
+      "side": 1,
+      "message": "ideally, this common code would be a helper function somewhere accessible to prevent redundancy.",
+      "revId": "cbe0e76ce1de6e84c2c93bee38048e6718126228",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1801648b_cfeb254d",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-06T14:34:15Z",
+      "side": 1,
+      "message": "Consider including full package NVR in the commit title like rdopkg does now unless it\u0027s too hard to get that information, something like \n\npython-novalicent-0.8.0-3 - DLRN build at %s\n\nThis would often result in long commit titles but they would be more consistent across distgits and make history navigation easier.",
+      "revId": "cbe0e76ce1de6e84c2c93bee38048e6718126228",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
