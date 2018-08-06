@@ -1,0 +1,10 @@
+Code-Review+1: Mehdi ABAAKOUK <sileht@sileht.net>
+Code-Review+1: Alfredo Moralejo <amoralej@redhat.com>
+Code-Review+2: Haïkel Guémar <hguemar@fedoraproject.org>
+Workflow+1: Haïkel Guémar <hguemar@fedoraproject.org>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Mon, 06 Aug 2018 13:20:32 +0000
+Reviewed-on: https://softwarefactory-project.io/r/13307
+Project: DLRN
+Branch: refs/heads/master
