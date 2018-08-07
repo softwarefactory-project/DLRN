@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a8bafe5_eb6f9517",
+        "filename": "dlrn/config.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-08-07T14:23:13Z",
+      "side": 1,
+      "message": "This tiny little comma is making self.templatedir be a tuple instead of a str, which breaks the tripleo-ci-oooq job (there is no templatedir in projects.ini in that job).",
+      "range": {
+        "startLine": 92,
+        "startChar": 41,
+        "endLine": 92,
+        "endChar": 42
+      },
+      "revId": "6e952cecb27fc5c5048063ee15e16415ba100b79",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
