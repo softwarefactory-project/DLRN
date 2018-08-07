@@ -48,13 +48,13 @@ def mocked_listdir(directory):
 class TestBuild(base.TestCase):
     def setUp(self):
         super(TestBuild, self).setUp()
-        config = configparser.RawConfigParser()
-        config.read("projects.ini")
-        config.set('DEFAULT', 'datadir', tempfile.mkdtemp())
-        config.set('DEFAULT', 'scriptsdir', tempfile.mkdtemp())
-        config.set('DEFAULT', 'baseurl', "file://%s" % config.get('DEFAULT',
-                                                                  'datadir'))
-        self.config = ConfigOptions(config)
+        self.configfile = configparser.RawConfigParser()
+        self.configfile.read("projects.ini")
+        self.configfile.set('DEFAULT', 'datadir', tempfile.mkdtemp())
+        self.configfile.set('DEFAULT', 'scriptsdir', tempfile.mkdtemp())
+        self.configfile.set('DEFAULT', 'baseurl', "file://%s" %
+                            self.configfile.get('DEFAULT', 'datadir'))
+        self.config = ConfigOptions(self.configfile)
         shutil.copyfile(os.path.join("scripts", "centos.cfg"),
                         os.path.join(self.config.scriptsdir, "centos.cfg"))
         with open(os.path.join(self.config.datadir,
@@ -72,6 +72,9 @@ class TestBuild(base.TestCase):
 
     @mock.patch('os.listdir', side_effect=mocked_listdir)
     def test_build_rpm_wrapper(self, ld_mock, sh_mock, env_mock, rc_mock):
+        self.configfile.set('DEFAULT', 'build_driver',
+                            'dlrn.drivers.mockdriver.MockBuildDriver')
+        self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
         build_rpm_wrapper(commit, False, False, False, None, True)
         # 4 sh calls:
@@ -87,6 +90,9 @@ class TestBuild(base.TestCase):
 
     @mock.patch('os.listdir', side_effect=mocked_listdir)
     def test_build(self, ld_mock, sh_mock, env_mock, rc_mock):
+        self.configfile.set('DEFAULT', 'build_driver',
+                            'dlrn.drivers.mockdriver.MockBuildDriver')
+        self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
         try:
             build([], commit, None, False, False, False, True)
@@ -95,11 +101,16 @@ class TestBuild(base.TestCase):
 
     @mock.patch('os.listdir', side_effect=mocked_listdir)
     def test_build_configdir(self, ld_mock, sh_mock, env_mock, rc_mock):
-        self.config.configdir = tempfile.mkdtemp()
+        configdir = tempfile.mkdtemp()
+        self.configfile.set('DEFAULT', 'configdir', configdir)
+        self.configfile.set('DEFAULT', 'build_driver',
+                            'dlrn.drivers.mockdriver.MockBuildDriver')
+        self.config = ConfigOptions(self.configfile)
+
         shutil.copyfile(os.path.join("scripts", "centos.cfg"),
-                        os.path.join(self.config.configdir, "centos.cfg"))
+                        os.path.join(configdir, "centos.cfg"))
         commit = db.getCommits(self.session)[-1]
-        expected = [mock.call('%s/centos.cfg' % self.config.configdir,
+        expected = [mock.call('%s/centos.cfg' % configdir,
                               '%s/dlrn-1.cfg.new' % self.config.datadir),
                     mock.call('%s/dlrn-1.cfg.new' % self.config.datadir,
                               '%s/dlrn-1.cfg' % self.config.datadir)]
@@ -109,12 +120,16 @@ class TestBuild(base.TestCase):
             build_rpm_wrapper(commit, False, False, False, None, True)
             self.assertEqual(expected, cp_mock.call_args_list)
 
+    @mock.patch('dlrn.drivers.kojidriver.KojiBuildDriver.build_package')
     @mock.patch('os.listdir', side_effect=mocked_listdir)
-    @mock.patch('dlrn.drivers.mockdriver.MockBuildDriver.write_mock_config',
+    @mock.patch('dlrn.drivers.kojidriver.KojiBuildDriver.write_mock_config',
                 create=True)
-    def test_build_rpm_wrapper_mock_config(self, wm_mock, ld_mock, sh_mock,
-                                           env_mock, rc_mock):
-        self.config.fetch_mock_config = True
+    def test_build_rpm_wrapper_mock_config(self, wm_mock, ld_mock, bp_mock,
+                                           sh_mock, env_mock, rc_mock):
+        self.configfile.set('kojibuild_driver', 'fetch_mock_config', 'True')
+        self.configfile.set('DEFAULT', 'build_driver',
+                            'dlrn.drivers.kojidriver.KojiBuildDriver')
+        self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
         build_rpm_wrapper(commit, False, False, False, None, True)
         self.assertEqual(wm_mock.call_count, 1)
