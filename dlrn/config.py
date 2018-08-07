@@ -11,6 +11,8 @@
 # under the License.
 import os
 
+from dlrn.utils import import_class
+
 _config_options = None
 
 DLRN_CORE_CONFIG = {
@@ -38,44 +40,16 @@ DLRN_CORE_CONFIG = {
         'database_connection': {'default': 'sqlite:///commits.sqlite'},
         'fallback_to_master': {'type': 'boolean', 'default': True},
         'release_numbering': {'default': '0.date.hash'},
-    }
-}
-
-MODULES_CONFIG = {
-    'rdoinfo_driver': {
-        'rdoinfo_repo': {'name': 'repo', 'ignore_missing': True},
-    },
-    'downstream_driver': {
-        'rdoinfo_repo': {'name': 'repo', 'ignore_missing': True},
-        'info_files': {},
-        'versions_url': {},
-        'downstream_distro_branch': {},
-        'downstream_prefix': {},
-        'downstream_prefix_filter': {},
-    },
-    'gitrepo_driver': {
-        'gitrepo_repo': {'name': 'repo'},
-        'gitrepo_dir': {'name': 'directory'},
-        'skip_dirs': {'name': 'skip', 'type': 'list'},
-        'use_version_from_spec': {'type': 'boolean'},
-        'keep_tarball': {'type': 'boolean'},
-    },
-    'mockbuild_driver': {
-        'install_after_build': {'type': 'boolean', 'default': True},
-    },
-    'kojibuild_driver': {
-        'koji_krb_principal': {'name': 'krb_principal'},
-        'koji_krb_keytab': {'name': 'krb_keytab'},
-        'koji_scratch_build': {'name': 'scratch_build', 'type': 'boolean',
-                               'default': True},
-        'koji_build_target': {'name': 'build_target'},
-        'koji_arch': {'name': 'arch', 'default': 'x86_64'},
-        'koji_use_rhpkg': {'name': 'use_rhpkg', 'type': 'boolean'},
-        'koji_exe': {'default': 'koji'},
+        # TODO(jruzicka): Following options were made driver specific but
+        # are still used in build_rpm_wrapper regardless of driver so we
+        # set them to default here and override using driver config_options.
+        # Once we refactor build_rpm_wrapper these dupes should go away.
         'fetch_mock_config': {'type': 'boolean'},
-    },
-    'coprbuild_driver': {
         'coprid': {},
+        'keep_tarball': {'type': 'boolean'},
+        'install_after_build': {'type': 'boolean', 'default': True},
+        # rdoinfo_repo is used by both koji and downstream driver
+        'rdoinfo_repo': {},
     }
 }
 
@@ -93,8 +67,19 @@ class ConfigOptions(object):
                              "templates")
 
         # handling for optional sections, driver-based
-        self.rdoinfo_repo = None
-        self.parse_config(MODULES_CONFIG, cp)
+        drivers = [
+            self.pkginfo_driver,
+            self.build_driver,
+        ]
+        for d in drivers:
+            # import driver specific config options
+            driver = import_class(d)
+            try:
+                driver_cfg = driver.DRIVER_CONFIG
+            except AttributeError:
+                driver_cfg = None
+            if driver_cfg:
+                self.parse_config(driver_cfg, cp)
 
         global _config_options
         _config_options = self
