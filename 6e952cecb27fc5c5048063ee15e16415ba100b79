@@ -22,6 +22,30 @@
       "revId": "6e952cecb27fc5c5048063ee15e16415ba100b79",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d0bda2d_0c0c0eb6",
+        "filename": "dlrn/config.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-07T17:00:54Z",
+      "side": 1,
+      "message": "stealthy typo is the deadliest! thanks for figuring that out :)",
+      "parentUuid": "5a8bafe5_eb6f9517",
+      "range": {
+        "startLine": 92,
+        "startChar": 41,
+        "endLine": 92,
+        "endChar": 42
+      },
+      "revId": "6e952cecb27fc5c5048063ee15e16415ba100b79",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
