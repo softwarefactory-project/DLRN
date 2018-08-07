@@ -37,6 +37,8 @@ class TestDriverDownstream(base.TestCase):
         super(TestDriverDownstream, self).setUp()
         config = configparser.RawConfigParser()
         config.read("projects.ini")
+        config.set("DEFAULT", "pkginfo_driver",
+                   "dlrn.drivers.downstream.DownstreamInfoDriver")
         self.config = ConfigOptions(config)
         self.config.versions_url = \
             'https://trunk.rdoproject.org/centos7-master/current/versions.csv'
