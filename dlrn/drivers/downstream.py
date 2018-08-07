@@ -21,8 +21,6 @@ import logging
 import os
 import sh
 
-from distroinfo import info
-from distroinfo import query
 from six.moves.urllib.request import urlopen
 
 
@@ -45,6 +43,16 @@ def fail_req_config_missing(opt_name):
 
 
 class DownstreamInfoDriver(PkgInfoDriver):
+    DRIVER_CONFIG = {
+        'downstream_driver': {
+            'rdoinfo_repo': {'name': 'repo', 'ignore_missing': True},
+            'info_files': {'type': 'list'},
+            'versions_url': {},
+            'downstream_distro_branch': {},
+            'downstream_prefix': {},
+            'downstream_prefix_filter': {},
+        }
+    }
 
     def __init__(self, *args, **kwargs):
         super(DownstreamInfoDriver, self).__init__(*args, **kwargs)

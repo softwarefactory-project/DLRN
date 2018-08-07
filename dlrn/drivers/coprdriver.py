@@ -32,6 +32,12 @@ logger.setLevel(logging.INFO)
 
 
 class CoprBuildDriver(BuildRPMDriver):
+    DRIVER_CONFIG = {
+        'coprbuild_driver': {
+            'coprid': {},
+        }
+    }
+
     def __init__(self, *args, **kwargs):
         super(CoprBuildDriver, self).__init__(*args, **kwargs)
         self.exe_name = 'copr'

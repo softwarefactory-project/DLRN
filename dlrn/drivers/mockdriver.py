@@ -31,6 +31,12 @@ logger.setLevel(logging.INFO)
 
 
 class MockBuildDriver(BuildRPMDriver):
+    DRIVER_CONFIG = {
+        'mockbuild_driver': {
+            'install_after_build': {'type': 'boolean', 'default': True},
+        },
+    }
+
     # We are using this method to "tee" mock output to mock.log and stdout
     def _process_mock_output(self, line):
         if dlrn.shell.verbose_build:
