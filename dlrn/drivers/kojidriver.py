@@ -38,6 +38,19 @@ mock_base_packages = "basesystem rpm-build python2-devel gcc make "\
 
 
 class KojiBuildDriver(BuildRPMDriver):
+    DRIVER_CONFIG = {
+        'kojibuild_driver': {
+            'koji_krb_principal': {'name': 'krb_principal'},
+            'koji_krb_keytab': {'name': 'krb_keytab'},
+            'koji_scratch_build': {'name': 'scratch_build', 'type': 'boolean',
+                                   'default': True},
+            'koji_build_target': {'name': 'build_target'},
+            'koji_arch': {'name': 'arch', 'default': 'x86_64'},
+            'koji_exe': {'default': 'koji'},
+            'fetch_mock_config': {'type': 'boolean'},
+        }
+    }
+
     def __init__(self, *args, **kwargs):
         super(KojiBuildDriver, self).__init__(*args, **kwargs)
         self.exe_name = self.config_options.koji_exe

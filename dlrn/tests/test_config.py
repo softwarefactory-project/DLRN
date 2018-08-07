@@ -30,6 +30,8 @@ class TestConfigOptions(base.TestCase):
         ConfigOptions(self.config)
 
     def test_with_gitrepo_driver(self):
+        self.config.set("DEFAULT", "pkginfo_driver",
+                        "dlrn.drivers.gitrepo.GitRepoDriver")
         self.config.set("gitrepo_driver", "skip", "pkg1,pkg2")
         config = ConfigOptions(self.config)
         self.assertEqual(config.skip_dirs, ["pkg1", "pkg2"])
@@ -39,6 +41,8 @@ class TestConfigOptions(base.TestCase):
         ConfigOptions(self.config)
 
     def test_with_rdoinfo_driver(self):
+        self.config.set("DEFAULT", "pkginfo_driver",
+                        "dlrn.drivers.rdoinfo.RdoInfoDriver")
         self.config.set(
             "rdoinfo_driver", "repo", "https://test/test.git")
         config = ConfigOptions(self.config)
