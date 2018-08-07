@@ -47,6 +47,11 @@ def buildtagsonly(package):
 
 
 class RdoInfoDriver(PkgInfoDriver):
+    DRIVER_CONFIG = {
+        'rdoinfo_driver': {
+            'rdoinfo_repo': {'name': 'repo', 'ignore_missing': True},
+        }
+    }
 
     def __init__(self, *args, **kwargs):
         super(RdoInfoDriver, self).__init__(*args, **kwargs)
