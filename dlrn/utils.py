@@ -37,15 +37,21 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'Temporary failure in name resolution')
 
 
-# Import a Python object
-def import_object(import_str, *args, **kwargs):
+# Import a Python class
+def import_class(import_str):
     mod_str, _sep, class_str = import_str.rpartition('.')
     __import__(mod_str)
     try:
         myclass = getattr(sys.modules[mod_str], class_str)
-        return myclass(*args, **kwargs)
+        return myclass
     except AttributeError:
         raise ImportError('Cannot find class %s' % class_str)
+
+
+# Import a Python object
+def import_object(import_str, *args, **kwargs):
+    myclass = import_class(import_str)
+    return myclass(*args, **kwargs)
 
 
 # Load a yaml file into a db session, used to populate a in memory database
