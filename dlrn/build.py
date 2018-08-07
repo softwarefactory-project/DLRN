@@ -132,7 +132,9 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     oldcfg = os.path.join(datadir, mock_config)
     shutil.copyfile(templatecfg, newcfg)
 
-    if config_options.fetch_mock_config:
+    if (config_options.build_driver ==
+            'dlrn.drivers.kojidriver.KojiBuildDriver' and
+            config_options.fetch_mock_config):
         buildrpm.write_mock_config(oldcfg)
 
     # Add the most current repo, we may have dependencies in it
@@ -212,14 +214,18 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     # don't change dlrn.cfg if the content hasn't changed to prevent
     # mock from rebuilding its cache.
     try:
-        if not config_options.fetch_mock_config and \
-           not filecmp.cmp(newcfg, oldcfg):
+        if (config_options.build_driver ==
+                'dlrn.drivers.kojidriver.KojiBuildDriver' and
+                not config_options.fetch_mock_config) and \
+                not filecmp.cmp(newcfg, oldcfg):
             shutil.copyfile(newcfg, oldcfg)
     except OSError:
         shutil.copyfile(newcfg, oldcfg)
 
     # Set env variable for Copr configuration
-    if config_options.coprid:
+    if (config_options.build_driver ==
+            'dlrn.drivers.coprdriver.CoprBuildDriver' and
+            config_options.coprid):
         os.environ['COPR_ID'] = config_options.coprid
 
     # Set release numbering option
@@ -239,7 +245,9 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     dlrn.shell.pkginfo.preprocess(package_name=commit.project_name)
 
-    if config_options.keep_tarball:
+    if (config_options.pkginfo_driver ==
+            'dlrn.drivers.gitrepo.GitRepoDriver' and
+            config_options.keep_tarball):
         if commit.commit_branch == config_options.source:
             # We are following the master tarball here, use it
             os.environ['DLRN_KEEP_TARBALL'] = '1'
