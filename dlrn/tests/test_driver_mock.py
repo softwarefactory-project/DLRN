@@ -35,6 +35,8 @@ class TestDriverMock(base.TestCase):
         super(TestDriverMock, self).setUp()
         config = configparser.RawConfigParser()
         config.read("projects.ini")
+        config.set("DEFAULT", "build_driver",
+                   "dlrn.drivers.mockdriver.MockBuildDriver")
         self.config = ConfigOptions(config)
         self.temp_dir = tempfile.mkdtemp()
 
@@ -111,3 +113,13 @@ class TestDriverMock(base.TestCase):
         self.assertEqual(env_mock.call_count, 1)
         self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(env_mock.call_args_list, expected)
+
+    def test_driver_config(self, ld_mock, env_mock, rc_mock):
+        cp = configparser.RawConfigParser()
+        cp.read("projects.ini")
+        cp.set("DEFAULT", "build_driver",
+               "dlrn.drivers.mockdriver.MockBuildDriver")
+        # default is True, test override
+        cp.set('mockbuild_driver', 'install_after_build', '0')
+        config = ConfigOptions(cp)
+        self.assertEqual(False, config.install_after_build)

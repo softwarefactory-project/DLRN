@@ -30,6 +30,8 @@ class TestDriverGit(base.TestCase):
         super(TestDriverGit, self).setUp()
         config = configparser.RawConfigParser()
         config.read("projects.ini")
+        config.set("DEFAULT", "pkginfo_driver",
+                   "dlrn.drivers.gitrepo.GitRepoDriver")
         self.config = ConfigOptions(config)
         self.config.gitrepo_dir = tempfile.mkdtemp()
 

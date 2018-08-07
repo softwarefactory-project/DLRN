@@ -30,8 +30,10 @@ class TestDriverCopr(base.TestCase):
         super(TestDriverCopr, self).setUp()
         config = configparser.RawConfigParser()
         config.read("projects.ini")
+        config.set("DEFAULT", "build_driver",
+                   "dlrn.drivers.coprdriver.CoprBuildDriver")
+        config.set('coprbuild_driver', 'coprid', 'foo/repo')
         self.config = ConfigOptions(config)
-        self.config.coprid = 'account/repo'
         self.temp_dir = tempfile.mkdtemp()
         # Create fake src.rpm
         with open('%s/pkg.src.rpm' % self.temp_dir, 'a') as fp:
@@ -87,3 +89,6 @@ class TestDriverCopr(base.TestCase):
         self.assertIn('pkg.rpm', content)
         self.assertIn('pkg.src.rpm', content)
         self.assertNotIn('1234', content)
+
+    def test_driver_config(self, env_mock, rc_mock):
+        self.assertEqual(self.config.coprid, 'foo/repo')

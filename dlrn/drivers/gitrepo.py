@@ -58,6 +58,16 @@ def check_url(url):
 
 
 class GitRepoDriver(PkgInfoDriver):
+    DRIVER_CONFIG = {
+        'gitrepo_driver': {
+            'gitrepo_repo': {'name': 'repo'},
+            'gitrepo_dir': {'name': 'directory'},
+            'skip_dirs': {'name': 'skip', 'type': 'list'},
+            'use_version_from_spec': {'type': 'boolean'},
+            'keep_tarball': {'type': 'boolean'},
+        }
+    }
+
     def __init__(self, *args, **kwargs):
         super(GitRepoDriver, self).__init__(*args, **kwargs)
 
@@ -67,6 +77,7 @@ class GitRepoDriver(PkgInfoDriver):
         for pkgfile in os.listdir(pkgdir):
             if pkgfile.endswith('.spec'):
                 spec = specfile.Spec(fn=os.path.join(packagepath, package,
+
                                                      pkgfile))
                 version = spec.get_tag('Version').encode()
                 release = spec.get_tag('Release').encode()

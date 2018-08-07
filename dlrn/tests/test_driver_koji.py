@@ -34,6 +34,8 @@ class TestDriverKoji(base.TestCase):
         super(TestDriverKoji, self).setUp()
         config = configparser.RawConfigParser()
         config.read("projects.ini")
+        config.set("DEFAULT", "build_driver",
+                   "dlrn.drivers.kojidriver.KojiBuildDriver")
         self.config = ConfigOptions(config)
         self.config.koji_krb_principal = 'test@example.com'
         self.config.koji_krb_keytab = '/home/test/test.keytab'
