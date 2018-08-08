@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9798d61b_cbb757d8",
+        "filename": "dlrn/config.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-08-08T14:51:03Z",
+      "side": 1,
+      "message": "default is False.",
+      "revId": "110b876c76b16d1e8c8eaa2712c4625209c90267",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f4e65f25_bd24f546",
+        "filename": "dlrn/config.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-08-08T14:51:03Z",
+      "side": 1,
+      "message": "Nit: default value is None (a bit convoluted in original code though)",
+      "revId": "110b876c76b16d1e8c8eaa2712c4625209c90267",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
