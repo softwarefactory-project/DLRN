@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "82025d2b_06ba02cb",
+        "filename": "dlrn/config.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2018-08-08T14:51:03Z",
+      "side": 1,
+      "message": "Why not use a dict here?",
+      "revId": "0764c68b8916249dba3ee437a8872077fc667be7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
