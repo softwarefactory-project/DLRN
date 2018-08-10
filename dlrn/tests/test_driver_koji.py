@@ -13,7 +13,10 @@
 # under the License.
 
 import mock
+import os
+import sh
 import shutil
+import stat
 import tempfile
 
 from dlrn.config import ConfigOptions
@@ -21,10 +24,16 @@ from dlrn.drivers.kojidriver import KojiBuildDriver
 from dlrn.shell import default_options
 from dlrn.tests import base
 from six.moves import configparser
+from time import localtime
+from time import strftime
 
 
 def _mocked_listdir(directory):
     return ['python-pysaml2-3.0-1a.el7.centos.src.rpm']
+
+
+def _mocked_time():
+    return float(1533293385.545039)
 
 
 @mock.patch('sh.restorecon', create=True)
@@ -44,6 +53,14 @@ class TestDriverKoji(base.TestCase):
         # Create fake build log
         with open("%s/kojibuild.log" % self.temp_dir, 'a') as fp:
             fp.write("Created task: 1234")
+        with open("%s/rhpkgbuild.log" % self.temp_dir, 'a') as fp:
+            fp.write("Created task: 5678")
+        # Create a fake rhpkg binary
+        with open("%s/rhpkg" % self.temp_dir, 'a') as fp:
+            fp.write("true")
+        os.chmod("%s/rhpkg" % self.temp_dir,
+                 stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
+        os.environ['PATH'] = self.temp_dir + ':' + os.environ['PATH']
 
     def tearDown(self):
         super(TestDriverKoji, self).tearDown()
@@ -162,3 +179,43 @@ class TestDriverKoji(base.TestCase):
         self.assertEqual(env_mock.call_count, 2)
         self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(env_mock.call_args_list, expected)
+
+    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('dlrn.drivers.kojidriver.time', side_effect=_mocked_time)
+    @mock.patch('sh.kinit', create=True)
+    def test_build_package_rhpkg(self, ki_mock, tm_mock, rh_mock, ld_mock,
+                                 env_mock, rc_mock):
+        self.config.koji_use_rhpkg = True
+        driver = KojiBuildDriver(cfg_options=self.config)
+        driver.build_package(output_directory=self.temp_dir,
+                             package_name='python-pysaml2')
+
+        expected_env = [mock.call(['koji', 'download-task', '--logs', '5678'],
+                                  _err=driver._process_koji_output,
+                                  _out=driver._process_koji_output,
+                                  _cwd=self.temp_dir,
+                                  _env={'PATH': '/usr/bin/'})]
+
+        pkg_date = strftime("%Y-%m-%d-%H%M%S", localtime(_mocked_time()))
+        expected_rh = [mock.call('%s/rhpkg' % self.temp_dir, 'import',
+                                 '--skip-diff',
+                                 '%s/python-pysaml2-3.0-1a.el7.centos.src'
+                                 '.rpm' % self.temp_dir),
+                       mock.call('%s/rhpkg' % self.temp_dir, 'commit', '-p',
+                                 '-m',
+                                 'DLRN build at %s' % pkg_date),
+                       mock.call('%s/rhpkg' % self.temp_dir, 'build',
+                                 scratch=True)]
+
+        # 1- kinit (handled by kb_mock)
+        # 2- rhpkg import (handled by rh_mock)
+        # 3- rhpkg commit (handled by rh_mock)
+        # 4- rhpkg build (handled by rh_mock)
+        # 5- koji download (handled by env_mock)
+        # 6- restorecon (handled by rc_mock)
+        self.assertEqual(ki_mock.call_count, 1)
+        self.assertEqual(rh_mock.call_count, 3)
+        self.assertEqual(env_mock.call_count, 1)
+        self.assertEqual(rc_mock.call_count, 1)
+        self.assertEqual(env_mock.call_args_list, expected_env)
+        self.assertEqual(rh_mock.call_args_list, expected_rh)
