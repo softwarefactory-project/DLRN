@@ -6,7 +6,8 @@ six
 SQLAlchemy
 PyMySQL
 PyYAML
-rdopkg>=0.45.0
+# rdopkg-0.47.0 switches to distroinfo - changes needed
+rdopkg>=0.45.0,<0.47.0
 distroinfo
 alembic>=0.7.0
 renderspec
