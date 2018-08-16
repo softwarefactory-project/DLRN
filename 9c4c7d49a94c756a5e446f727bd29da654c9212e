@@ -1,0 +1,9 @@
+Code-Review+2: Haïkel Guémar <hguemar@fedoraproject.org>
+Code-Review+2: Jakub Ružička <jruzicka@redhat.com>
+Workflow+1: Jakub Ružička <jruzicka@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Thu, 16 Aug 2018 13:00:31 +0000
+Reviewed-on: https://softwarefactory-project.io/r/13422
+Project: DLRN
+Branch: refs/heads/master
