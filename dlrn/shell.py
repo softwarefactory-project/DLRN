@@ -20,6 +20,7 @@ import sys
 import tempfile
 
 from copy import deepcopy
+from functools import cmp_to_key
 from functools import partial
 
 import sh
@@ -350,10 +351,17 @@ def main():
         # then use the timestamp of the commits as a secondary key
         def my_cmp(a, b):
             if a.project_name == b.project_name:
-                return cmp(a.dt_commit, b.dt_commit)
-            return cmp(orders.index(a.project_name),
-                       orders.index(b.project_name))
-        toprocess.sort(cmp=my_cmp)
+                _a = a.dt_commit
+                _b = b.dt_commit
+            else:
+                _a = orders.index(a.project_name)
+                _b = orders.index(b.project_name)
+            # cmp is no longer available in python3 so replace it. See Ordering
+            # Comparisons on:
+            # https://docs.python.org/3.0/whatsnew/3.0.html
+            return (_a > _b) - (_a < _b)
+
+        toprocess.sort(key=cmp_to_key(my_cmp))
     else:
         # sort according to the timestamp of the commits
         toprocess.sort()
