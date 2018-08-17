@@ -86,9 +86,15 @@ class TestDriverDownstream(base.TestCase):
                               'testbranch',
                               full_path='./data/openstack-nova_distro/',
                               local=None),
+                    mock.call('git://git.example.com/rpms/nova',
+                              './data/openstack-nova_distro_upstream',
+                              'rpm-master',
+                              full_path='./data/openstack-nova_distro_'
+                                        'upstream/',
+                              local=None),
                     mock.call('git://git.openstack.org/openstack/nova',
                               './data/nova', 'master', local=None)]
-        if len(rr_mock.call_args_list) == 1:
+        if len(rr_mock.call_args_list) == 2:
             # first refreshrepo call is skipped in dev_mode when
             # distro_dir already exists
             expected = expected[1:]
