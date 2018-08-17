@@ -31,6 +31,10 @@ def _mocked_refreshrepo(*args, **kwargs):
     return 'a', 'b', 'c'
 
 
+def _mocked_listdir(path):
+    return ['openstack-nova.spec']
+
+
 @mock.patch('dlrn.drivers.downstream.urlopen', side_effect=_mocked_versions)
 class TestDriverDownstream(base.TestCase):
     def setUp(self):
@@ -86,9 +90,15 @@ class TestDriverDownstream(base.TestCase):
                               'testbranch',
                               full_path='./data/openstack-nova_distro/',
                               local=None),
+                    mock.call('git://git.example.com/rpms/nova',
+                              './data/openstack-nova_distro_upstream',
+                              'rpm-master',
+                              full_path='./data/openstack-nova_distro_'
+                                        'upstream/',
+                              local=None),
                     mock.call('git://git.openstack.org/openstack/nova',
                               './data/nova', 'master', local=None)]
-        if len(rr_mock.call_args_list) == 1:
+        if len(rr_mock.call_args_list) == 2:
             # first refreshrepo call is skipped in dev_mode when
             # distro_dir already exists
             expected = expected[1:]
@@ -97,3 +107,32 @@ class TestDriverDownstream(base.TestCase):
         pi = pkginfo[0]
         assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
             pi.commit_hash
+
+    @mock.patch('dlrn.drivers.downstream.refreshrepo',
+                side_effect=_mocked_refreshrepo)
+    @mock.patch('os.listdir', side_effect=_mocked_listdir)
+    @mock.patch('shutil.copy')
+    def test_getinfo_use_upstream_spec(self, cp_mock, ld_mock, rr_mock,
+                                       uo_mock):
+        self.config.use_upstream_spec = True
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+        driver.getinfo(package=package, project='nova', dev_mode=True)
+
+        self.assertEqual(cp_mock.call_count, 1)

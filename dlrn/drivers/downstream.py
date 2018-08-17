@@ -13,13 +13,16 @@
 
 from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
+from dlrn.repositories import getdistrobranch
 from dlrn.repositories import getsourcebranch
 from dlrn.repositories import refreshrepo
 
 import csv
 import logging
 import os
+import re
 import sh
+import shutil
 
 from distroinfo import info
 from distroinfo import query
@@ -129,6 +132,11 @@ class DownstreamInfoDriver(PkgInfoDriver):
         source_branch = getsourcebranch(package)
         versions = self._getversions()
 
+        ups_distro = package['master-distgit']
+        ups_distro_dir = self._upstream_distgit_clone_dir(package['name'])
+        ups_distro_dir_full = self.upstream_distgit_dir(package['name'])
+        ups_distro_branch = getdistrobranch(package)
+
         # only process packages present in versions.csv
         if package['name'] not in versions:
             logger.warning('Package %s not present in %s - skipping.' % (
@@ -145,6 +153,11 @@ class DownstreamInfoDriver(PkgInfoDriver):
                     full_path=distro_dir_full)
                 # extract distro_hash from versions.csv
                 distro_hash = version[3]
+                # Also download upstream distgit
+                _, _, _ = refreshrepo(
+                    ups_distro, ups_distro_dir, distro_hash,
+                    local=local, full_path=ups_distro_dir_full)
+
             except Exception:
                 # The error was already logged by refreshrepo, and we want
                 # to avoid halting the whole run because this distgit repo
@@ -159,6 +172,35 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 # in dev mode, so no try/except
                 refreshrepo(distro, distro_dir, distro_branch, local=local,
                             full_path=distro_dir_full)
+            if not os.path.isdir(ups_distro_dir):
+                refreshrepo(ups_distro, ups_distro_dir, ups_distro_branch,
+                            local=local, full_path=ups_distro_dir_full)
+
+        # In this case, we will copy the upstream distgit into downstream
+        # distgit, then transform spec
+        if self.config_options.use_upstream_spec:
+            # Copy upstream distgit to downstream distgit
+            for f in os.listdir(ups_distro_dir_full):
+                # skip hidden files
+                if not f.startswith('.'):
+                    shutil.copy(os.path.join(ups_distro_dir_full, f),
+                                distro_dir_full)
+
+            # Transform based on rules, basically a crude sed implementation
+            for f in os.listdir(distro_dir_full):
+                if f.endswith('.spec'):
+                    specpath = os.path.join(distro_dir_full, f)
+                    with open(specpath, "r") as fp:
+                        contents = fp.readlines()
+
+                    if len(self.config_options.replace_list) > 0:
+                        with open(specpath, "w") as fp:
+                            for line in contents:
+                                for rule in self.config_options.replace_list:
+                                    src = rule.split('/')[0]
+                                    dst = rule.split('/')[1]
+                                    line = re.sub(src, dst, line)
+                                fp.write(line)
 
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory
@@ -190,6 +232,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                             distgit_dir=self.distgit_dir(package['name']),
                             commit_branch=source_branch)
             project_toprocess.append(commit)
+
         return project_toprocess
 
     def preprocess(self, **kwargs):
@@ -226,3 +269,19 @@ class DownstreamInfoDriver(PkgInfoDriver):
     def _distgit_clone_dir(self, package_name):
         datadir = self.config_options.datadir
         return os.path.join(datadir, package_name + "_distro")
+
+    def upstream_distgit_dir(self, package_name):
+        datadir = self.config_options.datadir
+        # Find extra directory inside it, if needed
+        extra_dir = '/'
+        for package in self.packages:
+            if package['name'] == package_name:
+                if 'distgit-path' in package:
+                    extra_dir = package['distgit-path']
+                    break
+        return os.path.join(datadir, package_name + "_distro_upstream",
+                            extra_dir.lstrip('/'))
+
+    def _upstream_distgit_clone_dir(self, package_name):
+        datadir = self.config_options.datadir
+        return os.path.join(datadir, package_name + "_distro_upstream")

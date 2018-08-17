@@ -52,6 +52,8 @@ MODULES_CONFIG = {
         'downstream_distro_branch': {},
         'downstream_prefix': {},
         'downstream_prefix_filter': {},
+        'use_upstream_spec': {'type': 'boolean'},
+        'replace_list': {'type': 'list'},
     },
     'gitrepo_driver': {
         'gitrepo_repo': {'name': 'repo'},
