@@ -13,6 +13,7 @@
 # under the License.
 
 import mock
+import os
 import shutil
 import tempfile
 
@@ -31,6 +32,10 @@ def _mocked_refreshrepo(*args, **kwargs):
     return 'a', 'b', 'c'
 
 
+def _mocked_listdir(path):
+    return ['openstack-nova.spec']
+
+
 @mock.patch('dlrn.drivers.downstream.urlopen', side_effect=_mocked_versions)
 class TestDriverDownstream(base.TestCase):
     def setUp(self):
@@ -39,12 +44,13 @@ class TestDriverDownstream(base.TestCase):
         config.read("projects.ini")
         config.set("DEFAULT", "pkginfo_driver",
                    "dlrn.drivers.downstream.DownstreamInfoDriver")
+        self.temp_dir = tempfile.mkdtemp()
         self.config = ConfigOptions(config)
         self.config.versions_url = \
             'https://trunk.rdoproject.org/centos7-master/current/versions.csv'
         self.config.downstream_distro_branch = 'testbranch'
         self.config.downstream_distgit_base = 'git://git.example.com/rpms'
-        self.temp_dir = tempfile.mkdtemp()
+        self.config.datadir = self.temp_dir
 
     def tearDown(self):
         super(TestDriverDownstream, self).tearDown()
@@ -84,13 +90,21 @@ class TestDriverDownstream(base.TestCase):
             dev_mode=True)
 
         expected = [mock.call('git://git.example.com/rpms/nova',
-                              './data/openstack-nova_distro',
+                              self.temp_dir + '/openstack-nova_distro',
                               'testbranch',
-                              full_path='./data/openstack-nova_distro/',
+                              full_path=self.temp_dir + '/openstack-nova_'
+                                                        'distro/',
+                              local=None),
+                    mock.call('git://git.example.com/rpms/nova',
+                              self.temp_dir + '/openstack-nova_distro_'
+                                              'upstream',
+                              'rpm-master',
+                              full_path=self.temp_dir + '/openstack-nova'
+                                                        '_distro_upstream/',
                               local=None),
                     mock.call('git://git.openstack.org/openstack/nova',
-                              './data/nova', 'master', local=None)]
-        if len(rr_mock.call_args_list) == 1:
+                              self.temp_dir + '/nova', 'master', local=None)]
+        if len(rr_mock.call_args_list) == 2:
             # first refreshrepo call is skipped in dev_mode when
             # distro_dir already exists
             expected = expected[1:]
@@ -99,3 +113,48 @@ class TestDriverDownstream(base.TestCase):
         pi = pkginfo[0]
         assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
             pi.commit_hash
+
+    @mock.patch('dlrn.drivers.downstream.refreshrepo',
+                side_effect=_mocked_refreshrepo)
+    @mock.patch('os.listdir', side_effect=_mocked_listdir)
+    def test_getinfo_use_upstream_spec(self, ld_mock, rr_mock, uo_mock):
+        self.config.use_upstream_spec = True
+        self.config.downstream_spec_replace_list =\
+            ['^%global with_doc.*/%global with_doc 0']
+
+        # Prepare fake upstream spec
+        os.mkdir(os.path.join(self.temp_dir,
+                              'openstack-nova_distro_upstream'))
+        os.mkdir(os.path.join(self.temp_dir, 'openstack-nova_distro'))
+        with open(os.path.join(self.temp_dir,
+                               'openstack-nova_distro_upstream',
+                               'openstack-nova.spec'), 'w') as fp:
+            fp.write("%global with_doc 1\n")
+            fp.write("foo")
+
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+        driver.getinfo(package=package, project='nova', dev_mode=True)
+
+        # This checks that the spec file got copied over, and modified with
+        # downstream_spec_replace_list
+        result = open(os.path.join(self.temp_dir, 'openstack-nova_distro',
+                      'openstack-nova.spec'), 'r').read()
+        expected = '%global with_doc 0\nfoo'
+        self.assertEqual(result, expected)

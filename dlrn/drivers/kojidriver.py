@@ -117,6 +117,21 @@ class KojiBuildDriver(BuildRPMDriver):
                               _out=self._process_koji_output,
                               _env={'PATH': '/usr/bin/'})
 
+        if (self.config_options.pkginfo_driver ==
+            'dlrn.drivers.downstream.DownstreamInfoDriver' and
+                self.config_options.use_upstream_spec):
+            # This is a special situation. We are copying the upstream
+            # spec over, but then building the srpm and importing. In this
+            # situation, rhpkg import will complain because there are
+            # uncommited changes to the repo... and we will commit them
+            # the srpm. So let's reset the git repo right before that.
+            git = sh.git.bake(_cwd=distgit_dir, _tty_out=False,
+                              _timeout=3600,
+                              _err=self._process_koji_output,
+                              _out=self._process_koji_output,
+                              _env={'PATH': '/usr/bin/'})
+            git.checkout('--', '*')
+
         with io.open("%s/rhpkgimport.log" % output_dir, 'a',
                      encoding='utf-8', errors='replace') as self.koji_fp:
             rhpkg('import', '--skip-diff', src_rpm)
