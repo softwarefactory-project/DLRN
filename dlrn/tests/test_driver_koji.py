@@ -20,6 +20,7 @@ import stat
 import tempfile
 
 from dlrn.config import ConfigOptions
+from dlrn import db
 from dlrn.drivers.kojidriver import KojiBuildDriver
 from dlrn.shell import default_options
 from dlrn.tests import base
@@ -186,9 +187,17 @@ class TestDriverKoji(base.TestCase):
     def test_build_package_rhpkg(self, ki_mock, tm_mock, rh_mock, ld_mock,
                                  env_mock, rc_mock):
         self.config.koji_use_rhpkg = True
+        commit = db.Commit(dt_commit=123, project_name='python-pysaml2',
+                           commit_hash='1234567890abcdef',
+                           distro_hash='1234567890abcdef',
+                           extended_hash='1234567890abcdef',
+                           dt_distro=123,
+                           dt_extended=123)
+
         driver = KojiBuildDriver(cfg_options=self.config)
         driver.build_package(output_directory=self.temp_dir,
-                             package_name='python-pysaml2')
+                             package_name='python-pysaml2',
+                             commit=commit)
 
         expected_env = [mock.call(['koji', 'download-task', '--logs', '5678'],
                                   _err=driver._process_koji_output,
@@ -204,17 +213,20 @@ class TestDriverKoji(base.TestCase):
                        mock.call('%s/rhpkg' % self.temp_dir, 'commit', '-p',
                                  '-m',
                                  'DLRN build at %s' % pkg_date),
+                       mock.call('/usr/bin/git log', '--pretty=format:%H %ct',
+                                 '-1', '.'),
                        mock.call('%s/rhpkg' % self.temp_dir, 'build',
                                  scratch=True)]
 
         # 1- kinit (handled by kb_mock)
         # 2- rhpkg import (handled by rh_mock)
         # 3- rhpkg commit (handled by rh_mock)
-        # 4- rhpkg build (handled by rh_mock)
-        # 5- koji download (handled by env_mock)
-        # 6- restorecon (handled by rc_mock)
+        # 4- git log (handled by rh_mock)
+        # 5- rhpkg build (handled by rh_mock)
+        # 6- koji download (handled by env_mock)
+        # 7- restorecon (handled by rc_mock)
         self.assertEqual(ki_mock.call_count, 1)
-        self.assertEqual(rh_mock.call_count, 3)
+        self.assertEqual(rh_mock.call_count, 4)
         self.assertEqual(env_mock.call_count, 1)
         self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(env_mock.call_args_list, expected_env)

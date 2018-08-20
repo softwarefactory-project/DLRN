@@ -326,6 +326,9 @@ following configuration options are included:
   Note that ``rhpkg`` requires a valid Kerberos ticket, so the ``krb_principal``
   and ``krb_keytab`` options must be set.
 
+  Also note that setting ``rhpkg`` only makes sense when using ``dlrn.drivers.downstream.DownstreamInfoDriver``
+  as the pkginfo driver.
+
 The optional ``[coprbuild_driver]`` section has the following configuration
 options:
 
