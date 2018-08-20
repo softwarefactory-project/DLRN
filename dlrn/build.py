@@ -73,7 +73,6 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
     project_name = commit.project_name
     datadir = os.path.realpath(config_options.datadir)
     yumrepodir = _get_yumrepodir(commit)
-    yumrepodir_abs = os.path.join(datadir, yumrepodir)
     version_from = get_version_from(packages, project_name)
 
     try:
@@ -85,6 +84,10 @@ def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
                                                             yumrepodir))
         raise Exception("Error in build_rpm_wrapper for %s: %s" %
                         (project_name, e))
+
+    # This *could* have changed during the build, see kojidriver.py
+    yumrepodir = _get_yumrepodir(commit)
+    yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
     built_rpms = []
     for rpm in os.listdir(yumrepodir_abs):
@@ -261,7 +264,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     buildrpm.build_package(output_directory=yumrepodir_abs,
                            additional_mock_opts=additional_mock_options,
-                           package_name=commit.project_name)
+                           package_name=commit.project_name,
+                           commit=commit)
 
 
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
