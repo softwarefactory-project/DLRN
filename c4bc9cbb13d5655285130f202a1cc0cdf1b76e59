@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8974c800_b9555b7e",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-21T16:27:14Z",
+      "side": 1,
+      "message": "My nitpicking senses were tingling the first time I seen this code above (line 125) and now I see it second time - this should be in a function somewhere so that we don\u0027t have code duplication.",
+      "revId": "c4bc9cbb13d5655285130f202a1cc0cdf1b76e59",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
