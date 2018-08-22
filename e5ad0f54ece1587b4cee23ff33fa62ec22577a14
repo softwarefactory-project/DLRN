@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b14fa52f_aa1e76c5",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-22T17:38:03Z",
+      "side": 1,
+      "message": "This would deserve its own function for the sake of reusability of the transformation but also because this function is big already.",
+      "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f8045b89_6b64f604",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-22T17:38:03Z",
+      "side": 1,
+      "message": "nice to have this factored out",
+      "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fd92ceba_09fd9f15",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-22T17:38:03Z",
+      "side": 1,
+      "message": "No way to escape them commas... let\u0027s hope noone needs them or this will need patching.",
+      "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "25f0581c_34e54bc0",
+        "filename": "projects.ini",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-22T17:38:03Z",
+      "side": 1,
+      "message": "replace_list is perhaps a too generic name...\n\ndownstream_replace_list\nspec_replace_list\nspec_transform_list\ndownstream_spec_replace_list\n\nor something like that?",
+      "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
