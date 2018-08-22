@@ -3,9 +3,10 @@
 # package names are all either exact matches or prefixed with either
 # "python-" or "openstack-", so we just check that the ends match
 
+import sh
 import sys
 
-from rdopkg.actionmods import rdoinfo
+from distroinfo import info
 
 if len(sys.argv) == 3:
     rdoinfo_location = sys.argv[2]
@@ -13,10 +14,12 @@ else:
     rdoinfo_location = "https://github.com/redhat-openstack/rdoinfo.git"
 
 if rdoinfo_location.startswith('http'):
-    inforepo = rdoinfo.RdoinfoRepo(".", rdoinfo_location)
-    inforepo.init()
+    sh.git('clone', rdoinfo_location, 'rdoinfo')
+    inforepo = info.DistroInfo(info_files='rdo.yml',
+                               local_info='rdoinfo')
 else:
-    inforepo = rdoinfo.RdoinfoRepo(local_repo_path=rdoinfo_location)
+    inforepo = info.DistroInfo(info_files='rdo.yml',
+                               local_info=rdoinfo_location)
 
 # Attempt a strict mapping with project name
 for package in inforepo.get_info()["packages"]:
