@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "45b3d154_77d20c64",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-08-23T09:39:27Z",
+      "side": 1,
+      "message": "Ack, I\u0027ll do that.",
+      "parentUuid": "b14fa52f_aa1e76c5",
+      "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f8045b89_6b64f604",
         "filename": "dlrn/drivers/downstream.py",
         "patchSetId": 3
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "46d79616_539fe310",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-08-23T09:39:27Z",
+      "side": 1,
+      "message": "I thought about it, but we would have the same issue if we used another separator... Let\u0027s keep it as-is for now.",
+      "parentUuid": "fd92ceba_09fd9f15",
+      "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "25f0581c_34e54bc0",
         "filename": "projects.ini",
         "patchSetId": 3
@@ -64,6 +100,24 @@
       "writtenOn": "2018-08-22T17:38:03Z",
       "side": 1,
       "message": "replace_list is perhaps a too generic name...\n\ndownstream_replace_list\nspec_replace_list\nspec_transform_list\ndownstream_spec_replace_list\n\nor something like that?",
+      "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7873e459_2f5e69d0",
+        "filename": "projects.ini",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-08-23T09:39:27Z",
+      "side": 1,
+      "message": "downstream_spec_replace_list it will be",
+      "parentUuid": "25f0581c_34e54bc0",
       "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
