@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0413172e_ef1ab5a0",
+        "filename": "dlrn/config.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-08-27T14:40:59Z",
+      "side": 1,
+      "message": "I just realized we need to have a default of \u0027\u0027 here, or we will be having trouble in https://github.com/softwarefactory-project/DLRN/blob/9927e03f0b0b64357d9b65351437a3b27d38e67b/dlrn/rsync.py#L31",
+      "range": {
+        "startLine": 28,
+        "startChar": 7,
+        "endLine": 28,
+        "endChar": 24
+      },
+      "revId": "685111375c3503d7842849ff94810ddd013d5b29",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
