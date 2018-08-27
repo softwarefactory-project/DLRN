@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0f773e9a_eea61196",
+        "filename": "dlrn/config.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-27T14:56:41Z",
+      "side": 1,
+      "message": "Yeah, that would be better, I just didn\u0027t want to spend time on that before confirming this approach.\n\nThese conditionals would also serve as strings to identify driver specific behavior and thus make the eventual refactoring of build_rpm_wrapper easier.\n\nSo that\u0027s a TODO for next iteration :)",
+      "parentUuid": "68633ff8_c8d4820d",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 65
+      },
+      "revId": "fbd51e8ae07c571a7d34465c741e61688a0d67d6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6ebbc8cd_58f999b3",
         "filename": "dlrn/drivers/gitrepo.py",
         "patchSetId": 6
@@ -36,6 +60,24 @@
       "writtenOn": "2018-08-24T10:54:10Z",
       "side": 1,
       "message": "This extra line is probably a typo (I wonder how pep8 allows it)",
+      "revId": "fbd51e8ae07c571a7d34465c741e61688a0d67d6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b89124c9_1d7abf74",
+        "filename": "dlrn/drivers/gitrepo.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-08-27T14:56:41Z",
+      "side": 1,
+      "message": "lol, I\u0027d sure expect pep8 to complain here :D",
+      "parentUuid": "6ebbc8cd_58f999b3",
       "revId": "fbd51e8ae07c571a7d34465c741e61688a0d67d6",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
