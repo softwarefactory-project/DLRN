@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "55a7fcfb_8438c159",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-09-05T17:19:12Z",
+      "side": 1,
+      "message": "yup",
+      "parentUuid": "46d79616_539fe310",
+      "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "25f0581c_34e54bc0",
         "filename": "projects.ini",
         "patchSetId": 3
@@ -118,6 +136,24 @@
       "side": 1,
       "message": "downstream_spec_replace_list it will be",
       "parentUuid": "25f0581c_34e54bc0",
+      "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "03ecb8c1_feb64f88",
+        "filename": "projects.ini",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-09-05T17:19:12Z",
+      "side": 1,
+      "message": "yup, that\u0027s significantly more descriptive ;)",
+      "parentUuid": "7873e459_2f5e69d0",
       "revId": "e5ad0f54ece1587b4cee23ff33fa62ec22577a14",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
