@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3de250ac_ec9cf8a1",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-09-11T15:11:31Z",
+      "side": 1,
+      "message": "FYI [\u003ctag\u003e] would be standard (well, docopt) way to say optional([...]) argument(\u003c...\u003e).",
+      "revId": "d40b8009b29f381542e1e49983eb89fbb73cf0f8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
