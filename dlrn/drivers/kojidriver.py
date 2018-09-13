@@ -37,7 +37,7 @@ logger.setLevel(logging.INFO)
 mock_base_packages = "basesystem rpm-build python2-devel gcc make "\
                      "python-sqlalchemy python-webob ghostscript graphviz "\
                      "python-sphinx python-eventlet python-six python-pbr "\
-                     "openstack-macros git yum-plugin-priorities rubygems"\
+                     "openstack-macros git yum-plugin-priorities rubygems "\
                      "python-setuptools_scm"
 
 
