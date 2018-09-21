@@ -20,6 +20,7 @@ import stat
 import tempfile
 
 from dlrn.config import ConfigOptions
+from dlrn import db
 from dlrn.drivers.kojidriver import KojiBuildDriver
 from dlrn.tests import base
 from six.moves import configparser
@@ -33,6 +34,12 @@ def _mocked_listdir(directory):
 
 def _mocked_time():
     return float(1533293385.545039)
+
+
+def _mocked_call(*args, **kwargs):
+    if args[0] == '/usr/bin/git log':
+        return '1 2'
+    return True
 
 
 @mock.patch('sh.restorecon', create=True)
@@ -51,10 +58,16 @@ class TestDriverKoji(base.TestCase):
         self.config.koji_scratch_build = True
         self.config.koji_build_target = 'build-target'
         self.temp_dir = tempfile.mkdtemp()
+        self.config.datadir = self.temp_dir
         # Create fake build log
         with open("%s/kojibuild.log" % self.temp_dir, 'a') as fp:
             fp.write("Created task: 1234")
-        with open("%s/rhpkgbuild.log" % self.temp_dir, 'a') as fp:
+        # In the rhpkg case, we need to create a full dir structure
+        self.rhpkg_extra_dir = "%s/repos/12/34/1234567890abcdef_12345678_1"\
+                               % self.temp_dir
+        os.makedirs(self.rhpkg_extra_dir)
+        with open("%s/rhpkgbuild.log"
+                  % self.rhpkg_extra_dir, 'a') as fp:
             fp.write("Created task: 5678")
         # Create a fake rhpkg binary
         with open("%s/rhpkg" % self.temp_dir, 'a') as fp:
@@ -181,20 +194,30 @@ class TestDriverKoji(base.TestCase):
         self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(env_mock.call_args_list, expected)
 
-    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('os.rename')
+    @mock.patch.object(sh.Command, '__call__', autospec=True,
+                       side_effect=_mocked_call)
     @mock.patch('dlrn.drivers.kojidriver.time', side_effect=_mocked_time)
     @mock.patch('sh.kinit', create=True)
-    def test_build_package_rhpkg(self, ki_mock, tm_mock, rh_mock, ld_mock,
-                                 env_mock, rc_mock):
+    def test_build_package_rhpkg(self, ki_mock, tm_mock, rh_mock, rn_mock,
+                                 ld_mock, env_mock, rc_mock):
         self.config.koji_use_rhpkg = True
+        commit = db.Commit(dt_commit=123, project_name='python-pysaml2',
+                           commit_hash='1234567890abcdef',
+                           distro_hash='1234567890abcdef',
+                           extended_hash='1234567890abcdef',
+                           dt_distro=123,
+                           dt_extended=123)
+
         driver = KojiBuildDriver(cfg_options=self.config)
         driver.build_package(output_directory=self.temp_dir,
-                             package_name='python-pysaml2')
+                             package_name='python-pysaml2',
+                             commit=commit)
 
         expected_env = [mock.call(['koji', 'download-task', '--logs', '5678'],
                                   _err=driver._process_koji_output,
                                   _out=driver._process_koji_output,
-                                  _cwd=self.temp_dir,
+                                  _cwd=self.rhpkg_extra_dir,
                                   _env={'PATH': '/usr/bin/'})]
 
         pkg_date = strftime("%Y-%m-%d-%H%M%S", localtime(_mocked_time()))
@@ -205,18 +228,23 @@ class TestDriverKoji(base.TestCase):
                        mock.call('%s/rhpkg' % self.temp_dir, 'commit', '-p',
                                  '-m',
                                  'DLRN build at %s' % pkg_date),
+                       mock.call('/usr/bin/git log', '--pretty=format:%H %ct',
+                                 '-1', '.'),
                        mock.call('%s/rhpkg' % self.temp_dir, 'build',
                                  scratch=True)]
 
         # 1- kinit (handled by kb_mock)
         # 2- rhpkg import (handled by rh_mock)
         # 3- rhpkg commit (handled by rh_mock)
-        # 4- rhpkg build (handled by rh_mock)
-        # 5- koji download (handled by env_mock)
-        # 6- restorecon (handled by rc_mock)
+        # 4- git log (handled by rh_mock)
+        # 5- rename (handled by rn_mock)
+        # 5- rhpkg build (handled by rh_mock)
+        # 6- koji download (handled by env_mock)
+        # 7- restorecon (handled by rc_mock)
         self.assertEqual(ki_mock.call_count, 1)
-        self.assertEqual(rh_mock.call_count, 3)
+        self.assertEqual(rh_mock.call_count, 4)
         self.assertEqual(env_mock.call_count, 1)
         self.assertEqual(rc_mock.call_count, 1)
+        self.assertEqual(rn_mock.call_count, 1)
         self.assertEqual(env_mock.call_args_list, expected_env)
         self.assertEqual(rh_mock.call_args_list, expected_rh)

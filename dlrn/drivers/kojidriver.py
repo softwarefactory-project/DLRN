@@ -90,7 +90,8 @@ class KojiBuildDriver(BuildRPMDriver):
         with open(filename, 'w') as fp:
             fp.write(''.join(lines))
 
-    def _build_with_rhpkg(self, package_name, output_dir, src_rpm, scratch):
+    def _build_with_rhpkg(self, package_name, output_dir, src_rpm, scratch,
+                          commit):
         """Use rhpkg as build backend
 
         :param package_name: package name to build
@@ -123,6 +124,25 @@ class KojiBuildDriver(BuildRPMDriver):
             pkg_date = strftime("%Y-%m-%d-%H%M%S", localtime(time()))
             rhpkg('commit', '-p', '-m', 'DLRN build at %s' % pkg_date)
 
+        # After running rhpkg commit, we have a different commit hash, so
+        # let's update it
+        git = sh.git.bake(_cwd=distgit_dir, _tty_out=False, _timeout=3600)
+        repoinfo = str(git.log("--pretty=format:%H %ct", "-1", ".")).\
+            strip().split(" ")
+
+        logger.info("Updated git: %s" % repoinfo)
+        commit.extended_hash = repoinfo[0]
+        commit.dt_extended = repoinfo[1]
+
+        # Since we are changing the extended_hash, we need to rename the
+        # output directory to match the updated value
+        datadir = os.path.realpath(self.config_options.datadir)
+        new_output_dir = os.path.join(datadir, "repos",
+                                      commit.getshardedcommitdir())
+        logger.info("Renaming %s to %s" % (output_dir, new_output_dir))
+        os.rename(output_dir, new_output_dir)
+        output_dir = new_output_dir
+
         with io.open("%s/rhpkgbuild.log" % output_dir, 'a',
                      encoding='utf-8', errors='replace') as self.koji_fp:
             try:
@@ -132,7 +152,8 @@ class KojiBuildDriver(BuildRPMDriver):
 
         return build_exception, "%s/rhpkgbuild.log" % output_dir
 
-    def _build_with_exe(self, package_name, output_dir, src_rpm, scratch):
+    def _build_with_exe(self, package_name, output_dir, src_rpm, scratch,
+                        commit):
         """Build using koji/brew executables (cbs being an aliases)
 
         :param package_name: package name to build
@@ -176,6 +197,7 @@ class KojiBuildDriver(BuildRPMDriver):
         """
         output_dir = kwargs.get('output_directory')
         package_name = kwargs.get('package_name')
+        commit = kwargs.get('commit')
         scratch = self.config_options.koji_scratch_build
         build_exception = None
 
@@ -189,7 +211,13 @@ class KojiBuildDriver(BuildRPMDriver):
             else:
                 build_method = self._build_with_exe
             build_exception, logfile = build_method(
-                package_name, output_dir, src_rpm, scratch)
+                package_name, output_dir, src_rpm, scratch, commit)
+
+            if self.config_options.koji_use_rhpkg:
+                # In this case, we need to re-calculate the output directory
+                datadir = os.path.realpath(self.config_options.datadir)
+                output_dir = os.path.join(datadir, "repos",
+                                          commit.getshardedcommitdir())
 
             # Find task id to download logs
             with open(logfile, 'r') as fp:
