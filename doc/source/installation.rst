@@ -251,6 +251,8 @@ options:
     downstream_distro_branch=foo-rocky
     downstream_prefix=foo-
     downstream_prefix_filter=True
+    use_upstream_spec=False
+    downstream_spec_replace_list=^foo/bar,string1/string2
 
 * ``repo`` selects a distroinfo repository to get package information from.
 * ``info_files`` selects an info file (or a list of info files) to get package
@@ -268,6 +270,19 @@ options:
 * ``downstream_distro_filter`` will filter ``packages`` section of packaging
   metadata (from ``repo``/``info_files``) to only contain packages with
   ``downstream_prefix``-ed attributes.
+* ``use_upstream_spec`` defines if the upstream distgit contents (spec file and
+  additional files) should be copied over the downstream distgit after cloning.
+* ``downstream_spec_replace_list``, when ``use_upstream_spec`` is set to True,
+  will perform some sed-like edits in the spec file after copying it from the
+  upstream to the downstream distgit. This is specially useful when the
+  downstream DLRN instance has special requirements, such as building without
+  documentation. in that case, a regular expresion like the following could be
+  used:
+
+.. code-block:: ini
+    downstream_spec_replace_list=^%global with_doc.+/%global with_doc 0
+
+  Multiple regular expressions can be used, separated by commas.
 
 The optional ``[mockbuild_driver]`` section has the following configuration
 options:
