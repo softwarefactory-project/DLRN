@@ -1,0 +1,9 @@
+Code-Review+2: Jakub Ružička <jruzicka@redhat.com>
+Code-Review+2: Javier Peña <jpena@redhat.com>
+Workflow+1: Javier Peña <jpena@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Fri, 21 Sep 2018 09:30:42 +0000
+Reviewed-on: https://softwarefactory-project.io/r/13444
+Project: DLRN
+Branch: refs/heads/master
