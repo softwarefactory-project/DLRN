@@ -50,7 +50,7 @@
       jobs:
         - tox-pep8
         - tox-py27
-        - tox-py35:
+        - tox-py36:
             nodeset:
               nodes:
                 - name: testrunner
@@ -63,7 +63,7 @@
       jobs:
         - tox-pep8
         - tox-py27
-        - tox-py35:
+        - tox-py36:
             nodeset:
               nodes:
                 - name: testrunner
