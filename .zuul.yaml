@@ -18,6 +18,18 @@
     run: playbooks/rpmbuild.yaml
 
 - job:
+    name: dlrn-rpmbuild-python3
+    parent: dlrn-base
+    description: Run DLRN to build a package using Python 3
+    run: playbooks/rpmbuild.yaml
+    vars:
+      python_version: py36
+    nodeset:
+      nodes:
+        - name: testrunner
+          label: rdo-fedora-stable
+
+- job:
     name: dlrn-rpmbuild-tripleo-ci
     parent: dlrn-base
     voting: false
@@ -56,6 +68,7 @@
                 - name: testrunner
                   label: fedora-oci
         - dlrn-rpmbuild
+        - dlrn-rpmbuild-python3
         - dlrn-rpmbuild-tripleo-ci
         - dlrn-rpmbuild-tripleo-ci-oooq
         - dlrn-api-functional
@@ -69,6 +82,7 @@
                 - name: testrunner
                   label: fedora-oci
         - dlrn-rpmbuild
+        - dlrn-rpmbuild-python3
     release:
       jobs:
         - upload-pypi
