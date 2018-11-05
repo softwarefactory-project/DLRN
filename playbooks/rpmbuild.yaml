@@ -4,6 +4,7 @@
     - name: Build package
       shell:
         cmd: |
+          export PYTHON_VERSION="{{ python_version | default('py27') }}"
           timeout --signal=SIGKILL 3600 ./scripts/run_tests.sh http://review.rdoproject.org/r/p/rdoinfo.git
       args:
         chdir: "{{ zuul.project.src_dir }}/"
