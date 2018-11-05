@@ -170,8 +170,8 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
             fi
 
             JSON=$(curl -s -L https://review.openstack.org/changes/openstack%2F${UPSTREAM_PROJECT_NAME}~$REVIEW_BRANCH~$UPSTREAM_ID/revisions/current/review|sed 1d)
-            COMMIT=$(python -c 'import json;import sys; s = json.loads(sys.stdin.read(-1)); print s["revisions"].keys()[0]' <<< $JSON)
-            REF=$(python -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print s['revisions']['$COMMIT']['ref']" <<< $JSON)
+            COMMIT=$(python -c 'import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s["revisions"].keys()[0])' <<< $JSON)
+            REF=$(python -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s['revisions']['$COMMIT']['ref'])" <<< $JSON)
             pushd data/${PROJECT_TO_BUILD_MAPPED}
             if [ -n "$REF" -a "$REF" != null ]; then
                 git fetch ${UPSTREAM_URL} $REF

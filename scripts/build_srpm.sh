@@ -57,7 +57,7 @@ else
     SOURCETYPE='tarball'
     # For Puppet modules, check the version in metadata.json (preferred) or Modulefile
     if [ -r metadata.json ]; then
-        version=$(python -c "import json; print json.loads(open('metadata.json').read(-1))['version']")
+        version=$(python -c "import json; print(json.loads(open('metadata.json').read(-1))['version'])")
     elif [ -r Modulefile ]; then
         version=$(grep version Modulefile | sed "s@version *'\(.*\)'@\1@")
     else
@@ -107,7 +107,7 @@ else
         echo $TARBALLS_OPS
         # We know OpenStack puppet modules have a common style for metadata.json
         if [ $TARBALLS_OPS -ne 0 ]; then
-            TARNAME=$(python -c "import json; print json.loads(open('metadata.json').read(-1))['name']")
+            TARNAME=$(python -c "import json; print(json.loads(open('metadata.json').read(-1))['name'])")
         else
             TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@;s@\.git$@@')
         fi
