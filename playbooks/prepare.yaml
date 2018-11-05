@@ -3,21 +3,32 @@
   tasks:
     - name: Install required dependencies
       package:
-        name: "{{ item }}"
+        name:
+          - git
+          - createrepo
+          - python-virtualenv
+          - mock
+          - gcc
+          - redhat-rpm-config
+          - rpmdevtools
+          - libffi-devel
+          - openssl-devel
+          - yum-utils
+          - policycoreutils
         state: present
-      with_items:
-      - git
-      - createrepo
-      - python-virtualenv
-      - mock
-      - gcc
-      - redhat-rpm-config
-      - rpmdevtools
-      - libffi-devel
-      - openssl-devel
-      - yum-utils
-      - policycoreutils
       become: true
+
+    - name: Install python-virtualenv (CentOS 7)
+      package: python-virtualenv
+        state: present
+      become: true
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+    - name: Install python-virtualenv (Fedora)
+      package: python3-virtualenv
+        state: present
+      become: true
+      when: ansible_distribution == "Fedora"
 
     - name: Set up mock configuration
       shell:

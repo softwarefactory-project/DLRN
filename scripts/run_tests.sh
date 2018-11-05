@@ -11,6 +11,7 @@ OPENSTACK_GIT_URL="git://git.openstack.org"
 ZUUL3_HOME="${ZUUL3_HOME:-/home/zuul}"
 ZUUL_CLONES_DIR="${ZUUL3_HOME}/src/review.rdoproject.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
+PYTHON_VERSION="${PYTHON_VERSION:-py27}"
 
 function filterref(){
     PROJ=${1%%:*}
@@ -24,8 +25,8 @@ git log -1
 ./scripts/run_sh_tests.sh
 
 # Setup virtualenv with tox and use it
-tox -epy27 --notest
-. .tox/py27/bin/activate
+tox -e${PYTHON_VERSION} --notest
+. .tox/${PYTHON_VERSION}/bin/activate
 
 # Default project to build
 PROJECT_DISTRO="openstack/packstack-distgit"
