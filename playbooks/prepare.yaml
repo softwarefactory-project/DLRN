@@ -1,23 +1,54 @@
 ---
 - hosts: all
   tasks:
+    # NOTE(jpena) The Fedora image contains an exclude for python-virtualenv
+    # in dnf.conf, because it installs it from PyPi. We do not need it in DLRN
+    # jobs.
+    - name: Remove excludes from /etc/dnf/dnf.conf (Fedora)
+      lineinfile:
+        path: /etc/dnf/dnf.conf
+        state: absent
+        regexp: '^exclude='
+      become: true
+      when: ansible_distribution == "Fedora"
+
     - name: Install required dependencies
       package:
-        name: "{{ item }}"
+        name:
+          - git
+          - createrepo
+          - mock
+          - gcc
+          - redhat-rpm-config
+          - rpmdevtools
+          - libffi-devel
+          - openssl-devel
+          - yum-utils
+          - policycoreutils
+          - python-virtualenv
         state: present
-      with_items:
-      - git
-      - createrepo
-      - python-virtualenv
-      - mock
-      - gcc
-      - redhat-rpm-config
-      - rpmdevtools
-      - libffi-devel
-      - openssl-devel
-      - yum-utils
-      - policycoreutils
       become: true
+
+    - block:
+        - name: Install dnf-yum and distribution-gpg-keys (Fedora)
+          package:
+            name:
+              - dnf-yum
+              - distribution-gpg-keys
+            state: present
+          become: true
+
+        # NOTE(jpena) The python3 job will build a CentOS package, so we need
+        # to have the CentOS 7 GPG key in the place mock will expect it
+        - name: Create symlink for RPM-GPG-KEY-CentOS-7
+          file:
+            src: /usr/share/distribution-gpg-keys/centos/RPM-GPG-KEY-CentOS-7
+            dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+            owner: root
+            group: root
+            state: link
+          become: true
+      when: ansible_distribution == "Fedora"
 
     - name: Set up mock configuration
       shell:
