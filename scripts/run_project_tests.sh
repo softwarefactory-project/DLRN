@@ -6,13 +6,14 @@ set -ex
 GIT_BASE_URL="https://review.rdoproject.org/r/p"
 OPENSTACK_GIT_URL="git://git.openstack.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
+PYTHON_VERSION="${PYTHON_VERSION:-py27}"
 
 # Display the current commit
 git log -1
 
 # Setup virtualenv with tox and use it
-tox -epy27 --notest
-. .tox/py27/bin/activate
+tox -e${PYTHON_VERSION} --notest
+. .tox/${PYTHON_VERSION}/bin/activate
 
 # Default project to build
 PROJECT_NAME="openstack/python-glanceclient"
