@@ -1,23 +1,37 @@
 ---
 - hosts: all
   tasks:
+    - name: Remove excludes from /etc/dnf/dnf.conf (Fedora)
+      lineinfile:
+        path: /etc/dnf/dnf.conf
+        state: absent
+        regexp: '^exclude='
+      become: true
+      when: ansible_distribution == "Fedora"
+
     - name: Install required dependencies
       package:
-        name: "{{ item }}"
+        name:
+          - git
+          - createrepo
+          - mock
+          - gcc
+          - redhat-rpm-config
+          - rpmdevtools
+          - libffi-devel
+          - openssl-devel
+          - yum-utils
+          - policycoreutils
+          - python-virtualenv
         state: present
-      with_items:
-      - git
-      - createrepo
-      - python-virtualenv
-      - mock
-      - gcc
-      - redhat-rpm-config
-      - rpmdevtools
-      - libffi-devel
-      - openssl-devel
-      - yum-utils
-      - policycoreutils
       become: true
+
+    - name: Install dnf-yum (Fedora)
+      package:
+        name: dnf-yum
+        state: present
+      become: true
+      when: ansible_distribution == "Fedora"
 
     - name: Set up mock configuration
       shell:
