@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f01fb0be_c55fcb55",
+        "filename": "playbooks/prepare.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-11-06T12:05:18Z",
+      "side": 1,
+      "message": "why is that?",
+      "revId": "c2a5a7250c3e9776dfcc0defa49ab48d0717d125",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a53211c_bffa9da7",
+        "filename": "playbooks/prepare.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-11-06T12:05:18Z",
+      "side": 1,
+      "message": "why do we install centos7 packages on Fedora??",
+      "revId": "c2a5a7250c3e9776dfcc0defa49ab48d0717d125",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
