@@ -105,6 +105,24 @@
       "revId": "c2a5a7250c3e9776dfcc0defa49ab48d0717d125",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64d3c100_97aae1fc",
+        "filename": "playbooks/prepare.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-11-06T13:37:35Z",
+      "side": 1,
+      "message": "Fair enough, I\u0027ll add comments about both.",
+      "parentUuid": "1a75c790_e794579f",
+      "revId": "c2a5a7250c3e9776dfcc0defa49ab48d0717d125",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
