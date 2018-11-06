@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d9c74ef6_bcf0ac1f",
+        "filename": "playbooks/prepare.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-11-06T12:12:15Z",
+      "side": 1,
+      "message": "The default image we use in nodepool contains an upstream element, that excludes python-virtualenv from being installed as an RPM (because it\u0027s usually overriden with a pip-installed version). In this case, this breaks us, so we want to avoid it.",
+      "parentUuid": "f01fb0be_c55fcb55",
+      "revId": "c2a5a7250c3e9776dfcc0defa49ab48d0717d125",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a53211c_bffa9da7",
         "filename": "playbooks/prepare.yaml",
         "patchSetId": 15
@@ -30,6 +48,24 @@
       "writtenOn": "2018-11-06T12:05:18Z",
       "side": 1,
       "message": "why do we install centos7 packages on Fedora??",
+      "revId": "c2a5a7250c3e9776dfcc0defa49ab48d0717d125",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "491a8e09_f7ad84f0",
+        "filename": "playbooks/prepare.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-11-06T12:12:15Z",
+      "side": 1,
+      "message": "The CentOS 7 gpg key is included as part of the distribution-gpg-keys package. To use the same run_tests.sh script, we build packages using a CentOS buildroot (even if we are in Fedora, because that\u0027s not important for the test itself), which requires the gpg key in that directory.",
+      "parentUuid": "3a53211c_bffa9da7",
       "revId": "c2a5a7250c3e9776dfcc0defa49ab48d0717d125",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
