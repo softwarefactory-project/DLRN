@@ -207,19 +207,6 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 refreshrepo(ups_distro, ups_distro_dir, ups_distro_branch,
                             local=local, full_path=ups_distro_dir_full)
 
-        # In this case, we will copy the upstream distgit into downstream
-        # distgit, then transform spec
-        if self.config_options.use_upstream_spec:
-            # Copy upstream distgit to downstream distgit
-            for f in os.listdir(ups_distro_dir_full):
-                # skip hidden files
-                if not f.startswith('.'):
-                    shutil.copy(os.path.join(ups_distro_dir_full, f),
-                                distro_dir_full)
-
-            if len(self.config_options.downstream_spec_replace_list) > 0:
-                self._transform_spec(distro_dir_full)
-
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory
         repos = [repo]
@@ -254,10 +241,25 @@ class DownstreamInfoDriver(PkgInfoDriver):
         return project_toprocess
 
     def preprocess(self, **kwargs):
-        # Pre-processing is only required if we have a jinja2 spec template
         package_name = kwargs.get('package_name')
         distgit_dir = self.distgit_dir(package_name)
-        # Now, try to check if we need to run a pre-processing job
+        ups_distro_dir_full = self.upstream_distgit_dir(package_name)
+        distro_dir_full = self.distgit_dir(package_name)
+
+        # In this case, we will copy the upstream distgit into downstream
+        # distgit, then transform spec
+        if self.config_options.use_upstream_spec:
+            # Copy upstream distgit to downstream distgit
+            for f in os.listdir(ups_distro_dir_full):
+                # skip hidden files
+                if not f.startswith('.'):
+                    shutil.copy(os.path.join(ups_distro_dir_full, f),
+                                distro_dir_full)
+
+            if len(self.config_options.downstream_spec_replace_list) > 0:
+                self._transform_spec(distro_dir_full)
+
+        # If we have a jinja2 spec template, run pre-processing
         preprocess_needed = False
         for f in os.listdir(distgit_dir):
             if f.endswith('.spec.j2'):
