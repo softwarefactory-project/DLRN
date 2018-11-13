@@ -141,7 +141,9 @@ Each driver must provide the following methods:
   specific package.
 
 - **preprocess()**. This method will run any required pre-processing for the
-  spec files.
+  spec files. If the ``custom_preprocess`` variable is defined in ``projects.ini``,
+  the external program or script defined in the variable will be executed as the
+  last step of the pre-processing.
 
 - **distgit_dir()**. This method will return the distgit repo directory for a
   given package name.
