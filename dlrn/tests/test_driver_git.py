@@ -13,6 +13,7 @@
 # under the License.
 
 import mock
+import os
 import sh
 import shutil
 import tempfile
@@ -24,7 +25,6 @@ from dlrn.drivers.gitrepo import GitRepoDriver
 from dlrn.tests import base
 
 
-@mock.patch.object(sh.Command, '__call__', autospec=True)
 class TestDriverGit(base.TestCase):
     def setUp(self):
         super(TestDriverGit, self).setUp()
@@ -33,12 +33,14 @@ class TestDriverGit(base.TestCase):
         config.set("DEFAULT", "pkginfo_driver",
                    "dlrn.drivers.gitrepo.GitRepoDriver")
         self.config = ConfigOptions(config)
-        self.config.gitrepo_dir = tempfile.mkdtemp()
+        self.config.datadir = tempfile.mkdtemp()
+        self.config.gitrepo_dir = '/openstack'
 
     def tearDown(self):
         super(TestDriverGit, self).tearDown()
-        shutil.rmtree(self.config.gitrepo_dir)
+        shutil.rmtree(self.config.datadir)
 
+    @mock.patch.object(sh.Command, '__call__', autospec=True)
     @mock.patch('dlrn.drivers.gitrepo.refreshrepo')
     def test_getinfo(self, refresh_mock, sh_mock):
         refresh_mock.return_value = [None, None, None]
@@ -47,9 +49,68 @@ class TestDriverGit(base.TestCase):
         info = driver.getinfo(package=package, project="test", dev_mode=True)
         self.assertEqual(info, [])
 
+    @mock.patch.object(sh.Command, '__call__', autospec=True)
     @mock.patch('os.listdir')
     def test_getpackages(self, listdir_mock, sh_mock):
         listdir_mock.return_value = []
         driver = GitRepoDriver(cfg_options=self.config)
         packages = driver.getpackages(dev_mode=True)
         self.assertEqual(packages, [])
+
+    @mock.patch('sh.renderspec', create=True)
+    @mock.patch('sh.env', create=True)
+    @mock.patch('os.listdir')
+    def test_custom_preprocess(self, ld_mock, env_mock, rs_mock):
+        self.config.custom_preprocess = ['/bin/true']
+        driver = GitRepoDriver(cfg_options=self.config)
+        driver.preprocess(package_name='foo')
+
+        directory = '%s/package_info/openstack/foo' % self.config.datadir
+
+        expected = [mock.call(
+            ['DLRN_PACKAGE_NAME=foo',
+             'DLRN_DISTGIT=%s' % directory,
+             '/bin/true'],
+            _cwd=directory,
+            _env={'LANG': 'C'})]
+
+        self.assertEqual(env_mock.call_args_list, expected)
+        self.assertEqual(env_mock.call_count, 1)
+
+    @mock.patch('sh.renderspec', create=True)
+    @mock.patch('sh.env', create=True)
+    @mock.patch('os.listdir')
+    def test_custom_preprocess_multiple_commands(self, ld_mock, env_mock,
+                                                 rs_mock):
+        self.config.custom_preprocess = ['/bin/true', '/bin/false']
+        driver = GitRepoDriver(cfg_options=self.config)
+        driver.preprocess(package_name='foo')
+
+        directory = '%s/package_info/openstack/foo' % self.config.datadir
+
+        expected = [mock.call(
+            ['DLRN_PACKAGE_NAME=foo',
+             'DLRN_DISTGIT=%s' % directory,
+             '/bin/true'],
+            _cwd=directory,
+            _env={'LANG': 'C'}),
+            mock.call(
+            ['DLRN_PACKAGE_NAME=foo',
+             'DLRN_DISTGIT=%s' % directory,
+             '/bin/false'],
+            _cwd=directory,
+            _env={'LANG': 'C'})
+            ]
+
+        self.assertEqual(env_mock.call_args_list, expected)
+        self.assertEqual(env_mock.call_count, 2)
+
+    @mock.patch('sh.renderspec', create=True)
+    @mock.patch('os.listdir')
+    def test_custom_preprocess_fail(self, ld_mock, rs_mock):
+        self.config.custom_preprocess = ['/bin/nonexistingcommand']
+        driver = GitRepoDriver(cfg_options=self.config)
+        os.makedirs(os.path.join(self.config.datadir,
+                                 'package_info/openstack/foo'))
+
+        self.assertRaises(RuntimeError, driver.preprocess, package_name='foo')

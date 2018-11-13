@@ -40,6 +40,7 @@ DLRN_CORE_CONFIG = {
         'database_connection': {'default': 'sqlite:///commits.sqlite'},
         'fallback_to_master': {'type': 'boolean', 'default': True},
         'release_numbering': {'default': '0.date.hash'},
+        'custom_preprocess': {'type': 'list'},
     }
 }
 

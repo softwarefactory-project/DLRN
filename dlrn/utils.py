@@ -10,8 +10,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import fcntl
+import logging
 import os
 import re
+import sh
 import sys
 import yaml
 
@@ -35,6 +37,11 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'Device or resource busy|'
                              'Could not resolve host|'
                              'Temporary failure in name resolution')
+
+
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger("dlrn-utils")
+logger.setLevel(logging.INFO)
 
 
 # Import a Python class
@@ -251,6 +258,34 @@ def lock_file(filename, mode='a'):
         fcntl.flock(lock_fp, fcntl.LOCK_EX)
         yield lock_fp
         fcntl.flock(lock_fp, fcntl.LOCK_UN)
+
+
+# Run external pre-processing step
+def run_external_preprocess(**kwargs):
+    # Initially, get any params to be set as environment variables
+    pkgname = kwargs.get('pkgname')
+    distgit = kwargs.get('distgit')
+    upstream_distgit = kwargs.get('upstream_distgit')
+    cmdline = kwargs.get('cmdline')
+
+    run_cmd = []
+    # Append environment variables
+    if pkgname:
+        run_cmd.append("DLRN_PACKAGE_NAME=%s" % pkgname)
+    if distgit:
+        run_cmd.append("DLRN_DISTGIT=%s" % distgit)
+    if upstream_distgit:
+        run_cmd.append("DLRN_UPSTREAM_DISTGIT=%s" % upstream_distgit)
+    run_cmd.extend([cmdline])
+
+    logger.info('Running custom pre-process: %s' % ' '.join(run_cmd))
+    try:
+        # We are forcing LANG to be C here, because env decides to use
+        # non-ascii characters when the command is not found in UTF-8
+        # environments
+        sh.env(run_cmd, _cwd=distgit, _env={'LANG': 'C'})
+    except Exception as e:
+        raise RuntimeError('Custom pre-process failed: %s' % e)
 
 
 if __name__ == '__main__':

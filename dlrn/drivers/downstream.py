@@ -16,6 +16,7 @@ from dlrn.drivers.pkginfo import PkgInfoDriver
 from dlrn.repositories import getdistrobranch
 from dlrn.repositories import getsourcebranch
 from dlrn.repositories import refreshrepo
+from dlrn.utils import run_external_preprocess
 
 import csv
 import logging
@@ -272,6 +273,14 @@ class DownstreamInfoDriver(PkgInfoDriver):
                                             _tty_out=False, _timeout=3600)
             renderspec('--spec-style', 'fedora', '--epoch',
                        '../../epoch/fedora.yaml')
+
+        for custom_preprocess in self.config_options.custom_preprocess:
+            if custom_preprocess != '':
+                run_external_preprocess(
+                    cmdline=custom_preprocess,
+                    pkgname=package_name,
+                    distgit=distgit_dir,
+                    upstream_distgit=ups_distro_dir_full)
         return
 
     def distgit_dir(self, package_name):

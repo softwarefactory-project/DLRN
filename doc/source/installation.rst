@@ -74,6 +74,7 @@ The configuration file looks like this:
     fallback_to_master=1
     coprid=account/repo
     release_numbering=0.date.hash
+    custom_preprocess=
 
 * ``datadir`` is the directory where the packages and repositories will be
   created.
@@ -197,6 +198,24 @@ The configuration file looks like this:
   * ``0.date.hash`` if the old method is used: 0.<date>.<hash>
   * ``0.1.date.hash`` if the new method is used: 0.1.<date>.<hash>. This new
     method provides better compatibility with the Fedora packaging guidelines.
+
+* ``custom_preprocess``, if set, defines a comma-separated list of custom programs
+  or scripts to be called as part of the pre-process step. The custom programs will
+  be executed sequentially.
+
+  After the distgit is cloned, and before the source RPM is built, the ``pkginfo``
+  drivers run a pre-process step where some actions are taken on the repository,
+  such as Jinja2 template processing. In addition to this per-driver step, a
+  custom pre-process step can be specified.
+  The external program(s) will be executed with certain environment variables set:
+
+  * ``DLRN_PACKAGE_NAME``: name of the package being built.
+  * ``DLRN_DISTGIT``: path to the distgit in the local file system.
+  * ``DLRN_UPSTREAM_DISTGIT``: for the ``downstream`` driver, path to the
+    upstream distgit in the local file system.
+
+  Do not assume any other environment variable (such as PATH), since it may not
+  be defined.
 
 The optional ``[gitrepo_driver]`` section has the following configuration
 options:
