@@ -51,6 +51,7 @@ class TestDriverDownstream(base.TestCase):
         self.config.downstream_distro_branch = 'testbranch'
         self.config.downstream_distgit_base = 'git://git.example.com/rpms'
         self.config.datadir = self.temp_dir
+        self.config.use_upstream_spec = False
 
     def tearDown(self):
         super(TestDriverDownstream, self).tearDown()
@@ -139,3 +140,50 @@ class TestDriverDownstream(base.TestCase):
                       'openstack-nova.spec'), 'r').read()
         expected = '%global with_doc 0\nfoo'
         self.assertEqual(result, expected)
+
+    @mock.patch('sh.env', create=True)
+    @mock.patch('os.listdir', side_effect=_mocked_listdir)
+    def test_custom_preprocess(self, ld_mock, sh_mock, uo_mock):
+        self.config.custom_preprocess = '/bin/true'
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        driver.preprocess(package_name='foo')
+
+        expected = [mock.call(
+            ['DLRN_PACKAGE_NAME=foo',
+             'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
+             'DLRN_UPSTREAM_DISTGIT=%s/foo_distro_upstream/' % self.temp_dir,
+             '/bin/true'],
+            _cwd='%s/foo_distro/' % self.temp_dir,
+            _env={'LANG': 'C'})]
+
+        self.assertEqual(sh_mock.call_args_list, expected)
+        self.assertEqual(sh_mock.call_count, 1)
+
+    @mock.patch('sh.env', create=True)
+    @mock.patch('os.listdir', side_effect=_mocked_listdir)
+    @mock.patch('shutil.copy')
+    def test_custom_preprocess_upstream_spec(self, cp_mock, ld_mock, sh_mock,
+                                             uo_mock):
+        self.config.custom_preprocess = '/bin/true'
+        self.config.use_upstream_spec = True
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        driver.preprocess(package_name='foo')
+
+        expected = [mock.call(
+            ['DLRN_PACKAGE_NAME=foo',
+             'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
+             'DLRN_UPSTREAM_DISTGIT=%s/foo_distro_upstream/' % self.temp_dir,
+             '/bin/true'],
+            _cwd='%s/foo_distro/' % self.temp_dir,
+            _env={'LANG': 'C'})]
+
+        self.assertEqual(sh_mock.call_args_list, expected)
+        self.assertEqual(sh_mock.call_count, 1)
+
+    @mock.patch('os.listdir', side_effect=_mocked_listdir)
+    def test_custom_preprocess_fail(self, ld_mock, uo_mock):
+        self.config.custom_preprocess = '/bin/nonexistingcommand'
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        os.mkdir(os.path.join(self.temp_dir, 'foo_distro'))
+
+        self.assertRaises(RuntimeError, driver.preprocess, package_name='foo')
