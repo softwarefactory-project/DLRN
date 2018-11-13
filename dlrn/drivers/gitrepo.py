@@ -29,6 +29,7 @@ from dlrn.db import Commit
 from dlrn.drivers.pkginfo import PkgInfoDriver
 from dlrn.repositories import getsourcebranch
 from dlrn.repositories import refreshrepo
+from dlrn.utils import run_external_preprocess
 from pymod2pkg import module2package
 from pymod2pkg import module2upstream
 from rdopkg.utils import specfile
@@ -252,6 +253,13 @@ class GitRepoDriver(PkgInfoDriver):
                     spec = re.sub('-%{version}', '-%{upstream_version}', spec)
                     fp.seek(0)
                     fp.write(spec)
+
+        if (self.config_options.custom_preprocess and
+           self.config_options.custom_preprocess != ''):
+            run_external_preprocess(
+                cmdline=self.config_options.custom_preprocess,
+                pkgname=package_name,
+                distgit=distgit_dir)
 
     def distgit_dir(self, package_name):
         datadir = self.config_options.datadir
