@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c085d1d6_65b12ef4",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 16
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-11-16T18:25:51Z",
+      "side": 1,
+      "message": "Seems unrelated change to py3?\nBTW this assumes ZUUL_CLONES_DIR \u003d\u003d ZUUL3_HOME ?",
+      "revId": "8e75c77e1a7ed135930b2004645277c849c894e6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
