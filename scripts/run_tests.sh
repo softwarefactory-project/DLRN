@@ -103,7 +103,10 @@ mkdir -p data/repos
 function copy_logs() {
     mkdir -p logs
     rsync -avzr data/repos logs/$target
-    rsync -avzrL data/repos/current logs/$target
+    # Only copy the current symlink if it exists
+    if [ -h data/repos/current ]; then
+      rsync -avzrL data/repos/current logs/$target
+    fi
 }
 trap copy_logs ERR EXIT
 
