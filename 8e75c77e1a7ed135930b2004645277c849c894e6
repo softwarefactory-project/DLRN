@@ -16,6 +16,24 @@
       "revId": "8e75c77e1a7ed135930b2004645277c849c894e6",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1155b868_ebaf3254",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 16
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-11-19T08:59:11Z",
+      "side": 1,
+      "message": "We needed to add this because of the way the Fedora images are built in sf.io.\n\nThey have a /home/zuul user, but when we are running the jobs on softwarefactory-project.io we do not have access to the distgits or rdoinfo repos, so the job was failing.",
+      "parentUuid": "c085d1d6_65b12ef4",
+      "revId": "8e75c77e1a7ed135930b2004645277c849c894e6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
