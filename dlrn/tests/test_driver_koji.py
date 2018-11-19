@@ -248,3 +248,29 @@ class TestDriverKoji(base.TestCase):
         self.assertEqual(rn_mock.call_count, 1)
         self.assertEqual(env_mock.call_args_list, expected_env)
         self.assertEqual(rh_mock.call_args_list, expected_rh)
+
+    def test_write_mock_config(self, ld_mock, env_mock, rc_mock):
+        self.config.koji_build_target = 'foo-target'
+        self.config.koji_arch = 'aarch64'
+        self.config.fetch_mock_config = True
+        self.config.mock_base_packages = 'foo bar'
+        driver = KojiBuildDriver(cfg_options=self.config)
+        output_file = os.path.join(self.temp_dir, 'dlrn-1.cfg')
+
+        # Create sample downloaded config file
+        with open(output_file, "w") as fp:
+            fp.write("config_opts['root'] = 'dlrn-centos7-x86_64-1'\n")
+            fp.write("config_opts['chroot_setup_cmd'] = 'install abc def\n")
+            fp.write("'''")
+
+        expected = "config_opts['chroot_setup_cmd'] = 'install foo bar'\n"
+
+        driver.write_mock_config(output_file)
+
+        with open(output_file, "r") as fp:
+            for line in fp.readlines():
+                if line.startswith("config_opts['chroot_setup_cmd']"):
+                    print(line)
+                    self.assertEqual(expected, line)
+
+        self.assertEqual(env_mock.call_count, 1)

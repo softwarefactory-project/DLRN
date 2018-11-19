@@ -33,13 +33,6 @@ logging.basicConfig(level=logging.ERROR,
 logger = logging.getLogger("dlrn-build-koji")
 logger.setLevel(logging.INFO)
 
-# FIXME(jpena): needs to be configurable, and driver-independent
-mock_base_packages = "basesystem rpm-build python2-devel gcc make "\
-                     "python-sqlalchemy python-webob ghostscript graphviz "\
-                     "python-sphinx python-eventlet python-six python-pbr "\
-                     "openstack-macros git yum-plugin-priorities rubygems "\
-                     "python-setuptools_scm"
-
 
 class KojiBuildDriver(BuildRPMDriver):
     DRIVER_CONFIG = {
@@ -53,6 +46,7 @@ class KojiBuildDriver(BuildRPMDriver):
             'koji_use_rhpkg': {'name': 'use_rhpkg', 'type': 'boolean'},
             'koji_exe': {'default': 'koji'},
             'fetch_mock_config': {'type': 'boolean'},
+            'mock_base_packages': {'default': ''},
         }
     }
 
@@ -82,9 +76,11 @@ class KojiBuildDriver(BuildRPMDriver):
         lines = []
         with open(filename, 'r') as fp:
             for line in fp.readlines():
-                if line.startswith("config_opts['chroot_setup_cmd']"):
+                if (line.startswith("config_opts['chroot_setup_cmd']") and
+                        self.config_options.mock_base_packages != ''):
                     lines.append("config_opts['chroot_setup_cmd'] = "
-                                 "'install %s'\n" % mock_base_packages)
+                                 "'install %s'\n" %
+                                 self.config_options.mock_base_packages)
                 else:
                     lines.append(line)
         with open(filename, 'w') as fp:
