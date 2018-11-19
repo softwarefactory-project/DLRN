@@ -309,8 +309,9 @@ following configuration options are included:
     scratch_build=True
     build_target=koji-target-build
     arch=aarch64
-    fetch_mock_config=False
     use_rhpkg=False
+    fetch_mock_config=False
+    mock_base_packages=basesystem rpm-build
 
 * ``koji_exe`` defines the executable to use. Some Koji instances create their
   own client packages to add their default configuration, such as
@@ -328,10 +329,6 @@ following configuration options are included:
   and base repositories to be used for the build.
 * ``arch`` allows to override default architecture (x86_64) in some cases (e.g
   retrieving mock configuration from Koji instance).
-* ``fetch_mock_config``, if set to ``true``, will instruct DLRN to download the
-  mock configuration for the build target from Koji, and use it when building
-  the source RPM. If set to ``false``, DLRN will use its internally defined mock
-  configuration, based on the ``DEFAULT/target`` configuration option.
 * ``use_rhpkg`` allows us to use ``rhpkg`` as the build tool in combination with
   ``koji_exe``. That involves some changes in the workflow:
   * Instead of using ``koji_exe`` to trigger the build, DLRN will generate the
@@ -343,6 +340,15 @@ following configuration options are included:
 
   Also note that setting ``rhpkg`` only makes sense when using ``dlrn.drivers.downstream.DownstreamInfoDriver``
   as the pkginfo driver.
+* ``fetch_mock_config``, if set to ``true``, will instruct DLRN to download the
+  mock configuration for the build target from Koji, and use it when building
+  the source RPM. If set to ``false``, DLRN will use its internally defined mock
+  configuration, based on the ``DEFAULT/target`` configuration option.
+* ``mock_base_packages``, if  ``fetch_mock_config`` is set to ``true``, will
+  define the set of base packages that will be installed in the mock configuration
+  when creating the source RPM. This list of packages will override the one
+  fetched in the mock configuration, if set. If not set, no overriding will
+  be done.
 
 The optional ``[coprbuild_driver]`` section has the following configuration
 options:
