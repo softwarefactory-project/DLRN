@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f280777f_879bc4bc",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2018-11-22T20:14:39Z",
+      "side": 1,
+      "message": "This ought to be replaced by the new line above, no?",
+      "revId": "06de475eb7c4751fcd5d349b9d245a181ca7d120",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
