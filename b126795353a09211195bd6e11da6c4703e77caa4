@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "76bd39f0_ba596258",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2018-12-03T18:28:52Z",
+      "side": 1,
+      "message": "nitpick (but also for easier traceability later with git annotate) - why was this moved?",
+      "revId": "b126795353a09211195bd6e11da6c4703e77caa4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
