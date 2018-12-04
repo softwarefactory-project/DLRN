@@ -34,6 +34,24 @@
       "revId": "b126795353a09211195bd6e11da6c4703e77caa4",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4571d21b_83111b22",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2018-12-04T08:58:30Z",
+      "side": 1,
+      "message": "Yes, that was the main reason.",
+      "parentUuid": "f01b62ec_447c4cb7",
+      "revId": "b126795353a09211195bd6e11da6c4703e77caa4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
