@@ -64,6 +64,8 @@
 
 - project:
     name: DLRN
+    vars:
+      rtd_webhook_id: '101768'
     check:
       jobs:
         - tox-pep8
@@ -89,6 +91,10 @@
                   label: fedora-oci
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
+    post:
+      jobs:
+        - publish-readthedocs
     release:
       jobs:
         - upload-pypi
+        - publish-readthedocs
