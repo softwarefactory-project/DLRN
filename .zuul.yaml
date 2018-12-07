@@ -58,15 +58,14 @@
 
 - project:
     name: DLRN
+    vars:
+      rtd_webhook_id: 'CHANGE_ME'
     check:
       jobs:
         - tox-pep8
         - tox-py27
         - tox-py36:
-            nodeset:
-              nodes:
-                - name: testrunner
-                  label: fedora-oci
+            nodeset: fedora-latest-runc
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
         - dlrn-rpmbuild-tripleo-ci
@@ -77,12 +76,13 @@
         - tox-pep8
         - tox-py27
         - tox-py36:
-            nodeset:
-              nodes:
-                - name: testrunner
-                  label: fedora-oci
+            nodeset: fedora-latest-runc
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
+    post:
+      jobs:
+        - publish-readthedocs
     release:
       jobs:
         - upload-pypi
+        - publish-readthedocs
