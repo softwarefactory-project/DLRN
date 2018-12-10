@@ -122,6 +122,7 @@ class Promotion(Base):
     timestamp = Column(Integer, nullable=False)
     user = Column(String(255),
                   ForeignKey('users.username', name='prom_user_fk'))
+    notes = Column(Text)
 
 
 class User(Base):

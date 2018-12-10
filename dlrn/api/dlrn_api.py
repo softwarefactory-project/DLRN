@@ -491,12 +491,15 @@ def promote():
     # commit_hash: commit hash
     # distro_hash: distro hash
     # promote_name: symlink name
+    # notes(optional): notes
     try:
         commit_hash = request.json['commit_hash']
         distro_hash = request.json['distro_hash']
         promote_name = request.json['promote_name']
     except KeyError:
         raise InvalidUsage('Missing parameters', status_code=400)
+
+    notes = request.json.get('notes', '')
 
     # Check for invalid promote names
     if (promote_name == 'consistent' or promote_name == 'current'):
@@ -532,7 +535,8 @@ def promote():
 
     timestamp = time.mktime(datetime.now().timetuple())
     promotion = Promotion(commit_id=commit.id, promotion_name=promote_name,
-                          timestamp=timestamp, user=auth.username())
+                          timestamp=timestamp, user=auth.username(),
+                          notes=notes)
 
     session.add(promotion)
     session.commit()
@@ -546,6 +550,7 @@ def promote():
               'repo_url': repo_url,
               'promote_name': promote_name,
               'timestamp': timestamp,
+              'notes': notes,
               'user': auth.username()}
     closeSession(session)
     return jsonify(result), 201

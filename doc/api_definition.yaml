@@ -418,6 +418,10 @@ paths:
                   Name to be used for the promotion. In the current
                   implementation, this is the name of the symlink to be created
                 type: string
+              notes:
+                description: |
+                  Additional notes
+                type: string
       responses:
         201:
           description: Successful response
@@ -568,6 +572,9 @@ definitions:
       repo_url:
         type: string
         description: Full URL of the promoted repository.
+      notes:
+        type: string
+        description: additional notes
 PromotionQuery:
     type: object
     properties:

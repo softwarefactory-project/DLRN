@@ -325,6 +325,7 @@ commit_hash     string      commit_hash of the repo to be promoted
 distro_hash     string      distro_hash of the repo to be promoted
 promote_name    string      name to be used for the promotion. In the current
                             implementation, this is the name of the symlink to be created
+notes           Text        Additional notes
 ==============  ==========  ==============================================================
 
 Response:
@@ -340,6 +341,7 @@ repo_url        string      Full URL of the promoted repository
 promote_name    string      name used for the promotion
 timestamp       integer     Timestamp (in seconds since the epoch)
 user            string      user who created the promotion
+notes           Text        Additional notes
 ==============  ==========  ==============================================================
 
 POST /api/remote/import
