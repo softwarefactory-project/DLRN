@@ -23,6 +23,15 @@ cleanup_sdist
 
 MOCKOPTS="-v -r ${DATA_DIR}/${MOCK_CONFIG} --resultdir $OUTPUT_DIRECTORY"
 
+# We want to make it work for both python2 and python3
+if [ -x /usr/bin/python3 ]; then
+  PYTHON=python3
+else
+  # Python 3 not available
+  PYTHON=python2
+fi
+
+
 # Cleanup mock directory and copy sources there, so we can run python setup.py
 # inside the buildroot
 /usr/bin/mock $MOCKOPTS --clean
@@ -38,10 +47,10 @@ if [ -r setup.py -a ! -r metadata.json ]; then
 
     # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
     # so only look at the last line for version
-    setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && rm -rf *.egg-info && python setup.py --version"| tail -n 1) \
+    setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && rm -rf *.egg-info && (([ -x /usr/bin/python3 ] && python3 setup.py --version) || python setup.py --version)"| tail -n 1) \
                          $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && git log --abbrev=7 -n1 --format=format:%h")
 
-    /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && python setup.py sdist"
+    /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && (([ -x /usr/bin/python3 ] && python3 setup.py sdist) || python setup.py sdist)"
     /usr/bin/mock $MOCKOPTS --copyout /var/tmp/pkgsrc/dist ./dist
 elif [ -r *.gemspec ]; then
     SOURCETYPE='gem'
@@ -57,7 +66,7 @@ else
     SOURCETYPE='tarball'
     # For Puppet modules, check the version in metadata.json (preferred) or Modulefile
     if [ -r metadata.json ]; then
-        version=$(python -c "import json; print(json.loads(open('metadata.json').read(-1))['version'])")
+        version=$($PYTHON -c "import json; print(json.loads(open('metadata.json').read(-1))['version'])")
     elif [ -r Modulefile ]; then
         version=$(grep version Modulefile | sed "s@version *'\(.*\)'@\1@")
     else
@@ -107,7 +116,7 @@ else
         echo $TARBALLS_OPS
         # We know OpenStack puppet modules have a common style for metadata.json
         if [ $TARBALLS_OPS -ne 0 ]; then
-            TARNAME=$(python -c "import json; print(json.loads(open('metadata.json').read(-1))['name'])")
+            TARNAME=$($PYTHON -c "import json; print(json.loads(open('metadata.json').read(-1))['name'])")
         else
             TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@;s@\.git$@@')
         fi
