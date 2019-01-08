@@ -213,6 +213,8 @@ The configuration file looks like this:
   * ``DLRN_DISTGIT``: path to the distgit in the local file system.
   * ``DLRN_UPSTREAM_DISTGIT``: for the ``downstream`` driver, path to the
     upstream distgit in the local file system.
+  * ``DLRN_DISTROINFO_REPO``: for the ``rdoinfo`` and ``downstream`` drivers,
+    path to the local or remote distroinfo repository used by the instance.
 
   Do not assume any other environment variable (such as PATH), since it may not
   be defined.
