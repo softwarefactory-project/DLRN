@@ -270,7 +270,6 @@ class TestDriverKoji(base.TestCase):
         with open(output_file, "r") as fp:
             for line in fp.readlines():
                 if line.startswith("config_opts['chroot_setup_cmd']"):
-                    print(line)
                     self.assertEqual(expected, line)
 
         self.assertEqual(env_mock.call_count, 1)
