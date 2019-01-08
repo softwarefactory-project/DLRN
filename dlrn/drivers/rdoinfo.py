@@ -56,6 +56,7 @@ class RdoInfoDriver(PkgInfoDriver):
 
     def __init__(self, *args, **kwargs):
         super(RdoInfoDriver, self).__init__(*args, **kwargs)
+        self.distroinfo_path = None
 
     def getpackages(self, **kwargs):
         """ Valid parameters:
@@ -66,21 +67,23 @@ class RdoInfoDriver(PkgInfoDriver):
         local_info_repo = kwargs.get('local_info_repo')
         tags = kwargs.get('tags')
         inforepo = None
-
         if local_info_repo:
             inforepo = info.DistroInfo(
                 info_files='rdo.yml',
                 local_info=local_info_repo)
+            self.distroinfo_path = local_info_repo
         elif self.config_options.rdoinfo_repo:
             inforepo = info.DistroInfo(
                 info_files='rdo.yml',
                 remote_git_info=self.config_options.rdoinfo_repo)
+            self.distroinfo_path = self.config_options.rdoinfo_repo
         else:
             # distroinfo will fetch info files from the rdoinfo repo as needed
             # and store them under ~/.distroinfo/cache
             inforepo = info.DistroInfo(
                 info_files='rdo.yml',
                 remote_info=rdoinfo_repo)
+            self.distroinfo_path = rdoinfo_repo
 
         pkginfo = inforepo.get_info(apply_tag=tags)
 
@@ -198,7 +201,8 @@ class RdoInfoDriver(PkgInfoDriver):
                 run_external_preprocess(
                     cmdline=custom_preprocess,
                     pkgname=package_name,
-                    distgit=distgit_dir)
+                    distgit=distgit_dir,
+                    distroinfo=self.distroinfo_path)
         return
 
     def distgit_dir(self, package_name):

@@ -60,6 +60,24 @@ class TestDriverRdoInfo(base.TestCase):
 
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
+    def test_custom_preprocess_rdoinfo_repo(self, ld_mock, sh_mock):
+        self.config.custom_preprocess = ['/bin/true']
+        driver = RdoInfoDriver(cfg_options=self.config)
+        driver.distroinfo_path = '/tmp/test'
+        driver.preprocess(package_name='foo')
+
+        expected = [mock.call(['DLRN_PACKAGE_NAME=foo',
+                               'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
+                               'DLRN_DISTROINFO_REPO=/tmp/test',
+                               '/bin/true'],
+                              _cwd='%s/foo_distro/' % self.temp_dir,
+                              _env={'LANG': 'C'})]
+
+        self.assertEqual(sh_mock.call_args_list, expected)
+        self.assertEqual(sh_mock.call_count, 1)
+
+    @mock.patch('sh.env', create=True)
+    @mock.patch('os.listdir', side_effect=_mocked_listdir)
     def test_custom_preprocess_multiple_commands(self, ld_mock, sh_mock):
         self.config.custom_preprocess = ['/bin/true', '/bin/true',
                                          '/bin/true']
