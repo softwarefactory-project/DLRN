@@ -268,6 +268,7 @@ def run_external_preprocess(**kwargs):
     upstream_distgit = kwargs.get('upstream_distgit')
     cmdline = kwargs.get('cmdline')
     distroinfo = kwargs.get('distroinfo')
+    srcdir = kwargs.get('source_dir')
 
     run_cmd = []
     # Append environment variables
@@ -279,6 +280,8 @@ def run_external_preprocess(**kwargs):
         run_cmd.append("DLRN_UPSTREAM_DISTGIT=%s" % upstream_distgit)
     if distroinfo:
         run_cmd.append("DLRN_DISTROINFO_REPO=%s" % distroinfo)
+    if srcdir:
+        run_cmd.append("DLRN_SOURCEDIR=%s" % srcdir)
     run_cmd.extend([cmdline])
 
     logger.info('Running custom pre-process: %s' % ' '.join(run_cmd))

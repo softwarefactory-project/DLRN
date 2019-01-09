@@ -51,6 +51,7 @@ class TestDriverRdoInfo(base.TestCase):
 
         expected = [mock.call(['DLRN_PACKAGE_NAME=foo',
                                'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
+                               'DLRN_SOURCEDIR=%s/foo' % self.temp_dir,
                                '/bin/true'],
                               _cwd='%s/foo_distro/' % self.temp_dir,
                               _env={'LANG': 'C'})]
@@ -69,6 +70,7 @@ class TestDriverRdoInfo(base.TestCase):
         expected = [mock.call(['DLRN_PACKAGE_NAME=foo',
                                'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
                                'DLRN_DISTROINFO_REPO=/tmp/test/rdo.yml',
+                               'DLRN_SOURCEDIR=%s/foo' % self.temp_dir,
                                '/bin/true'],
                               _cwd='%s/foo_distro/' % self.temp_dir,
                               _env={'LANG': 'C'})]

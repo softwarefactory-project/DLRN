@@ -251,6 +251,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
         distgit_dir = self.distgit_dir(package_name)
         ups_distro_dir_full = self.upstream_distgit_dir(package_name)
         distro_dir_full = self.distgit_dir(package_name)
+        source_dir = "%s/%s" % (self.config_options.datadir, package_name)
 
         # In this case, we will copy the upstream distgit into downstream
         # distgit, then transform spec
@@ -286,7 +287,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
                     pkgname=package_name,
                     distgit=distgit_dir,
                     upstream_distgit=ups_distro_dir_full,
-                    distroinfo=self.distroinfo_path)
+                    distroinfo=self.distroinfo_path,
+                    source_dir=source_dir)
         return
 
     def distgit_dir(self, package_name):
