@@ -282,6 +282,9 @@ def run_external_preprocess(**kwargs):
         run_cmd.append("DLRN_DISTROINFO_REPO=%s" % distroinfo)
     if srcdir:
         run_cmd.append("DLRN_SOURCEDIR=%s" % srcdir)
+    if os.environ.get('DLRN_SOURCE_COMMIT'):
+        run_cmd.append(
+            "DLRN_SOURCE_COMMIT=%s" % os.environ['DLRN_SOURCE_COMMIT'])
     run_cmd.extend([cmdline])
 
     logger.info('Running custom pre-process: %s' % ' '.join(run_cmd))

@@ -98,7 +98,7 @@ else
     fi
 
     # Reset the git repository to the right commit
-    git checkout -f ${SOURCE_COMMIT}
+    git checkout -f ${DLRN_SOURCE_COMMIT}
 
     setversionandrelease "$version" $(git log --abbrev=7 -n1 --format=format:%h)
     if [ -r metadata.json ]; then
