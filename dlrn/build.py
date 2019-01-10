@@ -248,6 +248,10 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     else:
         additional_mock_options = None
 
+    # We may do some git repo manipulation, so we need to make sure the
+    # right commit is there
+    os.environ['DLRN_SOURCE_COMMIT'] = commit.commit_hash
+
     dlrn.shell.pkginfo.preprocess(package_name=commit.project_name)
 
     if (config_options.pkginfo_driver ==
@@ -259,10 +263,6 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
         else:
             if 'DLRN_KEEP_TARBALL' in os.environ:
                 del os.environ['DLRN_KEEP_TARBALL']
-
-    # We may do some git repo manipulation, so we need to make sure the
-    # right commit is there
-    os.environ['SOURCE_COMMIT'] = commit.commit_hash
 
     run(os.path.join(scriptsdir, "build_srpm.sh"), commit, env_vars,
         dev_mode, use_public, bootstrap, version_from=version_from)
