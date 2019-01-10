@@ -269,6 +269,7 @@ def run_external_preprocess(**kwargs):
     cmdline = kwargs.get('cmdline')
     distroinfo = kwargs.get('distroinfo')
     srcdir = kwargs.get('source_dir')
+    commit_hash = kwargs.get('commit_hash')
 
     run_cmd = []
     # Append environment variables
@@ -282,6 +283,8 @@ def run_external_preprocess(**kwargs):
         run_cmd.append("DLRN_DISTROINFO_REPO=%s" % distroinfo)
     if srcdir:
         run_cmd.append("DLRN_SOURCEDIR=%s" % srcdir)
+    if commit_hash:
+        run_cmd.append("DLRN_SOURCE_COMMIT=%s" % commit_hash)
     run_cmd.extend([cmdline])
 
     logger.info('Running custom pre-process: %s' % ' '.join(run_cmd))

@@ -248,6 +248,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
 
     def preprocess(self, **kwargs):
         package_name = kwargs.get('package_name')
+        commit_hash = kwargs.get('commit_hash')
         distgit_dir = self.distgit_dir(package_name)
         ups_distro_dir_full = self.upstream_distgit_dir(package_name)
         distro_dir_full = self.distgit_dir(package_name)
@@ -288,7 +289,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
                     distgit=distgit_dir,
                     upstream_distgit=ups_distro_dir_full,
                     distroinfo=self.distroinfo_path,
-                    source_dir=source_dir)
+                    source_dir=source_dir,
+                    commit_hash=commit_hash)
         return
 
     def distgit_dir(self, package_name):
