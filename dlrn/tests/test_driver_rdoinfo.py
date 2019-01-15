@@ -59,9 +59,11 @@ class TestDriverRdoInfo(base.TestCase):
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(sh_mock.call_count, 1)
 
+    @mock.patch('os.environ.get', side_effect=['myuser'])
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
-    def test_custom_preprocess_source_commit(self, ld_mock, sh_mock):
+    def test_custom_preprocess_source_commit(self, ld_mock, sh_mock,
+                                             get_mock):
         self.config.custom_preprocess = ['/bin/true']
         driver = RdoInfoDriver(cfg_options=self.config)
         driver.preprocess(package_name='foo', commit_hash='abc123456')
@@ -70,6 +72,7 @@ class TestDriverRdoInfo(base.TestCase):
                                'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
                                'DLRN_SOURCEDIR=%s/foo' % self.temp_dir,
                                'DLRN_SOURCE_COMMIT=abc123456',
+                               'DLRN_USER=myuser',
                                '/bin/true'],
                               _cwd='%s/foo_distro/' % self.temp_dir,
                               _env={'LANG': 'C'})]
@@ -77,9 +80,10 @@ class TestDriverRdoInfo(base.TestCase):
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(sh_mock.call_count, 1)
 
+    @mock.patch('os.environ.get', side_effect=['myuser'])
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
-    def test_custom_preprocess_rdoinfo_repo(self, ld_mock, sh_mock):
+    def test_custom_preprocess_rdoinfo_repo(self, ld_mock, sh_mock, get_mock):
         self.config.custom_preprocess = ['/bin/true']
         driver = RdoInfoDriver(cfg_options=self.config)
         driver.distroinfo_path = '/tmp/test/rdo.yml'
@@ -89,6 +93,7 @@ class TestDriverRdoInfo(base.TestCase):
                                'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
                                'DLRN_DISTROINFO_REPO=/tmp/test/rdo.yml',
                                'DLRN_SOURCEDIR=%s/foo' % self.temp_dir,
+                               'DLRN_USER=myuser',
                                '/bin/true'],
                               _cwd='%s/foo_distro/' % self.temp_dir,
                               _env={'LANG': 'C'})]

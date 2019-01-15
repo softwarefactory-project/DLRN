@@ -25,6 +25,10 @@ from dlrn.drivers.gitrepo import GitRepoDriver
 from dlrn.tests import base
 
 
+def _mocked_environ(*args, **kwargs):
+    return 'myuser'
+
+
 class TestDriverGit(base.TestCase):
     def setUp(self):
         super(TestDriverGit, self).setUp()
@@ -57,10 +61,11 @@ class TestDriverGit(base.TestCase):
         packages = driver.getpackages(dev_mode=True)
         self.assertEqual(packages, [])
 
+    @mock.patch('os.environ.get', side_effect=['myuser'])
     @mock.patch('sh.renderspec', create=True)
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir')
-    def test_custom_preprocess(self, ld_mock, env_mock, rs_mock):
+    def test_custom_preprocess(self, ld_mock, env_mock, rs_mock, get_mock):
         self.config.custom_preprocess = ['/bin/true']
         driver = GitRepoDriver(cfg_options=self.config)
         driver.preprocess(package_name='foo')
@@ -71,6 +76,7 @@ class TestDriverGit(base.TestCase):
             ['DLRN_PACKAGE_NAME=foo',
              'DLRN_DISTGIT=%s' % directory,
              'DLRN_SOURCEDIR=%s/foo' % self.config.datadir,
+             'DLRN_USER=myuser',
              '/bin/true'],
             _cwd=directory,
             _env={'LANG': 'C'})]
@@ -78,11 +84,12 @@ class TestDriverGit(base.TestCase):
         self.assertEqual(env_mock.call_args_list, expected)
         self.assertEqual(env_mock.call_count, 1)
 
+    @mock.patch('os.environ.get', side_effect=_mocked_environ)
     @mock.patch('sh.renderspec', create=True)
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir')
     def test_custom_preprocess_multiple_commands(self, ld_mock, env_mock,
-                                                 rs_mock):
+                                                 rs_mock, get_mock):
         self.config.custom_preprocess = ['/bin/true', '/bin/false']
         driver = GitRepoDriver(cfg_options=self.config)
         driver.preprocess(package_name='foo')
@@ -93,6 +100,7 @@ class TestDriverGit(base.TestCase):
             ['DLRN_PACKAGE_NAME=foo',
              'DLRN_DISTGIT=%s' % directory,
              'DLRN_SOURCEDIR=%s/foo' % self.config.datadir,
+             'DLRN_USER=myuser',
              '/bin/true'],
             _cwd=directory,
             _env={'LANG': 'C'}),
@@ -100,6 +108,7 @@ class TestDriverGit(base.TestCase):
             ['DLRN_PACKAGE_NAME=foo',
              'DLRN_DISTGIT=%s' % directory,
              'DLRN_SOURCEDIR=%s/foo' % self.config.datadir,
+             'DLRN_USER=myuser',
              '/bin/false'],
             _cwd=directory,
             _env={'LANG': 'C'})
