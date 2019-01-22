@@ -130,6 +130,9 @@ def main():
                         help="Show verbose output during the package build.")
     parser.add_argument('--verbose-mock', action="store_true",
                         help=argparse.SUPPRESS)
+    parser.add_argument('--no-repo', action="store_true",
+                        help="Do not generate a repo with all the built "
+                        "packages.")
 
     options = parser.parse_args(sys.argv[1:])
 
@@ -369,7 +372,8 @@ def main():
                     failures = 1
                 else:
                     if not options.run:
-                        failures = post_build(status, packages, session)
+                        failures = post_build(status, packages, session,
+                                              options.no_repo)
                         consistent = (failures == 0)
                 exit_value = process_build_result(status, packages, session,
                                                   toprocess_copy,
@@ -414,7 +418,8 @@ def main():
                         # Create repo, build versions.csv file.
                         # This needs to be sequential
                         if not options.run:
-                            failures = post_build(status, packages, session)
+                            failures = post_build(status, packages, session,
+                                                  options.no_repo)
                             consistent = (failures == 0)
                     exit_value = process_build_result(
                         status, packages,
@@ -609,7 +614,7 @@ def export_commit_yaml(commit):
     saveYAML_commit(commit, os.path.join(yumrepodir, 'commit.yaml'))
 
 
-def post_build(status, packages, session):
+def post_build(status, packages, session, skip_repo):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
@@ -638,11 +643,12 @@ def post_build(status, packages, session):
         last_processed = getCommits(session, project=otherprojectname).first()
 
         if last_success:
-            for rpm in last_success.rpms.split(","):
-                rpm_link_src = os.path.join(yumrepodir_abs,
-                                            os.path.split(rpm)[1])
-                os.symlink(os.path.relpath(os.path.join(datadir, rpm),
-                                           yumrepodir_abs), rpm_link_src)
+            if not skip_repo:
+                for rpm in last_success.rpms.split(","):
+                    rpm_link_src = os.path.join(yumrepodir_abs,
+                                                os.path.split(rpm)[1])
+                    os.symlink(os.path.relpath(os.path.join(datadir, rpm),
+                                               yumrepodir_abs), rpm_link_src)
             last = last_success
         else:
             last = last_processed
@@ -662,23 +668,24 @@ def post_build(status, packages, session):
             failures += 1
     shafile.close()
 
-    # Use createrepo_c when available
-    try:
-        from sh import createrepo_c
-        sh.createrepo = createrepo_c
-    except ImportError:
-        pass
-    sh.createrepo(yumrepodir_abs)
+    if not skip_repo:
+        # Use createrepo_c when available
+        try:
+            from sh import createrepo_c
+            sh.createrepo = createrepo_c
+        except ImportError:
+            pass
+        sh.createrepo(yumrepodir_abs)
 
-    with open(os.path.join(
-            yumrepodir_abs, "%s.repo" % config_options.reponame),
-            "w") as fp:
-        fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
-                 "gpgcheck=0\npriority=1" % (config_options.reponame,
-                                             config_options.reponame,
-                                             project_name, commit_hash,
-                                             config_options.baseurl,
-                                             commit.getshardedcommitdir()))
+        with open(os.path.join(
+                yumrepodir_abs, "%s.repo" % config_options.reponame),
+                "w") as fp:
+            fp.write("[%s]\nname=%s-%s-%s\nbaseurl=%s/%s\nenabled=1\n"
+                     "gpgcheck=0\npriority=1" % (config_options.reponame,
+                                                 config_options.reponame,
+                                                 project_name, commit_hash,
+                                                 config_options.baseurl,
+                                                 commit.getshardedcommitdir()))
 
     return failures
 
