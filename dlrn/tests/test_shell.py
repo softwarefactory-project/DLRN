@@ -161,7 +161,7 @@ class TestPostBuild(base.TestCase):
                               self.commit.getshardedcommitdir())
         os.makedirs(yumdir)
         output = shell.post_build(status, self.packages,
-                                  self.session)
+                                  self.session, False)
 
         self.assertTrue(os.path.exists(
                         os.path.join(self.config.datadir,
@@ -188,7 +188,7 @@ class TestPostBuild(base.TestCase):
         yumdir = os.path.join(self.config.datadir, "repos",
                               self.commit.getshardedcommitdir())
         os.makedirs(yumdir)
-        output = shell.post_build(status, packages, self.session)
+        output = shell.post_build(status, packages, self.session, False)
         expected = [mock.call(yumdir)]
 
         self.assertEqual(sh_mock.call_args_list, expected)
