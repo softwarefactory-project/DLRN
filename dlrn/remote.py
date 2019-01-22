@@ -129,7 +129,9 @@ def import_commit(repo_url, config_file, db_connection=None,
                 for rpm in commit.rpms.split(","):
                     built_rpms.append(rpm)
                 status = [commit, built_rpms, commit.notes, None]
-                post_build(status, packages, session)
+                # NOTE(jpena): when importing, we assume we want to generate
+                # the repo
+                post_build(status, packages, session, False)
             else:
                 pkg = [p for p in packages if p['name'] == package][0]
                 # Here we fire a refresh of the repositories
