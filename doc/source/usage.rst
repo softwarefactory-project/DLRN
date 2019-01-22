@@ -12,7 +12,7 @@ Parameters
                 [--project-name PROJECT_NAME | --package-name PACKAGE_NAME]
                 [--dev] [--log-commands] [--use-public] [--order] [--sequential]
                 [--status] [--recheck] [--version] [--run RUN] [--stop]
-                [--verbose-build]
+                [--verbose-build] [--no-repo]
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -51,6 +51,7 @@ Parameters
                             --head-only
       --stop                Stop on error.
       --verbose-build       Show versobe output during the package build.
+      --no-repo             Do not generate a repo with all the built packages.
 
 
 Quickstart single package build
