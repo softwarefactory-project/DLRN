@@ -141,9 +141,10 @@ class TestDriverDownstream(base.TestCase):
         expected = '%global with_doc 0\nfoo'
         self.assertEqual(result, expected)
 
+    @mock.patch('os.environ.get', side_effect=['myuser'])
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
-    def test_custom_preprocess(self, ld_mock, sh_mock, uo_mock):
+    def test_custom_preprocess(self, ld_mock, sh_mock, get_mock, uo_mock):
         self.config.custom_preprocess = ['/bin/true']
         driver = DownstreamInfoDriver(cfg_options=self.config)
         driver.preprocess(package_name='foo')
@@ -153,6 +154,7 @@ class TestDriverDownstream(base.TestCase):
              'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
              'DLRN_UPSTREAM_DISTGIT=%s/foo_distro_upstream/' % self.temp_dir,
              'DLRN_SOURCEDIR=%s/foo' % self.temp_dir,
+             'DLRN_USER=myuser',
              '/bin/true'],
             _cwd='%s/foo_distro/' % self.temp_dir,
             _env={'LANG': 'C'})]
@@ -160,9 +162,11 @@ class TestDriverDownstream(base.TestCase):
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(sh_mock.call_count, 1)
 
+    @mock.patch('os.environ.get', side_effect=['myuser'])
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
-    def test_custom_preprocess_distroinfo(self, ld_mock, sh_mock, uo_mock):
+    def test_custom_preprocess_distroinfo(self, ld_mock, sh_mock, get_mock,
+                                          uo_mock):
         self.config.custom_preprocess = ['/bin/true']
         driver = DownstreamInfoDriver(cfg_options=self.config)
         driver.distroinfo_path = '/tmp/test/dsinfo.yml'
@@ -174,6 +178,7 @@ class TestDriverDownstream(base.TestCase):
              'DLRN_UPSTREAM_DISTGIT=%s/foo_distro_upstream/' % self.temp_dir,
              'DLRN_DISTROINFO_REPO=/tmp/test/dsinfo.yml',
              'DLRN_SOURCEDIR=%s/foo' % self.temp_dir,
+             'DLRN_USER=myuser',
              '/bin/true'],
             _cwd='%s/foo_distro/' % self.temp_dir,
             _env={'LANG': 'C'})]
@@ -181,11 +186,12 @@ class TestDriverDownstream(base.TestCase):
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(sh_mock.call_count, 1)
 
+    @mock.patch('os.environ.get', side_effect=['myuser'])
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
     @mock.patch('shutil.copy')
     def test_custom_preprocess_upstream_spec(self, cp_mock, ld_mock, sh_mock,
-                                             uo_mock):
+                                             get_mock, uo_mock):
         self.config.custom_preprocess = ['/bin/true']
         self.config.use_upstream_spec = True
         driver = DownstreamInfoDriver(cfg_options=self.config)
@@ -196,6 +202,7 @@ class TestDriverDownstream(base.TestCase):
              'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
              'DLRN_UPSTREAM_DISTGIT=%s/foo_distro_upstream/' % self.temp_dir,
              'DLRN_SOURCEDIR=%s/foo' % self.temp_dir,
+             'DLRN_USER=myuser',
              '/bin/true'],
             _cwd='%s/foo_distro/' % self.temp_dir,
             _env={'LANG': 'C'})]
