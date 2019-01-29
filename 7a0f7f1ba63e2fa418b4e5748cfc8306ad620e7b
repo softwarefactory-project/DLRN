@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e1254ce5_fb6c26fb",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 617,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-01-29T12:51:42Z",
+      "side": 1,
+      "message": "I got mostly bad experience with negated arguments like no_foo... I found it better to drop the negation in code a la\n\n    session, build_repo\u003dTrue)\n\nand get rid of it during CLI parsing, in this case line 421:\n\n    post_build(..., build_repo\u003dnot options.no_repo)\n\nAs a first sign of good deed you\u0027re gonna get\n\n    if build_repo:\n\ninstead of\n  \n    if not skip_repo:\n\nfew lines bellow :)",
+      "revId": "7a0f7f1ba63e2fa418b4e5748cfc8306ad620e7b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
