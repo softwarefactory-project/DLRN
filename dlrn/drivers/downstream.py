@@ -64,6 +64,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
 
     def __init__(self, *args, **kwargs):
         super(DownstreamInfoDriver, self).__init__(*args, **kwargs)
+        self.distroinfo_path = None
 
     def getpackages(self, **kwargs):
         """Valid parameters:
@@ -84,10 +85,14 @@ class DownstreamInfoDriver(PkgInfoDriver):
             inforepo = info.DistroInfo(
                 info_files=info_files,
                 local_info=local_info_repo)
+            self.distroinfo_path = "%s/%s" % (local_info_repo.rstrip('/'),
+                                              info_files)
         elif self.config_options.rdoinfo_repo:
             inforepo = info.DistroInfo(
                 info_files=info_files,
                 remote_git_info=self.config_options.rdoinfo_repo)
+            self.distroinfo_path = "%s/%s" % (
+                self.config_options.rdoinfo_repo.rstrip('/'), info_files)
         else:
             fail_req_config_missing('repo')
         pkginfo = inforepo.get_info(apply_tag=tags)
@@ -280,7 +285,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
                     cmdline=custom_preprocess,
                     pkgname=package_name,
                     distgit=distgit_dir,
-                    upstream_distgit=ups_distro_dir_full)
+                    upstream_distgit=ups_distro_dir_full,
+                    distroinfo=self.distroinfo_path)
         return
 
     def distgit_dir(self, package_name):
