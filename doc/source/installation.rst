@@ -211,6 +211,7 @@ The configuration file looks like this:
 
   * ``DLRN_PACKAGE_NAME``: name of the package being built.
   * ``DLRN_DISTGIT``: path to the distgit in the local file system.
+  * ``DLRN_SOURCEDIR``: path to the source git in the local file system.
   * ``DLRN_UPSTREAM_DISTGIT``: for the ``downstream`` driver, path to the
     upstream distgit in the local file system.
   * ``DLRN_DISTROINFO_REPO``: for the ``rdoinfo`` and ``downstream`` drivers,

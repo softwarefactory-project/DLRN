@@ -70,6 +70,7 @@ class TestDriverGit(base.TestCase):
         expected = [mock.call(
             ['DLRN_PACKAGE_NAME=foo',
              'DLRN_DISTGIT=%s' % directory,
+             'DLRN_SOURCEDIR=%s/foo' % self.config.datadir,
              '/bin/true'],
             _cwd=directory,
             _env={'LANG': 'C'})]
@@ -91,12 +92,14 @@ class TestDriverGit(base.TestCase):
         expected = [mock.call(
             ['DLRN_PACKAGE_NAME=foo',
              'DLRN_DISTGIT=%s' % directory,
+             'DLRN_SOURCEDIR=%s/foo' % self.config.datadir,
              '/bin/true'],
             _cwd=directory,
             _env={'LANG': 'C'}),
             mock.call(
             ['DLRN_PACKAGE_NAME=foo',
              'DLRN_DISTGIT=%s' % directory,
+             'DLRN_SOURCEDIR=%s/foo' % self.config.datadir,
              '/bin/false'],
             _cwd=directory,
             _env={'LANG': 'C'})

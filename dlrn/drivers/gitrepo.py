@@ -239,6 +239,7 @@ class GitRepoDriver(PkgInfoDriver):
         package_name = kwargs.get('package_name')
         distgit_dir = self.distgit_dir(package_name)
         output_filename = "%s.spec" % module2package(package_name, 'fedora')
+        source_dir = "%s/%s" % (self.config_options.datadir, package_name)
         preprocess = sh.renderspec.bake(_cwd=distgit_dir,
                                         _tty_out=False, _timeout=3600)
         preprocess('--spec-style', 'fedora', '--epoch',
@@ -259,7 +260,8 @@ class GitRepoDriver(PkgInfoDriver):
                 run_external_preprocess(
                     cmdline=custom_preprocess,
                     pkgname=package_name,
-                    distgit=distgit_dir)
+                    distgit=distgit_dir,
+                    source_dir=source_dir)
 
     def distgit_dir(self, package_name):
         datadir = self.config_options.datadir

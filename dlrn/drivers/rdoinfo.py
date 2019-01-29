@@ -185,6 +185,7 @@ class RdoInfoDriver(PkgInfoDriver):
         # Pre-processing is only required if we have a jinja2 spec template
         package_name = kwargs.get('package_name')
         distgit_dir = self.distgit_dir(package_name)
+        source_dir = "%s/%s" % (self.config_options.datadir, package_name)
         # Now, try to check if we need to run a pre-processing job
         preprocess_needed = False
         for f in os.listdir(distgit_dir):
@@ -205,7 +206,8 @@ class RdoInfoDriver(PkgInfoDriver):
                     cmdline=custom_preprocess,
                     pkgname=package_name,
                     distgit=distgit_dir,
-                    distroinfo=self.distroinfo_path)
+                    distroinfo=self.distroinfo_path,
+                    source_dir=source_dir)
         return
 
     def distgit_dir(self, package_name):
