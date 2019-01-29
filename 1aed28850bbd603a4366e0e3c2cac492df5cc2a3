@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54c2fb5b_6baf5b64",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-01-29T12:35:32Z",
+      "side": 1,
+      "message": "4 space tabs are used throughout this file :)",
+      "revId": "1aed28850bbd603a4366e0e3c2cac492df5cc2a3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ceef3ea_e05ac659",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-01-29T12:35:32Z",
+      "side": 1,
+      "message": "I wonder if\n\nPYTHON\u003dpython\n\nwouldn\u0027t be better default in case no specific numbered interpreter is found?\n\nAside from probably existing on every system, this doesn\u0027t force specific version (gonna work with pythonN :-p) and $PYTHON variable clearly answers which python interpreter was detected/selected.",
+      "revId": "1aed28850bbd603a4366e0e3c2cac492df5cc2a3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6526bb9c_890c8879",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-01-29T12:35:32Z",
+      "side": 1,
+      "message": "I suggest using exactly the same code as in build_srpm.sh including variable name to decrease confusion. After applying my linting hints, that is ;)\n\nThis snippet will see quite some use I reckon. Information about preferred python interpreter has been available on Debian systems through simple `alternatives` symlink (alongside system to support multiple python versions for each python package) for ages, but I fail to find a decent alternative on Fedora systems. If there is no such thing, we\u0027re gonna need this code all over the place, I wonder how to centralize and not mass duplicate it...",
+      "revId": "1aed28850bbd603a4366e0e3c2cac492df5cc2a3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
