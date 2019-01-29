@@ -237,6 +237,7 @@ class GitRepoDriver(PkgInfoDriver):
 
     def preprocess(self, **kwargs):
         package_name = kwargs.get('package_name')
+        commit_hash = kwargs.get('commit_hash')
         distgit_dir = self.distgit_dir(package_name)
         output_filename = "%s.spec" % module2package(package_name, 'fedora')
         source_dir = "%s/%s" % (self.config_options.datadir, package_name)
@@ -261,7 +262,8 @@ class GitRepoDriver(PkgInfoDriver):
                     cmdline=custom_preprocess,
                     pkgname=package_name,
                     distgit=distgit_dir,
-                    source_dir=source_dir)
+                    source_dir=source_dir,
+                    commit_hash=commit_hash)
 
     def distgit_dir(self, package_name):
         datadir = self.config_options.datadir

@@ -248,7 +248,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     else:
         additional_mock_options = None
 
-    dlrn.shell.pkginfo.preprocess(package_name=commit.project_name)
+    dlrn.shell.pkginfo.preprocess(package_name=commit.project_name,
+                                  commit_hash=commit.commit_hash)
 
     if (config_options.pkginfo_driver ==
             'dlrn.drivers.gitrepo.GitRepoDriver' and
@@ -262,7 +263,7 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     # We may do some git repo manipulation, so we need to make sure the
     # right commit is there
-    os.environ['SOURCE_COMMIT'] = commit.commit_hash
+    os.environ['DLRN_SOURCE_COMMIT'] = commit.commit_hash
 
     run(os.path.join(scriptsdir, "build_srpm.sh"), commit, env_vars,
         dev_mode, use_public, bootstrap, version_from=version_from)
