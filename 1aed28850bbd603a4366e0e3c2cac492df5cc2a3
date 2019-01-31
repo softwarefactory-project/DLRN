@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b7681905_68a08fe8",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-01-31T13:56:42Z",
+      "side": 1,
+      "message": "Oh, good call",
+      "parentUuid": "54c2fb5b_6baf5b64",
+      "revId": "1aed28850bbd603a4366e0e3c2cac492df5cc2a3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ceef3ea_e05ac659",
         "filename": "scripts/build_srpm.sh",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2019-01-29T12:35:32Z",
       "side": 1,
       "message": "I wonder if\n\nPYTHON\u003dpython\n\nwouldn\u0027t be better default in case no specific numbered interpreter is found?\n\nAside from probably existing on every system, this doesn\u0027t force specific version (gonna work with pythonN :-p) and $PYTHON variable clearly answers which python interpreter was detected/selected.",
+      "revId": "1aed28850bbd603a4366e0e3c2cac492df5cc2a3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44ecf81d_62a1f33c",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-01-31T13:56:42Z",
+      "side": 1,
+      "message": "Well, this is an issue. Fedora Rawhide is getting rid of the unversioned python executable, and RHEL 8 is going along the same lines. We don\u0027t have python 4 in the horizon, so we should be safe.",
+      "parentUuid": "1ceef3ea_e05ac659",
       "revId": "1aed28850bbd603a4366e0e3c2cac492df5cc2a3",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
