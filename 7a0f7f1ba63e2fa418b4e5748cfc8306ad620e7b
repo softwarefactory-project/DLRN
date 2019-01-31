@@ -16,6 +16,24 @@
       "revId": "7a0f7f1ba63e2fa418b4e5748cfc8306ad620e7b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "55548914_037a7b16",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 617,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-01-31T12:22:21Z",
+      "side": 1,
+      "message": "Ok, I\u0027ll change it accordingly",
+      "parentUuid": "e1254ce5_fb6c26fb",
+      "revId": "7a0f7f1ba63e2fa418b4e5748cfc8306ad620e7b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
