@@ -30,14 +30,6 @@
           label: rdo-fedora-28
 
 - job:
-    name: dlrn-rpmbuild-tripleo-ci
-    parent: dlrn-base
-    voting: false
-    description: Run DLRN to build a package using the tripleo.sh scripts from tripleo-ci
-    run: playbooks/tripleo-ci.yaml
-    post-run: playbooks/tripleo-ci-getlogs.yaml
-
-- job:
     name: dlrn-rpmbuild-tripleo-ci-oooq
     parent: dlrn-base
     voting: false
