@@ -23,6 +23,18 @@ commits:
   repo_dir: /home/centos-master/data/python-alembic
   rpms: repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.noarch.rpm,repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.src.rpm
   status: SUCCESS
+- commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0e77
+  distro_hash: 8170b8686c38bafb6021d998e2fb268ab26ccf77
+  dt_build: '1441669027'
+  dt_commit: '1441245154'
+  dt_distro: '1441668908'
+  flags: '2'
+  id: '5656'
+  notes: OK
+  project_name: python-alembic
+  repo_dir: /home/centos-master/data/python-alembic
+  rpms: repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0e77_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.noarch.rpm,repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0e77_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.src.rpm
+  status: SUCCESS
 civotes:
 - id: '1'
   commit_id: '5627'
