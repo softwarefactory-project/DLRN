@@ -85,14 +85,26 @@ class DownstreamInfoDriver(PkgInfoDriver):
             inforepo = info.DistroInfo(
                 info_files=info_files,
                 local_info=local_info_repo)
+            # NOTE(jpena): in general, info_files will only contain one file,
+            # but it supports multiple... In that case, we will have a comma
+            # separated list of URLs
             self.distroinfo_path = "%s/%s" % (local_info_repo.rstrip('/'),
-                                              info_files)
+                                              info_files[0])
+            for extra_file in info_files[1:]:
+                self.distroinfo_path += ",%s/%s" % (
+                    local_info_repo.rstrip('/'))
+
         elif self.config_options.rdoinfo_repo:
             inforepo = info.DistroInfo(
                 info_files=info_files,
                 remote_git_info=self.config_options.rdoinfo_repo)
-            self.distroinfo_path = "%s/%s" % (
-                self.config_options.rdoinfo_repo.rstrip('/'), info_files)
+            rdoinfo_repo = self.config_options.rdoinfo_repo
+            self.distroinfo_path = "%s/%s" % (rdoinfo_repo.rstrip('/'),
+                                              info_files[0])
+            for extra_file in info_files[1:]:
+                self.distroinfo_path += ",%s/%s" % (
+                    rdoinfo_repo.rstrip('/'), extra_file)
+
         else:
             fail_req_config_missing('repo')
         pkginfo = inforepo.get_info(apply_tag=tags)
