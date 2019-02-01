@@ -392,7 +392,8 @@ paths:
         worker, or any other form in the future.
 
         Note the API will refuse to promote using promote_name="consistent" or "current", since
-        those are reserved keywords for DLRN.
+        those are reserved keywords for DLRN. Also, a commit that has been purged from the
+        database cannot be promoted.
       parameters:
         - name: params
           in: body

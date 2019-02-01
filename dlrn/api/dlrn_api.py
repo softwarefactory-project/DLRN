@@ -29,6 +29,8 @@ from dlrn.db import Promotion
 
 from dlrn.config import ConfigOptions
 
+from dlrn.purge import FLAG_PURGED
+
 from dlrn.remote import import_commit
 
 from flask import jsonify
@@ -510,6 +512,11 @@ def promote():
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash combination not found',
                            status_code=404)
+
+    # If the commit has been purged, do not move on
+    if commit.flags & FLAG_PURGED:
+        raise InvalidUsage('commit_hash+distro_hash has been purged, cannot '
+                           'promote it', status_code=410)
 
     target_link = os.path.join(app.config['REPO_PATH'], promote_name)
     # Check for invalid target links, like ../promotename

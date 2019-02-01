@@ -338,6 +338,22 @@ class TestPromote(DLRNAPITestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_promote_purged_commit(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='1c67b1ab8c6fe273d4e17'
+                                               '5a14f0df5d3cbbd0e77',
+                                   distro_hash='8170b8686c38bafb6021d'
+                                               '998e2fb268ab26ccf77',
+                                   promote_name='foo-ci'))
+        response = self.app.post('/api/promote',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 410)
+        self.assertEqual(data['message'], 'commit_hash+distro_hash has been'
+                                          ' purged, cannot promote it')
+
     @mock.patch('os.symlink')
     def test_promote_successful(self, sl_mock, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='1c67b1ab8c6fe273d4e'
@@ -611,8 +627,8 @@ class TestMetrics(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(data['total'], 2)
-        self.assertEqual(data['succeeded'], 2)
+        self.assertEqual(data['total'], 3)
+        self.assertEqual(data['succeeded'], 3)
         self.assertEqual(data['failed'], 0)
 
     def test_metrics_filtered(self, db2_mock, db_mock):
