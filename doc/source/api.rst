@@ -310,11 +310,12 @@ Promote a repository. This can be implemented as a local symlink creation in the
 worker, or any other form in the future.
 
 Note the API will refuse to promote using promote_name="consistent" or "current", since
-those are reserved keywords for DLRN.
+those are reserved keywords for DLRN. Also, a commit that has been purged from the
+database cannot be promoted.
 
 Normal response codes: 201
 
-Error response codes: 400, 403, 404, 415, 500
+Error response codes: 400, 403, 404, 410, 415, 500
 
 Request:
 
