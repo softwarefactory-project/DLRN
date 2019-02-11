@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "28141b90_e0ee330f",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-02-11T15:37:39Z",
+      "side": 1,
+      "message": "The reason is we are running this in the mock environment, which may be different from our current running one.\n\nFor example, imagine you\u0027re running DLRN on Fedora 30 (so PYTHON\u003dpython3), but you\u0027re building a package for CentOS 7. There is no python3 in the mock buildroot, so we have to detect it.",
+      "parentUuid": "2cdb335d_66e1d00b",
+      "revId": "e330d834d197db9339a89d673e55da8e9207050c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "55e16cbc_bc4d9799",
         "filename": "scripts/build_srpm.sh",
         "patchSetId": 4
