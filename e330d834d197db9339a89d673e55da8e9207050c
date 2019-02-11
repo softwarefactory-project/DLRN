@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2cdb335d_66e1d00b",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-02-11T15:34:38Z",
+      "side": 1,
+      "message": "Why not use `$PYTHON setup.py --version` here?\n\nIt sure is a long line ;)",
+      "revId": "e330d834d197db9339a89d673e55da8e9207050c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "55e16cbc_bc4d9799",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-02-11T15:34:38Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "e330d834d197db9339a89d673e55da8e9207050c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
