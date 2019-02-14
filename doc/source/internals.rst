@@ -237,7 +237,9 @@ Post-build actions
 After a package is built, we need to create a package repository with the latest
 version for every package in the project list. The ``post_build()`` function in
 ``shell.py`` takes care of that. The idea behind this is that the repo for each
-build will contain the most current version of each package to date.
+build will contain the most current version of each package to date. This
+behavior can be skipped if the ``--no-repo`` command-line option is provided, so
+only the build package and logs will be stored.
 
 To minimize the amount of storage used for each repo, DLRN does not copy the
 packages to the current hashed directory. Instead, ``post_build()`` iterates

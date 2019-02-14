@@ -193,3 +193,26 @@ class TestPostBuild(base.TestCase):
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(output, 0)
+
+    def test_successful_build_no_repo(self, sh_mock):
+        packages = [{'upstream': 'https://github.com/openstack/foo',
+                     'name': 'foo', 'maintainers': 'test@test.com',
+                     'master-distgit':
+                     'https://github.com/rdo-packages/foo-distgit.git'}]
+        built_rpms = ['repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf'
+                      '_c31d1b18/foo-1.2.3.el7.centos.noarch.rpm',
+                      'repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf'
+                      '_c31d1b18/foo-1.2.3.el7.centos.src.rpm']
+
+        status = [self.commit, built_rpms, 'OK', None]
+        # Create directory for the CSV file
+        yumdir = os.path.join(self.config.datadir, "repos",
+                              self.commit.getshardedcommitdir())
+        os.makedirs(yumdir)
+        output = shell.post_build(status, packages, self.session,
+                                  build_repo=False)
+        # There will be no createrepo call
+        expected = []
+
+        self.assertEqual(sh_mock.call_args_list, expected)
+        self.assertEqual(output, 0)
