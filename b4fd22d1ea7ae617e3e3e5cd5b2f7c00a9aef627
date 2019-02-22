@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a8877a1_f0def606",
+        "filename": "dlrn/tests/test_api.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-02-22T16:17:50Z",
+      "side": 1,
+      "message": "Kudos for proper HTTP code ;)",
+      "revId": "b4fd22d1ea7ae617e3e3e5cd5b2f7c00a9aef627",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
