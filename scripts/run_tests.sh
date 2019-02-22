@@ -12,6 +12,15 @@ ZUUL3_HOME="${ZUUL3_HOME:-/home/zuul}"
 ZUUL_CLONES_DIR="${ZUUL3_HOME}/src/review.rdoproject.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
 PYTHON_VERSION="${PYTHON_VERSION:-py27}"
+# We want to make it work for both python2 and python3
+if [ -x /usr/bin/python3 ]; then
+    PYTHON=python3
+else
+    # Python 3 not available
+    PYTHON=python2
+fi
+
+echo "Using $PYTHON as python interpreter"
 
 function filterref(){
     PROJ=${1%%:*}
@@ -174,8 +183,8 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
             fi
 
             JSON=$(curl -s -L https://review.openstack.org/changes/openstack%2F${UPSTREAM_PROJECT_NAME}~$REVIEW_BRANCH~$UPSTREAM_ID/revisions/current/review|sed 1d)
-            COMMIT=$(python -c 'import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s["revisions"].keys()[0])' <<< $JSON)
-            REF=$(python -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s['revisions']['$COMMIT']['ref'])" <<< $JSON)
+            COMMIT=$($PYTHON -c 'import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s["revisions"].keys()[0])' <<< $JSON)
+            REF=$($PYTHON -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s['revisions']['$COMMIT']['ref'])" <<< $JSON)
             pushd data/${PROJECT_TO_BUILD_MAPPED}
             if [ -n "$REF" -a "$REF" != null ]; then
                 git fetch ${UPSTREAM_URL} $REF
