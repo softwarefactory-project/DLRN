@@ -285,8 +285,6 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
     datadir = os.path.realpath(config_options.datadir)
     yumrepodir = _get_yumrepodir(commit)
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
-
-    commit_hash = commit.commit_hash
     project_name = commit.project_name
     repo_dir = commit.repo_dir
 
@@ -296,11 +294,9 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
             shutil.rmtree(yumrepodir_abs)
         os.makedirs(yumrepodir_abs)
 
-    git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
-    git.reset("--hard", commit_hash)
-
     if version_from:
         logger.info('Taking tags to define version from %s' % version_from)
+        git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
         git.merge('-s', 'ours', '-m', '"fake merge tags"', version_from)
 
     run_cmd = []

@@ -77,14 +77,12 @@ class TestBuild(base.TestCase):
         self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
         build_rpm_wrapper(commit, False, False, False, None, True)
-        # 4 sh calls:
-        # 1- git reset --hard
-        # 2- build_srpm.sh
-        # 3- mock (handled by env_mock)
-        # 4- restorecon (handled by rc_mock)
+        # 3 sh calls:
+        # 1- build_srpm.sh
+        # 2- mock (handled by env_mock)
+        # 3- restorecon (handled by rc_mock)
         self.assertEqual(env_mock.call_count, 2)
         self.assertEqual(rc_mock.call_count, 1)
-        self.assertEqual(sh_mock.call_count, 1)
         self.assertTrue(os.path.exists(os.path.join(self.config.datadir,
                                                     "dlrn-1.cfg")))
 
