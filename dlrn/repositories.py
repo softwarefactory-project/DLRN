@@ -12,6 +12,7 @@
 
 import logging
 import os
+import re
 import sh
 import shutil
 
@@ -84,9 +85,10 @@ def refreshrepo(url, path, branch="master", local=False, full_path=None):
         try:
             git.checkout('-f', branch)
         except sh.ErrorReturnCode_1:
-            if branch in ["master", "rpm-master"]:
-                # Do not try fallback if already on master branch
-                raise
+            for branch_re in config_options.nonfallback_branches:
+                if re.match(branch_re, branch):
+                    # Do not try fallback on selected branches
+                    raise
             else:
                 if config_options.fallback_to_master:
                     # Fallback to master
