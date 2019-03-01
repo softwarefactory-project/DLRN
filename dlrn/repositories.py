@@ -87,6 +87,9 @@ def refreshrepo(url, path, branch="master", local=False, full_path=None):
             if branch in ["master", "rpm-master"]:
                 # Do not try fallback if already on master branch
                 raise
+            elif branch.startswith("rhos-"):
+                # Do not try fallback for branch names starting with rhos-
+                raise
             else:
                 if config_options.fallback_to_master:
                     # Fallback to master

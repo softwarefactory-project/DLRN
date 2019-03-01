@@ -84,3 +84,17 @@ class TestRefreshRepo(base.TestCase):
                         mock.call('origin'),
                         mock.call('-f', 'branch')]
             self.assertEqual(new_mock.call_args_list, expected)
+
+    def test_clone_no_fallback_rhos(self, sh_mock):
+        config = configparser.RawConfigParser()
+        config.read("projects.ini")
+        config.set('DEFAULT', 'fallback_to_master', '1')
+        self.config = ConfigOptions(config)
+        with mock.patch.object(sh.Command, '__call__') as new_mock:
+            new_mock.side_effect = _aux_sh
+            self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
+                              'url', 'path', branch='rhos-test')
+            expected = [mock.call('url', 'path'),
+                        mock.call('origin'),
+                        mock.call('-f', 'rhos-test')]
+            self.assertEqual(new_mock.call_args_list, expected)
