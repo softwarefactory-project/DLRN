@@ -39,6 +39,8 @@ DLRN_CORE_CONFIG = {
         'gerrit_topic': {'default': 'rdo-FTBFS'},
         'database_connection': {'default': 'sqlite:///commits.sqlite'},
         'fallback_to_master': {'type': 'boolean', 'default': True},
+        'nonfallback_branches': {'type': 'list',
+                                 'default': ['^master$', '^rpm-master$']},
         'release_numbering': {'default': '0.date.hash'},
         'custom_preprocess': {'type': 'list'},
         'include_srpm_in_repo': {'type': 'boolean', 'default': True},
