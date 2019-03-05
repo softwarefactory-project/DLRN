@@ -133,7 +133,9 @@ class KojiBuildDriver(BuildRPMDriver):
                      encoding='utf-8', errors='replace') as self.koji_fp:
             rhpkg('import', '--skip-diff', src_rpm)
             pkg_date = strftime("%Y-%m-%d-%H%M%S", localtime(time()))
-            rhpkg('commit', '-p', '-m', 'DLRN build at %s' % pkg_date)
+            rhpkg('commit', '-p', '-m',
+                  'DLRN build at %s\n\nSource SHA: %s\nDist SHA: %s\n' %
+                  (pkg_date, commit.commit_hash, commit.distro_hash))
 
         # After running rhpkg commit, we have a different commit hash, so
         # let's update it
