@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a6f252b_67282f2e",
+        "filename": "dlrn/repositories.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2019-03-05T09:23:39Z",
+      "side": 1,
+      "message": "Suggestion: make it configurable (and use regex for reusability)",
+      "revId": "fa5b507e721f4e677b1f5348aae59b4450f1c4cd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
