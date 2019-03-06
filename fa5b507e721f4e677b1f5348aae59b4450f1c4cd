@@ -34,6 +34,24 @@
       "revId": "fa5b507e721f4e677b1f5348aae59b4450f1c4cd",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "249b6ab1_10652e9e",
+        "filename": "dlrn/repositories.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-06T09:55:18Z",
+      "side": 1,
+      "message": "Agreed. \u0027rhos-\u0027 isn\u0027t a generict name so we shouldn\u0027t hardcode it.\n\nIt could be made fully configurable by introducing\n\n    master_branches \u003d master,rpm-master,rhos-\n\nin config (or similar). It can be a list of strings to check with stratswith(), or a list of regular expressions to match with re.match() or a single regular expression.",
+      "parentUuid": "1d7e0cfa_b73b69a0",
+      "revId": "fa5b507e721f4e677b1f5348aae59b4450f1c4cd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
