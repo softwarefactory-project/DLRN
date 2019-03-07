@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "eb8c07ee_1531bc40",
+        "filename": "projects.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-03-07T14:29:07Z",
+      "side": 1,
+      "message": "Mmmm... Ok, that matches the behavior of the \u0027tags\u0027 parameter. I\u0027ll do that.",
+      "parentUuid": "f1b6bf0a_9c343ade",
+      "revId": "d93f7b4eda9d54025b6ea432337b2a4f082b518d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "766feef4_e263231a",
         "filename": "projects.ini",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2019-03-07T14:27:35Z",
       "side": 1,
       "message": "I don\u0027t think it\u0027s really \"tag\", we use that word for other things (more than one already)... it\u0027s more like downstream_distgit_attr(ibute) or downstream_distgit_key or something like that.",
+      "revId": "d93f7b4eda9d54025b6ea432337b2a4f082b518d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "22fbb004_2d5974c3",
+        "filename": "projects.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-03-07T14:29:07Z",
+      "side": 1,
+      "message": "Ok, downstream_distgit_key sounds good to me.",
+      "parentUuid": "766feef4_e263231a",
       "revId": "d93f7b4eda9d54025b6ea432337b2a4f082b518d",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
