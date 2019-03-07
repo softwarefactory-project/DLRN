@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e74cd40b_23fdfb15",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-07T14:42:05Z",
+      "side": 1,
+      "message": "^ needs nuking",
+      "revId": "99c828e635996c31b367c7a42de2d1298904553a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
