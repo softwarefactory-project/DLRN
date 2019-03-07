@@ -21,10 +21,7 @@ from dlrn.config import getConfigOptions
 from dlrn.reporting import get_commit_url
 from email.mime.text import MIMEText
 
-logging.basicConfig(level=logging.ERROR,
-                    format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-notifications")
-logger.setLevel(logging.INFO)
 
 
 def submit_review(commit, packages, env_vars):

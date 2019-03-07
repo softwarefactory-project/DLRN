@@ -9,6 +9,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import logging
 import os
 
 from dlrn.utils import import_class
@@ -44,6 +45,13 @@ DLRN_CORE_CONFIG = {
         'include_srpm_in_repo': {'type': 'boolean', 'default': True},
     }
 }
+
+
+def setup_logging(debug=False, filename=None):
+    logging.basicConfig(
+        level=logging.DEBUG if debug else logging.INFO,
+        filename=filename,
+        format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 
 
 class ConfigOptions(object):

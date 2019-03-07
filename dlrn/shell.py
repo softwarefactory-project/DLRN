@@ -30,6 +30,7 @@ from dlrn.build import build_worker
 
 from dlrn.config import ConfigOptions
 from dlrn.config import getConfigOptions
+from dlrn.config import setup_logging
 
 from dlrn.db import CIVote
 from dlrn.db import closeSession
@@ -55,10 +56,7 @@ from dlrn.utils import saveYAML_commit
 from dlrn.utils import timesretried
 from dlrn import version
 
-logging.basicConfig(level=logging.ERROR,
-                    format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn")
-logger.setLevel(logging.INFO)
 
 
 def deprecation():
@@ -133,8 +131,12 @@ def main():
     parser.add_argument('--no-repo', action="store_true",
                         help="Do not generate a repo with all the built "
                         "packages.")
+    parser.add_argument('--debug', action='store_true',
+                        help="Print debug logs")
 
     options = parser.parse_args(sys.argv[1:])
+
+    setup_logging(options.debug)
 
     if options.verbose_mock:
         logger.warning('The --verbose-mock command-line option is deprecated.'

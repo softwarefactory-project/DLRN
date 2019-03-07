@@ -39,9 +39,7 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'Temporary failure in name resolution')
 
 
-logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-utils")
-logger.setLevel(logging.INFO)
 
 
 # Import a Python class
