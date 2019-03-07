@@ -55,8 +55,9 @@ class DownstreamInfoDriver(PkgInfoDriver):
             'info_files': {'type': 'list'},
             'versions_url': {},
             'downstream_distro_branch': {},
-            'downstream_prefix': {},
-            'downstream_prefix_filter': {},
+            'downstream_tag': {},
+            'downstream_tag_filter': {},
+            'downstream_distgit_tag': {},
             'use_upstream_spec': {'type': 'boolean'},
             'downstream_spec_replace_list': {'type': 'list'},
         }
@@ -113,13 +114,14 @@ class DownstreamInfoDriver(PkgInfoDriver):
         if tags:
             # FIXME allow list of tags?
             self.packages = query.filter_pkgs(self.packages, {'tags': tags})
-        if self.config_options.downstream_prefix_filter:
+
+        if self.config_options.downstream_tag_filter:
             # filter out packages missing parameters with
-            # downstream_prefix prefix
-            downstream_prefix = self.config_options.downstream_prefix or ''
+            # downstream_tag
+            downstream_tag = self.config_options.downstream_tag or ''
             self.packages = query.filter_pkgs(
                 self.packages,
-                {downstream_prefix + 'distgit': '.+'})
+                {'tags': downstream_tag})
         return self.packages
 
     def _getversions(self):
@@ -166,10 +168,9 @@ class DownstreamInfoDriver(PkgInfoDriver):
         local = kwargs.get('local')
         dev_mode = kwargs.get('dev_mode')
 
-        ds_prefix = self.config_options.downstream_prefix or ''
         datadir = self.config_options.datadir
         repo = package['upstream']
-        distgit_attr = ds_prefix + 'distgit'
+        distgit_attr = self.config_options.downstream_distgit_tag or 'distgit'
         distro = package.get(distgit_attr)
         if not distro:
             fail_req_attr_missing(distgit_attr, package)
