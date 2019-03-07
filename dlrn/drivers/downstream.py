@@ -30,9 +30,7 @@ from distroinfo import query
 from six.moves.urllib.request import urlopen
 
 
-logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-downstream-driver")
-logger.setLevel(logging.INFO)
 
 
 def fail_req_attr_missing(attr_name, package):

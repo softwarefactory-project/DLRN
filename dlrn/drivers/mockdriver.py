@@ -24,10 +24,7 @@ import os
 import re
 import sh
 
-logging.basicConfig(level=logging.ERROR,
-                    format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-build-mock")
-logger.setLevel(logging.INFO)
 
 
 class MockBuildDriver(BuildRPMDriver):

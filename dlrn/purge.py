@@ -21,6 +21,7 @@ from datetime import timedelta
 from six.moves import configparser
 from time import mktime
 
+from dlrn.config import setup_logging
 from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
@@ -28,9 +29,7 @@ from dlrn.db import getSession
 
 FLAG_PURGED = 0x2
 
-logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-purge")
-logger.setLevel(logging.INFO)
 
 
 def is_commit_in_dirs(commit, dirlist):
@@ -70,8 +69,11 @@ def purge():
     parser.add_argument('--exclude-dirs', help="Do not remove commits whose"
                         " packages are included in one of the specifided"
                         " directories (comma-separated list).")
+    parser.add_argument('--debug', action='store_true', help="Print debug logs")
 
     options = parser.parse_args(sys.argv[1:])
+
+    setup_logging(options.debug)
 
     cp = configparser.RawConfigParser()
     cp.read(options.config_file)

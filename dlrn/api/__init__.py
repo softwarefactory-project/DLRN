@@ -21,4 +21,8 @@ try:
 except KeyError:
     pass
 
+from dlrn.config import setup_logging  # nopep8
 from dlrn.api import dlrn_api  # nopep8
+
+
+setup_logging(os.environ.get("DLRN_DEBUG"), os.environ.get("DLRN_LOG_FILE"))
