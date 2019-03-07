@@ -278,8 +278,8 @@ options:
     info_files=foo.yml
     versions_url=https://trunk.rdoproject.org/centos7-master/current/versions.csv
     downstream_distro_branch=foo-rocky
-    downstream_prefix=foo-
-    downstream_prefix_filter=True
+    downstream_tag=foo-
+    downstream_distgit_tag=foo-distgit
     use_upstream_spec=False
     downstream_spec_replace_list=^foo/bar,string1/string2
 
@@ -292,13 +292,12 @@ options:
   processed.
 * ``downstream_distro_branch`` defines which branch to use when cloning the
   downstream distgit, since it may be different from the upstream distgit branch.
-* ``downstream_prefix`` when accessing package metadata, use this prefix
-  for all attributes. For example ``downstream_prefix=foo-`` will cause the
-  downstream driver to look at ``foo-distgit`` attribute instead of just
-  ``distgit``.
-* ``downstream_distro_filter`` will filter ``packages`` section of packaging
+* ``downstream_tag`` if set, it will filter the ``packages`` section of packaging
   metadata (from ``repo``/``info_files``) to only contain packages with
-  ``downstream_prefix``-ed attributes.
+  the ``downstream_tag`` tag. This tag will be filtered in addition to the one
+  set in the ``DEFAULT/tags`` section.
+* ``downstream_distgit_key`` is the key used to find the downstream distgit in
+  the ``packages`` section of packaging metadata (from ``repo``/``info_files``).
 * ``use_upstream_spec`` defines if the upstream distgit contents (spec file and
   additional files) should be copied over the downstream distgit after cloning.
 * ``downstream_spec_replace_list``, when ``use_upstream_spec`` is set to True,
