@@ -142,7 +142,7 @@ distro_hash          string      If set, commit_hash of the repo to use as filte
 promote_name         string      If set to a value, filter results by the specified promotion
                      (optional)  name.
 offset               integer     If set to a value, skip the initial <offset> promotions.
-                     (optional)  
+                     (optional)
 limit                integer     If set to a value, limit the returned promotions amount
                      (optional)  to <limit>.
 ===================  ==========  ==============================================================
@@ -429,6 +429,10 @@ following is an example file, named ``/etc/httpd/conf.d/wsgi-dlrn.conf``:
 
 Set ``CONFIG_FILE`` to the path of the DLRN configuration file, and make sure
 you specify the right user and group for the ``WSGIDaemonProcess`` line.
+
+Set ``DLRN_DEBUG`` to enable debug logs and set ``DLRN_LOG_FILE`` to the path
+of a logfile.
+
 
 DLRN API configuration
 ----------------------

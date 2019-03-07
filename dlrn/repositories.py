@@ -17,10 +17,7 @@ import shutil
 
 from dlrn.config import getConfigOptions
 
-logging.basicConfig(level=logging.ERROR,
-                    format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-repositories")
-logger.setLevel(logging.INFO)
 
 
 def refreshrepo(url, path, branch="master", local=False, full_path=None):

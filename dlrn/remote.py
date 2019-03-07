@@ -22,6 +22,7 @@ from six.moves.urllib.request import urlopen
 from tempfile import mkstemp
 
 from dlrn.config import ConfigOptions
+from dlrn.config import setup_logging
 from dlrn.db import closeSession
 from dlrn.db import getLastProcessedCommit
 from dlrn.db import getSession
@@ -32,9 +33,7 @@ from dlrn.utils import loadYAML_list
 from dlrn.utils import lock_file
 
 
-logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-remote")
-logger.setLevel(logging.INFO)
 
 
 def import_commit(repo_url, config_file, db_connection=None,
@@ -168,8 +167,12 @@ def remote():
                              "fetching the default one using rdopkg. Only "
                              "applies when pkginfo_driver is rdoinfo in "
                              "projects.ini")
+    parser.add_argument('--debug', action='store_true',
+                        help="Print debug logs")
 
     options = parser.parse_args(sys.argv[1:])
+
+    setup_logging(options.debug)
 
     return import_commit(options.repo_url, options.config_file,
                          local_info_repo=options.info_repo)

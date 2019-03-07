@@ -18,6 +18,7 @@ from six.moves import input
 import sys
 
 from dlrn.config import ConfigOptions
+from dlrn.config import setup_logging
 from dlrn.db import closeSession
 from dlrn.db import getSession
 from dlrn.db import User
@@ -108,6 +109,8 @@ def user_manager():
     parser.add_argument('--config-file',
                         default='projects.ini',
                         help="Config file. Default: projects.ini")
+    parser.add_argument('--debug', action='store_true',
+                        help="Print debug logs")
 
     subparsers = parser.add_subparsers(dest='command',
                                        title='subcommands',
@@ -139,6 +142,8 @@ def user_manager():
                                help='New password')
 
     options = parser.parse_args(sys.argv[1:])
+
+    setup_logging(options.debug)
 
     cp = configparser.RawConfigParser()
     cp.read(options.config_file)

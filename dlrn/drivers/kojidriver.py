@@ -28,10 +28,7 @@ from time import localtime
 from time import strftime
 from time import time
 
-logging.basicConfig(level=logging.ERROR,
-                    format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-build-koji")
-logger.setLevel(logging.INFO)
 
 
 class KojiBuildDriver(BuildRPMDriver):
