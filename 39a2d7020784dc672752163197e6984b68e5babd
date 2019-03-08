@@ -16,6 +16,24 @@
       "revId": "39a2d7020784dc672752163197e6984b68e5babd",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "72c1f59c_8773787f",
+        "filename": "dlrn/config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-03-08T07:03:09Z",
+      "side": 1,
+      "message": "Happy to silence those, next PS will include that great suggestion.",
+      "parentUuid": "ae8da12f_4db762c6",
+      "revId": "39a2d7020784dc672752163197e6984b68e5babd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
