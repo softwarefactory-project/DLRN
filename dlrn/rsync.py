@@ -16,10 +16,7 @@ import sh
 
 from dlrn.config import getConfigOptions
 
-logging.basicConfig(level=logging.ERROR,
-                    format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-rsync")
-logger.setLevel(logging.INFO)
 
 
 def sync_repo(commit):

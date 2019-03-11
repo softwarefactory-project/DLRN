@@ -24,10 +24,7 @@ from dlrn.config import getConfigOptions
 from dlrn.utils import import_object
 from time import time
 
-logging.basicConfig(level=logging.ERROR,
-                    format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-build")
-logger.setLevel(logging.INFO)
 
 
 def _get_yumrepodir(commit):

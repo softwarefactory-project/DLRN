@@ -35,9 +35,7 @@ from distroinfo import query
 from distroinfo import info
 
 
-logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-rdoinfo-driver")
-logger.setLevel(logging.INFO)
 rdoinfo_repo = ('https://raw.githubusercontent.com/'
                 'redhat-openstack/rdoinfo/master/')
 

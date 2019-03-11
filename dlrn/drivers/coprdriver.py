@@ -25,10 +25,7 @@ import re
 import sh
 import shutil
 
-logging.basicConfig(level=logging.ERROR,
-                    format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger("dlrn-build-copr")
-logger.setLevel(logging.INFO)
 
 
 class CoprBuildDriver(BuildRPMDriver):

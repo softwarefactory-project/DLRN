@@ -36,9 +36,7 @@ from rdopkg.utils import specfile
 from six.moves import urllib
 from six.moves.urllib.request import urlopen
 
-logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("dlrn-gitrepo-driver")
-logger.setLevel(logging.INFO)
 
 version_match = re.compile('\W*set upstream_version\D+([\w.]+).*')
 wrong_match = re.compile('\W*set upstream_version\D+\(\).*')
