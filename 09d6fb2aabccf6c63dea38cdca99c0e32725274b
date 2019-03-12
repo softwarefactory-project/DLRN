@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5229be72_422e7305",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-03-12T16:56:52Z",
+      "side": 1,
+      "message": "This is actually intentional, so let\u0027s keep it",
+      "parentUuid": "b7eb0fb0_f8c72c9e",
+      "revId": "09d6fb2aabccf6c63dea38cdca99c0e32725274b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "55523ab4_eaebb9ad",
         "filename": "doc/source/installation.rst",
         "patchSetId": 4
