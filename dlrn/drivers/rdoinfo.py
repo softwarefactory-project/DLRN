@@ -49,6 +49,8 @@ class RdoInfoDriver(PkgInfoDriver):
     DRIVER_CONFIG = {
         'rdoinfo_driver': {
             'rdoinfo_repo': {'name': 'repo'},
+            'rdoinfo_file': {'name': 'info_files', 'type': 'list',
+                             'default': ['rdo.yml']},
         }
     }
 
@@ -65,26 +67,40 @@ class RdoInfoDriver(PkgInfoDriver):
         local_info_repo = kwargs.get('local_info_repo')
         tags = kwargs.get('tags')
         inforepo = None
+        info_files = self.config_options.rdoinfo_file
+
         if local_info_repo:
             inforepo = info.DistroInfo(
-                info_files='rdo.yml',
+                info_files=self.config_options.rdoinfo_file,
                 local_info=local_info_repo)
+            # NOTE(jpena): in general, info_files will only contain one file,
+            # but it supports multiple... In that case, we will have a comma
+            # separated list of URLs
             self.distroinfo_path = "%s/%s" % (local_info_repo.rstrip('/'),
-                                              'rdo.yml')
+                                              info_files[0])
+            for extra_file in info_files[1:]:
+                self.distroinfo_path += ",%s/%s" % (
+                    local_info_repo.rstrip('/'))
         elif self.config_options.rdoinfo_repo:
             inforepo = info.DistroInfo(
-                info_files='rdo.yml',
+                info_files=self.config_options.rdoinfo_file,
                 remote_git_info=self.config_options.rdoinfo_repo)
             self.distroinfo_path = "%s/%s" % (
-                self.config_options.rdoinfo_repo.rstrip('/'), 'rdo.yml')
+                self.config_options.rdoinfo_repo.rstrip('/'), info_files[0])
+            for extra_file in info_files[1:]:
+                self.distroinfo_path += ",%s/%s" % (
+                    self.config_options.rdoinfo_repo.rstrip('/'))
         else:
             # distroinfo will fetch info files from the rdoinfo repo as needed
             # and store them under ~/.distroinfo/cache
             inforepo = info.DistroInfo(
-                info_files='rdo.yml',
+                info_files=self.config_options.rdoinfo_file,
                 remote_info=rdoinfo_repo)
             self.distroinfo_path = "%s/%s" % (rdoinfo_repo.rstrip('/'),
-                                              'rdo.yml')
+                                              info_files[0])
+            for extra_file in info_files[1:]:
+                self.distroinfo_path += ",%s/%s" % (
+                    rdoinfo_repo.rstrip('/'))
 
         pkginfo = inforepo.get_info(apply_tag=tags)
 
