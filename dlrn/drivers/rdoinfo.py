@@ -49,6 +49,7 @@ class RdoInfoDriver(PkgInfoDriver):
     DRIVER_CONFIG = {
         'rdoinfo_driver': {
             'rdoinfo_repo': {'name': 'repo'},
+            'rdoinfo_file': {'name': 'file', 'default': 'rdo.yml'},
         }
     }
 
@@ -67,24 +68,27 @@ class RdoInfoDriver(PkgInfoDriver):
         inforepo = None
         if local_info_repo:
             inforepo = info.DistroInfo(
-                info_files='rdo.yml',
+                info_files=self.config_options.rdoinfo_file,
                 local_info=local_info_repo)
-            self.distroinfo_path = "%s/%s" % (local_info_repo.rstrip('/'),
-                                              'rdo.yml')
+            self.distroinfo_path = "%s/%s" % (
+                local_info_repo.rstrip('/'),
+                self.config_options.rdoinfo_file)
         elif self.config_options.rdoinfo_repo:
             inforepo = info.DistroInfo(
-                info_files='rdo.yml',
+                info_files=self.config_options.rdoinfo_file,
                 remote_git_info=self.config_options.rdoinfo_repo)
             self.distroinfo_path = "%s/%s" % (
-                self.config_options.rdoinfo_repo.rstrip('/'), 'rdo.yml')
+                self.config_options.rdoinfo_repo.rstrip('/'),
+                self.config_options.rdoinfo_file)
         else:
             # distroinfo will fetch info files from the rdoinfo repo as needed
             # and store them under ~/.distroinfo/cache
             inforepo = info.DistroInfo(
-                info_files='rdo.yml',
+                info_files=self.config_options.rdoinfo_file,
                 remote_info=rdoinfo_repo)
-            self.distroinfo_path = "%s/%s" % (rdoinfo_repo.rstrip('/'),
-                                              'rdo.yml')
+            self.distroinfo_path = "%s/%s" % (
+                rdoinfo_repo.rstrip('/'),
+                self.config_options.rdoinfo_file)
 
         pkginfo = inforepo.get_info(apply_tag=tags)
 

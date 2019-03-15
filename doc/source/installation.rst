@@ -267,9 +267,12 @@ options:
 
     [rdoinfo_driver]
     repo=http://github.com/org/rdoinfo-fork
+    file=file.yml
 
 * ``repo`` defines the rdoinfo repository to use. This setting
-    must be set if a fork of the rdoinfo repository must be used.
+  must be set if a fork of the rdoinfo repository must be used.
+* ``file`` defines the base file to load for the distroinfo information. It
+  defaults to ``rdo.yml``.
 
 The optional ``[downstream_driver]`` section has the following configuration
 options:
