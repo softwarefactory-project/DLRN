@@ -17,6 +17,7 @@ from six.moves import configparser
 
 from dlrn.config import ConfigOptions
 from dlrn.config import getConfigOptions
+import os
 
 
 class TestConfigOptions(base.TestCase):
@@ -58,3 +59,23 @@ class TestConfigOptions(base.TestCase):
         self.assertEqual(config.scriptsdir, './scripts')
         self.assertEqual(config.configdir, './scripts')
         self.assertEqual(config.templatedir, './dlrn/templates')
+
+    def test_detect_dirs(self):
+        self.config = configparser.RawConfigParser()
+        self.config.read("samples/projects.ini.detect")
+        config = ConfigOptions(self.config)
+        self.assertEqual(
+            config.datadir,
+            os.path.realpath(os.path.join(
+                             os.path.dirname(os.path.abspath(__file__)),
+                             "../../data")))
+        self.assertEqual(
+            config.templatedir,
+            os.path.realpath(os.path.join(
+                             os.path.dirname(os.path.abspath(__file__)),
+                             "../templates")))
+        self.assertEqual(
+            config.scriptsdir,
+            os.path.realpath(os.path.join(
+                             os.path.dirname(os.path.abspath(__file__)),
+                             "../../scripts")))

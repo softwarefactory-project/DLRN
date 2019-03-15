@@ -78,10 +78,12 @@ The configuration file looks like this:
     include_srpm_in_repo=true
 
 * ``datadir`` is the directory where the packages and repositories will be
-  created.
+  created. If not set, it will default to ``/data`` on the parent directory
+  of where DLRN is installed.
 
 * ``scriptsdir`` is the directory where scripts utilized during the build and
-  test process are located.
+  test process are located. If not set, it will default to ``/scripts`` on the
+  parent directory of where DLRN is installed.
 
 * ``configdir`` is the directory where additional configuration files used by
   the build process are located, such as base mock configurations. If not set,
@@ -108,7 +110,8 @@ The configuration file looks like this:
 * ``reponame`` name of the directory that contains the generated repository.
 
 * ``templatedir`` path to the directory that contains the report templates and
-  stylesheets.
+  stylesheets. If not set, it will default to ``/templates`` under the directory
+  where DLRN is installed.
 
 * ``maxretries`` is the maximum number of retries on known errors before
   marking the build as failed. If a build fails, DLRN will check the log files

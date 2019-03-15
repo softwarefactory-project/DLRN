@@ -19,7 +19,9 @@ _config_options = None
 DLRN_CORE_CONFIG = {
     'DEFAULT': {
         'tags': {},
-        'datadir': {},
+        'datadir': {'default': os.path.realpath(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "../data"))},
         'gerrit': {},
         'maxretries': {'type': 'int', 'default': 3},
         'baseurl': {},
@@ -30,9 +32,12 @@ DLRN_CORE_CONFIG = {
         'reponame': {},
         'rsyncdest': {'default': ''},
         'rsyncport': {'default': 22},
-        'scriptsdir': {},
+        'scriptsdir': {'default': os.path.realpath(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "../scripts"))},
         'configdir': {},
-        'templatedir': {},
+        'templatedir': {'default': os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "templates")},
         'project_name': {'default': 'RDO'},
         'pkginfo_driver': {'default': 'dlrn.drivers.rdoinfo.RdoInfoDriver'},
         'build_driver': {'default': 'dlrn.drivers.mockdriver.MockBuildDriver'},
