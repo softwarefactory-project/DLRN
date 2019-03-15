@@ -16,10 +16,28 @@ from dlrn.utils import import_class
 
 _config_options = None
 
+
+def _default_datadir():
+    return os.path.realpath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                     "../data"))
+
+
+def _default_scriptsdir():
+    return os.path.realpath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                     "../scripts"))
+
+
+def _default_templatedir():
+    return os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "templates")
+
+
 DLRN_CORE_CONFIG = {
     'DEFAULT': {
         'tags': {},
-        'datadir': {},
+        'datadir': {'default': _default_datadir()},
         'gerrit': {},
         'maxretries': {'type': 'int', 'default': 3},
         'baseurl': {},
@@ -30,9 +48,9 @@ DLRN_CORE_CONFIG = {
         'reponame': {},
         'rsyncdest': {'default': ''},
         'rsyncport': {'default': 22},
-        'scriptsdir': {},
+        'scriptsdir': {'default': _default_scriptsdir()},
         'configdir': {},
-        'templatedir': {},
+        'templatedir': {'default': _default_templatedir()},
         'project_name': {'default': 'RDO'},
         'pkginfo_driver': {'default': 'dlrn.drivers.rdoinfo.RdoInfoDriver'},
         'build_driver': {'default': 'dlrn.drivers.mockdriver.MockBuildDriver'},
