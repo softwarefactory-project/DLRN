@@ -42,6 +42,41 @@ class TestDriverRdoInfo(base.TestCase):
         super(TestDriverRdoInfo, self).tearDown()
         shutil.rmtree(self.temp_dir)
 
+    @mock.patch('distroinfo.info.DistroInfo')
+    def test_getpackages_default(self, di_mock):
+        driver = RdoInfoDriver(cfg_options=self.config)
+        driver.getpackages()
+        rdoinfo_repo = ('https://raw.githubusercontent.com/'
+                        'redhat-openstack/rdoinfo/master/')
+
+        expected = [mock.call(info_files=['rdo.yml'],
+                              remote_info=rdoinfo_repo)]
+
+        self.assertEqual(di_mock.call_args_list, expected)
+
+    @mock.patch('distroinfo.info.DistroInfo')
+    def test_getpackages_config(self, di_mock):
+        self.config.rdoinfo_file = ['foo.yml']
+        self.config.rdoinfo_repo = 'http:/github.com/foo'
+        driver = RdoInfoDriver(cfg_options=self.config)
+        driver.getpackages()
+
+        expected = [mock.call(info_files=['foo.yml'],
+                              remote_git_info='http:/github.com/foo')]
+
+        self.assertEqual(di_mock.call_args_list, expected)
+
+    @mock.patch('distroinfo.info.DistroInfo')
+    def test_getpackages_local_info_repo(self, di_mock):
+        self.config.rdoinfo_file = ['foo.yml']
+        driver = RdoInfoDriver(cfg_options=self.config)
+        driver.getpackages(local_info_repo='/tmp/bar')
+
+        expected = [mock.call(info_files=['foo.yml'],
+                              local_info='/tmp/bar')]
+
+        self.assertEqual(di_mock.call_args_list, expected)
+
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
     def test_custom_preprocess(self, ld_mock, sh_mock):
