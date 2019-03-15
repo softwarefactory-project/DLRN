@@ -160,7 +160,9 @@ sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
 if [ "$DLRN_KEEP_TARBALL" != "1" ]; then
     sed -i -e "s/^\(Source\|Source0\):.*/\1: $SOURCEWITHREL/" *.spec
 fi
-sed -i -e '/^%changelog.*/q' *.spec
+if [ "$DLRN_KEEP_CHANGELOG" != "1" ]; then
+    sed -i -e '/^%changelog.*/q' *.spec
+fi
 cat *.spec
 spectool -g -C ${TOP_DIR}/SOURCES *.spec
 /usr/bin/mock --buildsrpm ${MOCKOPTS} --spec *.spec --sources=${TOP_DIR}/SOURCES
