@@ -63,7 +63,7 @@ def import_object(import_str, *args, **kwargs):
 # during tests
 def loadYAML(session, yamlfile):
     with open(yamlfile) as fp:
-        data = yaml.load(fp)
+        data = yaml.safe_load(fp)
 
     for commit in data['commits']:
         c = Commit(**commit)
@@ -107,7 +107,7 @@ def loadYAML(session, yamlfile):
 # Load a yaml file into a list of commits
 def loadYAML_list(yamlfile):
     with open(yamlfile) as fp:
-        data = yaml.load(fp)
+        data = yaml.safe_load(fp)
 
     commit_list = []
     for commit in data['commits']:
