@@ -1,0 +1,78 @@
+[DEFAULT]
+#datadir=./data
+#scriptsdir=./scripts
+configdir=
+baseurl=http://trunk.rdoproject.org/centos7/
+distro=rpm-master
+source=master
+target=centos
+smtpserver=
+reponame=delorean
+#templatedir=./dlrn/templates
+project_name=RDO
+maxretries=3
+pkginfo_driver=dlrn.drivers.rdoinfo.RdoInfoDriver
+build_driver=dlrn.drivers.mockdriver.MockBuildDriver
+tags=
+#tags=mitaka
+rsyncdest=
+rsyncport=22
+workers=1
+gerrit_topic=rdo-FTBFS
+database_connection=sqlite:///commits.sqlite
+fallback_to_master=1
+release_numbering=0.date.hash
+custom_preprocess=
+include_srpm_in_repo=true
+
+[gitrepo_driver]
+# options to be specified if pkginfo_driver is set to
+# dlrn.drivers.gitrepo.GitRepoDriver
+#
+#repo=http://github.com/openstack/rpm-packaging
+#directory=/openstack
+#skip=openstack-macros,keystoneauth1
+#use_version_from_spec=1
+#keep_tarball=0
+
+[rdoinfo_driver]
+# options to be specified if pkginfo_driver is set to
+# dlrn.drivers.rdoinfo.RdoInfoDriver
+#
+#repo=http://github.com/org/rdoinfo-fork
+
+[downstream_driver]
+# options to be specified if pkginfo_driver is set to
+# dlrn.drivers.downstream.DownstreamInfoDriver
+#
+#repo=http://github.com/org/fooinfo
+#info_files=foo.yml
+#versions_url=https://trunk.rdoproject.org/centos7-master/current/versions.csv
+#downstream_distro_branch=foo-rocky
+#downstream_tag=foo-
+#downstream_distgit_key=foo-distgit
+#use_upstream_spec=False
+#downstream_spec_replace_list=^foo/bar,string1/string2
+
+[mockbuild_driver]
+# options to be specified if build_driver is set to
+# dlrn.drivers.mockdriver.MockBuildDriver
+#install_after_build=1
+
+[kojibuild_driver]
+# options to be specified if build_driver is set to
+# dlrn.drivers.kojidriver.KojiBuildDriver
+#koji_exe=koji
+#krb_principal=user@EXAMPLE.COM
+#krb_keytab=/home/user/user.keytab
+#scratch_build=True
+#build_target=koji-target-build
+#arch=x86_64
+#use_rhpkg=False
+#fetch_mock_config=False
+#mock_base_packages=basesystem rpm-build python2-devel gcc make python-sqlalchemy python-webob ghostscript graphviz python-sphinx python-eventlet python-six python-pbr openstack-macros git yum-plugin-priorities rubygems python-setuptools_scm
+
+[coprbuild_driver]
+# options to be specified if build_driver is set to
+# dlrn.drivers.coprdriver.CoprBuildDriver
+#coprid=account/repo
