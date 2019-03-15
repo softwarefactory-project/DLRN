@@ -258,6 +258,9 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
             if 'DLRN_KEEP_TARBALL' in os.environ:
                 del os.environ['DLRN_KEEP_TARBALL']
 
+    if config_options.keep_changelog:
+        os.environ['DLRN_KEEP_CHANGELOG'] = '1'
+
     # We may do some git repo manipulation, so we need to make sure the
     # right commit is there
     os.environ['DLRN_SOURCE_COMMIT'] = commit.commit_hash

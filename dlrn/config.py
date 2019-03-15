@@ -43,6 +43,7 @@ DLRN_CORE_CONFIG = {
         'release_numbering': {'default': '0.date.hash'},
         'custom_preprocess': {'type': 'list'},
         'include_srpm_in_repo': {'type': 'boolean', 'default': True},
+        'keep_changelog': {'type': 'boolean', 'default': False},
     }
 }
 
