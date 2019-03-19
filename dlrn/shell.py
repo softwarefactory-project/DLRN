@@ -502,7 +502,7 @@ def process_build_result(status, packages, session, packages_to_process,
             logger.exception("Known error building packages for %s,"
                              " will retry later" % project)
             commit.status = "RETRY"
-            commit.notes = getattr(exception, "message", notes)
+            commit.notes = str(exception)
             # do not switch from an error exit code to a retry
             # exit code
             if exit_code != 1:
@@ -515,7 +515,7 @@ def process_build_result(status, packages, session, packages_to_process,
                 os.makedirs(yumrepodir)
             if not os.path.exists(logfile):
                 with open(logfile, "w") as fp:
-                    fp.write(getattr(exception, "message", notes))
+                    fp.write(str(exception))
 
             if not project_info.suppress_email():
                 sendnotifymail(packages, commit)
@@ -541,7 +541,7 @@ def process_build_result(status, packages, session, packages_to_process,
                     logger.info('Last build not successful '
                                 'for %s' % project)
             commit.status = "FAILED"
-            commit.notes = getattr(exception, "message", notes)
+            commit.notes = str(exception)
         if stop:
             return exit_code
     # Add commit to the session
@@ -559,7 +559,7 @@ def process_build_result(status, packages, session, packages_to_process,
             exit_code = 1
             # We need to make the commit status be "failed"
             commit.status = "FAILED"
-            commit.notes = getattr(e, "message", notes)
+            commit.notes = str(e)
             session.add(commit)
             # And open a review if needed
             if config_options.gerrit is not None:
