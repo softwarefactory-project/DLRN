@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "edc8c313_be784c37",
+        "filename": "dlrn/config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-19T14:21:51Z",
+      "side": 1,
+      "message": "in order to keep the config clean and seemingly declarative (:-p), I\u0027d put these ugly os.path chains into dedicated functions.\n\n\u0027datadir\u0027: {\u0027default\u0027: default_datadir()},\n...\n\nContain the evil ;) Just a reccommendation, though.",
+      "revId": "03e25e1f8e54653430e815756af017b38979da68",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d38b225_a7e29990",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-19T14:21:51Z",
+      "side": 1,
+      "message": "I\u0027m confused by / in the path suggesting this is an absolute path. I\u0027d use valid relative path from the installation directory.\n\ndata, ../data, ../../data, etc.",
+      "revId": "03e25e1f8e54653430e815756af017b38979da68",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    }
+  ]
+}
