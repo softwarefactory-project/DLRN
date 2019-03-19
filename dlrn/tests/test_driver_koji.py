@@ -233,7 +233,7 @@ class TestDriverKoji(base.TestCase):
                        mock.call('/usr/bin/git log', '--pretty=format:%H %ct',
                                  '-1', '.'),
                        mock.call('%s/rhpkg' % self.temp_dir, 'build',
-                                 scratch=True)]
+                                 '--skip-nvr-check', scratch=True)]
 
         # 1- kinit (handled by kb_mock)
         # 2- rhpkg import (handled by rh_mock)
