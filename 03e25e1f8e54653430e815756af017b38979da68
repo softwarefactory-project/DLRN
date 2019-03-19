@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "28aa467f_cb7d4982",
+        "filename": "dlrn/config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-03-19T14:42:25Z",
+      "side": 1,
+      "message": "Mmm... Looks like a good idea, I\u0027ll try that. Thanks!",
+      "parentUuid": "edc8c313_be784c37",
+      "revId": "03e25e1f8e54653430e815756af017b38979da68",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7d38b225_a7e29990",
         "filename": "doc/source/installation.rst",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2019-03-19T14:21:51Z",
       "side": 1,
       "message": "I\u0027m confused by / in the path suggesting this is an absolute path. I\u0027d use valid relative path from the installation directory.\n\ndata, ../data, ../../data, etc.",
+      "revId": "03e25e1f8e54653430e815756af017b38979da68",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "059a03b3_c0609efe",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-03-19T14:42:25Z",
+      "side": 1,
+      "message": "Ack, I\u0027ll fix that.",
+      "parentUuid": "7d38b225_a7e29990",
       "revId": "03e25e1f8e54653430e815756af017b38979da68",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": true
