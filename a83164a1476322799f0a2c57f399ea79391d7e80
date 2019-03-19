@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "572d55f3_f9f09f2e",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-19T14:40:03Z",
+      "side": 1,
+      "message": "same name as in rdopkg config (RDOINFO_REPO) - nice",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9db828a_4f4c6deb",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-19T14:40:03Z",
+      "side": 1,
+      "message": "I proposed RDOINFO_INFO_FILE which is consistent with distroinfo naming and rdopkg prefixing, but it does look a little redundant, doesn\u0027t it? :)\n\nOn the other hand, when you strip the prefix, just \"file\" is a little bit generic.\n\nI\u0027m not sure about this, what do you think? Either way, I\u0027ll align in rdopkg so that we have consistent naming.",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bdca12a9_d9df0e75",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-19T14:40:03Z",
+      "side": 1,
+      "message": "oh yeah, this looks pretty readable with just rdoinfo_file...",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3eb4248e_1abee68b",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-19T14:40:03Z",
+      "side": 1,
+      "message": "I\u0027d go with\n\ninfo_files\u003dfile.yml\n\nas in downstream driver and distroinfo.\n\nNow I have to question my decision to only go with info_file in rdopkg :)",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98b13591_4d6fca71",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-19T14:40:03Z",
+      "side": 1,
+      "message": "there\u0027s repo and info_files here, I\u0027d copy.",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b97b9624_8c25c3a4",
+        "filename": "projects.ini",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-19T14:40:03Z",
+      "side": 1,
+      "message": "#info_files\u003d",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    }
+  ]
+}
