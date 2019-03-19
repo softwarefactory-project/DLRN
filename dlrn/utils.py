@@ -301,7 +301,12 @@ def run_external_preprocess(**kwargs):
         # environments
         sh.env(run_cmd, _cwd=distgit, _env={'LANG': 'C'})
     except Exception as e:
-        raise RuntimeError('Custom pre-process failed: %s' % e)
+        msg = getattr(e, 'stder', None)
+        if msg:
+            msg = msg.decode('utf-8')
+        else:
+            msg = e
+        raise RuntimeError('Custom pre-process failed: %s' % msg)
 
 
 if __name__ == '__main__':
