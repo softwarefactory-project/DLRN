@@ -16,6 +16,24 @@
       "revId": "3f03640956d86b16dcfbfe0d960d3e0b469cdfd9",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6628b447_0fe36233",
+        "filename": "dlrn/config.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-03-21T13:37:49Z",
+      "side": 1,
+      "message": "This approach was already working (see line 86), and it has the advantage of not requiring setuptools in runtime. Which kind of potential unsafety do you see?",
+      "parentUuid": "272cc21a_32fa843b",
+      "revId": "3f03640956d86b16dcfbfe0d960d3e0b469cdfd9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
