@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "272cc21a_32fa843b",
+        "filename": "dlrn/config.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-03-21T10:54:55Z",
+      "side": 1,
+      "message": "I\u0027m not sure using the such strategy is really safe. Setuptools offers a solution to find package data:\nhttps://setuptools.readthedocs.io/en/latest/pkg_resources.html?highlight\u003dresource_string#resourcemanager-api\n\nI\u0027m using it in repoxplorer: https://softwarefactory-project.io/cgit/repoxplorer/tree/bin/repoxplorer-fetch-web-assets#n172\nhttps://softwarefactory-project.io/cgit/repoxplorer/tree/setup.py#n33",
+      "revId": "3f03640956d86b16dcfbfe0d960d3e0b469cdfd9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
