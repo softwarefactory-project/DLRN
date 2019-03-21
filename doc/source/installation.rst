@@ -72,6 +72,7 @@ The configuration file looks like this:
     gerrit_topic=rdo-FTBFS
     database_connection=sqlite:///commits.sqlite
     fallback_to_master=1
+    nonfallback_branches=^master$,^rpm-master$,^rhos-
     coprid=account/repo
     release_numbering=0.date.hash
     custom_preprocess=
@@ -152,6 +153,14 @@ The configuration file looks like this:
   * If the value is 0, there will be no fallback, so if the configured branch
     does not exist an error message will be displayed, and the project will be
     ignored when deciding which packages need to be built.
+
+* ``nonfallback_branches`` defines a list of regular expressions of branches for
+  source and distgit repositories that should never fall back to other branches,
+  even if not present in the repository. This is used when we want to avoid certain
+  type of fallback that could cause issues in our environment.
+
+  The default value is ``^master$,^rpm-master$``, which means that branches named
+  ``master`` or ``rpm-master`` will never try to fall back.
 
 * ``pkginfo_driver`` defines the driver to be used to manage the distgit
   repositories. Following drivers are available:

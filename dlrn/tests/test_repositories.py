@@ -84,3 +84,50 @@ class TestRefreshRepo(base.TestCase):
                         mock.call('origin'),
                         mock.call('-f', 'branch')]
             self.assertEqual(new_mock.call_args_list, expected)
+
+    def test_clone_no_fallback_default(self, sh_mock):
+        config = configparser.RawConfigParser()
+        config.read("projects.ini")
+        config.set('DEFAULT', 'fallback_to_master', '1')
+        self.config = ConfigOptions(config)
+        with mock.patch.object(sh.Command, '__call__') as new_mock:
+            new_mock.side_effect = _aux_sh
+            self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
+                              'url', 'path', branch='rpm-master')
+            expected = [mock.call('url', 'path'),
+                        mock.call('origin'),
+                        mock.call('-f', 'rpm-master')]
+            self.assertEqual(new_mock.call_args_list, expected)
+
+    def test_clone_no_fallback_var(self, sh_mock):
+        config = configparser.RawConfigParser()
+        config.read("projects.ini")
+        config.set('DEFAULT', 'fallback_to_master', '1')
+        config.set('DEFAULT', 'nonfallback_branches', '^foo-')
+        self.config = ConfigOptions(config)
+        with mock.patch.object(sh.Command, '__call__') as new_mock:
+            new_mock.side_effect = _aux_sh
+            self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
+                              'url', 'path', branch='foo-bar')
+            expected = [mock.call('url', 'path'),
+                        mock.call('origin'),
+                        mock.call('-f', 'foo-bar')]
+            self.assertEqual(new_mock.call_args_list, expected)
+
+    def test_clone_fallback_var(self, sh_mock):
+        config = configparser.RawConfigParser()
+        config.read("projects.ini")
+        config.set('DEFAULT', 'fallback_to_master', '1')
+        config.set('DEFAULT', 'nonfallback_branches', '^foo-')
+        self.config = ConfigOptions(config)
+        with mock.patch.object(sh.Command, '__call__') as new_mock:
+            new_mock.side_effect = _aux_sh
+            result = repositories.refreshrepo('url', 'path', branch='bar')
+            self.assertEqual(result, ['master', 'None'])
+            expected = [mock.call('url', 'path'),
+                        mock.call('origin'),
+                        mock.call('-f', 'bar'),
+                        mock.call('master'),
+                        mock.call('--hard', 'origin/master'),
+                        mock.call('--pretty=format:%H %ct', '-1', '.')]
+            self.assertEqual(new_mock.call_args_list, expected)
