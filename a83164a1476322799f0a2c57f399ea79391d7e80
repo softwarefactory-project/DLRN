@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "13de9581_f4e4042e",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-03-22T14:32:33Z",
+      "side": 1,
+      "message": "I think I prefer rdoinfo_file, the \"info\" part is already there, so rdoinfo_info_file feels redundant to me.",
+      "parentUuid": "c9db828a_4f4c6deb",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bdca12a9_d9df0e75",
         "filename": "dlrn/drivers/rdoinfo.py",
         "patchSetId": 2
@@ -138,6 +156,24 @@
       "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3323bf30_a9446ef0",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-03-22T14:32:33Z",
+      "side": 1,
+      "message": "Ack, I think it\u0027s a good idea.",
+      "parentUuid": "98b13591_4d6fca71",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
     },
     {
       "key": {
