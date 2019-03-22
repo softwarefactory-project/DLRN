@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2a3eb4a4_c539a3ec",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-22T14:26:51Z",
+      "side": 1,
+      "message": "Cool, I\u0027ll do the same in rdopkg.",
+      "revId": "bdce22f021859b9ef2134a09d73eadf8b8c525c1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    }
+  ]
+}
