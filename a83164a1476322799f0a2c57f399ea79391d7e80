@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "e6f8e0fe_a65f7035",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-22T14:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9db828a_4f4c6deb",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bdca12a9_d9df0e75",
         "filename": "dlrn/drivers/rdoinfo.py",
         "patchSetId": 2
@@ -70,6 +88,24 @@
     },
     {
       "key": {
+        "uuid": "2a96d6f8_62e0b5b8",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-22T14:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3eb4248e_1abee68b",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "98b13591_4d6fca71",
         "filename": "doc/source/installation.rst",
         "patchSetId": 2
@@ -84,6 +120,24 @@
       "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d4db103c_9b55ee1e",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-22T14:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98b13591_4d6fca71",
+      "revId": "a83164a1476322799f0a2c57f399ea79391d7e80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     },
     {
       "key": {
