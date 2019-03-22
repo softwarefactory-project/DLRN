@@ -52,6 +52,24 @@
       "revId": "3f03640956d86b16dcfbfe0d960d3e0b469cdfd9",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f917adaf_22d26af9",
+        "filename": "dlrn/config.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-03-22T14:38:15Z",
+      "side": 1,
+      "message": "This is a valid concern, but for the sake of atomicity of commits, I\u0027d solve that in a separate dedicated patch set.\n\nAlso, setuptools are pain in general, so going with the simple solution that worked so far until a problem is discovered sounds reasonable, especially since we have a fix ready in repoexplorer, so thanks for mentioning that with convenient links, Fabien!",
+      "parentUuid": "2f6df36f_1586c09b",
+      "revId": "3f03640956d86b16dcfbfe0d960d3e0b469cdfd9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
