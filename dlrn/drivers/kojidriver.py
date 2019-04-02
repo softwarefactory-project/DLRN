@@ -20,6 +20,7 @@ import dlrn.shell
 
 import io
 import logging
+import multiprocessing
 import os
 import re
 import sh
@@ -64,6 +65,11 @@ class KojiBuildDriver(BuildRPMDriver):
         """
         target = self.config_options.koji_build_target
         arch = self.config_options.koji_arch
+        try:
+            worker_id = multiprocessing.current_process()._identity[0]
+        except IndexError:
+            # Not in multiprocessing mode
+            worker_id = 1
         run_cmd = [self.exe_name]
         run_cmd.extend(['mock-config',
                         '--arch', arch, '--target', target, '-o', filename])
@@ -78,6 +84,10 @@ class KojiBuildDriver(BuildRPMDriver):
                     lines.append("config_opts['chroot_setup_cmd'] = "
                                  "'install %s'\n" %
                                  self.config_options.mock_base_packages)
+                elif line.startswith("config_opts['root']"):
+                    # Append worker id to mock buildroot name
+                    line = line[:-2] + "-" + str(worker_id) + "'\n"
+                    lines.append(line)
                 else:
                     lines.append(line)
         with open(filename, 'w') as fp:
