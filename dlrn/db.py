@@ -85,6 +85,14 @@ class Commit(Base):
                             hash_dir)
 
 
+class CommitRefs(Base):
+    __tablename__ = "commitrefs"
+    id = Column(Integer, primary_key=True)
+    commit_id = Column(Integer, ForeignKey('commits.id'), nullable=False)
+    referenced_commit_id = Column(Integer, ForeignKey('commits.id'),
+                                  nullable=False)
+
+
 class Project(Base):
     __tablename__ = "projects"
 
@@ -200,6 +208,16 @@ def getCommits(session, project=None, with_status=None, without_status=None,
     if limit:
         commits = commits.limit(limit)
     return commits
+
+
+def getRefCommitCount(session, commit_id):
+    return session.query(CommitRefs).filter(
+        CommitRefs.referenced_commit_id == commit_id).count()
+
+
+def deleteCommitRefs(session, commit_id):
+    session.query(CommitRefs).filter(
+        CommitRefs.commit_id == commit_id).delete()
 
 
 @event.listens_for(Engine, "connect")

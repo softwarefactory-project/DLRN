@@ -35,6 +35,7 @@ from dlrn.config import setup_logging
 from dlrn.db import CIVote
 from dlrn.db import closeSession
 from dlrn.db import Commit
+from dlrn.db import CommitRefs
 from dlrn.db import getCommits
 from dlrn.db import getLastBuiltCommit
 from dlrn.db import getLastProcessedCommit
@@ -666,6 +667,8 @@ def post_build_rpm(status, packages, session, build_repo=True):
                   "Status,Last Success Timestamp,Pkg NVR\n")
     failures = 0
 
+    session.add(commit)
+
     for otherproject in packages:
         otherprojectname = otherproject["name"]
         if otherprojectname == project_name:
@@ -689,6 +692,11 @@ def post_build_rpm(status, packages, session, build_repo=True):
                     os.symlink(os.path.relpath(os.path.join(datadir, rpm),
                                                yumrepodir_abs), rpm_link_src)
             last = last_success
+            # Create commit reference
+            cref = CommitRefs(commit_id=commit.id,
+                              referenced_commit_id=last_success.id)
+            session.add(cref)
+            session.commit()
         else:
             last = last_processed
         if last:
