@@ -167,21 +167,34 @@ a certain date.
 
 .. code-block:: console
 
-    usage: dlrn-purge [-h] --config-file CONFIG_FILE --older-than OLDER_THAN [-y] [--dry-run]
+    usage: dlrn-purge [-h] --config-file CONFIG_FILE --older-than OLDER_THAN [-y]
+                      [--dry-run] [--exclude-dirs EXCLUDE_DIRS] [--debug]
+
     arguments:
       -h, --help            show this help message and exit
       --config-file CONFIG_FILE
                             Config file (required)
-      --older-than  OLDER_THAN
-                            how old a build needs to be, in order to be considered
-                            for removal (required). It is measured in days.
-      -y                    Assume yes for all questions.
-      --dry-run             If specified, do not apply any changes. Instead, show what would
-                            be removed from the filesystem.
+      --older-than OLDER_THAN
+                            Purge builds older than provided value (in days).
+      -y                    Answer "yes" to any questions
+      --dry-run             Do not change anything, show what changes would be
+                            made
+      --exclude-dirs EXCLUDE_DIRS
+                            Do not remove commits whose packages are included in
+                            one of the specifided directories (comma-separated
+                            list).
+      --debug               Print debug logs
 
 Old commits will remain in the database, although their flag will be set to purged, and their
-associated repo directory will be removed. There is one exception to this rule, when an old
-commit is the newest one that was successfully built. In that case, it will be preserved.
+associated repo directory will be removed. There are some exceptions to this rule:
+
+- When an old commit is the newest one that was successfully built, it will be preserved.
+- When a commit is present in one of the directories specified in the ``--exclude-dirs``
+  option. This can be useful to preserve special commits, such as those that passed
+  CI tests or where included in a certain release.
+- If a commit is included in the repository of a newer commit, it will not be deleted.
+  This prevents dlrn-purge from breaking symlinks, and leaving newer repositories without
+  some of its packages.
 
 Building only the last commit
 -----------------------------
