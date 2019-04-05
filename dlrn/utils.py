@@ -22,6 +22,7 @@ import sqlalchemy
 from contextlib import contextmanager
 from dlrn.db import CIVote
 from dlrn.db import Commit
+from dlrn.db import CommitRefs
 from dlrn.db import getSession
 from dlrn.db import Project
 from dlrn.db import Promotion
@@ -97,6 +98,13 @@ def loadYAML(session, yamlfile):
         for promotion in data['promotions']:
             p = Promotion(**promotion)
             session.add(p)
+            session.commit()
+    except KeyError:
+        pass   # No promotions in yaml, just ignore
+    try:
+        for commitref in data['commitrefs']:
+            c = CommitRefs(**commitref)
+            session.add(c)
             session.commit()
     except KeyError:
         pass   # No promotions in yaml, just ignore
@@ -184,6 +192,18 @@ def saveYAML(session, yamlfile):
         for a in attrs:
             d[a] = str(getattr(promotion, a))
         data['promotions'].append(d)
+
+    attrs = []
+    for a in dir(CommitRefs):
+        if type(getattr(CommitRefs, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['commitrefs'] = []
+    for cref in session.query(CommitRefs).all():
+        d = {}
+        for a in attrs:
+            d[a] = str(getattr(cref, a))
+        data['commitrefs'].append(d)
 
     with open(yamlfile, 'w') as fp:
         fp.write(yaml.dump(data, default_flow_style=False))

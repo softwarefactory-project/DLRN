@@ -24,7 +24,9 @@ from time import mktime
 from dlrn.config import setup_logging
 from dlrn.db import closeSession
 from dlrn.db import Commit
+from dlrn.db import deleteCommitRefs
 from dlrn.db import getCommits
+from dlrn.db import getRefCommitCount
 from dlrn.db import getSession
 
 FLAG_PURGED = 0x2
@@ -112,6 +114,14 @@ def purge():
                                                    commit.project_name))
             continue
 
+        # Do not consider commits that are referenced by other repos, to
+        # avoid leaving broken symlinks
+        refcount = getRefCommitCount(session, commit.id)
+        if refcount > 0:
+            logger.info("Not considering commit %s, referenced by %s "
+                        "other commits" % (commit.id, refcount))
+            continue
+
         datadir = os.path.join(cp.get('DEFAULT', 'datadir'), "repos",
                                commit.getshardedcommitdir())
         if commit.project_name not in fullpurge and commit.status == "SUCCESS":
@@ -144,6 +154,7 @@ def purge():
                                " ignoring." % datadir)
             fullpurge.append(commit.project_name)
             commit.flags |= FLAG_PURGED
+            deleteCommitRefs(session, commit.id)
             logger.info("Remove %s" % datadir)
             if options.dry_run is False:
                 shutil.rmtree(datadir, ignore_errors=True)
@@ -161,10 +172,11 @@ def purge():
                     if options.dry_run is False:
                         shutil.rmtree(datadir, ignore_errors=True)
             else:
-                    logger.info("Remove %s" % datadir)
-                    if options.dry_run is False:
-                        shutil.rmtree(datadir, ignore_errors=True)
+                logger.info("Remove %s" % datadir)
+                if options.dry_run is False:
+                    shutil.rmtree(datadir, ignore_errors=True)
             commit.flags |= FLAG_PURGED
+            deleteCommitRefs(session, commit.id)
     if options.dry_run is False:
         session.commit()
     closeSession(session)
