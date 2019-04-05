@@ -31,11 +31,21 @@ expected_repos = [
     './data/repos/12/ed/12edde8a53c7299105bb8297c6f31d3a458615ab_354991d9',
     './data/repos/17/23/17234e9ab9dfab4cf5600f67f1d24db5064f1025_024e24f0']
 
+expected_repos_2 = [
+    './data/repos/e4/f7/e4f71ada86ee4a42287cf401b77d48c9f98ca5aa_354991d9']
+
 
 def mocked_session(url):
     db_fd, filepath = tempfile.mkstemp()
     session = db.getSession("sqlite:///%s" % filepath)
     utils.loadYAML(session, './dlrn/tests/samples/commits_1.yaml')
+    return session
+
+
+def mocked_session_2(url):
+    db_fd, filepath = tempfile.mkstemp()
+    session = db.getSession("sqlite:///%s" % filepath)
+    utils.loadYAML(session, './dlrn/tests/samples/commits_purge_refs.yaml')
     return session
 
 
@@ -56,13 +66,15 @@ def mocked_is_commit_in_dirs(commit, dirlist):
 
 @mock.patch('os.path.islink', side_effect=mocked_islink)
 @mock.patch('os.listdir', side_effect=mocked_listdir)
-@mock.patch('dlrn.purge.getSession', side_effect=mocked_session)
 @mock.patch('shutil.rmtree')
 @mock.patch('dlrn.purge.is_commit_in_dirs',
             side_effect=mocked_is_commit_in_dirs)
 class TestPurge(base.TestCase):
+    # This test has no commit refs at all, so it shows the old behavior
+    # in action
+    @mock.patch('dlrn.purge.getSession', side_effect=mocked_session)
     @mock.patch('dlrn.purge.datetime')
-    def test_purge(self, dt_mock, icid_mock, sh_mock, db_mock, lst_mock,
+    def test_purge(self, dt_mock, db_mock, icid_mock, sh_mock, lst_mock,
                    il_mock):
         testargs = ["dlrn-purge", "--config-file",
                     "projects.ini", "--older-than",
@@ -72,5 +84,22 @@ class TestPurge(base.TestCase):
             purge.purge()
             expected = []
             for repo in expected_repos:
+                expected.append(mock.call(repo, ignore_errors=True))
+            self.assertEqual(sh_mock.call_args_list, expected)
+
+    # This test has some commit refs, so we see they are preventing some
+    # commits from being purged
+    @mock.patch('dlrn.purge.getSession', side_effect=mocked_session_2)
+    @mock.patch('dlrn.purge.datetime')
+    def test_purge_commitrefs(self, dt_mock, db_mock, icid_mock, sh_mock,
+                              lst_mock, il_mock):
+        testargs = ["dlrn-purge", "--config-file",
+                    "projects.ini", "--older-than",
+                    "1", "-y"]
+        dt_mock.now.return_value = datetime(2015, 10, 1, 14, 20)
+        with mock.patch.object(sys, 'argv', testargs):
+            purge.purge()
+            expected = []
+            for repo in expected_repos_2:
                 expected.append(mock.call(repo, ignore_errors=True))
             self.assertEqual(sh_mock.call_args_list, expected)
