@@ -51,6 +51,7 @@ class RdoInfoDriver(PkgInfoDriver):
             'rdoinfo_repo': {'name': 'repo'},
             'rdoinfo_file': {'name': 'info_files', 'type': 'list',
                              'default': ['rdo.yml']},
+            'cache_dir': {'name': 'cache_directory'},
         }
     }
 
@@ -71,7 +72,7 @@ class RdoInfoDriver(PkgInfoDriver):
 
         if local_info_repo:
             inforepo = info.DistroInfo(
-                info_files=self.config_options.rdoinfo_file,
+                info_files=self.config_options.rdoinfo_file,self.config_options.cache_dir,
                 local_info=local_info_repo)
             # NOTE(jpena): in general, info_files will only contain one file,
             # but it supports multiple... In that case, we will have a comma
@@ -83,7 +84,7 @@ class RdoInfoDriver(PkgInfoDriver):
                     local_info_repo.rstrip('/'))
         elif self.config_options.rdoinfo_repo:
             inforepo = info.DistroInfo(
-                info_files=self.config_options.rdoinfo_file,
+                info_files=self.config_options.rdoinfo_file,self.config_options.cache_dir,
                 remote_git_info=self.config_options.rdoinfo_repo)
             self.distroinfo_path = "%s/%s" % (
                 self.config_options.rdoinfo_repo.rstrip('/'), info_files[0])
@@ -94,7 +95,7 @@ class RdoInfoDriver(PkgInfoDriver):
             # distroinfo will fetch info files from the rdoinfo repo as needed
             # and store them under ~/.distroinfo/cache
             inforepo = info.DistroInfo(
-                info_files=self.config_options.rdoinfo_file,
+                info_files=self.config_options.rdoinfo_file,self.config_options.cache_dir,
                 remote_info=rdoinfo_repo)
             self.distroinfo_path = "%s/%s" % (rdoinfo_repo.rstrip('/'),
                                               info_files[0])
