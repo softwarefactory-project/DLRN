@@ -51,6 +51,7 @@ class RdoInfoDriver(PkgInfoDriver):
             'rdoinfo_repo': {'name': 'repo'},
             'rdoinfo_file': {'name': 'info_files', 'type': 'list',
                              'default': ['rdo.yml']},
+            'cache_dir': {'name': 'cache_directory'},
         }
     }
 
