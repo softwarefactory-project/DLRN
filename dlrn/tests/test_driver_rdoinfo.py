@@ -50,7 +50,8 @@ class TestDriverRdoInfo(base.TestCase):
                         'redhat-openstack/rdoinfo/master/')
 
         expected = [mock.call(info_files=['rdo.yml'],
-                              remote_info=rdoinfo_repo)]
+                              remote_info=rdoinfo_repo,
+                              cache_base_path=None)]
 
         self.assertEqual(di_mock.call_args_list, expected)
 
@@ -62,7 +63,8 @@ class TestDriverRdoInfo(base.TestCase):
         driver.getpackages()
 
         expected = [mock.call(info_files=['foo.yml'],
-                              remote_git_info='http:/github.com/foo')]
+                              remote_git_info='http:/github.com/foo',
+                              cache_base_path=None)]
 
         self.assertEqual(di_mock.call_args_list, expected)
 
@@ -73,7 +75,8 @@ class TestDriverRdoInfo(base.TestCase):
         driver.getpackages(local_info_repo='/tmp/bar')
 
         expected = [mock.call(info_files=['foo.yml'],
-                              local_info='/tmp/bar')]
+                              local_info='/tmp/bar',
+                              cache_base_path=None)]
 
         self.assertEqual(di_mock.call_args_list, expected)
 

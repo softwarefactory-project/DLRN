@@ -57,6 +57,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
             'downstream_distgit_key': {},
             'use_upstream_spec': {'type': 'boolean'},
             'downstream_spec_replace_list': {'type': 'list'},
+            'cache_dir': {},
         }
     }
 
@@ -82,7 +83,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
         if local_info_repo:
             inforepo = info.DistroInfo(
                 info_files=info_files,
-                local_info=local_info_repo)
+                local_info=local_info_repo,
+                cache_base_path=self.config_options.cache_dir)
             # NOTE(jpena): in general, info_files will only contain one file,
             # but it supports multiple... In that case, we will have a comma
             # separated list of URLs
@@ -95,7 +97,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
         elif self.config_options.rdoinfo_repo:
             inforepo = info.DistroInfo(
                 info_files=info_files,
-                remote_git_info=self.config_options.rdoinfo_repo)
+                remote_git_info=self.config_options.rdoinfo_repo,
+                cache_base_path=self.config_options.cache_dir)
             rdoinfo_repo = self.config_options.rdoinfo_repo
             self.distroinfo_path = "%s/%s" % (rdoinfo_repo.rstrip('/'),
                                               info_files[0])
