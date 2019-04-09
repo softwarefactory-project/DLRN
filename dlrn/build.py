@@ -270,6 +270,11 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     yumrepodir = _get_yumrepodir(commit)
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
 
+    # If we are using the downstream driver, write the reference commit
+    if (config_options.pkginfo_driver ==
+            'dlrn.drivers.downstream.DownstreamInfoDriver'):
+        dlrn.shell.pkginfo._write_reference_commit(yumrepodir_abs)
+
     buildrpm.build_package(output_directory=yumrepodir_abs,
                            additional_mock_opts=additional_mock_options,
                            package_name=commit.project_name,
