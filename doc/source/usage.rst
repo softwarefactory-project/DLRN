@@ -7,7 +7,8 @@ Parameters
 
 .. code-block:: console
 
-    usage: dlrn [-h] [--config-file CONFIG_FILE] [--info-repo INFO_REPO]
+    usage: dlrn [-h] [--config-file CONFIG_FILE]
+                [--config-override CONFIG_OVERRIDE] [--info-repo INFO_REPO]
                 [--build-env BUILD_ENV] [--local] [--head-only]
                 [--project-name PROJECT_NAME | --package-name PACKAGE_NAME]
                 [--dev] [--log-commands] [--use-public] [--order] [--sequential]
@@ -18,6 +19,10 @@ Parameters
       -h, --help            show this help message and exit
       --config-file CONFIG_FILE
                             Config file. Default: projects.ini
+      --config-override CONFIG_OVERRIDE
+                            Override a configuration option from the config file.
+                            Specify it as: section.option=value. Can be used
+                            multiple times if more than one override is needed.
       --info-repo INFO_REPO
                             use a local rdoinfo repo instead of fetching the
                             default one using rdopkg. Only applies when
