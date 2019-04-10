@@ -73,10 +73,15 @@ def main():
     parser.add_argument('--config-file',
                         default='projects.ini',
                         help="Config file. Default: projects.ini")
+    parser.add_argument('--config-override', action='append',
+                        help="Override a configuration option from the"
+                             " config file. Specify it as: "
+                             "section.option=value. Can be used multiple "
+                             "times if more than one override is needed.")
     parser.add_argument('--info-repo',
-                        help="use a local rdoinfo repo instead of"
-                             " fetching the default one using rdopkg. Only"
-                             " applies when pkginfo_driver is rdoinfo in"
+                        help="use a local distroinfo repo instead of"
+                             " fetching the default one. Only applies when"
+                             " pkginfo_driver is rdoinfo or downstream in"
                              " projects.ini")
     parser.add_argument('--build-env', action='append',
                         help="Variables for the build environment.")
@@ -153,7 +158,7 @@ def main():
     if options.order is True:
         options.sequential = True
 
-    config_options = ConfigOptions(cp)
+    config_options = ConfigOptions(cp, options.config_override)
     if options.dev:
         _, tmpdb_path = tempfile.mkstemp()
         logger.info("Using file %s for temporary db" % tmpdb_path)

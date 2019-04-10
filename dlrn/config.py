@@ -79,7 +79,8 @@ def setup_logging(debug=False, filename=None):
 
 class ConfigOptions(object):
 
-    def __init__(self, cp):
+    def __init__(self, cp, overrides=None):
+        self.parse_overrides(cp, overrides)
         self.parse_config(DLRN_CORE_CONFIG, cp)
         # dynamic directory defaults
         if not self.configdir:
@@ -106,6 +107,21 @@ class ConfigOptions(object):
 
         global _config_options
         _config_options = self
+
+    def parse_overrides(self, config_parser, overrides):
+        if overrides is None:
+            return
+        # Now check for any potential overrides
+        for rule in overrides:
+            setting = rule.split('=')
+            section = setting[0].split('.')[0]
+            key = setting[0].split('.')[1]
+            value = setting[1]
+            if section == 'DEFAULT' or config_parser.has_section(section):
+                if config_parser.has_option(section, key):
+                    logging.info("Overriding option %s.%s with value %s" %
+                                 (section, key, value))
+                    config_parser[section][key] = value
 
     def parse_config(self, config_rules, config_parser):
         for section, rules in config_rules.items():
