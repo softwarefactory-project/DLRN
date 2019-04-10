@@ -11,6 +11,7 @@
 # under the License.
 import logging
 import os
+import re
 
 from dlrn.utils import import_class
 
@@ -80,7 +81,8 @@ def setup_logging(debug=False, filename=None):
 
 class ConfigOptions(object):
 
-    def __init__(self, cp):
+    def __init__(self, cp, overrides=None):
+        self.parse_overrides(cp, overrides)
         self.parse_config(DLRN_CORE_CONFIG, cp)
         # dynamic directory defaults
         if not self.configdir:
@@ -107,6 +109,27 @@ class ConfigOptions(object):
 
         global _config_options
         _config_options = self
+
+    def parse_overrides(self, config_parser, overrides):
+        if overrides is None:
+            return
+        # Now check for any potential overrides
+        for rule in overrides:
+            rule_match = re.match(r'^(\w+)\.(\w+)=(\w+)$', rule)
+            if rule_match is not None:
+                section = rule_match.group(1)
+                key = rule_match.group(2)
+                value = rule_match.group(3)
+                if section == 'DEFAULT' or config_parser.has_section(section):
+                    if config_parser.has_option(section, key):
+                        logging.info("Overriding option %s.%s with value %s" %
+                                     (section, key, value))
+                        config_parser.set(section, key, value)
+                    else:
+                        logging.error("Option %s.%s is not present in the"
+                                      "configuration file." % (section, key))
+                        raise Exception("Unknown config option %s.%s" %
+                                        (section, key))
 
     def parse_config(self, config_rules, config_parser):
         for section, rules in config_rules.items():

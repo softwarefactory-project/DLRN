@@ -54,6 +54,27 @@ class TestConfigOptions(base.TestCase):
         config = ConfigOptions(self.config)
         self.assertEqual(config, getConfigOptions())
 
+    def test_override(self):
+        self.config.set("DEFAULT", "fallback_to_master", "1")
+        self.config.set("DEFAULT", "workers", "7")
+        config = ConfigOptions(self.config)
+        # No changes
+        self.assertEqual(config.fallback_to_master, True)
+        self.assertEqual(config.workers, 7)
+
+        overrides = ['DEFAULT.fallback_to_master=0',
+                     'DEFAULT.workers=3']
+        config = ConfigOptions(self.config, overrides=overrides)
+        # Overrides in effect
+        self.assertEqual(config.fallback_to_master, False)
+        self.assertEqual(config.workers, 3)
+
+    def test_override_non_existing(self):
+        config = ConfigOptions(self.config)
+        overrides = ['DEFAULT.non_existing_option=0']
+        self.assertRaises(Exception, ConfigOptions,
+                          self.config, overrides=overrides)
+
     def test_dynamic_dirs(self):
         config = ConfigOptions(self.config)
         self.assertEqual(config.scriptsdir, './scripts')
