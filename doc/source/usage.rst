@@ -7,51 +7,57 @@ Parameters
 
 .. code-block:: console
 
-    usage: dlrn [-h] [--config-file CONFIG_FILE] [--info-repo INFO_REPO]
-                [--build-env BUILD_ENV] [--local] [--head-only]
-                [--project-name PROJECT_NAME | --package-name PACKAGE_NAME]
-                [--dev] [--log-commands] [--use-public] [--order] [--sequential]
-                [--status] [--recheck] [--version] [--run RUN] [--stop]
-                [--verbose-build] [--no-repo]
+usage: dlrn [-h] [--config-file CONFIG_FILE]
+            [--config-override CONFIG_OVERRIDE] [--info-repo INFO_REPO]
+            [--build-env BUILD_ENV] [--local] [--head-only]
+            [--project-name PROJECT_NAME | --package-name PACKAGE_NAME]
+            [--dev] [--log-commands] [--use-public] [--order] [--sequential]
+            [--status] [--recheck] [--version] [--run RUN] [--stop]
+            [--verbose-build] [--no-repo] [--debug]
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      --config-file CONFIG_FILE
-                            Config file. Default: projects.ini
-      --info-repo INFO_REPO
-                            use a local rdoinfo repo instead of fetching the
-                            default one using rdopkg. Only applies when
-                            pkginfo_driver is rdoinfo in projects.ini
-      --build-env BUILD_ENV
-                            Variables for the build environment.
-      --local               Use local git repos if possible. Only commited changes
-                            in the local repo will be used in the build.
-      --head-only           Build from the most recent Git commit only.
-      --project-name PROJECT_NAME
-                            Build a specific project name only. Use multiple times
-                            to build more than one project in a run.
-      --package-name PACKAGE_NAME
-                            Build a specific package name only. Use multiple times
-                            to build more than one package in a run.
-      --dev                 Don't reset packaging git repo, force build and add
-                            public master repo for dependencies (dev mode).
-      --log-commands        Log the commands run by dlrn.
-      --use-public          Use the public master repo for dependencies when doing
-                            install verification.
-      --order               Compute the build order according to the spec files
-                            instead of the dates of the commits. Implies
-                            --sequential.
-      --sequential          Run all actions sequentially, regardless of the number
-                            of workers specified in projects.ini.
-      --status              Get the status of packages.
-      --recheck             Force a rebuild for a particular package. Implies
-                            --package-name
-      --version             show program's version number and exit
-      --run RUN             Run a program instead of trying to build. Implies
-                            --head-only
-      --stop                Stop on error.
-      --verbose-build       Show versobe output during the package build.
-      --no-repo             Do not generate a repo with all the built packages.
+optional arguments:
+  -h, --help            show this help message and exit
+  --config-file CONFIG_FILE
+                        Config file. Default: projects.ini
+  --config-override CONFIG_OVERRIDE
+                        Override a configuration option from the config file.
+                        Specify it as: section.option=value. Can be used
+                        multiple times if more than one override is needed.
+  --info-repo INFO_REPO
+                        use a local distroinfo repo instead of fetching the
+                        default one. Only applies when pkginfo_driver is
+                        rdoinfo or downstream in projects.ini
+  --build-env BUILD_ENV
+                        Variables for the build environment.
+  --local               Use local git repos if possible. Only commited changes
+                        in the local repo will be used in the build.
+  --head-only           Build from the most recent Git commit only.
+  --project-name PROJECT_NAME
+                        Build a specific project name only. Use multiple times
+                        to build more than one project in a run.
+  --package-name PACKAGE_NAME
+                        Build a specific package name only. Use multiple times
+                        to build more than one package in a run.
+  --dev                 Don't reset packaging git repo, force build and add
+                        public master repo for dependencies (dev mode).
+  --log-commands        Log the commands run by dlrn.
+  --use-public          Use the public master repo for dependencies when doing
+                        install verification.
+  --order               Compute the build order according to the spec files
+                        instead of the dates of the commits. Implies
+                        --sequential.
+  --sequential          Run all actions sequentially, regardless of the number
+                        of workers specified in projects.ini.
+  --status              Get the status of packages.
+  --recheck             Force a rebuild for a particular package. Implies
+                        --package-name
+  --version             show program's version number and exit
+  --run RUN             Run a program instead of trying to build. Implies
+                        --head-only
+  --stop                Stop on error.
+  --verbose-build       Show verbose output during the package build.
+  --no-repo             Do not generate a repo with all the built packages.
+  --debug               Print debug logs
 
 
 Quickstart single package build
