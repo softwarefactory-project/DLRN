@@ -16,6 +16,24 @@
       "revId": "27394b49fa388d0e38b59a98a85353e4d480e640",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1b3b854a_0c3c9e56",
+        "filename": "dlrn/config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-11T16:43:02Z",
+      "side": 1,
+      "message": "I\u0027d rather keep the section explicit at all times, to stay consistent.\n\nAlso, I expect most of the usage will come from automated tools. A conversation with jjoyce was the initial trigger for this, and it was related to calling DLRN from an external tool.",
+      "parentUuid": "c6a457e7_36df126f",
+      "revId": "27394b49fa388d0e38b59a98a85353e4d480e640",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
     }
   ]
 }
