@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cde6ff09_47236df3",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-11T08:55:17Z",
+      "side": 1,
+      "message": "We need the fix in these two calls, too :)",
+      "range": {
+        "startLine": 86,
+        "startChar": 46,
+        "endLine": 101,
+        "endChar": 65
+      },
+      "revId": "7c3b9eef75552f67fd31166300507fe20666b346",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
