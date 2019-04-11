@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "104df298_8999b9b7",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-11T14:54:09Z",
+      "side": 1,
+      "message": "this line needs to be removed (I guess copy/paste issue)",
+      "range": {
+        "startLine": 102,
+        "startChar": 14,
+        "endLine": 102,
+        "endChar": 65
+      },
+      "revId": "a1ca6c50f635e3ae74a2f6700eaf88e5c15ec913",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
