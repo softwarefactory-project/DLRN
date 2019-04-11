@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c1724f06_86df5a80",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-11T07:46:28Z",
+      "side": 1,
+      "message": "We need to use a different format here (sorry if I didn\u0027t explain it properly). In the distroinfo constructor [1], cache_base_path is a named option, so we should call it like:\n\ninfo_files\u003d...,\nlocal_info\u003d...,\ncache_base_path\u003dself.config_options.cache_dir)",
+      "range": {
+        "startLine": 74,
+        "startChar": 39,
+        "endLine": 76,
+        "endChar": 43
+      },
+      "revId": "9018e7faba650c3e1c8ad3b68105adcafd38fe1a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
