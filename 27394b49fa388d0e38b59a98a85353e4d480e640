@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c6a457e7_36df126f",
+        "filename": "dlrn/config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-04-11T16:34:47Z",
+      "side": 1,
+      "message": "You could also support\n\nkey\u003dvalue -\u003e DEFAULT.key\u003dvalue\n\nfor shorter CLI invocations if you wanted.",
+      "revId": "27394b49fa388d0e38b59a98a85353e4d480e640",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    }
+  ]
+}
