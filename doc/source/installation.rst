@@ -185,7 +185,11 @@ The configuration file looks like this:
     with per-distgit directories, following the same schema used by the
     `RPM Packaging for OpenStack <https://github.com/openstack/rpm-packaging>`_
     project. This driver requires setting some optional configuration options
-    in the ``[gitrepo_driver]`` section
+    in the ``[gitrepo_driver]`` section.
+  * ``dlrn.drivers.local.LocalDriver``, which uses a current directory to
+    discover a specfile. The current directory must be a git repository. The
+    specfile is used as it is to build the rpm(s). This driver does not require
+    specific configuration options.
 
 * ``build_driver`` defines the driver used to build the packages. Source RPMs
   are always created using Mock, but the actual RPM build process can use the
