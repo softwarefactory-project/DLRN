@@ -282,6 +282,9 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     if config_options.keep_changelog:
         os.environ['DLRN_KEEP_CHANGELOG'] = '1'
 
+    if (config_options.pkginfo_driver == 'dlrn.drivers.local.LocalDriver'):
+        os.environ['DLRN_KEEP_SPEC_AS_IS'] = '1'
+
     # We may do some git repo manipulation, so we need to make sure the
     # right commit is there
     os.environ['DLRN_SOURCE_COMMIT'] = commit.commit_hash
