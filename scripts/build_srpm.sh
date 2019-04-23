@@ -10,6 +10,24 @@ source $(dirname $0)/common-functions
 exec &> >(tee "${OUTPUT_DIRECTORY}/rpmbuild.log") 2>&1
 set -x
 
+if [ "$DLRN_KEEP_SPEC_AS_IS" == "1" ]; then
+    MOCKOPTS="-v -r ${DATA_DIR}/${MOCK_CONFIG} --resultdir $OUTPUT_DIRECTORY"
+    # Cleanup mock directory and copy sources there, so we can run python setup.py
+    # inside the buildroot
+    /usr/bin/mock $MOCKOPTS --clean
+    /usr/bin/mock $MOCKOPTS --init
+    # A simple mock --copyin should be enough, but it does not handle symlinks properly
+    MOCKDIR=$(/usr/bin/mock -r ${DATA_DIR}/${MOCK_CONFIG} -p)
+    cd ${DISTGIT_DIR}
+    cp -a * ${TOP_DIR}/SOURCES/
+    cp *.spec ${TOP_DIR}/SPECS/
+    cd ${TOP_DIR}/SPECS/
+    cat *.spec
+    spectool -g -C ${TOP_DIR}/SOURCES *.spec
+    /usr/bin/mock --buildsrpm ${MOCKOPTS} --spec *.spec --sources=${TOP_DIR}/SOURCES
+    exit 0
+fi
+
 for FILE in {test-,}requirements.txt
 do
     if [ -f ${FILE} ]
