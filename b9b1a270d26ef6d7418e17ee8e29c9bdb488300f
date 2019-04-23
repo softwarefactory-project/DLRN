@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "24ccddd5_cabe12f8",
+        "filename": "dlrn/build.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-23T16:13:44Z",
+      "side": 1,
+      "message": "Seeing the changes in build_srpm.sh, it looks like this is not needed.",
+      "range": {
+        "startLine": 265,
+        "startChar": 8,
+        "endLine": 265,
+        "endChar": 45
+      },
+      "revId": "b9b1a270d26ef6d7418e17ee8e29c9bdb488300f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b96927ba_ea2cd6a4",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-23T16:13:44Z",
+      "side": 1,
+      "message": "Well, not really :D",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 13
+      },
+      "revId": "b9b1a270d26ef6d7418e17ee8e29c9bdb488300f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8428756c_af5ee39c",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-23T16:13:44Z",
+      "side": 1,
+      "message": "This is going to work fine for a CI or non-stable environment, but will fail if we try to build two different commits for the same package, since both will have the commit/distro hash combination.",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 46
+      },
+      "revId": "b9b1a270d26ef6d7418e17ee8e29c9bdb488300f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6afe4129_798ba949",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-23T16:13:44Z",
+      "side": 1,
+      "message": "This is duplicating a lot of the lines below. Could we find a better way to avoid duplication?",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 2
+      },
+      "revId": "b9b1a270d26ef6d7418e17ee8e29c9bdb488300f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
