@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb09b88b_81af542e",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-23T08:30:26Z",
+      "side": 1,
+      "message": "You need to expose the option in DRIVER_CONFIG, just like it is in the rdoinfo driver.",
+      "range": {
+        "startLine": 85,
+        "startChar": 15,
+        "endLine": 86,
+        "endChar": 62
+      },
+      "revId": "bb0ec0bfcca2280984d91b4a9237d6ea99f1a51a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ee52736a_81504c91",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-23T08:30:26Z",
+      "side": 1,
+      "message": "nit: trailing space.",
+      "revId": "bb0ec0bfcca2280984d91b4a9237d6ea99f1a51a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb243380_e82d8ad5",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-23T08:30:26Z",
+      "side": 1,
+      "message": "I\u0027d better specify that the default is None, which means whatever distroinfo has as a default. If distroinfo changes its default, this would no longer be true.",
+      "range": {
+        "startLine": 288,
+        "startChar": 52,
+        "endLine": 288,
+        "endChar": 72
+      },
+      "revId": "bb0ec0bfcca2280984d91b4a9237d6ea99f1a51a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2928a11a_73a8909f",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-23T08:30:26Z",
+      "side": 1,
+      "message": "Same as above.",
+      "range": {
+        "startLine": 337,
+        "startChar": 65,
+        "endLine": 339,
+        "endChar": 83
+      },
+      "revId": "bb0ec0bfcca2280984d91b4a9237d6ea99f1a51a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4c498d06_a63397a8",
+        "filename": "projects.ini",
+        "patchSetId": 9
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-23T08:30:26Z",
+      "side": 1,
+      "message": "I would leave it empty",
+      "revId": "bb0ec0bfcca2280984d91b4a9237d6ea99f1a51a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
