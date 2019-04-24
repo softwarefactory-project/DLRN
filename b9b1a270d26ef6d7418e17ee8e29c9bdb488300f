@@ -71,6 +71,30 @@
     },
     {
       "key": {
+        "uuid": "ffa163db_f64aba36",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-24T10:31:19Z",
+      "side": 1,
+      "message": "Thinking about this, maybe we could use uuid.uuid1().hex to generate a unique hash for commit_hash and distro_hash, or uuid4 to generate a random one. What do you think?",
+      "parentUuid": "8428756c_af5ee39c",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 46
+      },
+      "revId": "b9b1a270d26ef6d7418e17ee8e29c9bdb488300f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6afe4129_798ba949",
         "filename": "scripts/build_srpm.sh",
         "patchSetId": 2
