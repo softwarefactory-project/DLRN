@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1290e0cc_4d4c79e5",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-24T09:52:46Z",
+      "side": 1,
+      "message": "We use cache_dir in projects.ini and the documentation, so let\u0027s leave this empty as \u0027cache_dir\u0027: {}, otherwise we will change the setting in projects.ini but it will never do anything.",
+      "range": {
+        "startLine": 60,
+        "startChar": 34,
+        "endLine": 60,
+        "endChar": 51
+      },
+      "revId": "509ff101af6dd63440d735401a218146fbf0884c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "276f8081_af052e1d",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-24T09:52:46Z",
+      "side": 1,
+      "message": "We use cache_dir in projects.ini and the documentation, so let\u0027s leave this empty as \u0027cache_dir\u0027: {}, otherwise we will change the setting in projects.ini but it will never do anything.",
+      "range": {
+        "startLine": 54,
+        "startChar": 13,
+        "endLine": 54,
+        "endChar": 53
+      },
+      "revId": "509ff101af6dd63440d735401a218146fbf0884c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
