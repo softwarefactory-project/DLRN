@@ -54,6 +54,7 @@ DLRN_CORE_CONFIG = {
         'project_name': {'default': 'RDO'},
         'pkginfo_driver': {'default': 'dlrn.drivers.rdoinfo.RdoInfoDriver'},
         'build_driver': {'default': 'dlrn.drivers.mockdriver.MockBuildDriver'},
+        'container_build_driver': {},
         'workers': {'type': 'int', 'default': 1},
         'gerrit_topic': {'default': 'rdo-FTBFS'},
         'database_connection': {'default': 'sqlite:///commits.sqlite'},
