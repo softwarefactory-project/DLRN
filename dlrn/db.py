@@ -51,6 +51,7 @@ class Commit(Base):
     commit_branch = Column(String(256))
     status = Column(String(64))
     rpms = Column(Text)
+    ocis = Column(Text)
     notes = Column(Text)
     flags = Column(Integer, default=0)
 

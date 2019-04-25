@@ -120,6 +120,9 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     # Retrieve build driver
     build_driver = config_options.build_driver
     buildrpm = import_object(build_driver, cfg_options=config_options)
+    container_build_driver = config_options.container_build_driver
+    if container_build_driver:
+        container_build = import_object(container_build_driver)
 
     # FIXME(hguemar): move all the mock config logic to driver
     mock_config = "dlrn-" + str(worker_id) + ".cfg"
@@ -280,6 +283,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
                            additional_mock_opts=additional_mock_options,
                            package_name=commit.project_name,
                            commit=commit)
+    if container_build_driver:
+        container_build.build_container(commit=commit)
 
 
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
