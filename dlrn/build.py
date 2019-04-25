@@ -75,9 +75,20 @@ def build(packages, commit, env_vars, dev_mode, use_public,
         raise Exception("Unknown type %s" % commit.type)
 
 
-def build_container(packages, commit, env_vars, dev_mode, use_public,
-                    bootstrap, sequential):
-    raise NotImplemented()
+def build_container(packages, commit, env_vars, dev_mode,
+                    use_public, bootstrap, sequential):
+    config_options = getConfigOptions()
+    container_build_driver = config_options.container_build_driver
+    if not container_build_driver:
+        raise RuntimeError("No container_build_driver configured!")
+    container_build = import_object(container_build_driver)
+    try:
+        print("Container build with %s" % commit.__dict__)
+        built_containers = container_build.build_container(commit=commit)
+    except Exception as e:
+        logger.error("Build failed.")
+        raise e
+    return built_containers, "OK"
 
 
 def build_rpm(packages, commit, env_vars, dev_mode, use_public,

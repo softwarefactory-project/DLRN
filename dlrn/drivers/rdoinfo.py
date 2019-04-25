@@ -122,8 +122,7 @@ class RdoInfoDriver(PkgInfoDriver):
         tags_only = buildtagsonly(package)
         build_type = kwargs.get("type")
 
-        if build_type != "rpm":
-            # rdoinfo doesn't support non-rpm build
+        if build_type == "container" and not package.get("container"):
             return []
 
         distro_dir = self._distgit_clone_dir(package['name'])
@@ -149,6 +148,20 @@ class RdoInfoDriver(PkgInfoDriver):
                 # in dev mode, so no try/except
                 refreshrepo(distro, distro_dir, distro_branch, local=local,
                             full_path=distro_dir_full)
+
+        if build_type == "container" and package["container"] == "auto":
+            # Check if a container needs to be build
+            found_bindir = False
+            for spec in filter(lambda x: x.endswith(".spec"),
+                               os.listdir(distro_dir_full)):
+                if "%{_bindir}" in open(
+                        os.path.join(distro_dir_full, spec)).read():
+                    found_bindir = True
+                    break
+            if not found_bindir:
+                logger.debug("No bindir found in %s skipping container build",
+                             distro_dir_full)
+                return []
 
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory
