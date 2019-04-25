@@ -73,7 +73,17 @@ def build(*args, **kwargs):
 
 def build_container(config_options, packages, commit, env_vars, dev_mode,
                     use_public, bootstrap, sequential):
-    raise NotImplemented()
+    container_build_driver = config_options.container_build_driver
+    if not container_build_driver:
+        raise RuntimeError("No container_build_driver configured!")
+    container_build = import_object(container_build_driver)
+    try:
+        print("Container build with %s" % commit.__dict__)
+        built_containers = container_build.build_container(commit=commit)
+    except Exception as e:
+        logger.error("Build failed.")
+        raise e
+    return built_containers, "OK"
 
 
 def build_rpm(config_options, packages, commit, env_vars, dev_mode, use_public,
