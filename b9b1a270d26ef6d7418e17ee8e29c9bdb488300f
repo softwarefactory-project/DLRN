@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "14d50246_3c7ff570",
+        "filename": "dlrn/build.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-25T05:31:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24ccddd5_cabe12f8",
+      "range": {
+        "startLine": 265,
+        "startChar": 8,
+        "endLine": 265,
+        "endChar": 45
+      },
+      "revId": "b9b1a270d26ef6d7418e17ee8e29c9bdb488300f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b96927ba_ea2cd6a4",
         "filename": "dlrn/drivers/local.py",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2019-04-23T16:13:44Z",
       "side": 1,
       "message": "Well, not really :D",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 13
+      },
+      "revId": "b9b1a270d26ef6d7418e17ee8e29c9bdb488300f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "178d26a9_da1bfcfa",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-25T05:31:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b96927ba_ea2cd6a4",
       "range": {
         "startLine": 20,
         "startChar": 0,
@@ -95,6 +143,30 @@
     },
     {
       "key": {
+        "uuid": "f7edb39e_5cb62901",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-25T05:31:32Z",
+      "side": 1,
+      "message": "I\u0027ve added the same logic as in the gitrepo driver for the distro_hash/dt_distro. Not sure we should bother with the commit_hash, perhaps uses the package[\u0027source-branch\u0027] ?",
+      "parentUuid": "ffa163db_f64aba36",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 46
+      },
+      "revId": "b9b1a270d26ef6d7418e17ee8e29c9bdb488300f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6afe4129_798ba949",
         "filename": "scripts/build_srpm.sh",
         "patchSetId": 2
@@ -106,6 +178,30 @@
       "writtenOn": "2019-04-23T16:13:44Z",
       "side": 1,
       "message": "This is duplicating a lot of the lines below. Could we find a better way to avoid duplication?",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 2
+      },
+      "revId": "b9b1a270d26ef6d7418e17ee8e29c9bdb488300f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c7609701_38c2637c",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-25T05:31:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6afe4129_798ba949",
       "range": {
         "startLine": 12,
         "startChar": 0,
