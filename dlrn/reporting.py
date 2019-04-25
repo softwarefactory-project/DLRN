@@ -165,6 +165,18 @@ def genreports(packages, head_only, session, all_commits):
     with open(report_file, "w") as fp:
         fp.write(content)
 
+    jinja_template = jinja_env.get_template("status_report_csv.j2")
+    content = jinja_template.render(msg=msg,
+                                    reponame=reponame,
+                                    src=src,
+                                    project_name=project_name,
+                                    target=target,
+                                    pkgs=pkgs)
+
+    report_file = os.path.join(repodir, "status_report.csv")
+    with open(report_file, "w") as fp:
+        fp.write(content)
+
     # Create a report for the pending packages
     jinja_template = jinja_env.get_template("queue.j2")
     pending_commits = []
