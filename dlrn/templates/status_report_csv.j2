@@ -1,0 +1,4 @@
+Project,Source Sha,Dist Sha,Status,Timestamp,Packages
+{% for pkg in pkgs -%}
+{{ pkg["name"] }},{{ pkg["last_build"].commit_hash }},{{ pkg["last_build"].distro_hash }},{{ pkg["last_build"].status }},{{ pkg["last_build"].dt_build }},{{ pkg["last_build"].artifacts | replace(",","|") }}
+{% endfor %}
