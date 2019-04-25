@@ -175,6 +175,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     contents = contents[:-1]
 
     try:
+        if not baseurl:
+            raise Exception("No baseurl defined")
         r = urlopen(baseurl + "/delorean-deps.repo")
         delorean_deps = True
     except Exception as e:
