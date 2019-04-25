@@ -63,7 +63,8 @@ class TestSyncRepo(base.TestCase):
                                os.path.join(repodir, 'report.html'),
                                os.path.join(repodir, 'status_report.html'),
                                os.path.join(repodir, 'styles.css'),
-                               os.path.join(repodir, 'queue.html')],
+                               os.path.join(repodir, 'queue.html'),
+                               os.path.join(repodir, 'status_report.csv')],
                               'user@host:/directory')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
