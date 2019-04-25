@@ -145,6 +145,22 @@ class RdoInfoDriver(PkgInfoDriver):
                 refreshrepo(distro, distro_dir, distro_branch, local=local,
                             full_path=distro_dir_full)
 
+        build_container = False
+        if package.get("container") == "auto":
+            # Check if a container needs to be build
+            found_bindir = False
+            for spec in filter(lambda x: x.endswith(".spec"),
+                               os.listdir(distro_dir_full)):
+                if "%{_bindir}" in open(
+                        os.path.join(distro_dir_full, spec)).read():
+                    found_bindir = True
+                    break
+            if found_bindir:
+                build_container = True
+            else:
+                logger.debug("No bindir found in %s skipping container build",
+                             distro_dir_full)
+
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory
         repos = [repo]
@@ -193,6 +209,15 @@ class RdoInfoDriver(PkgInfoDriver):
                                 commit_branch=source_branch,
                                 dt_extended=0, extended_hash=None)
                 project_toprocess.append(commit)
+                if build_container:
+                    project_toprocess.append(Commit(
+                        dt_commit=float(dt), project_name=project,
+                        type="container",
+                        commit_hash=commit_hash, repo_dir=repo_dir,
+                        distro_hash=distro_hash, dt_distro=dt_distro,
+                        distgit_dir=self.distgit_dir(package['name']),
+                        commit_branch=source_branch,
+                        dt_extended=0, extended_hash=None))
 
         return project_toprocess
 
