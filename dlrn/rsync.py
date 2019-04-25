@@ -36,7 +36,7 @@ def sync_repo(commit):
         # We also need report.html, status_report.html, queue.html,
         # styles.css and the consistent and current symlinks
         for filename in ['report.html', 'status_report.html', 'styles.css',
-                         'queue.html']:
+                         'queue.html', 'status_report.csv']:
             filepath = os.path.join(datadir, "repos", ".", filename)
             rsyncpaths.append(filepath)
 
