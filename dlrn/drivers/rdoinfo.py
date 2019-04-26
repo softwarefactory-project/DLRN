@@ -120,6 +120,11 @@ class RdoInfoDriver(PkgInfoDriver):
         repo = package['upstream']
         distro = package['master-distgit']
         tags_only = buildtagsonly(package)
+        build_type = kwargs.get("type")
+
+        if build_type != "rpm":
+            # rdoinfo doesn't support non-rpm build
+            return []
 
         distro_dir = self._distgit_clone_dir(package['name'])
         distro_dir_full = self.distgit_dir(package['name'])
@@ -186,6 +191,7 @@ class RdoInfoDriver(PkgInfoDriver):
             for line in lines:
                 dt, commit_hash = str(line).strip().strip("'").split(" ")[:2]
                 commit = Commit(dt_commit=float(dt), project_name=project,
+                                type=build_type,
                                 commit_hash=commit_hash, repo_dir=repo_dir,
                                 distro_hash=distro_hash, dt_distro=dt_distro,
                                 distgit_dir=self.distgit_dir(package['name']),
