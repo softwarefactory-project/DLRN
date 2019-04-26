@@ -37,6 +37,7 @@ def _default_templatedir():
 DLRN_CORE_CONFIG = {
     'DEFAULT': {
         'tags': {},
+        'build_type': {'default': 'rpm'},
         'datadir': {'default': _default_datadir()},
         'gerrit': {},
         'maxretries': {'type': 'int', 'default': 3},
