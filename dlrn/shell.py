@@ -73,6 +73,10 @@ def main():
     parser.add_argument('--config-file',
                         default='projects.ini',
                         help="Config file. Default: projects.ini")
+    parser.add_argument('--build-type',
+                        default='rpm',
+                        choices=('rpm', 'container'),
+                        help="The type of build (default to rpm)")
     parser.add_argument('--info-repo',
                         help="use a local rdoinfo repo instead of"
                              " fetching the default one using rdopkg. Only"
@@ -152,8 +156,15 @@ def main():
         logging.getLogger("sh.command").setLevel(logging.INFO)
     if options.order is True:
         options.sequential = True
+        if options.build_type != "rpm":
+            raise NotImplemented("Order option only work for rpm build")
 
     config_options = ConfigOptions(cp)
+    if options.build_type != "rpm":
+        config_options.build_type = options.build_type
+        if config_options.workers != 1:
+            logger.warning("Forcing workers to 1 for non rpm  build")
+            config_options.worker = 1
     if options.dev:
         _, tmpdb_path = tempfile.mkstemp()
         logger.info("Using file %s for temporary db" % tmpdb_path)
@@ -179,7 +190,9 @@ def main():
         if not pkg_names:
             pkg_names = [p['name'] for p in packages]
         for name in pkg_names:
-            commit = getLastProcessedCommit(session, name, 'invalid status')
+            commit = getLastProcessedCommit(
+                session, name, 'invalid status',
+                type=config_options.build_type)
             if commit:
                 print(name, commit.status)
             else:
@@ -196,7 +209,8 @@ def main():
             logger.error('Please use --package-name or --project-name '
                          'with --recheck.')
             sys.exit(1)
-        commit = getLastProcessedCommit(session, pkg_name)
+        commit = getLastProcessedCommit(
+            session, pkg_name, type=config_options.build_type)
         if commit:
             if commit.status == 'SUCCESS':
                 logger.error("Trying to recheck an already successful commit,"
@@ -257,6 +271,7 @@ def main():
                         (not session.query(Commit).filter(
                             Commit.commit_hash == commit_toprocess.commit_hash,
                             Commit.distro_hash == commit_toprocess.distro_hash,
+                            Commit.type == config_options.build_type,
                             Commit.extended_hash ==
                             commit_toprocess.extended_hash,
                             Commit.status != "RETRY")
@@ -280,6 +295,7 @@ def main():
                         (not session.query(Commit).filter(
                             Commit.commit_hash == commit_toprocess.commit_hash,
                             Commit.distro_hash == commit_toprocess.distro_hash,
+                            Commit.type == config_options.build_type,
                             Commit.extended_hash ==
                             commit_toprocess.extended_hash,
                             Commit.status != "RETRY")
@@ -460,11 +476,29 @@ def main():
     return exit_code
 
 
-def process_build_result(status, packages, session, packages_to_process,
-                         dev_mode=False, run_cmd=False, stop=False,
-                         build_env=None, head_only=False, consistent=False,
-                         failures=0):
+def process_build_result(*args, **kwargs):
     config_options = getConfigOptions()
+    if config_options.build_type == "rpm":
+        return process_build_result_rpm(config_options, *args, **kwargs)
+    elif config_options.build_type == "container":
+        return process_build_result_container(config_options, *args, **kwargs)
+    else:
+        raise NotImplemented("Unknown type %s" % config_options.build_type)
+
+
+def process_build_result_container(
+        config_options, status, packages, session, packages_to_process,
+        dev_mode=False, run_cmd=False, stop=False,
+        build_env=None, head_only=False, consistent=False,
+        failures=0):
+    raise NotImplemented()
+
+
+def process_build_result_rpm(
+        config_options, status, packages, session, packages_to_process,
+        dev_mode=False, run_cmd=False, stop=False,
+        build_env=None, head_only=False, consistent=False,
+        failures=0):
     commit = status[0]
     built_rpms = status[1]
     notes = status[2]
@@ -619,6 +653,20 @@ def export_commit_yaml(commit):
 
 def post_build(status, packages, session, build_repo=True):
     config_options = getConfigOptions()
+    if config_options.build_type == "rpm":
+        return post_build_rpm(
+            status, packages, session, config_options, build_repo)
+    elif config_options.build_type == "container":
+        return post_build_container(status, packages, session, config_options)
+    else:
+        raise NotImplemented("Unknown type %s" % config_options.build_type)
+
+
+def post_build_container(status, packages, session, config_options):
+    raise NotImplemented()
+
+
+def post_build_rpm(status, packages, session, config_options, build_repo):
     commit = status[0]
     built_rpms = status[1]
     project_name = commit.project_name
