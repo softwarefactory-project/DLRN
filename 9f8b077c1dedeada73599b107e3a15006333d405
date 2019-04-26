@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0b21ab09_69e4e36b",
+        "filename": "dlrn/migrations/versions/2d503b5034b7_rename_artifacts.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-26T09:21:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c8bd2a3_652be0bf",
+      "range": {
+        "startLine": 32,
+        "startChar": 3,
+        "endLine": 32,
+        "endChar": 67
+      },
+      "revId": "9f8b077c1dedeada73599b107e3a15006333d405",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "074468dc_ce01f47e",
         "filename": "dlrn/shell.py",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "cbfdc3cf_97a36cb3",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-26T09:21:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "074468dc_ce01f47e",
+      "range": {
+        "startLine": 650,
+        "startChar": 40,
+        "endLine": 650,
+        "endChar": 44
+      },
+      "revId": "9f8b077c1dedeada73599b107e3a15006333d405",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3bd2438d_ca16353a",
         "filename": "dlrn/shell.py",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2019-04-26T08:08:59Z",
       "side": 1,
       "message": "This should be renamed, too",
+      "range": {
+        "startLine": 660,
+        "startChar": 31,
+        "endLine": 660,
+        "endChar": 35
+      },
+      "revId": "9f8b077c1dedeada73599b107e3a15006333d405",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f4e8de7d_8100f003",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-26T09:21:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3bd2438d_ca16353a",
       "range": {
         "startLine": 660,
         "startChar": 31,
