@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e75f1b3e_bacf1eaf",
+        "filename": "dlrn/config.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T09:40:08Z",
+      "side": 1,
+      "message": "If we are adding a command-line switch for the build type, this is not required.",
+      "range": {
+        "startLine": 40,
+        "startChar": 6,
+        "endLine": 40,
+        "endChar": 41
+      },
+      "revId": "642989fbe926acc7ea3851953085a68a7b95d7f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69a1d026_b9d5dff5",
+        "filename": "dlrn/db.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T09:40:08Z",
+      "side": 1,
+      "message": "Why don\u0027t we just set the default type to \"rpm\" then?",
+      "range": {
+        "startLine": 189,
+        "startChar": 0,
+        "endLine": 190,
+        "endChar": 20
+      },
+      "revId": "642989fbe926acc7ea3851953085a68a7b95d7f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f09e0301_143efac0",
+        "filename": "dlrn/migrations/versions/b6f658f481f8_add_commit_type.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T09:40:08Z",
+      "side": 1,
+      "message": "For an already created database, it is safe to assume that the type for all existing commits will be \"rpm\", so we should set it as well.",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 56
+      },
+      "revId": "642989fbe926acc7ea3851953085a68a7b95d7f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "40a02ca8_986f9115",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T09:40:08Z",
+      "side": 1,
+      "message": "Why? Have you found any issue with this?",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 166,
+        "endChar": 37
+      },
+      "revId": "642989fbe926acc7ea3851953085a68a7b95d7f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "165d001a_07e8a706",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T09:40:08Z",
+      "side": 1,
+      "message": "I\u0027m not sure about this duality in command-line and config option for the same parameter. I would rather use a global for this, just like we do with verbose_build (see above).",
+      "range": {
+        "startLine": 481,
+        "startChar": 2,
+        "endLine": 481,
+        "endChar": 39
+      },
+      "revId": "642989fbe926acc7ea3851953085a68a7b95d7f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "88ab601d_468e957b",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T09:40:08Z",
+      "side": 1,
+      "message": "Later down the road, I would move each of these methods to separate files, so we have build_rpm.py and build_container.py files.",
+      "range": {
+        "startLine": 666,
+        "startChar": 0,
+        "endLine": 670,
+        "endChar": 74
+      },
+      "revId": "642989fbe926acc7ea3851953085a68a7b95d7f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
