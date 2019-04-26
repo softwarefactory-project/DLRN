@@ -14,7 +14,7 @@ commits:
   notes: "\n\n  RAN: '/bin/docker run -t --volume=/home/centos-master/data:/data --volume=/home/centos-master/de"
   project_name: python-alembic
   repo_dir: /home/centos-master/data/python-alembic
-  rpms: None
+  artifacts: None
   status: FAILED
 - commit_hash: 17234e9ab9dfab4cf5600f67f1d24db5064f1025
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -28,7 +28,7 @@ commits:
   notes: OK
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: repos/17/23/17234e9ab9dfab4cf5600f67f1d24db5064f1025_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/17/23/17234e9ab9dfab4cf5600f67f1d24db5064f1025_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
+  artifacts: repos/17/23/17234e9ab9dfab4cf5600f67f1d24db5064f1025_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/17/23/17234e9ab9dfab4cf5600f67f1d24db5064f1025_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc
   distro_hash: 8170b8686c38bafb6021d998e2fb268ab26ccf65
@@ -42,7 +42,7 @@ commits:
   notes: OK
   project_name: python-alembic
   repo_dir: /home/centos-master/data/python-alembic
-  rpms: repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.noarch.rpm,repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.src.rpm
+  artifacts: repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.noarch.rpm,repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc
   distro_hash: 885e80778edb6cbb8ee4d8909623be8062369a04
@@ -56,7 +56,7 @@ commits:
   notes: "\n\n  RAN: '/bin/docker run -t --volume=/home/centos-master/data:/data --volume=/home/centos-master/de"
   project_name: python-alembic
   repo_dir: /home/centos-master/data/python-alembic
-  rpms: None
+  artifacts: None
   status: FAILED
 - commit_hash: 12edde8a53c7299105bb8297c6f31d3a458615ab
   distro_hash: 354991d934d4217de5cfa447aabda684489544b5
@@ -70,7 +70,7 @@ commits:
   notes: OK
   project_name: python-tripleoclient
   repo_dir: /home/centos-master/data/python-tripleoclient
-  rpms: repos/12/ed/12edde8a53c7299105bb8297c6f31d3a458615ab_354991d9/python-tripleoclient-0.0.11-dev2.el7.centos.noarch.rpm,repos/12/ed/12edde8a53c7299105bb8297c6f31d3a458615ab_354991d9/python-tripleoclient-0.0.11-dev2.el7.centos.src.rpm
+  artifacts: repos/12/ed/12edde8a53c7299105bb8297c6f31d3a458615ab_354991d9/python-tripleoclient-0.0.11-dev2.el7.centos.noarch.rpm,repos/12/ed/12edde8a53c7299105bb8297c6f31d3a458615ab_354991d9/python-tripleoclient-0.0.11-dev2.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 80f6969520b526b01c210b1c680565bef8a1f8ad
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -83,7 +83,7 @@ commits:
   notes: OK
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: None
+  artifacts: None
   status: FAILED
 - commit_hash: e4f71ada86ee4a42287cf401b77d48c9f98ca5aa
   distro_hash: 354991d934d4217de5cfa447aabda684489544b5
@@ -96,7 +96,7 @@ commits:
   notes: OK
   project_name: python-tripleoclient
   repo_dir: /home/centos-master/data/python-tripleoclient
-  rpms: repos/e4/f7/e4f71ada86ee4a42287cf401b77d48c9f98ca5aa_354991d9/python-tripleoclient-0.0.11-dev3.el7.centos.noarch.rpm,repos/e4/f7/e4f71ada86ee4a42287cf401b77d48c9f98ca5aa_354991d9/python-tripleoclient-0.0.11-dev3.el7.centos.src.rpm
+  artifacts: repos/e4/f7/e4f71ada86ee4a42287cf401b77d48c9f98ca5aa_354991d9/python-tripleoclient-0.0.11-dev3.el7.centos.noarch.rpm,repos/e4/f7/e4f71ada86ee4a42287cf401b77d48c9f98ca5aa_354991d9/python-tripleoclient-0.0.11-dev3.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 459549c9ab7fef91b2dc8986bc0643bb2f6ec0c8
   distro_hash: 885e80778edb6cbb8ee4d8909623be8062369a04
@@ -109,7 +109,7 @@ commits:
   notes: "\n\n  RAN: '/bin/docker run -t --volume=/home/centos-master/data:/data --volume=/home/centos-master/de"
   project_name: python-alembic
   repo_dir: /home/centos-master/data/python-alembic
-  rpms: None
+  artifacts: None
   status: FAILED
 - commit_hash: ae9d27e5100f002f55ad6eb2b252a0aa5f16a336
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -122,7 +122,7 @@ commits:
   notes: OK
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: None
+  artifacts: None
   status: FAILED
 - commit_hash: 6abf557aa1d8fff0aa21f8eba6cd18302c2c86ff
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
@@ -135,7 +135,7 @@ commits:
   notes: OK
   project_name: python-tripleoclient
   repo_dir: /home/centos-master/data/python-tripleoclient
-  rpms: repos/6a/bf/6abf557aa1d8fff0aa21f8eba6cd18302c2c86ff_0b1ce934/python-tripleoclient-0.0.11-dev34.el7.centos.noarch.rpm,repos/6a/bf/6abf557aa1d8fff0aa21f8eba6cd18302c2c86ff_0b1ce934/python-tripleoclient-0.0.11-dev34.el7.centos.src.rpm
+  artifacts: repos/6a/bf/6abf557aa1d8fff0aa21f8eba6cd18302c2c86ff_0b1ce934/python-tripleoclient-0.0.11-dev34.el7.centos.noarch.rpm,repos/6a/bf/6abf557aa1d8fff0aa21f8eba6cd18302c2c86ff_0b1ce934/python-tripleoclient-0.0.11-dev34.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: b43d00e1a72187d5e82db4653cc39e3d6ac2788b
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
@@ -148,7 +148,7 @@ commits:
   notes: OK
   project_name: python-tripleoclient
   repo_dir: /home/centos-master/data/python-tripleoclient
-  rpms: repos/b4/3d/b43d00e1a72187d5e82db4653cc39e3d6ac2788b_0b1ce934/python-tripleoclient-0.0.11-dev44.el7.centos.noarch.rpm,repos/b4/3d/b43d00e1a72187d5e82db4653cc39e3d6ac2788b_0b1ce934/python-tripleoclient-0.0.11-dev44.el7.centos.src.rpm
+  artifacts: repos/b4/3d/b43d00e1a72187d5e82db4653cc39e3d6ac2788b_0b1ce934/python-tripleoclient-0.0.11-dev44.el7.centos.noarch.rpm,repos/b4/3d/b43d00e1a72187d5e82db4653cc39e3d6ac2788b_0b1ce934/python-tripleoclient-0.0.11-dev44.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 688945fdcfc1d6cec45ee83843cd6c65bc3f0f43
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -161,7 +161,7 @@ commits:
   notes: "\n\n  RAN: '/bin/docker run -t --volume=/home/centos-master/data:/data --volume=/home/centos-master/de"
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: None
+  artifacts: None
   status: RETRY
 - commit_hash: 688945fdcfc1d6cec45ee83843cd6c65bc3f0f43
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -174,7 +174,7 @@ commits:
   notes: "\n\n  RAN: '/bin/docker run -t --volume=/home/centos-master/data:/data --volume=/home/centos-master/de"
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: None
+  artifacts: None
   status: RETRY
 - commit_hash: 688945fdcfc1d6cec45ee83843cd6c65bc3f0f43
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -187,7 +187,7 @@ commits:
   notes: "\n\n  RAN: '/bin/docker run -t --volume=/home/centos-master/data:/data --volume=/home/centos-master/de"
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: None
+  artifacts: None
   status: RETRY
 - commit_hash: 688945fdcfc1d6cec45ee83843cd6c65bc3f0f43
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -200,7 +200,7 @@ commits:
   notes: OK
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: repos/68/89/688945fdcfc1d6cec45ee83843cd6c65bc3f0f43_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/68/89/688945fdcfc1d6cec45ee83843cd6c65bc3f0f43_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
+  artifacts: repos/68/89/688945fdcfc1d6cec45ee83843cd6c65bc3f0f43_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/68/89/688945fdcfc1d6cec45ee83843cd6c65bc3f0f43_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 39cc225c11e540bb8dfe8ff056296da75fa33c14
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
@@ -213,7 +213,7 @@ commits:
   notes: OK
   project_name: python-tripleoclient
   repo_dir: /home/centos-master/data/python-tripleoclient
-  rpms: repos/39/cc/39cc225c11e540bb8dfe8ff056296da75fa33c14_0b1ce934/python-tripleoclient-0.0.11-dev46.el7.centos.noarch.rpm,repos/39/cc/39cc225c11e540bb8dfe8ff056296da75fa33c14_0b1ce934/python-tripleoclient-0.0.11-dev46.el7.centos.src.rpm
+  artifacts: repos/39/cc/39cc225c11e540bb8dfe8ff056296da75fa33c14_0b1ce934/python-tripleoclient-0.0.11-dev46.el7.centos.noarch.rpm,repos/39/cc/39cc225c11e540bb8dfe8ff056296da75fa33c14_0b1ce934/python-tripleoclient-0.0.11-dev46.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 38539fdfc44fa87f3034dac17606a435b6f438a7
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -226,7 +226,7 @@ commits:
   notes: OK
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: repos/38/53/38539fdfc44fa87f3034dac17606a435b6f438a7_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/38/53/38539fdfc44fa87f3034dac17606a435b6f438a7_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
+  artifacts: repos/38/53/38539fdfc44fa87f3034dac17606a435b6f438a7_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/38/53/38539fdfc44fa87f3034dac17606a435b6f438a7_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 7d21bb1f4d9068b1ee5f2237d77496bb9afe63ac
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
@@ -239,7 +239,7 @@ commits:
   notes: OK
   project_name: python-tripleoclient
   repo_dir: /home/centos-master/data/python-tripleoclient
-  rpms: repos/7d/21/7d21bb1f4d9068b1ee5f2237d77496bb9afe63ac_0b1ce934/python-tripleoclient-0.0.11-dev52.el7.centos.noarch.rpm,repos/7d/21/7d21bb1f4d9068b1ee5f2237d77496bb9afe63ac_0b1ce934/python-tripleoclient-0.0.11-dev52.el7.centos.src.rpm
+  artifacts: repos/7d/21/7d21bb1f4d9068b1ee5f2237d77496bb9afe63ac_0b1ce934/python-tripleoclient-0.0.11-dev52.el7.centos.noarch.rpm,repos/7d/21/7d21bb1f4d9068b1ee5f2237d77496bb9afe63ac_0b1ce934/python-tripleoclient-0.0.11-dev52.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: a12cc2a979f5203e4c136684aa35741f4a73d1ce
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -252,7 +252,7 @@ commits:
   notes: OK
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: repos/a1/2c/a12cc2a979f5203e4c136684aa35741f4a73d1ce_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/a1/2c/a12cc2a979f5203e4c136684aa35741f4a73d1ce_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
+  artifacts: repos/a1/2c/a12cc2a979f5203e4c136684aa35741f4a73d1ce_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/a1/2c/a12cc2a979f5203e4c136684aa35741f4a73d1ce_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 1da7b10e55abf8c518e8f61ee7966188f0405f59
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
@@ -265,7 +265,7 @@ commits:
   notes: OK
   project_name: python-tripleoclient
   repo_dir: /home/centos-master/data/python-tripleoclient
-  rpms: repos/1d/a7/1da7b10e55abf8c518e8f61ee7966188f0405f59_0b1ce934/python-tripleoclient-0.0.11-dev54.el7.centos.noarch.rpm,repos/1d/a7/1da7b10e55abf8c518e8f61ee7966188f0405f59_0b1ce934/python-tripleoclient-0.0.11-dev54.el7.centos.src.rpm
+  artifacts: repos/1d/a7/1da7b10e55abf8c518e8f61ee7966188f0405f59_0b1ce934/python-tripleoclient-0.0.11-dev54.el7.centos.noarch.rpm,repos/1d/a7/1da7b10e55abf8c518e8f61ee7966188f0405f59_0b1ce934/python-tripleoclient-0.0.11-dev54.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -278,7 +278,7 @@ commits:
   notes: "\n\n  RAN: '/bin/docker run -t --volume=/home/centos-master/data:/data --volume=/home/centos-master/de"
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: None
+  artifacts: None
   status: RETRY
 - commit_hash: 3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
@@ -292,7 +292,7 @@ commits:
   notes: OK
   project_name: python-pysaml2
   repo_dir: /home/centos-master/data/python-pysaml2
-  rpms: repos/3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
+  artifacts: repos/3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
   status: SUCCESS
 - commit_hash: 7ac2745f11522d46b8fed8c015922b93f68a6488
   distro_hash: 0b1ce934e5b2e7d45a448f6555d24036f9aeca51
@@ -306,5 +306,5 @@ commits:
   project_name: python-tripleoclient
   repo_dir: /home/centos-master/data/python-tripleoclient
   distgit_dir: /home/centos-master/data/python-tripleoclient-distgit
-  rpms: None
+  artifacts: None
   status: RETRY

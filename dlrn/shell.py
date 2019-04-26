@@ -487,7 +487,7 @@ def process_build_result(status, packages, session, packages_to_process,
     if exception is None:
         commit.status = "SUCCESS"
         commit.notes = notes
-        commit.rpms = ",".join(built_rpms)
+        commit.artifacts = ",".join(built_rpms)
     else:
         logger.error("Received exception %s" % exception)
 
@@ -647,7 +647,7 @@ def post_build(status, packages, session, build_repo=True):
 
         if last_success:
             if build_repo:
-                for rpm in last_success.rpms.split(","):
+                for rpm in last_success.artifacts.split(","):
                     rpm_link_src = os.path.join(yumrepodir_abs,
                                                 os.path.split(rpm)[1])
                     os.symlink(os.path.relpath(os.path.join(datadir, rpm),
@@ -656,8 +656,8 @@ def post_build(status, packages, session, build_repo=True):
         else:
             last = last_processed
         if last:
-            if last.rpms:
-                rpmlist = last.rpms.split(",")
+            if last.artifacts:
+                rpmlist = last.artifacts.split(",")
             else:
                 rpmlist = []
             upstream = otherproject.get('upstream', '')
