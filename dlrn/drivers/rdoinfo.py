@@ -120,6 +120,11 @@ class RdoInfoDriver(PkgInfoDriver):
         repo = package['upstream']
         distro = package['master-distgit']
         tags_only = buildtagsonly(package)
+        build_type = kwargs.get("type")
+
+        if build_type != "rpm":
+            # rdoinfo doesn't support non-rpm build
+            return []
 
         distro_dir = self._distgit_clone_dir(package['name'])
         distro_dir_full = self.distgit_dir(package['name'])

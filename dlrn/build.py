@@ -61,8 +61,27 @@ def get_version_from(packages, project_name):
     return None
 
 
-def build(packages, commit, env_vars, dev_mode, use_public, bootstrap,
-          sequential):
+def build(packages, commit, env_vars, dev_mode, use_public,
+          bootstrap, sequential):
+    if commit.type == "rpm":
+        return build_rpm(
+            packages, commit, env_vars, dev_mode, use_public,
+            bootstrap, sequential)
+    elif commit.type == "container":
+        return build_container(
+            packages, commit, env_vars, dev_mode, use_public,
+            bootstrap, sequential)
+    else:
+        raise Exception("Unknown type %s" % commit.typetype)
+
+
+def build_container(packages, commit, env_vars, dev_mode, use_public,
+                    bootstrap, sequential):
+    raise NotImplemented()
+
+
+def build_rpm(packages, commit, env_vars, dev_mode, use_public,
+              bootstrap, sequential):
     config_options = getConfigOptions()
     # Set the build timestamp to now
     commit.dt_build = int(time())
