@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1db4b8c8_a7fdf390",
+        "filename": "dlrn/migrations/versions/b6f658f481f8_add_commit_type.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T16:38:27Z",
+      "side": 1,
+      "message": "In this case, adding a column does not need a batch operation. We could do:\n\nop.add_column(\u0027commits\u0027, sa.Column(\u0027type\u0027, sa.String(18), server_default\u003d\u0027rpm\u0027))",
+      "range": {
+        "startLine": 35,
+        "startChar": 20,
+        "endLine": 35,
+        "endChar": 54
+      },
+      "revId": "4f79a1b00db0299281d693ce1cffae0d5d3ca5da",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
