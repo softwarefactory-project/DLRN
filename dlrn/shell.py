@@ -179,11 +179,15 @@ def main():
         if not pkg_names:
             pkg_names = [p['name'] for p in packages]
         for name in pkg_names:
-            commit = getLastProcessedCommit(session, name, 'invalid status')
-            if commit:
-                print(name, commit.status)
-            else:
-                print(name, 'NO_BUILD')
+            package = [p for p in packages if p['name'] == name][0]
+            for build_type in package.get('types', ['rpm']):
+                commit = getLastProcessedCommit(
+                    session, name, 'invalid status',
+                    type=build_type)
+                if commit:
+                    print("{:>9}".format(build_type), name, commit.status)
+                else:
+                    print("{:>9}".format(build_type), name, 'NO_BUILD')
         sys.exit(0)
 
     if pkg_names:
@@ -191,33 +195,39 @@ def main():
     else:
         pkg_name = None
 
+    def recheck_commit(commit):
+        if commit.status == 'SUCCESS':
+            logger.error(
+                "Trying to recheck an already successful commit,"
+                " ignoring.")
+            sys.exit(1)
+        elif commit.status == 'RETRY':
+            # In this case, we are going to retry anyway, so
+            # do nothing and exit
+            logger.warning("Trying to recheck a commit in RETRY state,"
+                           " ignoring.")
+            sys.exit(0)
+        else:
+            # We could set the status to RETRY here, but if we have gone
+            # beyond max_retries it wouldn't work as expected. Thus, our
+            # only chance is to remove the commit
+            session.delete(commit)
+            session.commit()
+            sys.exit(0)
+
     if options.recheck is True:
         if not pkg_name:
             logger.error('Please use --package-name or --project-name '
                          'with --recheck.')
             sys.exit(1)
-        commit = getLastProcessedCommit(session, pkg_name)
-        if commit:
-            if commit.status == 'SUCCESS':
-                logger.error("Trying to recheck an already successful commit,"
-                             " ignoring.")
-                sys.exit(1)
-            elif commit.status == 'RETRY':
-                # In this case, we are going to retry anyway, so
-                # do nothing and exit
-                logger.warning("Trying to recheck a commit in RETRY state,"
-                               " ignoring.")
-                sys.exit(0)
+        package = [p for p in packages if p['name'] == pkg_name][0]
+        for build_type in package.get('types', ['rpm']):
+            commit = getLastProcessedCommit(session, pkg_name, type=build_type)
+            if commit:
+                recheck_commit(commit)
             else:
-                # We could set the status to RETRY here, but if we have gone
-                # beyond max_retries it wouldn't work as expected. Thus, our
-                # only chance is to remove the commit
-                session.delete(commit)
-                session.commit()
-                sys.exit(0)
-        else:
-                logger.error("There are no existing commits for package %s"
-                             % pkg_name)
+                logger.error("There are no existing commits for package %s",
+                             pkg_name)
                 sys.exit(1)
     # when we run a program instead of building we don't care about
     # the commits, we just want to run once per package
@@ -225,6 +235,24 @@ def main():
         options.head_only = True
     # Build a list of commits we need to process
     toprocess = []
+
+    def add_commits(project_toprocess):
+        # The first entry in the list of commits is a commit we have
+        # already processed, we want to process it again only if in dev
+        # mode or distro hash has changed, we can't simply check
+        # against the last commit in the db, as multiple commits can
+        # have the same commit date
+        for commit_toprocess in project_toprocess:
+            if options.dev is True or \
+               options.run or \
+               not session.query(Commit).filter(
+                   Commit.commit_hash == commit_toprocess.commit_hash,
+                   Commit.distro_hash == commit_toprocess.distro_hash,
+                   Commit.extended_hash == commit_toprocess.extended_hash,
+                   Commit.type == commit_toprocess.type,
+                   Commit.status != "RETRY").all():
+                toprocess.append(commit_toprocess)
+
     if not pkg_name and not pkg_names:
         pool = multiprocessing.Pool()   # This will use all the system cpus
         # Use functools.partial to iterate on the packages to process,
@@ -242,26 +270,11 @@ def main():
                     if package['name'] == updated_pkg['name']:
                         if package['upstream'] == 'Unknown':
                             package['upstream'] = updated_pkg['upstream']
-                            logger.debug("Updated upstream for package %s to "
-                                         "%s" % (package['name'],
-                                                 package['upstream']))
+                            logger.debug(
+                                "Updated upstream for package %s to %s",
+                                package['name'], package['upstream'])
                         break
-                # The first entry in the list of commits is a commit we have
-                # already processed, we want to process it again only if in dev
-                # mode or distro hash has changed, we can't simply check
-                # against the last commit in the db, as multiple commits can
-                # have the same commit date
-                for commit_toprocess in project_toprocess:
-                    if ((options.dev is True) or
-                        options.run or
-                        (not session.query(Commit).filter(
-                            Commit.commit_hash == commit_toprocess.commit_hash,
-                            Commit.distro_hash == commit_toprocess.distro_hash,
-                            Commit.extended_hash ==
-                            commit_toprocess.extended_hash,
-                            Commit.status != "RETRY")
-                            .all())):
-                        toprocess.append(commit_toprocess)
+                add_commits(project_toprocess)
             except StopIteration:
                 break
         pool.close()
@@ -274,17 +287,7 @@ def main():
                                                head_only=options.head_only,
                                                db_connection=config_options.
                                                database_connection)
-                for commit_toprocess in project_toprocess:
-                    if ((options.dev is True) or
-                        options.run or
-                        (not session.query(Commit).filter(
-                            Commit.commit_hash == commit_toprocess.commit_hash,
-                            Commit.distro_hash == commit_toprocess.distro_hash,
-                            Commit.extended_hash ==
-                            commit_toprocess.extended_hash,
-                            Commit.status != "RETRY")
-                            .all())):
-                        toprocess.append(commit_toprocess)
+                add_commits(project_toprocess)
     closeSession(session)   # Close session, will reopen during post_build
 
     # Check if there is any commit at all to process
@@ -460,10 +463,28 @@ def main():
     return exit_code
 
 
-def process_build_result(status, packages, session, packages_to_process,
-                         dev_mode=False, run_cmd=False, stop=False,
-                         build_env=None, head_only=False, consistent=False,
-                         failures=0):
+def process_build_result(status, *args, **kwargs):
+    if status[0].type == "rpm":
+        return process_build_result_rpm(status, *args, **kwargs)
+    elif status[0].type == "container":
+        return process_build_result_container(status, *args, **kwargs)
+    else:
+        raise Exception("Unknown type %s" % status[0].type)
+
+
+def process_build_result_container(
+        status, packages, session, packages_to_process,
+        dev_mode=False, run_cmd=False, stop=False,
+        build_env=None, head_only=False, consistent=False,
+        failures=0):
+    raise NotImplemented()
+
+
+def process_build_result_rpm(
+        status, packages, session, packages_to_process,
+        dev_mode=False, run_cmd=False, stop=False,
+        build_env=None, head_only=False, consistent=False,
+        failures=0):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
@@ -617,7 +638,20 @@ def export_commit_yaml(commit):
     saveYAML_commit(commit, os.path.join(yumrepodir, 'commit.yaml'))
 
 
-def post_build(status, packages, session, build_repo=True):
+def post_build(status, *args, **kwargs):
+    if status[0].type == "rpm":
+        return post_build_rpm(status, *args, **kwargs)
+    elif status[0].type == "container":
+        return post_build_container(status, *args, **kwargs)
+    else:
+        raise Exception("Unknown type %s" % status[0].type)
+
+
+def post_build_container(status, packages, session, build_repo=None):
+    raise NotImplemented()
+
+
+def post_build_rpm(status, packages, session, build_repo=True):
     config_options = getConfigOptions()
     commit = status[0]
     built_rpms = status[1]
@@ -642,8 +676,10 @@ def post_build(status, packages, session, build_repo=True):
             continue
         # Output sha's of all other projects represented in this repo
         last_success = getCommits(session, project=otherprojectname,
-                                  with_status="SUCCESS").first()
-        last_processed = getCommits(session, project=otherprojectname).first()
+                                  with_status="SUCCESS",
+                                  type=commit.type).first()
+        last_processed = getCommits(session, project=otherprojectname,
+                                    type=commit.type).first()
 
         if last_success:
             if build_repo:
@@ -699,11 +735,11 @@ def post_build(status, packages, session, build_repo=True):
 
 
 def getinfo(package, local=False, dev_mode=False, head_only=False,
-            db_connection=None):
+            db_connection=None, type="rpm"):
     project = package["name"]
     since = "-1"
     session = getSession(db_connection)
-    commit = getLastProcessedCommit(session, project)
+    commit = getLastProcessedCommit(session, project, type=type)
     if commit:
         # If we have switched source branches, we want to behave
         # as if no previous commits had been built, and only build
@@ -717,7 +753,7 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
             # in case, let's check if we built a previous commit from the
             # current branch
             commit = getLastBuiltCommit(session, project,
-                                        getsourcebranch(package))
+                                        getsourcebranch(package), type=type)
             if commit:
                 logger.info("Last commit belongs to another branch, but"
                             " we're ok with that")
@@ -727,7 +763,7 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
 
     project_toprocess = pkginfo.getinfo(project=project, package=package,
                                         since=since, local=local,
-                                        dev_mode=dev_mode)
+                                        dev_mode=dev_mode, type=type)
 
     closeSession(session)
     # If since == -1, then we only want to trigger a build for the
