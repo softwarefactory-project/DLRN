@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "19b07313_9fcc59a1",
+        "filename": "dlrn/db.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T09:52:00Z",
+      "side": 1,
+      "message": "The failure in the functional job is caused by the column rename, which breaks compatibility with existing commit.yaml files. I have found a fix using SQLAlchemy synonyms [1]:\n\nfrom sqlalchemy.orm import synonym\n  \n    (in class Commit():)  \n    # For backwards compatibility when importing commits\n    rpms \u003d synonym(\"artifacts\")\n\n[1] https://docs.sqlalchemy.org/en/13/orm/mapped_attributes.html#synonyms",
+      "range": {
+        "startLine": 53,
+        "startChar": 2,
+        "endLine": 53,
+        "endChar": 28
+      },
+      "revId": "e8eb0734d3edba7367db7cadd0284b358358b625",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
