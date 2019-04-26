@@ -487,7 +487,7 @@ def process_build_result(status, packages, session, packages_to_process,
     if exception is None:
         commit.status = "SUCCESS"
         commit.notes = notes
-        commit.rpms = ",".join(built_rpms)
+        commit.artifacts = ",".join(built_rpms)
     else:
         logger.error("Received exception %s" % exception)
 
@@ -656,7 +656,7 @@ def post_build(status, packages, session, build_repo=True):
         else:
             last = last_processed
         if last:
-            if last.rpms:
+            if last.artifacts:
                 rpmlist = last.rpms.split(",")
             else:
                 rpmlist = []
