@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c8bd2a3_652be0bf",
+        "filename": "dlrn/migrations/versions/2d503b5034b7_rename_artifacts.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T08:08:59Z",
+      "side": 1,
+      "message": "We need to use batch operations for this to work, otherwise it breaks the alembic upgrade on SQLAlchemy, see https://softwarefactory-project.io/logs/37/15437/1/check/dlrn-api-functional/7dc3f38/ara-report/result/faa70011-eca1-4bdc-bbcc-8aa66e6a638b/\n\nThis should work:\n\n    with op.batch_alter_table(\"commits\") as batch_op:\n        batch_op.alter_column(\u0027rpms\u0027, new_column_name\u003d\u0027artifacts\u0027)",
+      "range": {
+        "startLine": 32,
+        "startChar": 3,
+        "endLine": 32,
+        "endChar": 67
+      },
+      "revId": "9f8b077c1dedeada73599b107e3a15006333d405",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "074468dc_ce01f47e",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T08:08:59Z",
+      "side": 1,
+      "message": "This should be renamed, too",
+      "range": {
+        "startLine": 650,
+        "startChar": 40,
+        "endLine": 650,
+        "endChar": 44
+      },
+      "revId": "9f8b077c1dedeada73599b107e3a15006333d405",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3bd2438d_ca16353a",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-26T08:08:59Z",
+      "side": 1,
+      "message": "This should be renamed, too",
+      "range": {
+        "startLine": 660,
+        "startChar": 31,
+        "endLine": 660,
+        "endChar": 35
+      },
+      "revId": "9f8b077c1dedeada73599b107e3a15006333d405",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
