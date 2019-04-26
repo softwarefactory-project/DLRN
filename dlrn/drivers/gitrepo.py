@@ -224,6 +224,7 @@ class GitRepoDriver(PkgInfoDriver):
             for line in lines:
                 dt, commit_hash = str(line).strip().strip("'").split(" ")
                 commit = Commit(dt_commit=float(dt), project_name=project,
+                                type='rpm',
                                 commit_hash=commit_hash, repo_dir=repo_dir,
                                 distro_hash=distro_hash, dt_distro=dt_distro,
                                 distgit_dir=distro_dir,
