@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "59509d5c_bb981019",
+        "filename": "dlrn/db.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-26T11:11:58Z",
+      "side": 1,
+      "message": "indeed, not sure what i was thinking here :-)",
+      "parentUuid": "69a1d026_b9d5dff5",
+      "range": {
+        "startLine": 189,
+        "startChar": 0,
+        "endLine": 190,
+        "endChar": 20
+      },
+      "revId": "642989fbe926acc7ea3851953085a68a7b95d7f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f09e0301_143efac0",
         "filename": "dlrn/migrations/versions/b6f658f481f8_add_commit_type.py",
         "patchSetId": 1
@@ -71,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "f6f33c31_20aa63e7",
+        "filename": "dlrn/migrations/versions/b6f658f481f8_add_commit_type.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-26T11:11:58Z",
+      "side": 1,
+      "message": "Oops, I thought server_default would do that.",
+      "parentUuid": "f09e0301_143efac0",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 56
+      },
+      "revId": "642989fbe926acc7ea3851953085a68a7b95d7f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "40a02ca8_986f9115",
         "filename": "dlrn/shell.py",
         "patchSetId": 1
@@ -82,6 +130,30 @@
       "writtenOn": "2019-04-26T09:40:08Z",
       "side": 1,
       "message": "Why? Have you found any issue with this?",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 166,
+        "endChar": 37
+      },
+      "revId": "642989fbe926acc7ea3851953085a68a7b95d7f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f6884da1_233e3efc",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-26T11:11:58Z",
+      "side": 1,
+      "message": "It shouldn\u0027t, it just meant to be conservative in this first implem.",
+      "parentUuid": "40a02ca8_986f9115",
       "range": {
         "startLine": 164,
         "startChar": 0,
