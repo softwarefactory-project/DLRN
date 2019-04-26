@@ -35,11 +35,11 @@ logger = logging.getLogger("dlrn-purge")
 def is_commit_in_dirs(commit, dirlist):
     if dirlist is None:
         return False
-    if commit.rpms is None:
+    if commit.artifacts is None:
         return False
     directories = dirlist.split(',')
     rpms = []
-    for rpm in commit.rpms.split(','):
+    for rpm in commit.artifacts.split(','):
         rpms.append(rpm.split('/')[-1])
 
     for rpm in rpms:
