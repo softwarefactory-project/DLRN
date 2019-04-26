@@ -70,6 +70,9 @@ def loadYAML(session, yamlfile):
         # We need a special case for extended_hash, which could be "None"
         if c.extended_hash == 'None':
             c.extended_hash = None
+        # Retro compatibility before commit type
+        if not c.type:
+            c.type = "rpm"
         session.add(c)
         session.commit()
     try:
@@ -115,6 +118,9 @@ def loadYAML_list(yamlfile):
         # We need a special case for extended_hash, which could be "None"
         if c.extended_hash == 'None':
             c.extended_hash = None
+        # Retro compatibility before commit type
+        if not c.type:
+            c.type = "rpm"
         commit_list.append(c)
 
     return commit_list
