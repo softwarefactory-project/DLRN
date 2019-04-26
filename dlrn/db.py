@@ -50,7 +50,7 @@ class Commit(Base):
     extended_hash = Column(String(64))
     commit_branch = Column(String(256))
     status = Column(String(64))
-    rpms = Column(Text)
+    artifacts = Column(Text)
     notes = Column(Text)
     flags = Column(Integer, default=0)
 

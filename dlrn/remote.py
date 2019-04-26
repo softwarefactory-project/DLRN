@@ -64,8 +64,8 @@ def import_commit(repo_url, config_file, db_connection=None,
 
     for commit in commits:
         commit.id = None
-        if commit.rpms == 'None':
-            commit.rpms = None
+        if commit.artifacts == 'None':
+            commit.artifacts = None
         commit.dt_build = int(commit.dt_build)
         commit.dt_commit = float(commit.dt_commit)
         commit.dt_distro = int(commit.dt_distro)
@@ -106,8 +106,8 @@ def import_commit(repo_url, config_file, db_connection=None,
                 # some missing files
                 pass
 
-        if commit.rpms:
-            for rpm in commit.rpms.split(","):
+        if commit.artifacts:
+            for rpm in commit.artifacts.split(","):
                 rpm_url = repo_url + '/' + rpm.split('/')[-1]
                 try:
                     r = urlopen(rpm_url)
@@ -125,7 +125,7 @@ def import_commit(repo_url, config_file, db_connection=None,
             logger.debug("Acquired lock")
             if commit.status == 'SUCCESS':
                 built_rpms = []
-                for rpm in commit.rpms.split(","):
+                for rpm in commit.artifacts.split(","):
                     built_rpms.append(rpm)
                 status = [commit, built_rpms, commit.notes, None]
                 post_build(status, packages, session)
