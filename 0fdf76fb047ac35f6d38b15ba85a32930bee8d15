@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a1814694_ea7e03de",
+        "filename": "dlrn/build.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-29T08:45:27Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 75,
+        "startChar": 51,
+        "endLine": 75,
+        "endChar": 59
+      },
+      "revId": "0fdf76fb047ac35f6d38b15ba85a32930bee8d15",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
