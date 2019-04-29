@@ -20,6 +20,8 @@ import shutil
 
 from six.moves.urllib.request import urlopen
 
+from dlrn.db import FLAG_KEEPCHANGELOG, FLAG_KEEPTARBALL
+from dlrn.db import FLAG_KEEPTARBALL
 from dlrn.config import getConfigOptions
 from dlrn.utils import import_object
 from time import time
@@ -262,6 +264,11 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
 
     if config_options.keep_changelog:
         os.environ['DLRN_KEEP_CHANGELOG'] = '1'
+
+    if commit.flags & FLAG_KEEPCHANGELOG:
+        os.environ['DLRN_KEEP_CHANGELOG'] = '1'
+    if commit.flags & FLAG_KEEPTARBALL:
+        os.environ['DLRN_KEEP_TARBALL'] = '1'
 
     # We may do some git repo manipulation, so we need to make sure the
     # right commit is there
