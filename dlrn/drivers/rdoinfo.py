@@ -21,6 +21,7 @@
 #    containts a .spec.j2 file
 
 from dlrn.db import Commit
+from dlrn.db import FLAG_KEEPCHANGELOG, FLAG_KEEPTARBALL
 from dlrn.drivers.pkginfo import PkgInfoDriver
 from dlrn.repositories import getdistrobranch
 from dlrn.repositories import getsourcebranch
@@ -125,6 +126,8 @@ class RdoInfoDriver(PkgInfoDriver):
         distro_dir_full = self.distgit_dir(package['name'])
         distro_branch = getdistrobranch(package)
         source_branch = getsourcebranch(package)
+        keepchangelog = package.get('keep_changelog', 0)
+        keeptarball = package.get('keep_tarball', 0)
 
         if dev_mode is False:
             try:
@@ -183,6 +186,12 @@ class RdoInfoDriver(PkgInfoDriver):
                                 since, "--first-parent",
                                 "--reverse")
 
+            flags = 0
+            if keepchangelog:
+               flags |= FLAG_KEEPCHANGELOG
+            if keeptarball:
+               flags |= FLAG_KEEPTARBALL
+
             for line in lines:
                 dt, commit_hash = str(line).strip().strip("'").split(" ")[:2]
                 commit = Commit(dt_commit=float(dt), project_name=project,
@@ -190,7 +199,7 @@ class RdoInfoDriver(PkgInfoDriver):
                                 distro_hash=distro_hash, dt_distro=dt_distro,
                                 distgit_dir=self.distgit_dir(package['name']),
                                 commit_branch=source_branch,
-                                dt_extended=0, extended_hash=None)
+                                dt_extended=0, extended_hash=None, flags=flags)
                 project_toprocess.append(commit)
 
         return project_toprocess

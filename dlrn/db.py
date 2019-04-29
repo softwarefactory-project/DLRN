@@ -33,6 +33,9 @@ from sqlalchemy.pool import NullPool
 
 Base = sqlalchemy.ext.declarative.declarative_base()
 
+FLAG_KEEPCHANGELOG = 0x4
+FLAG_KEEPTARBALL = 0x8
+
 
 class Commit(Base):
     __tablename__ = "commits"
