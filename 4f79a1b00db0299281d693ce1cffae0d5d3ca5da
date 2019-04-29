@@ -22,6 +22,30 @@
       "revId": "4f79a1b00db0299281d693ce1cffae0d5d3ca5da",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "98aaa381_98171b8f",
+        "filename": "dlrn/migrations/versions/b6f658f481f8_add_commit_type.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-29T05:09:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1db4b8c8_a7fdf390",
+      "range": {
+        "startLine": 35,
+        "startChar": 20,
+        "endLine": 35,
+        "endChar": 54
+      },
+      "revId": "4f79a1b00db0299281d693ce1cffae0d5d3ca5da",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
