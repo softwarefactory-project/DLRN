@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "66a61e32_873b030d",
+        "filename": "dlrn/drivers/rdoinfo.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-29T08:45:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4476da4_51176545",
+      "revId": "a16b82f73b50e845077ffde5528b6c99f321381d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da876d75_44d4c59e",
         "filename": "dlrn/shell.py",
         "patchSetId": 5
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "90ca54b7_e3048e17",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-29T08:45:27Z",
+      "side": 1,
+      "message": "Well by default you would have both. I\u0027ve removed this argument to simplify the getpackage method",
+      "parentUuid": "da876d75_44d4c59e",
+      "range": {
+        "startLine": 151,
+        "startChar": 0,
+        "endLine": 154,
+        "endChar": 42
+      },
+      "revId": "a16b82f73b50e845077ffde5528b6c99f321381d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "06295b8b_a978294d",
         "filename": "dlrn/shell.py",
         "patchSetId": 5
@@ -53,6 +95,30 @@
       "writtenOn": "2019-04-29T08:25:41Z",
       "side": 1,
       "message": "This whole pattern of going through all build types seems cumbersome to me. I was thinking on a different approach, where this type of filtering is done previously, in the pkginfo driver:\n\n- The driver sets the commit.type parameter, and filters out those projects that do not match the build types we want to use in this match.\n\n- Then, here in shell.py, we do not have to run everything for both, and filter if not needed. We can just build based on the commit.type parameter.\n\nNote that this would force us to have 2 entries in the distroinfo file if we want to build an rpm and container for the same project, one for each type. However, I prefer this idea, since it makes it more explicit.",
+      "range": {
+        "startLine": 266,
+        "startChar": 7,
+        "endLine": 266,
+        "endChar": 38
+      },
+      "revId": "a16b82f73b50e845077ffde5528b6c99f321381d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30fc72dd_5bb7246b",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-29T08:45:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06295b8b_a978294d",
       "range": {
         "startLine": 266,
         "startChar": 7,
