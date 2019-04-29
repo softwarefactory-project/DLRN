@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a929c49_ea072ecf",
+        "filename": "dlrn/build.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-29T13:18:21Z",
+      "side": 1,
+      "message": "this is duplicated",
+      "range": {
+        "startLine": 23,
+        "startChar": 39,
+        "endLine": 23,
+        "endChar": 56
+      },
+      "revId": "ea7b647c27a653be8844f09e15b212b57b3fc877",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c423436_6593d7db",
+        "filename": "dlrn/build.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-04-29T13:18:21Z",
+      "side": 1,
+      "message": "Do you want to do this on a per-package level? We have the option to set that in projects.ini, and even the option to override it from the command-line using https://softwarefactory-project.io/r/15356",
+      "range": {
+        "startLine": 268,
+        "startChar": 0,
+        "endLine": 269,
+        "endChar": 47
+      },
+      "revId": "ea7b647c27a653be8844f09e15b212b57b3fc877",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
