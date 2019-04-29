@@ -45,6 +45,30 @@
       "revId": "ea7b647c27a653be8844f09e15b212b57b3fc877",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d6578031_40520851",
+        "filename": "dlrn/build.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-04-29T13:41:35Z",
+      "side": 1,
+      "message": "I need to discuss with Tristan, because probably the local driver will fit well also (not sure if the local driver way is a blocker for you). With this change the resulting package is named python3-redis-3.1.0-0.20190429115935.a051ddb.fc31.noarch.rpm with date and src hash. So it does not reflect the spec. So maybe the use of KEEP_SPEC_AS_IS might be better then.",
+      "parentUuid": "9c423436_6593d7db",
+      "range": {
+        "startLine": 268,
+        "startChar": 0,
+        "endLine": 269,
+        "endChar": 47
+      },
+      "revId": "ea7b647c27a653be8844f09e15b212b57b3fc877",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
