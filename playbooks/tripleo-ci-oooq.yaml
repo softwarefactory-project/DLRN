@@ -67,7 +67,7 @@
                - project: openstack/tripleo-heat-templates
                  branch: master
                  refspec: master
-                 host: https://review.openstack.org
+                 host: https://review.opendev.org
               artg_compressed_gating_repo: '/tmp/gating_repo.tar.gz'
               build_repo_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/..'
               dlrn_pre_installed: true

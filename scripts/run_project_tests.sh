@@ -4,7 +4,7 @@ set -ex
 # Simple script to test DLRN build from an upstream project
 # Works either locally or in a zuul environment
 GIT_BASE_URL="https://review.rdoproject.org/r/p"
-OPENSTACK_GIT_URL="git://git.openstack.org"
+OPENSTACK_GIT_URL="https://opendev.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
 PYTHON_VERSION="${PYTHON_VERSION:-py27}"
 

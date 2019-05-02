@@ -7,7 +7,7 @@ set -ex
 
 # Simple script to test that DLRN works either locally or in a zuul environment
 GIT_BASE_URL="https://review.rdoproject.org/r/p"
-OPENSTACK_GIT_URL="git://git.openstack.org"
+OPENSTACK_GIT_URL="https://opendev.org"
 ZUUL3_HOME="${ZUUL3_HOME:-/home/zuul}"
 ZUUL_CLONES_DIR="${ZUUL3_HOME}/src/review.rdoproject.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
@@ -182,7 +182,7 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
                 REVIEW_BRANCH="master"
             fi
 
-            JSON=$(curl -s -L https://review.openstack.org/changes/openstack%2F${UPSTREAM_PROJECT_NAME}~$REVIEW_BRANCH~$UPSTREAM_ID/revisions/current/review|sed 1d)
+            JSON=$(curl -s -L https://review.opendev.org/changes/openstack%2F${UPSTREAM_PROJECT_NAME}~$REVIEW_BRANCH~$UPSTREAM_ID/revisions/current/review|sed 1d)
             COMMIT=$($PYTHON -c 'import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s["revisions"].keys()[0])' <<< $JSON)
             REF=$($PYTHON -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s['revisions']['$COMMIT']['ref'])" <<< $JSON)
             pushd data/${PROJECT_TO_BUILD_MAPPED}
