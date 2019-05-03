@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ae2e3208_a20de0b7",
+        "filename": "playbooks/dlrn-api-functional.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-03T07:52:22Z",
+      "side": 1,
+      "message": "We had https://softwarefactory-project.io/r/15448 for this, but let\u0027s merge this version.",
+      "range": {
+        "startLine": 7,
+        "startChar": 20,
+        "endLine": 7,
+        "endChar": 112
+      },
+      "revId": "f6b29e75d37902944b90b9cdc672e6afece690ee",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
