@@ -19,6 +19,7 @@ import sys
 from datetime import datetime
 from datetime import timedelta
 from six.moves import configparser
+from six.moves import input
 from time import mktime
 
 from dlrn.config import setup_logging
@@ -82,7 +83,7 @@ def purge():
     timeparsed = datetime.now() - timedelta(days=int(options.older_than))
 
     if options.y is False:
-        ans = raw_input(("Remove all data before %s, correct? [N/y] " %
+        ans = input(("Remove all data before %s, correct? [N/y] " %
                         timeparsed.ctime()))
         if ans.lower() != "y":
             return
