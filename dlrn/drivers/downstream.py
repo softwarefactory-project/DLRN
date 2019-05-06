@@ -143,6 +143,35 @@ class DownstreamInfoDriver(PkgInfoDriver):
             vers[row[0]] = row[1:]
         return vers
 
+    def _fetch_reference_commit(self):
+        """Fetch the commit.yaml file used for this run
+
+        """
+        versions_url = self.config_options.versions_url
+        commit_url = re.sub('/versions.csv$', '/commit.yaml', versions_url)
+        try:
+            r = urlopen(commit_url)
+            content = [x.decode('utf-8') for x in r.readlines()]
+            return content
+        except Exception:
+            # We do not want to fail on this
+            return None
+
+    def _write_reference_commit(self, directory):
+        """Write the commit.yaml file
+
+        Used for this run in directory as reference_commit.yaml
+
+        :param: directory where the file will be stored
+        """
+
+        if self.ref_commit_yaml is None:
+            return
+        path = os.path.join(directory, 'reference_commit.yaml')
+        with open(path, 'w') as fp:
+            for line in self.ref_commit_yaml:
+                fp.write(line)
+
     def _transform_spec(self, directory):
         """Transform based on rules, basically a crude sed implementation
 
@@ -181,6 +210,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
             fail_req_config_missing('downstream_distro_branch')
         source_branch = getsourcebranch(package)
         versions = self._getversions()
+
+        self.ref_commit_yaml = self._fetch_reference_commit()
 
         ups_distro = package['master-distgit']
         ups_distro_dir = self._upstream_distgit_clone_dir(package['name'])
