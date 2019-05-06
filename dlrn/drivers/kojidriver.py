@@ -166,7 +166,10 @@ class KojiBuildDriver(BuildRPMDriver):
         with io.open("%s/rhpkgbuild.log" % output_dir, 'a',
                      encoding='utf-8', errors='replace') as self.koji_fp:
             try:
-                rhpkg('build', scratch=scratch)
+                # NOTE(jpena): we are using --skip-nvr-check to avoid
+                # issues when building RHEL8 packages on RHEL7, due to
+                # new RPM features.
+                rhpkg('build', '--skip-nvr-check', scratch=scratch)
             except Exception as e:
                 build_exception = e
 
