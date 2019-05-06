@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "62b28f4a_0b5c04cd",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-06T13:54:37Z",
+      "side": 1,
+      "message": "In that case, maybe we should do it the other way around: if the git repo is available, get the distro_hash from there, otherwise set distro_hash to \"dev\". That would not restrict us to a git repo for the distgit.\n\n+2 to documenting this caveat.",
+      "parentUuid": "8c6a6c60_6c572854",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 35
+      },
+      "revId": "9c0895fd8d8648511dc3879dfd18515337b89ce6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5023462c_a0b63cab",
         "filename": "dlrn/drivers/local.py",
         "patchSetId": 5
