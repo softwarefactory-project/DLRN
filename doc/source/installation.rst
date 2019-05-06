@@ -282,12 +282,17 @@ options:
     [rdoinfo_driver]
     repo=http://github.com/org/rdoinfo-fork
     info_files=file.yml
+    cache_dir=~/.distroinfo/cache
 
 * ``repo`` defines the rdoinfo repository to use. This setting
   must be set if a fork of the rdoinfo repository must be used.
 * ``info_files`` selects an info file (or a list of info files) to get package
   information from (within the distroinfo repo selected with ``repo``). It
   defaults to ``rdo.yml``.
+* ``cache_dir`` defines the directory uses for caching to avoid downloading
+  the same repo multiple times. By default, it uses None.
+  A different base directory for the cache can be set for both ``[rdoinfo_driver]``
+  and ``[downstream_driver]``
 
 The optional ``[downstream_driver]`` section has the following configuration
 options:
@@ -303,6 +308,7 @@ options:
     downstream_distgit_tag=foo-distgit
     use_upstream_spec=False
     downstream_spec_replace_list=^foo/bar,string1/string2
+    cache_dir=~/.distroinfo/cache
 
 * ``repo`` selects a distroinfo repository to get package information from.
 * ``info_files`` selects an info file (or a list of info files) to get package
@@ -332,6 +338,11 @@ options:
     downstream_spec_replace_list=^%global with_doc.+/%global with_doc 0
 
   Multiple regular expressions can be used, separated by commas.
+
+* ``cache_dir`` defines the directory uses for caching to avoid downloading
+  the same repo multiple times. By default, it uses None.
+  A different base directory for the cache can be set for both ``[rdoinfo_driver]``
+  and ``[downstream_driver]``
 
 The optional ``[mockbuild_driver]`` section has the following configuration
 options:
