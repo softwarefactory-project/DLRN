@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a2fa0b9_6420248f",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-06T13:23:57Z",
+      "side": 1,
+      "message": "Do we expect at least to have the spec on a git repo? If so, this condition will be ok, otherwise we may see errors when git log is run against a non-repo.\n\nHowever, we are not refreshing the repo, see https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/rdoinfo.py#L133-L142 for an example.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 35
+      },
+      "revId": "9c0895fd8d8648511dc3879dfd18515337b89ce6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5023462c_a0b63cab",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-06T13:23:57Z",
+      "side": 1,
+      "message": "I like this.",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 67
+      },
+      "revId": "9c0895fd8d8648511dc3879dfd18515337b89ce6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9544ae18_c346847e",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-06T13:23:57Z",
+      "side": 1,
+      "message": "I think this would be clearer if we used [ -z \"$DLRN_KEEP_SPEC_AS_IS\" ]",
+      "range": {
+        "startLine": 43,
+        "startChar": 5,
+        "endLine": 43,
+        "endChar": 37
+      },
+      "revId": "9c0895fd8d8648511dc3879dfd18515337b89ce6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "55a8b0bc_ae0d57cb",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-06T13:23:57Z",
+      "side": 1,
+      "message": "Same here.",
+      "range": {
+        "startLine": 155,
+        "startChar": 2,
+        "endLine": 155,
+        "endChar": 40
+      },
+      "revId": "9c0895fd8d8648511dc3879dfd18515337b89ce6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
