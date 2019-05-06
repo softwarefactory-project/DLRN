@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "8c6a6c60_6c572854",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-06T13:50:03Z",
+      "side": 1,
+      "message": "We don\u0027t have the distgit url as the infos are limited (only the distgit repo copy as input). I think we should remove the dev mode handling (I don\u0027t think it make sense here) and raise an error if the distgit is not a git repo. Then specify in the doc that a git repo copy for the distgit dir is required.",
+      "parentUuid": "1a2fa0b9_6420248f",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 35
+      },
+      "revId": "9c0895fd8d8648511dc3879dfd18515337b89ce6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5023462c_a0b63cab",
         "filename": "dlrn/drivers/local.py",
         "patchSetId": 5
