@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f56f796c_9d6fcea2",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-07T13:35:08Z",
+      "side": 1,
+      "message": "I\u0027m quite confused about this part. There\u0027s a few things that look strange to me:\n\n- The \u0027src_dir\u0027 parameter is never used, I only see it in the unit tests. Is this ok?\n\n- Then, I understand that we must call DLRN from the directory where the spec file is located, right? And that the directory name must match the package name, because that\u0027s what we use.\n\nI guess the reason for this is that this is the only way to guess where the spec is without adding a command-line parameter or a projects.ini setting. If this is the case, we should document it properly in the installation.rst file.\n\nAbout the package name, I think it might be better if we used the .spec file name, of course without \".spec\".\n\n- Finally, we copy the spec and other contents to $datadir/$package_name. However, if the destination directory already exists, we do not overwrite it. Why? This prevents us from building the same package more than once.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 46
+      },
+      "revId": "1d35d4abc6c36ef6ecaa9d929ef80c9737ff4efc",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f6b84db0_cf930706",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-07T13:35:08Z",
+      "side": 1,
+      "message": "As we discussed in a previous patchset, it would be nice if we could make it work for non-git directories, too, by setting \"dev\" as distro_hash and \"0\" as dt_distro.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 31
+      },
+      "revId": "1d35d4abc6c36ef6ecaa9d929ef80c9737ff4efc",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
