@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e450ea08_958d227e",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-07T15:52:18Z",
+      "side": 1,
+      "message": "We should do this before line 64 (see we set package there), using src_dir as a parameter I assume.",
+      "range": {
+        "startLine": 70,
+        "startChar": 5,
+        "endLine": 70,
+        "endChar": 61
+      },
+      "revId": "b34d974da764b58cf6d1dbd6d0283a5d9ba9b301",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
