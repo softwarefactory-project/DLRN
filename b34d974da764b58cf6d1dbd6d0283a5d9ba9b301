@@ -22,6 +22,30 @@
       "revId": "b34d974da764b58cf6d1dbd6d0283a5d9ba9b301",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97d769f5_b1f97ef5",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-07T17:32:40Z",
+      "side": 1,
+      "message": "Line 64 we just used the package var to store the target directory name in data/. As of now we set the package name from the spec file name and if the directory name can be different from the package name then I think that\u0027s fine. Next PS remove the use of a var named \u0027package\u0027 line 64. Let me know if this is fine.",
+      "parentUuid": "e450ea08_958d227e",
+      "range": {
+        "startLine": 70,
+        "startChar": 5,
+        "endLine": 70,
+        "endChar": 61
+      },
+      "revId": "b34d974da764b58cf6d1dbd6d0283a5d9ba9b301",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
