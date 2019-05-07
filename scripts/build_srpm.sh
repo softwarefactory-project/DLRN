@@ -44,6 +44,9 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
     # handle python packages (some puppet modules are carrying a setup.py too)
     if [ -r setup.py -a ! -r metadata.json ]; then
         SOURCETYPE='tarball'
+        # Reset the git repository to the right commit
+        git checkout -f ${DLRN_SOURCE_COMMIT}
+
         mkdir ${MOCKDIR}/var/tmp/pkgsrc
         cp -pr . ${MOCKDIR}/var/tmp/pkgsrc
 
@@ -56,6 +59,9 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
         /usr/bin/mock $MOCKOPTS --copyout /var/tmp/pkgsrc/dist ./dist
     elif [ -r *.gemspec ]; then
         SOURCETYPE='gem'
+        # Reset the git repository to the right commit
+        git checkout -f ${DLRN_SOURCE_COMMIT}
+
         GEMSPEC=$(ls -l | grep gemspec | awk '{print $9}')
         PROJECT=$(basename $GEMSPEC .gemspec)
         VERSION=$(ruby -e "require 'rubygems'; spec = Gem::Specification::load('$GEMSPEC'); puts spec.version")
@@ -170,3 +176,4 @@ fi
 cat *.spec
 spectool -g -C ${TOP_DIR}/SOURCES *.spec
 /usr/bin/mock --buildsrpm ${MOCKOPTS} --spec *.spec --sources=${TOP_DIR}/SOURCES
+
