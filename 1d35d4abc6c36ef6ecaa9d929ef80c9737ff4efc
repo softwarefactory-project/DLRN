@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9a4f5e4a_b588ba2f",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-07T15:14:07Z",
+      "side": 1,
+      "message": "\u003e I\u0027m quite confused about this part. There\u0027s a few things that look\n \u003e strange to me:\n \u003e \n \u003e - The \u0027src_dir\u0027 parameter is never used, I only see it in the unit\n \u003e tests. Is this ok?\n\n\nYes, the problem and why I\u0027m using that src_dir (only for the test case) is to not use os.chdir during the test to have the current dir to be the distgit dir. Using chdir during the test have side effect on others tests. I\u0027ll add a comment in the code. \n\n\n \u003e - Then, I understand that we must call DLRN from the directory\n \u003e where the spec file is located, right? And that the directory name\n \u003e must match the package name, because that\u0027s what we use.\n\n \nYes. There isn\u0027t any verification about the directory name matching the package name.\n\n\n \u003e I guess the reason for this is that this is the only way to guess\n \u003e where the spec is without adding a command-line parameter or a\n \u003e projects.ini setting. If this is the case, we should document it\n \u003e properly in the installation.rst file.\n\n\nOk, I\u0027ll clarify in the doc. \n\n \n \u003e About the package name, I think it might be better if we used the\n \u003e .spec file name, of course without \".spec\".\n\n \nOk, I\u0027ll change that.\n\n\n \u003e - Finally, we copy the spec and other contents to $datadir/$package_name.\n \u003e However, if the destination directory already exists, we do not\n \u003e overwrite it. Why? This prevents us from building the same package\n \u003e more than once.\n\n\n\nYes, let\u0027s remove the previous directory if it exists.",
+      "parentUuid": "f56f796c_9d6fcea2",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 46
+      },
+      "revId": "1d35d4abc6c36ef6ecaa9d929ef80c9737ff4efc",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f6b84db0_cf930706",
         "filename": "dlrn/drivers/local.py",
         "patchSetId": 8
@@ -36,6 +60,30 @@
       "writtenOn": "2019-05-07T13:35:08Z",
       "side": 1,
       "message": "As we discussed in a previous patchset, it would be nice if we could make it work for non-git directories, too, by setting \"dev\" as distro_hash and \"0\" as dt_distro.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 31
+      },
+      "revId": "1d35d4abc6c36ef6ecaa9d929ef80c9737ff4efc",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d7ada727_11e03793",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-07T15:14:07Z",
+      "side": 1,
+      "message": "Ok.",
+      "parentUuid": "f6b84db0_cf930706",
       "range": {
         "startLine": 84,
         "startChar": 0,
