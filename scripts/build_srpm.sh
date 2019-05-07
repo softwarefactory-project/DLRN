@@ -40,9 +40,14 @@ echo "Using $PYTHON as python interpreter"
 # A simple mock --copyin should be enough, but it does not handle symlinks properly
 MOCKDIR=$(/usr/bin/mock -r ${DATA_DIR}/${MOCK_CONFIG} -p)
 
+
 # handle python packages (some puppet modules are carrying a setup.py too)
 if [ -r setup.py -a ! -r metadata.json ]; then
     SOURCETYPE='tarball'
+
+    # Reset the git repository to the right commit
+    git checkout -f ${DLRN_SOURCE_COMMIT}
+
     mkdir ${MOCKDIR}/var/tmp/pkgsrc
     cp -pr . ${MOCKDIR}/var/tmp/pkgsrc
 
@@ -58,6 +63,10 @@ elif [ -r *.gemspec ]; then
     GEMSPEC=$(ls -l | grep gemspec | awk '{print $9}')
     PROJECT=$(basename $GEMSPEC .gemspec)
     VERSION=$(ruby -e "require 'rubygems'; spec = Gem::Specification::load('$GEMSPEC'); puts spec.version")
+
+    # Reset the git repository to the right commit
+    git checkout -f ${DLRN_SOURCE_COMMIT}
+
     mkdir ${MOCKDIR}/var/tmp/pkgsrc
     cp -pr . ${MOCKDIR}/var/tmp/pkgsrc
     /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && gem build $GEMSPEC"
