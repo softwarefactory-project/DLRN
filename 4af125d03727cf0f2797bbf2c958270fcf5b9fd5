@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9b003f78_30a0d01b",
+        "filename": "dlrn/db.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-05-08T16:29:46Z",
+      "side": 1,
+      "message": "Nice trick indeed!",
+      "revId": "4af125d03727cf0f2797bbf2c958270fcf5b9fd5",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    }
+  ]
+}
