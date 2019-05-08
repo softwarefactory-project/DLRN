@@ -46,6 +46,30 @@
       "revId": "b34d974da764b58cf6d1dbd6d0283a5d9ba9b301",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc14e204_7389a818",
+        "filename": "dlrn/drivers/local.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-05-08T08:49:08Z",
+      "side": 1,
+      "message": "The main issue we had here is consistency. In my test, I had a directory data/test under the DLRN tree, where I had my test spec (called dlrn.spec). When running this, package was initially set to \"test\" (instead of dlrn), so it tried to copy everything to data/test, and failed.\n\nInstead of that, if we had done:\n\npackage, version \u003d self._get_infos_from_pkg(src_dir)\n\nin this line, we\u0027d have package\u003ddlrn and the right version already. With this, it would have tried to copy the spec to data/dlrn, and everything would have flowed correctly.\n\nThe new patchset still has the same issue with dest_dir, so it would try to copy the spec file to data/test.",
+      "parentUuid": "97d769f5_b1f97ef5",
+      "range": {
+        "startLine": 70,
+        "startChar": 5,
+        "endLine": 70,
+        "endChar": 61
+      },
+      "revId": "b34d974da764b58cf6d1dbd6d0283a5d9ba9b301",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
