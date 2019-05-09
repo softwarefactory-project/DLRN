@@ -29,6 +29,7 @@ from sqlalchemy import Text
 
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import synonym
 from sqlalchemy.pool import NullPool
 
 Base = sqlalchemy.ext.declarative.declarative_base()
@@ -50,9 +51,12 @@ class Commit(Base):
     extended_hash = Column(String(64))
     commit_branch = Column(String(256))
     status = Column(String(64))
-    rpms = Column(Text)
+    artifacts = Column(Text)
     notes = Column(Text)
     flags = Column(Integer, default=0)
+
+    # For backwards compatibility when importing commits
+    rpms = synonym("artifacts")
 
     def __gt__(self, b):
         return self.dt_commit > b.dt_commit
