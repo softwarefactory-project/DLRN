@@ -40,7 +40,7 @@ class TestProcessBuildResult(base.TestCase):
         config.set('DEFAULT', 'baseurl', "file://%s" % config.get('DEFAULT',
                                                                   'datadir'))
         self.config = ConfigOptions(config)
-        self.commit = db.Commit(dt_commit=123, project_name='foo',
+        self.commit = db.Commit(dt_commit=123, project_name='foo', type="rpm",
                                 commit_hash='1c67b1ab8c6fe273d4e175a14f0df5'
                                             'd3cbbd0edf',
                                 repo_dir='/home/dlrn/data/foo',
@@ -123,7 +123,7 @@ class TestPostBuild(base.TestCase):
         config.set('DEFAULT', 'baseurl', "file://%s" % config.get('DEFAULT',
                                                                   'datadir'))
         self.config = ConfigOptions(config)
-        self.commit = db.Commit(dt_commit=123, project_name='foo',
+        self.commit = db.Commit(dt_commit=123, project_name='foo', type="rpm",
                                 commit_hash='1c67b1ab8c6fe273d4e175a14f0df5'
                                             'd3cbbd0edf',
                                 repo_dir='/home/dlrn/data/foo',

@@ -280,6 +280,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
             dt = version[5]
             commit_hash = version[1]
             commit = Commit(dt_commit=float(dt), project_name=project,
+                            type='rpm',
                             commit_hash=commit_hash, repo_dir=repo_dir,
                             distro_hash=distro_hash, dt_distro=dt_distro,
                             extended_hash=extended_hash,

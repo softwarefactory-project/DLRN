@@ -39,6 +39,8 @@ class Commit(Base):
     __tablename__ = "commits"
 
     id = Column(Integer, primary_key=True)
+    # Type has a default value for safety, this may be dropped in the future
+    type = Column(String(18), default="rpm")
     dt_commit = Column(Integer)
     dt_distro = Column(Integer)
     dt_extended = Column(Integer)
@@ -150,8 +152,10 @@ def closeSession(session):
 
 # Get the most recently processed commit for project_name, we ignore commits
 # with a status of "RETRY" as we want to retry these.
-def getLastProcessedCommit(session, project_name, not_status="RETRY"):
+def getLastProcessedCommit(
+        session, project_name, not_status="RETRY", type='rpm'):
     commit = session.query(Commit).filter(Commit.project_name == project_name,
+                                          Commit.type == type,
                                           Commit.status != not_status).\
         order_by(desc(Commit.dt_commit)).\
         order_by(desc(Commit.id)).first()
@@ -160,10 +164,11 @@ def getLastProcessedCommit(session, project_name, not_status="RETRY"):
 
 # Get the most recently built commit for project_name and commit_branch, we
 # ignore commits with a status of "RETRY" as we want to retry these.
-def getLastBuiltCommit(session, project_name, commit_branch,
-                       not_status="RETRY"):
+def getLastBuiltCommit(
+        session, project_name, commit_branch, not_status="RETRY", type='rpm'):
     commit = session.query(Commit).filter(Commit.project_name == project_name,
                                           Commit.status != not_status,
+                                          Commit.type == type,
                                           Commit.commit_branch ==
                                           commit_branch).\
         order_by(desc(Commit.dt_build)).\
@@ -172,8 +177,9 @@ def getLastBuiltCommit(session, project_name, commit_branch,
 
 
 def getCommits(session, project=None, with_status=None, without_status=None,
-               limit=1, order="desc", since=None, before=None, offset=0):
-    commits = session.query(Commit)
+               limit=1, order="desc", since=None, before=None, offset=0,
+               type="rpm"):
+    commits = session.query(Commit).filter(Commit.type == type)
     if project is not None:
         commits = commits.filter(Commit.project_name == project)
     if with_status is not None:
