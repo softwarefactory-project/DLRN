@@ -708,6 +708,10 @@ def post_build_rpm(status, packages, session, build_repo=True):
     shafile.close()
 
     if build_repo:
+        revision = "%s_%s" % (commit_hash, commit.distro_hash[:8])
+        if commit.extended_hash:
+            revision = "%s_%s" % (revision, extended_hash[:8])
+
         # Use createrepo_c when available
         try:
             from sh import createrepo_c
@@ -716,9 +720,10 @@ def post_build_rpm(status, packages, session, build_repo=True):
             pass
 
         if config_options.include_srpm_in_repo:
-            sh.createrepo(yumrepodir_abs)
+            sh.createrepo('--revision', revision, yumrepodir_abs)
         else:
-            sh.createrepo('-x', '*.src.rpm', yumrepodir_abs)
+            sh.createrepo('-x', '*.src.rpm', '--revision', revision,
+                          yumrepodir_abs)
 
         with open(os.path.join(
                 yumrepodir_abs, "%s.repo" % config_options.reponame),
