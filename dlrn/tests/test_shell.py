@@ -172,6 +172,8 @@ class TestPostBuild(base.TestCase):
                       'repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf'
                       '_c31d1b18/foo-1.2.3.el7.centos.src.rpm']
 
+        revision = '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf_c31d1b18'
+
         status = [self.commit, built_rpms, 'OK', None]
         # Create directory for the CSV file
         yumdir = os.path.join(self.config.datadir, "repos",
@@ -186,7 +188,7 @@ class TestPostBuild(base.TestCase):
                                      self.commit.getshardedcommitdir(),
                                      "versions.csv")))
 
-        expected = [mock.call(yumdir)]
+        expected = [mock.call('--revision', revision, yumdir)]
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(output, 1)     # 1 non-successfully built package
 
@@ -200,13 +202,14 @@ class TestPostBuild(base.TestCase):
                       'repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf'
                       '_c31d1b18/foo-1.2.3.el7.centos.src.rpm']
 
+        revision = '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf_c31d1b18'
         status = [self.commit, built_rpms, 'OK', None]
         # Create directory for the CSV file
         yumdir = os.path.join(self.config.datadir, "repos",
                               self.commit.getshardedcommitdir())
         os.makedirs(yumdir)
         output = shell.post_build(status, packages, self.session)
-        expected = [mock.call(yumdir)]
+        expected = [mock.call('--revision', revision, yumdir)]
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(output, 0)
@@ -221,6 +224,7 @@ class TestPostBuild(base.TestCase):
                       'repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf'
                       '_c31d1b18/foo-1.2.3.el7.centos.src.rpm']
 
+        revision = '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf_c31d1b18'
         self.config.include_srpm_in_repo = False
 
         status = [self.commit, built_rpms, 'OK', None]
@@ -229,7 +233,8 @@ class TestPostBuild(base.TestCase):
                               self.commit.getshardedcommitdir())
         os.makedirs(yumdir)
         output = shell.post_build(status, packages, self.session)
-        expected = [mock.call('-x', '*.src.rpm', yumdir)]
+        expected = [mock.call('-x', '*.src.rpm', '--revision', revision,
+                              yumdir)]
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(output, 0)
