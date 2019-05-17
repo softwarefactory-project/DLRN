@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f09b87d_84f49fa6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-05-17T13:32:42Z",
+      "side": 1,
+      "message": "The spec file must be final because no processing will be performed by the driver.",
+      "revId": "3ed59335cac87d312c638edb89d056ae120ed0ca",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    }
+  ]
+}
