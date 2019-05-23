@@ -11,8 +11,8 @@ Parameters
                 [--build-env BUILD_ENV] [--local] [--head-only]
                 [--project-name PROJECT_NAME | --package-name PACKAGE_NAME]
                 [--dev] [--log-commands] [--use-public] [--order] [--sequential]
-                [--status] [--recheck] [--version] [--run RUN] [--stop]
-                [--verbose-build] [--no-repo]
+                [--status] [--recheck] [--force-recheck] [--version] [--run RUN]
+                [--stop] [--verbose-build] [--no-repo] [--debug]
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -46,12 +46,18 @@ Parameters
       --status              Get the status of packages.
       --recheck             Force a rebuild for a particular package. Implies
                             --package-name
+      --force-recheck       Force a rebuild for a particular package, even if its
+                            last build was successful. Requires setting
+                            allow_force_rechecks=True in projects.ini. Implies
+                            --package-name and --recheck
       --version             show program's version number and exit
       --run RUN             Run a program instead of trying to build. Implies
                             --head-only
       --stop                Stop on error.
-      --verbose-build       Show versobe output during the package build.
+      --verbose-build       Show verbose output during the package build.
       --no-repo             Do not generate a repo with all the built packages.
+      --debug               Print debug logs
+
 
 
 Quickstart single package build
@@ -72,6 +78,19 @@ DLRN database content. To do so you need to run:
 .. code-block:: shell-session
 
     $ dlrn --recheck --package-name openstack-cinder
+    $ dlrn --use-public --package-name openstack-cinder
+
+It is also possible to force the recheck of a successfully built commit.
+Please note that this is not advisable if you rely on the DLRN-generated
+repositories, since it will remove packages that other hashed repositories
+may have symlinked. 
+
+If you are sure you need it, set ``allow_force_rechecks=true`` in your
+projects.ini file, then run:
+
+.. code-block:: shell-session
+
+    $ dlrn --recheck --force-recheck --package-name openstack-cinder
     $ dlrn --use-public --package-name openstack-cinder
 
 Full build

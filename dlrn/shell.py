@@ -116,6 +116,11 @@ def main():
     parser.add_argument('--recheck', action="store_true",
                         help="Force a rebuild for a particular package. "
                         "Implies --package-name")
+    parser.add_argument('--force-recheck', action="store_true",
+                        help="Force a rebuild for a particular package, even "
+                        "if its last build was successful. Requires setting "
+                        "allow_force_rechecks=True in projects.ini. "
+                        "Implies --package-name and --recheck")
     parser.add_argument('--version',
                         action='version',
                         version=version.version_info.version_string())
@@ -195,36 +200,45 @@ def main():
     else:
         pkg_name = None
 
-    def recheck_commit(commit):
+    def recheck_commit(commit, force):
         if commit.status == 'SUCCESS':
-            logger.error(
-                "Trying to recheck an already successful commit,"
-                " ignoring.")
-            sys.exit(1)
+            if not force:
+                logger.error(
+                    "Trying to recheck an already successful commit,"
+                    " ignoring. If you want to force it, use --force-recheck"
+                    " and set allow_force_rechecks=True in projects.ini")
+                sys.exit(1)
+            else:
+                logger.info("Forcefully rechecking a successfully built "
+                            "commit for %s" % commit.project_name)
         elif commit.status == 'RETRY':
             # In this case, we are going to retry anyway, so
             # do nothing and exit
             logger.warning("Trying to recheck a commit in RETRY state,"
                            " ignoring.")
             sys.exit(0)
-        else:
-            # We could set the status to RETRY here, but if we have gone
-            # beyond max_retries it wouldn't work as expected. Thus, our
-            # only chance is to remove the commit
-            session.delete(commit)
-            session.commit()
-            sys.exit(0)
+        # We could set the status to RETRY here, but if we have gone
+        # beyond max_retries it wouldn't work as expected. Thus, our
+        # only chance is to remove the commit
+        session.delete(commit)
+        session.commit()
+        sys.exit(0)
 
     if options.recheck is True:
         if not pkg_name:
             logger.error('Please use --package-name or --project-name '
                          'with --recheck.')
             sys.exit(1)
+
+        if options.force_recheck and config_options.allow_force_rechecks:
+            force_recheck = True
+        else:
+            force_recheck = False
         package = [p for p in packages if p['name'] == pkg_name][0]
         for build_type in package.get('types', ['rpm']):
             commit = getLastProcessedCommit(session, pkg_name, type=build_type)
             if commit:
-                recheck_commit(commit)
+                recheck_commit(commit, force_recheck)
             else:
                 logger.error("There are no existing commits for package %s",
                              pkg_name)

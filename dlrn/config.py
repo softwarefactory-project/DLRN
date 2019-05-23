@@ -64,6 +64,7 @@ DLRN_CORE_CONFIG = {
         'custom_preprocess': {'type': 'list'},
         'include_srpm_in_repo': {'type': 'boolean', 'default': True},
         'keep_changelog': {'type': 'boolean', 'default': False},
+        'allow_force_rechecks': {'type': 'boolean', 'default': False},
     }
 }
 
