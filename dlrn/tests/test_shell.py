@@ -13,6 +13,7 @@
 import mock
 import os
 import shutil
+import sys
 import tempfile
 
 from dlrn.config import ConfigOptions
@@ -28,6 +29,22 @@ def mocked_session(url):
     session = db.getSession(url)
     utils.loadYAML(session, './dlrn/tests/samples/commits_1.yaml')
     return session
+
+
+def mocked_session_recheck(url):
+    db_fd, filepath = tempfile.mkstemp()
+    session = db.getSession("sqlite:///%s" % filepath)
+    utils.loadYAML(session, './dlrn/tests/samples/commits_1.yaml')
+    return session
+
+
+def mocked_getpackages(**kwargs):
+        return [{'upstream': 'https://github.com/openstack/foo',
+                 'name': 'foo', 'maintainers': 'test@test.com'},
+                {'upstream': 'https://github.com/openstack/test',
+                 'name': 'test', 'maintainers': 'test@test.com'},
+                {'upstream': 'https://github.com/openstack/test',
+                 'name': 'python-pysaml2', 'maintainers': 'test@test.com'}]
 
 
 class TestProcessBuildResult(base.TestCase):
@@ -239,3 +256,48 @@ class TestPostBuild(base.TestCase):
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(output, 0)
+
+
+class TestRecheck(base.TestCase):
+    def setUp(self):
+        super(TestRecheck, self).setUp()
+
+    def tearDown(self):
+        super(TestRecheck, self).tearDown()
+
+    @mock.patch('dlrn.shell.getSession', side_effect=mocked_session_recheck)
+    @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver.getpackages',
+                side_effect=mocked_getpackages)
+    def test_basic_recheck(self, gp_mock, db_mock):
+        testargs = ['dlrn', '--package-name',
+                    'python-pysaml2', '--recheck']
+        with mock.patch.object(sys, 'argv', testargs):
+            e = self.assertRaises(SystemExit, shell.main)
+            # Rechecking python-pysaml2 should fail because the last commit
+            # was successfully built
+            self.assertEqual(e.code, 1)
+
+    @mock.patch('dlrn.shell.getSession', side_effect=mocked_session_recheck)
+    @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver.getpackages',
+                side_effect=mocked_getpackages)
+    def test_force_recheck_withoutprojectsini(self, gp_mock, db_mock):
+        testargs = ['dlrn', '--package-name',
+                    'python-pysaml2', '--recheck', '--force-recheck']
+        with mock.patch.object(sys, 'argv', testargs):
+            e = self.assertRaises(SystemExit, shell.main)
+            # Rechecking python-pysaml2 should fail because the last commit
+            # was successfully built
+            self.assertEqual(e.code, 1)
+
+    @mock.patch('dlrn.shell.getSession', side_effect=mocked_session_recheck)
+    @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver.getpackages',
+                side_effect=mocked_getpackages)
+    def test_force_recheck_withprojectsini(self, gp_mock, db_mock):
+        testargs = ['dlrn', '--package-name',
+                    'python-pysaml2', '--recheck', '--force-recheck',
+                    '--config-file',
+                    './dlrn/tests/samples/projects_force.ini']
+        with mock.patch.object(sys, 'argv', testargs):
+            e = self.assertRaises(SystemExit, shell.main)
+            # It will work this time
+            self.assertEqual(e.code, 0)
