@@ -165,11 +165,13 @@ class DownstreamInfoDriver(PkgInfoDriver):
         :param: directory where the file will be stored
         """
 
-        if self.ref_commit_yaml is None:
+        ref_commit_yaml = self._fetch_reference_commit()
+
+        if ref_commit_yaml is None:
             return
         path = os.path.join(directory, 'reference_commit.yaml')
         with open(path, 'w') as fp:
-            for line in self.ref_commit_yaml:
+            for line in ref_commit_yaml:
                 fp.write(line)
 
     def _transform_spec(self, directory):
@@ -210,8 +212,6 @@ class DownstreamInfoDriver(PkgInfoDriver):
             fail_req_config_missing('downstream_distro_branch')
         source_branch = getsourcebranch(package)
         versions = self._getversions()
-
-        self.ref_commit_yaml = self._fetch_reference_commit()
 
         ups_distro = package['master-distgit']
         ups_distro_dir = self._upstream_distgit_clone_dir(package['name'])
