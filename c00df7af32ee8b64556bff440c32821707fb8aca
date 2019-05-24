@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "243050c9_53947a04",
+        "filename": "doc/source/usage.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 442
+      },
+      "writtenOn": "2019-05-24T11:20:20Z",
+      "side": 1,
+      "message": "Extra whitespace.",
+      "range": {
+        "startLine": 86,
+        "startChar": 19,
+        "endLine": 86,
+        "endChar": 20
+      },
+      "revId": "c00df7af32ee8b64556bff440c32821707fb8aca",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
