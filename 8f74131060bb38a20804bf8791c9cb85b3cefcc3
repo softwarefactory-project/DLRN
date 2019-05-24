@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ddfed9a_b43f4900",
+        "filename": "dlrn/tests/test_shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2019-05-24T15:19:28Z",
+      "side": 1,
+      "message": "ok, with triple check nobody can say oops :)",
+      "range": {
+        "startLine": 297,
+        "startChar": 38,
+        "endLine": 297,
+        "endChar": 68
+      },
+      "revId": "8f74131060bb38a20804bf8791c9cb85b3cefcc3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
