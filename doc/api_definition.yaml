@@ -44,8 +44,8 @@ paths:
       # This is array of GET operation parameters:
       parameters:
         - name: params
-          in: body
-          description: The JSON params to post
+          in: query
+          description: The params to post
           schema:
             type: object
             required:
@@ -115,7 +115,7 @@ paths:
 
         The sequential mode is meant to be used by CI pipelines, where a CI (n) job needs
         to use the same repo tested by CI (n-1).
-      # This is array of GET operation parameters:
+      # This is array of POST operation parameters:
       parameters:
         - name: params
           in: body
@@ -178,8 +178,8 @@ paths:
         Get all the CI reports for a specific repository.
       parameters:
         - name: params
-          in: body
-          description: The JSON params to post
+          in: query
+          description: The params to post
           required: true
           schema:
             type: object
@@ -219,8 +219,8 @@ paths:
         optionally filtered by package name.
       parameters:
         - name: params
-          in: body
-          description: The JSON params to post
+          in: query
+          description: The params to post
           required: true
           schema:
             type: object
@@ -436,8 +436,8 @@ paths:
         limited to 100 results per query.
       parameters:
         - name: params
-          in: body
-          description: The JSON params to post
+          in: query
+          description: The params to post
           required: true
           schema:
             type: object
