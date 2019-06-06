@@ -60,10 +60,6 @@ class DLRNAPITestCase(base.TestCase):
 @mock.patch('dlrn.api.dlrn_api.datetime')
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 class TestGetLastTestedRepo(DLRNAPITestCase):
-    def test_get_last_tested_repo_needs_json(self, db_mock, dt_mock):
-        response = self.app.get('/api/last_tested_repo')
-        self.assertEqual(response.status_code, 415)
-
     def test_get_last_tested_repo_no_results(self, db_mock, dt_mock):
         req_data = json.dumps(dict(max_age='48'))
         dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
@@ -72,12 +68,30 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 404)
 
+    def test_get_last_tested_repo_no_results_url_params(self, db_mock,
+                                                        dt_mock):
+        dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
+        response = self.app.get('/api/last_tested_repo?max_age=48')
+        self.assertEqual(response.status_code, 404)
+
     def test_get_last_tested_repo_with_age(self, db_mock, dt_mock):
         req_data = json.dumps(dict(max_age='72'))
         dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
         response = self.app.get('/api/last_tested_repo',
                                 data=req_data,
                                 content_type='application/json')
+        data = json.loads(response.data)
+
+        self.assertEqual(data['commit_hash'],
+                         '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc')
+        self.assertEqual(data['distro_hash'],
+                         '8170b8686c38bafb6021d998e2fb268ab26ccf65')
+        self.assertEqual(data['job_id'], 'consistent')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_last_tested_repo_with_age_url_params(self, db_mock, dt_mock):
+        dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
+        response = self.app.get('/api/last_tested_repo?max_age=72')
         data = json.loads(response.data)
 
         self.assertEqual(data['commit_hash'],
@@ -136,6 +150,17 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
         response = self.app.get('/api/last_tested_repo',
                                 data=req_data,
                                 content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(data['commit_hash'],
+                         '17234e9ab9dfab4cf5600f67f1d24db5064f1025')
+        self.assertEqual(data['distro_hash'],
+                         '024e24f0cf4366c2290c22f24e42de714d1addd1')
+        self.assertEqual(data['job_id'], 'current-passed-ci')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_last_tested_repo_failed_url_params(self, db_mock, dt_mock):
+        dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
+        response = self.app.get('/api/last_tested_repo?max_age=0&success=0')
         data = json.loads(response.data)
         self.assertEqual(data['commit_hash'],
                          '17234e9ab9dfab4cf5600f67f1d24db5064f1025')
@@ -402,16 +427,17 @@ class TestPromote(DLRNAPITestCase):
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
 class TestRepoStatus(DLRNAPITestCase):
-    def test_get_last_tested_repo_needs_json(self, db2_mock, db_mock):
-        response = self.app.get('/api/repo_status')
-        self.assertEqual(response.status_code, 415)
-
     def test_repo_status_missing_commit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='abc123', distro_hash='abc123'))
         response = self.app.get('/api/repo_status',
                                 data=req_data,
                                 content_type='application/json')
 
+        self.assertEqual(response.status_code, 404)
+
+    def test_repo_status_missing_commit_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/repo_status?commit_hash=abc123'
+                                '&distro_hash=abc123')
         self.assertEqual(response.status_code, 404)
 
     def test_repo_status_multiple_votes(self, db2_mock, db_mock):
@@ -427,6 +453,15 @@ class TestRepoStatus(DLRNAPITestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data), 2)
 
+    def test_repo_status_multiple_votes_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/repo_status?commit_hash='
+                                '17234e9ab9dfab4cf5600f67f1d24db5064f1025&'
+                                'distro_hash=024e24f0cf4366c2290c22f24e42d'
+                                'e714d1addd1')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 2)
+
     def test_repo_status_with_success(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='17234e9ab9dfab4cf5600f'
                                                '67f1d24db5064f1025',
@@ -437,6 +472,15 @@ class TestRepoStatus(DLRNAPITestCase):
                                 data=req_data,
                                 content_type='application/json')
 
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
+    def test_repo_status_with_success_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/repo_status?commit_hash='
+                                '17234e9ab9dfab4cf5600f67f1d24db5064f1025&'
+                                'distro_hash=024e24f0cf4366c2290c22f24e42d'
+                                'e714d1addd1&success=true')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
@@ -518,10 +562,6 @@ class TestGetReport(DLRNAPITestCase):
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
 class TestGetPromotions(DLRNAPITestCase):
-    def test_get_promotions_needs_json(self, db2_mock, db_mock):
-        response = self.app.get('/api/promotions')
-        self.assertEqual(response.status_code, 415)
-
     def test_get_promotions_missing_commit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(distro_hash='abc123'))
         response = self.app.get('/api/promotions',
@@ -537,6 +577,12 @@ class TestGetPromotions(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 404)
 
+    def test_get_promotions_no_such_commit_url_params(self, db2_mock,
+                                                      db_mock):
+        response = self.app.get('/api/promotions?commit_hash=abc123&'
+                                'distro_hash=abc123')
+        self.assertEqual(response.status_code, 404)
+
     def test_get_promotions_multiple_votes(self, db2_mock, db_mock):
         req_data = '{}'
         response = self.app.get('/api/promotions',
@@ -546,11 +592,24 @@ class TestGetPromotions(DLRNAPITestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data), 2)
 
+    def test_get_promotions_multiple_votes_url_params(self, db2_mock, db_mock):
+        response = self.app.get('/api/promotions')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 2)
+
     def test_get_promotions_with_promote_name(self, db2_mock, db_mock):
         req_data = json.dumps(dict(promote_name='another-ci'))
         response = self.app.get('/api/promotions',
                                 data=req_data,
                                 content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
+    def test_get_promotions_with_promote_name_url_params(self, db2_mock,
+                                                         db_mock):
+        response = self.app.get('/api/promotions?promote_name=another-ci')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
@@ -576,6 +635,12 @@ class TestGetPromotions(DLRNAPITestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
 
+    def test_get_promotions_with_offset_url_params(self, db2_mock, db_mock):
+        response = self.app.get('/api/promotions?offset=1')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
     def test_get_promotions_with_limit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(limit=1))
         response = self.app.get('/api/promotions',
@@ -585,14 +650,16 @@ class TestGetPromotions(DLRNAPITestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
 
+    def test_get_promotions_with_limit_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/promotions?limit=1')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
 class TestMetrics(DLRNAPITestCase):
-    def test_metrics_json(self, db2_mock, db_mock):
-        response = self.app.get('/api/metrics/builds')
-        self.assertEqual(response.status_code, 415)
-
     def test_metrics_missing_start_date(self, db2_mock, db_mock):
         req_data = json.dumps(dict(end_date='0'))
         response = self.app.get('/api/metrics/builds',
@@ -600,11 +667,19 @@ class TestMetrics(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
+    def test_metrics_missing_start_date_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/metrics/builds?end_date=0')
+        self.assertEqual(response.status_code, 400)
+
     def test_metrics_wrong_date_format(self, db2_mock, db_mock):
         req_data = json.dumps(dict(start_date='0', end_date='0'))
         response = self.app.get('/api/metrics/builds',
                                 data=req_data,
                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_metrics_wrong_date_format_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/metrics/builds?start_date=0&end_date=0')
         self.assertEqual(response.status_code, 400)
 
     def test_metrics_notindate(self, db2_mock, db_mock):
@@ -631,6 +706,15 @@ class TestMetrics(DLRNAPITestCase):
         self.assertEqual(data['succeeded'], 3)
         self.assertEqual(data['failed'], 0)
 
+    def test_metrics_success_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/metrics/builds?start_date=2015-09-07'
+                                '&end_date=2015-09-09')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['total'], 3)
+        self.assertEqual(data['succeeded'], 3)
+        self.assertEqual(data['failed'], 0)
+
     def test_metrics_filtered(self, db2_mock, db_mock):
         req_data = json.dumps(dict(start_date='2015-09-07',
                                    end_date='2015-09-09',
@@ -644,6 +728,16 @@ class TestMetrics(DLRNAPITestCase):
         self.assertEqual(data['succeeded'], 1)
         self.assertEqual(data['failed'], 0)
 
+    def test_metrics_filtered_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/metrics/builds?start_date=2015-09-07'
+                                '&end_date=2015-09-09&'
+                                'package_name=python-pysaml2')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['total'], 1)
+        self.assertEqual(data['succeeded'], 1)
+        self.assertEqual(data['failed'], 0)
+
     def test_metrics_filtered_nopackage(self, db2_mock, db_mock):
         req_data = json.dumps(dict(start_date='2015-09-07',
                                    end_date='2015-09-09',
@@ -651,6 +745,14 @@ class TestMetrics(DLRNAPITestCase):
         response = self.app.get('/api/metrics/builds',
                                 data=req_data,
                                 content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['total'], 0)
+
+    def test_metrics_filtered_nopackage_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/metrics/builds?start_date=2015-09-07'
+                                '&end_date=2015-09-09&'
+                                'package_name=python-pysaml')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(data['total'], 0)

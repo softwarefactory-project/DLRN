@@ -11,7 +11,10 @@ authentication using username+password.
 
 Password information is stored in the database using the SHA512 hash.
 
-All data will be sent/received using JSON objects, unless stated otherwise.
+For POST operations, all data will be sent/received using JSON objects, unless
+stated otherwise. For GET operations, the recommended method is to send data
+using in-query parameters. JSON in-body objects still work, but are deprecated
+and expected to be removed in a future version.
 
 *********
 API calls
@@ -42,7 +45,7 @@ to use the same repo tested by CI (n-1).
 
 Normal response codes: 200
 
-Error response codes: 400, 404, 415
+Error response codes: 400, 404
 
 
 Request:
@@ -87,7 +90,7 @@ Get all the CI reports for a specific repository.
 
 Normal response codes: 200
 
-Error response codes: 400, 404, 415
+Error response codes: 400, 404
 
 
 Request:
@@ -128,7 +131,7 @@ per query.
 
 Normal response codes: 200
 
-Error response codes: 400, 404, 415
+Error response codes: 400, 404
 
 Request:
 
@@ -172,7 +175,7 @@ package name.
 
 Normal response codes: 200
 
-Error response codes: 400, 415
+Error response codes: 400
 
 ===================  ==========  ==============================================================
        Parameter       Type                             Description

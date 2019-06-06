@@ -126,14 +126,25 @@ def getVote(session, timestamp, success=None, job_id=None, fallback=True):
 
 
 @app.route('/api/repo_status', methods=['GET'])
-@_json_media_type
 def repo_status():
     # commit_hash: commit hash
     # distro_hash: distro hash
     # success(optional): only report successful/unsuccessful votes
-    commit_hash = request.json.get('commit_hash', None)
-    distro_hash = request.json.get('distro_hash', None)
-    success = request.json.get('success', None)
+
+    commit_hash = request.args.get('commit_hash', None)
+    distro_hash = request.args.get('distro_hash', None)
+    success = request.args.get('success', None)
+
+    if request.headers.get('Content-Type') == 'application/json':
+        # This is the old, deprecated method of in-body parameters
+        # We will keep it for backwards compatibility
+        if commit_hash is None:
+            commit_hash = request.json.get('commit_hash', None)
+        if distro_hash is None:
+            distro_hash = request.json.get('distro_hash', None)
+        if success is None:
+            success = request.json.get('success', None)
+
     if (commit_hash is None or distro_hash is None):
         raise InvalidUsage('Missing parameters', status_code=400)
 
@@ -172,7 +183,6 @@ def repo_status():
 
 
 @app.route('/api/last_tested_repo', methods=['GET'])
-@_json_media_type
 def last_tested_repo_GET():
     # max_age: Maximum age in hours, used as base for the search
     # success(optional): find repos with a successful/unsuccessful vote
@@ -182,11 +192,26 @@ def last_tested_repo_GET():
     #                            search for. Defaults to false
     # previous_job_id(optional): CI name to search for, if sequential_mode is
     #                            True
-    max_age = request.json.get('max_age', None)
-    job_id = request.json.get('job_id', None)
-    success = request.json.get('success', None)
-    sequential_mode = request.json.get('sequential_mode', None)
-    previous_job_id = request.json.get('previous_job_id', None)
+
+    max_age = request.args.get('max_age', None)
+    job_id = request.args.get('job_id', None)
+    success = request.args.get('success', None)
+    sequential_mode = request.args.get('sequential_mode', None)
+    previous_job_id = request.args.get('previous_job_id', None)
+
+    if request.headers.get('Content-Type') == 'application/json':
+        # This is the old, deprecated method of in-body parameters
+        # We will keep it for backwards compatibility
+        if max_age is None:
+            max_age = request.json.get('max_age', None)
+        if job_id is None:
+            job_id = request.json.get('job_id', None)
+        if success is None:
+            success = request.json.get('success', None)
+        if sequential_mode is None:
+            sequential_mode = request.json.get('sequential_mode', None)
+        if previous_job_id is None:
+            previous_job_id = request.json.get('previous_job_id', None)
 
     if success is not None:
         success = bool(strtobool(success))
@@ -236,18 +261,31 @@ def last_tested_repo_GET():
 
 
 @app.route('/api/promotions', methods=['GET'])
-@_json_media_type
 def promotions_GET():
     # commit_hash(optional): commit hash
     # distro_hash(optional): distro hash
     # promote_name(optional): only report promotions for promote_name
     # offset(optional): skip the first X promotions (only 100 are shown
     #                   per query)
-    commit_hash = request.json.get('commit_hash', None)
-    distro_hash = request.json.get('distro_hash', None)
-    promote_name = request.json.get('promote_name', None)
-    offset = request.json.get('offset', 0)
-    limit = request.json.get('limit', 100)
+    commit_hash = request.args.get('commit_hash', None)
+    distro_hash = request.args.get('distro_hash', None)
+    promote_name = request.args.get('promote_name', None)
+    offset = int(request.args.get('offset', 0))
+    limit = int(request.args.get('limit', 100))
+
+    if request.headers.get('Content-Type') == 'application/json':
+        # This is the old, deprecated method of in-body parameters
+        # We will keep it for backwards compatibility
+        if commit_hash is None:
+            commit_hash = request.json.get('commit_hash', None)
+        if distro_hash is None:
+            distro_hash = request.json.get('distro_hash', None)
+        if promote_name is None:
+            promote_name = request.json.get('promote_name', None)
+        if offset == 0:
+            offset = int(request.json.get('offset', 0))
+        if limit == 100:
+            limit = int(request.json.get('limit', 100))
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
@@ -307,17 +345,26 @@ def promotions_GET():
 
 
 @app.route('/api/metrics/builds', methods=['GET'])
-@_json_media_type
 def get_metrics():
     # start_date: start date for period, in YYYY-mm-dd format (UTC)
     # end_date: end date for period, in YYYY-mm-dd format (UTC)
     # package_name (optional): return metrics for package_name
-    try:
-        start_date = request.json['start_date']
-        end_date = request.json['end_date']
-    except KeyError:
+    start_date = request.args.get('start_date', None)
+    end_date = request.args.get('end_date', None)
+    package_name = request.args.get('package_name', None)
+
+    if request.headers.get('Content-Type') == 'application/json':
+        # This is the old, deprecated method of in-body parameters
+        # We will keep it for backwards compatibility
+        if start_date is None:
+            start_date = request.json.get('start_date', None)
+        if end_date is None:
+            end_date = request.json.get('end_date', None)
+        if package_name is None:
+            package_name = request.json.get('package_name', None)
+
+    if start_date is None or end_date is None:
         raise InvalidUsage('Missing parameters', status_code=400)
-    package_name = request.json.get('package_name', None)
 
     # Convert dates to timestamp
     fmt = '%Y-%m-%d'
