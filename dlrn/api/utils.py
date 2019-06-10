@@ -15,6 +15,7 @@ from dlrn.db import User
 from flask_httpauth import HTTPBasicAuth
 
 import passlib.hash
+import yaml
 
 auth = HTTPBasicAuth()
 
@@ -27,6 +28,32 @@ def verify_pw(username, password):
         return passlib.hash.sha512_crypt.verify(password, user.password)
     else:
         return False
+
+
+def verify_acl(path, method, user):
+    try:
+        with open(app.config['ACL_PATH']) as fp:
+            data = yaml.safe_load(fp)
+    except Exception as e:
+        raise InvalidUsage('Missing ACL file', status_code=500)
+
+    key = "%s:%s" % (path, method)
+
+    for rule in data:
+        if rule == key:
+            acl = data[rule]
+            if isinstance(acl, list):
+                if len(acl) == 0:   # An empty acl means allow all
+                    return True
+                for u in acl:
+                    if u == user:
+                        return True
+            else:
+                if acl == 'deny_all':   # A special rule to deny all access
+                    return False
+    # If the rule is not present, or the rule:user combination is missing,
+    # deny access
+    return False
 
 
 class InvalidUsage(Exception):

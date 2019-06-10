@@ -19,6 +19,7 @@ from dlrn.api import app
 from dlrn.api.utils import auth
 from dlrn.api.utils import InvalidUsage
 from dlrn.api.utils import RepoDetail
+from dlrn.api.utils import verify_acl
 
 from dlrn.db import CIVote
 from dlrn.db import closeSession
@@ -65,6 +66,17 @@ def _json_media_type(f):
             raise InvalidUsage('Unsupported Media Type, use JSON',
                                status_code=415)
         return f(*args, **kwargs)
+    return decorated_function
+
+
+def _acl_wrapper(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if verify_acl(request.path, request.method, auth.username()):
+            return f(*args, **kwargs)
+        else:
+            raise InvalidUsage('ACL denied for user %s' % auth.username(),
+                               status_code=403)
     return decorated_function
 
 
@@ -127,6 +139,7 @@ def getVote(session, timestamp, success=None, job_id=None, fallback=True):
 
 @app.route('/api/repo_status', methods=['GET'])
 @_json_media_type
+@_acl_wrapper
 def repo_status():
     # commit_hash: commit hash
     # distro_hash: distro hash
@@ -173,6 +186,7 @@ def repo_status():
 
 @app.route('/api/last_tested_repo', methods=['GET'])
 @_json_media_type
+@_acl_wrapper
 def last_tested_repo_GET():
     # max_age: Maximum age in hours, used as base for the search
     # success(optional): find repos with a successful/unsuccessful vote
@@ -237,6 +251,7 @@ def last_tested_repo_GET():
 
 @app.route('/api/promotions', methods=['GET'])
 @_json_media_type
+@_acl_wrapper
 def promotions_GET():
     # commit_hash(optional): commit hash
     # distro_hash(optional): distro hash
@@ -308,6 +323,7 @@ def promotions_GET():
 
 @app.route('/api/metrics/builds', methods=['GET'])
 @_json_media_type
+@_acl_wrapper
 def get_metrics():
     # start_date: start date for period, in YYYY-mm-dd format (UTC)
     # end_date: end date for period, in YYYY-mm-dd format (UTC)
@@ -363,6 +379,7 @@ def get_metrics():
 @app.route('/api/last_tested_repo', methods=['POST'])
 @auth.login_required
 @_json_media_type
+@_acl_wrapper
 def last_tested_repo_POST():
     # max_age: Maximum age in hours, used as base for the search
     # success(optional): find repos with a successful/unsuccessful vote
@@ -438,6 +455,7 @@ def last_tested_repo_POST():
 @app.route('/api/report_result', methods=['POST'])
 @auth.login_required
 @_json_media_type
+@_acl_wrapper
 def report_result():
     # job_id: name of CI
     # commit_hash: commit hash
@@ -489,6 +507,7 @@ def report_result():
 @app.route('/api/promote', methods=['POST'])
 @auth.login_required
 @_json_media_type
+@_acl_wrapper
 def promote():
     # commit_hash: commit hash
     # distro_hash: distro hash
@@ -561,6 +580,7 @@ def promote():
 @app.route('/api/remote/import', methods=['POST'])
 @auth.login_required
 @_json_media_type
+@_acl_wrapper
 def remote_import():
     # repo_url: repository URL to import from
     try:
@@ -586,6 +606,7 @@ def strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
 
 
 @app.route('/api/civotes.html', methods=['GET'])
+@_acl_wrapper
 def get_civotes():
     session = getSession(app.config['DB_PATH'])
     offset = request.args.get('offset', 0)
@@ -634,6 +655,7 @@ def get_civotes():
 
 
 @app.route('/api/civotes_detail.html', methods=['GET'])
+@_acl_wrapper
 def get_civotes_detail():
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
@@ -681,6 +703,7 @@ def get_civotes_detail():
 
 
 @app.route('/api/report.html', methods=['GET'])
+@_acl_wrapper
 def get_report():
     package_name = request.args.get('package', None)
     success = request.args.get('success', None)

@@ -13,6 +13,44 @@ Password information is stored in the database using the SHA512 hash.
 
 All data will be sent/received using JSON objects, unless stated otherwise.
 
+**************
+Access control
+**************
+
+Access control is described in a YAML file. The path to the file is included in
+the ``config.py`` file as ``ACL_PATH``.
+
+Each API call needs to have a corresponding entry in the YAML file, in the form
+``"api_url:method": ACL``. If the entry for the API call is missing, any access
+will be denied.
+
+The ACL can use the following syntax:
+
+- ``[]`` (empty list), that means all users can use the API call.
+
+  .. code-block:: YAML
+
+    "/api/repo_status:GET": []
+
+- A list of usernames (only for POST operations), so only those users can use
+  the API call.
+
+  .. code-block:: YAML
+
+    "/api/last_tested_repo:POST":
+      - user1
+      - user2
+
+- The special keyword ``deny_all`` to deny the operation to all users
+
+  .. code-block:: YAML
+
+    "/api/repo_status:GET": deny_all
+
+DLRN comes with a default ``api_acl.yml`` file, that allows access to every
+user. Feel free to customize it as needed.
+
+
 *********
 API calls
 *********
