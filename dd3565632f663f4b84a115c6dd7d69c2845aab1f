@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "70bd86bd_3a3c3b0e",
+        "filename": "dlrn/config.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-06-10T11:23:00Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there be a else: warning or even an error when a rule wasn\u0027t applied and thus it\u0027s invalid?",
+      "revId": "dd3565632f663f4b84a115c6dd7d69c2845aab1f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98c4b91d_667cf5d6",
+        "filename": "doc/source/usage.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 421
+      },
+      "writtenOn": "2019-06-10T11:23:00Z",
+      "side": 1,
+      "message": "Description indentation inconsistent with the rest (missing 4 spaces).",
+      "revId": "dd3565632f663f4b84a115c6dd7d69c2845aab1f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    }
+  ]
+}
