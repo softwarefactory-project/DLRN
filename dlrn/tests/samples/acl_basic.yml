@@ -1,0 +1,14 @@
+# An empty list means everyone can do it
+"/api/repo_status:GET": []
+"/api/last_tested_repo:GET": []
+"/api/promotions:GET": []
+"/api/metrics/builds:GET": []
+"/api/civotes.html:GET": []
+"/api/civotes_detail.html:GET": []
+"/api/report.html:GET": []
+
+# An empty list on a POST action means any authenticated user can do it
+"/api/last_tested_repo:POST": []
+"/api/report_result:POST": []
+"/api/promote:POST": []
+"/api/remote/import:POST": []

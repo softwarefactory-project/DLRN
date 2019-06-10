@@ -1,0 +1,32 @@
+# This file describes the access control lists for DLRN API operations
+# There are some basic rules:
+# 1- Each API call needs to have a corresponding entry here, in the form
+#    "api_url:method": ACL
+# 2- If the entry for the API call is missing, any access will be denied
+# 3- The ACL can look like the following:
+#    - [] (empty list), that means all users can do it
+#    - A list of usernames (only for POST operations), so only those users
+#      can use the API call.
+#    - The special keyword "deny_all" to deny the operation to all users
+#
+# Example rules:
+# "/api/repo_status:GET": []               (full access)
+# "/api/repo_status:GET": deny_all         (API call is effectively disabled)
+# "/api/last_tested_repo:POST":            (Allowed for user1 and user2)
+#   - user1
+#   - user2
+
+# An empty list means everyone can do it
+"/api/repo_status:GET": []
+"/api/last_tested_repo:GET": []
+"/api/promotions:GET": []
+"/api/metrics/builds:GET": []
+"/api/civotes.html:GET": []
+"/api/civotes_detail.html:GET": []
+"/api/report.html:GET": []
+
+# An empty list on a POST action means any authenticated user can do it
+"/api/last_tested_repo:POST": []
+"/api/report_result:POST": []
+"/api/remote/import:POST": []
+"/api/promote:POST": []
