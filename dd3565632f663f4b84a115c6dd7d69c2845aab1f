@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "afd231e3_1a0a4a26",
+        "filename": "dlrn/config.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-06-10T13:29:17Z",
+      "side": 1,
+      "message": "Mmm that makes sense. When we use an invalid command-line option, we throw an error, so this should follow the same idea. I\u0027ll fix that.",
+      "parentUuid": "70bd86bd_3a3c3b0e",
+      "revId": "dd3565632f663f4b84a115c6dd7d69c2845aab1f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "98c4b91d_667cf5d6",
         "filename": "doc/source/usage.rst",
         "patchSetId": 4
