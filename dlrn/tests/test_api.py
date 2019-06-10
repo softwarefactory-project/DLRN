@@ -46,6 +46,7 @@ class DLRNAPITestCase(base.TestCase):
         self.db_fd, self.filepath = tempfile.mkstemp()
         app.config['DB_PATH'] = "sqlite:///%s" % self.filepath
         app.config['REPO_PATH'] = '/tmp'
+        app.config['ACL_PATH'] = './dlrn/tests/samples/acl_basic.yml'
         self.app = app.test_client()
         self.app.testing = True
         self.headers = {'Authorization': 'Basic %s' % (
@@ -654,3 +655,73 @@ class TestMetrics(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(data['total'], 0)
+
+
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestACL(DLRNAPITestCase):
+    def setUp(self):
+        super(DLRNAPITestCase, self).setUp()
+        self.db_fd, self.filepath = tempfile.mkstemp()
+        app.config['DB_PATH'] = "sqlite:///%s" % self.filepath
+        app.config['REPO_PATH'] = '/tmp'
+        app.config['ACL_PATH'] = './dlrn/tests/samples/acl_complex.yml'
+        self.app = app.test_client()
+        self.app.testing = True
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:bar').decode('ascii'))}
+
+    # Base test, should succeed because we allow every user
+    def test_acl_success_allowall(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(start_date='2015-09-07',
+                                   end_date='2015-09-09'))
+        response = self.app.get('/api/metrics/builds',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+    # Should fail, because the rule for promotions is missing
+    def test_acl_fail_missing_rule(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='abc123',
+                              distro_hash='abc123'))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+
+    # Should pass, user is in ACL
+    @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver.getpackages')
+    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('dlrn.remote.post_build')
+    @mock.patch('dlrn.remote.urlopen', side_effect=mocked_urlopen)
+    def test_acl_success_user(self, url_mock, build_mock, sh_mock,
+                              db2_mock, db_mock, gp_mock):
+        req_data = json.dumps(dict(repo_url='http://example.com/1/'))
+        response = self.app.post('/api/remote/import',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+
+    # Should fail, user is not in ACL
+    def test_acl_fail_not_in_acl(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='0', job_id='foo-ci', url='',
+                                   timestamp='1941635095', success='true',
+                                   distro_hash='8170b8686c38bafb6021d998e2fb26'
+                                               '8ab26ccf65'))
+
+        response = self.app.post('/api/report_result',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+
+    # Should fail, we have deny_all in ACL
+    def test_acl_fail_deny_all(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='abc123', distro_hash='abc123',
+                                   promote_name='foo'))
+        response = self.app.post('/api/promote',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 403)
