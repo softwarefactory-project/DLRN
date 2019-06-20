@@ -38,7 +38,7 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'Could not resolve host|'
                              'Temporary failure in name resolution|'
                              'distroinfo.exception.CommandFailed: Command '
-                             'failed with return code 128: git checkout -f')
+                             'failed with return code 128: git')
 
 
 logger = logging.getLogger("dlrn-utils")
