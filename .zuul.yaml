@@ -30,6 +30,18 @@
           label: rdo-fedora-28
 
 - job:
+    name: dlrn-rpmbuild-tripleo-ci-oooq-rhel8
+    parent: dlrn-base
+    nodeset:
+      nodes:
+        - name: test-node-rhel-8
+          label: upstream-rhel-8
+    voting: false
+    description: Run DLRN to build a package using Tripleo-Quickstart playbooks
+    run: playbooks/tripleo-ci-oooq.yaml
+    post-run: playbooks/tripleo-ci-oooq-getlogs.yaml
+
+- job:
     name: dlrn-rpmbuild-tripleo-ci-oooq
     parent: dlrn-base
     voting: false
