@@ -30,6 +30,23 @@
           label: rdo-fedora-28
 
 - job:
+    name: dlrn-rpmbuild-tripleo-ci-oooq-rhel8
+    parent: dlrn-base
+    nodeset:
+      nodes:
+        - name: test-node-rhel-8
+          label: upstream-rhel-8
+    voting: false
+    host-vars:
+      localhost:
+        ansible_python_interpreter: /usr/bin/python3
+      test-node-rhel-8:
+        ansible_python_interpreter: /usr/bin/python3
+    description: Run DLRN to build a package using Tripleo-Quickstart playbooks
+    run: playbooks/tripleo-ci-oooq.yaml
+    post-run: playbooks/tripleo-ci-oooq-getlogs.yaml
+
+- job:
     name: dlrn-rpmbuild-tripleo-ci-oooq
     parent: dlrn-base
     voting: false
@@ -62,6 +79,7 @@
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
         - dlrn-rpmbuild-tripleo-ci-oooq
+        - dlrn-rpmbuild-tripleo-ci-oooq-rhel8
         - dlrn-api-functional
     gate:
       jobs:

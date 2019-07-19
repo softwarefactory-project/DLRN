@@ -25,9 +25,24 @@
           - openssl-devel
           - yum-utils
           - policycoreutils
+        state: present
+      become: true
+
+    - name: Install Fedora/RHEL8-specific dependencies
+      package:
+        name:
+          - python3-virtualenv
+        state: present
+      become: true
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora') and ansible_distribution_major_version | int > 7
+
+    - name: Install CentOS7-specific dependencies
+      package:
+        name:
           - python-virtualenv
         state: present
       become: true
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 7
 
     - block:
         - name: Install dnf-yum and distribution-gpg-keys (Fedora)
