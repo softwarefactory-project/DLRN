@@ -48,9 +48,11 @@ The DLRN codebase is structured as follows:
     `Building packages`_ section).
   * *submit_review.sh*: script to open a Gerrit review after a build failure (see
     the `Error reporting`_ section).
-  * *centos.cfg* and *fedora.cfg*: base mock configurations for CentOS and Fedora
-    builders. These base configurations can be located in a separate directory,
-    defined by the ``configdir`` option in projects.ini.
+  * *centos.cfg*, *fedora.cfg* and *redhat.cfg*: base mock configurations for
+    CentOS 7, Fedora and RHEL 8 builders. For a RHEL 8 builder, you will have
+    to make sure the appropriate base repos are configured, since those are not
+    publicly available. These base configurations can be located in a separate
+    directory, defined by the ``configdir`` option in projects.ini.
 
 - **dlrn/**: main DLRN code
 

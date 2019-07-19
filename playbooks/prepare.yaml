@@ -25,30 +25,57 @@
           - openssl-devel
           - yum-utils
           - policycoreutils
-          - python-virtualenv
         state: present
       become: true
 
-    - block:
-        - name: Install dnf-yum and distribution-gpg-keys (Fedora)
-          package:
-            name:
-              - dnf-yum
-              - distribution-gpg-keys
-            state: present
-          become: true
+    - name: Install Fedora/RHEL8-specific dependencies
+      package:
+        name:
+          - python3-virtualenv
+          - python3-devel
+          - python2-devel
+          - systemd-container
+        state: present
+      become: true
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora') and ansible_distribution_major_version | int > 7
 
-        # NOTE(jpena) The python3 job will build a CentOS package, so we need
-        # to have the CentOS 7 GPG key in the place mock will expect it
-        - name: Create symlink for RPM-GPG-KEY-CentOS-7
-          file:
-            src: /usr/share/distribution-gpg-keys/centos/RPM-GPG-KEY-CentOS-7
-            dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
-            owner: root
-            group: root
-            state: link
-          become: true
+    - name: Install CentOS7-specific dependencies
+      package:
+        name:
+          - python-virtualenv
+          - python2-devel
+        state: present
+      become: true
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 7
+
+    - name: Install dnf-yum and distribution-gpg-keys (Fedora)
+      package:
+        name:
+          - dnf-yum
+          - distribution-gpg-keys
+        state: present
+      become: true
       when: ansible_distribution == "Fedora"
+
+    # NOTE(jpena) The python3 job will build a CentOS package, so we need
+    # to have the CentOS 7 GPG key in the place mock will expect it
+    - name: Create symlink for RPM-GPG-KEY-CentOS-7
+      file:
+        src: /usr/share/distribution-gpg-keys/centos/RPM-GPG-KEY-CentOS-7
+        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+        owner: root
+        group: root
+        state: link
+      become: true
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora') and ansible_distribution_major_version | int > 7
+
+    # NOTE(jpena) This is needed by mock when building on RHEL
+    - name: Make sure /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT exists (RHEL)
+      shell:
+        cmd: |
+          touch /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT
+      become: true
+      when: ansible_distribution == 'RedHat' and ansible_distribution_major_version | int > 7
 
     - name: Set up mock configuration
       shell:
