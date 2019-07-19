@@ -12,8 +12,13 @@
 # FIXME(jpena): this should be done using the pip module, however there is
 # an issue with Ansible 2.3.1 that prevents this
 # See https://github.com/ansible/ansible-modules-core/issues/5458
-    - name: Prepare virtualenv
+    - name: Prepare virtualenv for CentOS 7
       command: virtualenv -p python2 "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv"
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 7
+
+    - name: Prepare virtualenv for Fedora and RHEL 8
+      command: virtualenv -p python3 "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv"
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora') and ansible_distribution_major_version | int > 7
 
     - name: Install updated pip
       shell:
