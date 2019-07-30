@@ -536,6 +536,15 @@ def process_build_result_rpm(
                                   commit.getshardedcommitdir())
         logfile = os.path.join(yumrepodir,
                                "rpmbuild.log")
+
+        # If the log file hasn't been created we add what we have
+        # This happens if the rpm build script didn't run.
+        if not os.path.exists(yumrepodir):
+            os.makedirs(yumrepodir)
+        if not os.path.exists(logfile):
+            with open(logfile, "w") as fp:
+                fp.write(str(exception))
+
         if (isknownerror(logfile) and
             (timesretried(project, session, commit_hash, commit.distro_hash) <
              config_options.maxretries)):
@@ -549,13 +558,6 @@ def process_build_result_rpm(
                 exit_code = 2
         else:
             exit_code = 1
-            # If the log file hasn't been created we add what we have
-            # This happens if the rpm build script didn't run.
-            if not os.path.exists(yumrepodir):
-                os.makedirs(yumrepodir)
-            if not os.path.exists(logfile):
-                with open(logfile, "w") as fp:
-                    fp.write(str(exception))
 
             if not project_info.suppress_email():
                 sendnotifymail(packages, commit)
