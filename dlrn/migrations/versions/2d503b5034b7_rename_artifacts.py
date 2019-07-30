@@ -19,6 +19,7 @@ Create Date: 2019-04-26 01:06:50.462042
 """
 
 from alembic import op
+import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
@@ -30,9 +31,11 @@ depends_on = None
 
 def upgrade():
     with op.batch_alter_table("commits") as batch_op:
-        batch_op.alter_column('rpms', new_column_name='artifacts')
+        batch_op.alter_column('rpms', existing_type=sa.Text(),
+                              new_column_name='artifacts')
 
 
 def downgrade():
     with op.batch_alter_table("commits") as batch_op:
-        batch_op.alter_column('artifacts', new_column_name='rpms')
+        batch_op.alter_column('artifacts', existing_type=sa.Text(),
+                              new_column_name='rpms')
