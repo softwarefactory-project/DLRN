@@ -99,8 +99,8 @@ The configuration file looks like this:
 
 * ``source`` is the branch to use from the upstream repository.
 
-* ``target`` is the distribution to use for building the packages (``centos``
-  or ``fedora``).
+* ``target`` is the distribution to use for building the packages (``centos``,
+  ``fedora`` or ``redhat``, provided that you have the right content).
 
 * ``project_name`` name of the project for which DLRN is building RPMs.
   This name is used to render various templates (emails, web pages).

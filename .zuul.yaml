@@ -38,6 +38,20 @@
     post-run: playbooks/tripleo-ci-oooq-getlogs.yaml
 
 - job:
+    name: dlrn-rpmbuild-tripleo-ci-oooq-rhel8
+    parent: dlrn-rpmbuild-tripleo-ci-oooq
+    nodeset:
+      nodes:
+        - name: test-node-rhel-8
+          label: upstream-rhel-8
+    host-vars:
+      localhost:
+        ansible_python_interpreter: /usr/bin/python3
+      test-node-rhel-8:
+        ansible_python_interpreter: /usr/bin/python3
+    description: Run DLRN to build a package using Tripleo-Quickstart playbooks on RHEL 8
+
+- job:
     name: dlrn-api-functional
     parent: dlrn-base
     voting: false
@@ -62,6 +76,7 @@
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
         - dlrn-rpmbuild-tripleo-ci-oooq
+        - dlrn-rpmbuild-tripleo-ci-oooq-rhel8
         - dlrn-api-functional
     gate:
       jobs:
