@@ -31,9 +31,12 @@
         dest: '{{ ansible_user_dir }}/tripleo-quickstart'
 
     - name: Clone tripleo-quickstart-extras
-      git:
-        repo: 'https://github.com/openstack/tripleo-quickstart-extras'
-        dest: '{{ ansible_user_dir }}/tripleo-quickstart-extras'
+      shell: |
+        git clone https://review.opendev.org/openstack/tripleo-quickstart-extras '{{ ansible_user_dir }}/tripleo-quickstart-extras'
+        pushd '{{ ansible_user_dir }}/tripleo-quickstart-extras'
+        git fetch https://review.opendev.org/openstack/tripleo-quickstart-extras refs/changes/43/674943/1
+        git checkout FETCH_HEAD
+        popd
 
     - name: Install tripleo-quickstart in venv
       shell:
