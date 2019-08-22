@@ -261,9 +261,10 @@ options:
     keep_tarball=0
 
 * ``repo`` is the single Git repository where all distgits are located.
-* ``directory`` is a directory inside the repo. DLRN will expect each
-  directory inside it to include the spec file for a single project, using
-  a Jinja2 template like in the RPM Packaging for OpenStack project.
+* ``directory`` is a directory or comma-separated list of the directories
+  inside the repo. DLRN will expect each directory inside it to include the
+  spec file for a single project, using a Jinja2 template like in the RPM
+  Packaging for OpenStack project.
 * ``skip`` is a comma-separated list of directories to skip from ``directory``
   when creating the list of packages to build. This can be of use when the
   Git repo contains one or more directories without a spec file in it, or

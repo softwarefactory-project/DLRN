@@ -60,7 +60,7 @@ class GitRepoDriver(PkgInfoDriver):
     DRIVER_CONFIG = {
         'gitrepo_driver': {
             'gitrepo_repo': {'name': 'repo'},
-            'gitrepo_dir': {'name': 'directory'},
+            'gitrepo_dirs': {'name': 'directory', 'type': 'list'},
             'skip_dirs': {'name': 'skip', 'type': 'list'},
             'use_version_from_spec': {'type': 'boolean'},
             'keep_tarball': {'type': 'boolean'},
@@ -89,7 +89,6 @@ class GitRepoDriver(PkgInfoDriver):
 
     def getpackages(self, **kwargs):
         repo = self.config_options.gitrepo_repo
-        path = self.config_options.gitrepo_dir.strip('/')
         distro_branch = self.config_options.distro
         datadir = self.config_options.datadir
         skip_dirs = self.config_options.skip_dirs
@@ -111,55 +110,57 @@ class GitRepoDriver(PkgInfoDriver):
                 logger.info("Falling back to master")
                 git.reset("--hard", "origin/master")
 
-        packagepath = os.path.join(gitpath, path)
+        for basepath in self.config_options.gitrepo_dirs:
+            path = basepath.strip('/')
+            packagepath = os.path.join(gitpath, path)
 
-        for package in os.listdir(packagepath):
-            if (os.path.isdir(os.path.join(packagepath, package)) and
-               package not in skip_dirs):
-                pkg_hash = {}
-                pkg_hash['name'] = package
-                pkg_hash['maintainers'] = 'test@example.com'
-                pkg_hash['master-distgit'] = (repo + '/' + path + '/' +
-                                              package)
-                pkg_hash['upstream'] = 'Unknown'
-                if self.config_options.use_version_from_spec is True:
-                    version = None
-                    # Try to deduce version from spec template
-                    pkgdir = os.path.join(packagepath, package)
-                    for pkgfile in os.listdir(pkgdir):
-                        if pkgfile.endswith('.j2'):
-                            with open(os.path.join(pkgdir, pkgfile)) as fp:
-                                j2content = fp.readlines()
-                            for line in j2content:
-                                # Make sure we are not matching the wrong
-                                # version of the upstream_version() macro
-                                m = wrong_match.match(line)
-                                if m is not None:
-                                    # We are deducing the version using the
-                                    # source tarball. This is a bit more
-                                    # complex, since we need to run renderspec
-                                    # and find the version in the resulting
-                                    # spec
-                                    version = self._get_version_from_pkg(
-                                        packagepath, package)
-                                    logger.info(
-                                        "Got version %s for %s from the spec"
-                                        % (version, package))
-                                    break
-                                # Check if template defines upstream_version
-                                m = version_match.match(line)
-                                if m is not None:
-                                    version = m.group(1)
-                                    break
-                                # Otherwise, we're using a direct version
-                                if line.startswith('Version:'):
-                                    version = line.split(':')[1].strip().\
-                                        replace('~', '')
-                                    break
+            for package in os.listdir(packagepath):
+                if (os.path.isdir(os.path.join(packagepath, package)) and
+                   package not in skip_dirs):
+                    pkg_hash = {}
+                    pkg_hash['name'] = package
+                    pkg_hash['maintainers'] = 'test@example.com'
+                    pkg_hash['master-distgit'] = (repo + '/' + path + '/' +
+                                                  package)
+                    pkg_hash['upstream'] = 'Unknown'
+                    if self.config_options.use_version_from_spec is True:
+                        version = None
+                        # Try to deduce version from spec template
+                        pkgdir = os.path.join(packagepath, package)
+                        for pkgfile in os.listdir(pkgdir):
+                            if pkgfile.endswith('.j2'):
+                                with open(os.path.join(pkgdir, pkgfile)) as fp:
+                                    j2content = fp.readlines()
+                                for line in j2content:
+                                    # Make sure we are not matching the wrong
+                                    # version of the upstream_version() macro
+                                    m = wrong_match.match(line)
+                                    if m is not None:
+                                        # We are deducing the version using
+                                        # the source tarball. This is a bit
+                                        # mroe complex, since we need to run
+                                        # renderspec and find the version in
+                                        # the resulting spec
+                                        version = self._get_version_from_pkg(
+                                            packagepath, package)
+                                        logger.info(
+                                            "Got version %s for %s from the "
+                                            "spec" % (version, package))
+                                        break
+                                    # Does template define upstream_version?
+                                    m = version_match.match(line)
+                                    if m is not None:
+                                        version = m.group(1)
+                                        break
+                                    # Otherwise, we're using a direct version
+                                    if line.startswith('Version:'):
+                                        version = line.split(':')[1].strip().\
+                                            replace('~', '')
+                                        break
 
-                    if version is not None:
-                        pkg_hash['source-branch'] = version
-                packages.append(pkg_hash)
+                        if version is not None:
+                            pkg_hash['source-branch'] = version
+                    packages.append(pkg_hash)
         return packages
 
     def getinfo(self, **kwargs):
@@ -266,5 +267,10 @@ class GitRepoDriver(PkgInfoDriver):
 
     def distgit_dir(self, package_name):
         datadir = self.config_options.datadir
-        path = self.config_options.gitrepo_dir.strip('/')
-        return os.path.join(datadir, 'package_info', path, package_name)
+        # Check all potential base directories
+        for basepath in self.config_options.gitrepo_dirs:
+            path = basepath.strip('/')
+            fullpath = os.path.join(datadir, 'package_info', path,
+                                    package_name)
+            if os.path.exists(fullpath):
+                return fullpath

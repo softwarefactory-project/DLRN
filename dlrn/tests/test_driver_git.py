@@ -29,6 +29,10 @@ def _mocked_environ(*args, **kwargs):
     return 'myuser'
 
 
+def _mocked_exists(path):
+    return True
+
+
 class TestDriverGit(base.TestCase):
     def setUp(self):
         super(TestDriverGit, self).setUp()
@@ -38,7 +42,7 @@ class TestDriverGit(base.TestCase):
                    "dlrn.drivers.gitrepo.GitRepoDriver")
         self.config = ConfigOptions(config)
         self.config.datadir = tempfile.mkdtemp()
-        self.config.gitrepo_dir = '/openstack'
+        self.config.gitrepo_dirs = ['/openstack']
 
     def tearDown(self):
         super(TestDriverGit, self).tearDown()
@@ -61,11 +65,13 @@ class TestDriverGit(base.TestCase):
         packages = driver.getpackages(dev_mode=True)
         self.assertEqual(packages, [])
 
+    @mock.patch('os.path.exists', side_effect=_mocked_exists)
     @mock.patch('os.environ.get', side_effect=['myuser'])
     @mock.patch('sh.renderspec', create=True)
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir')
-    def test_custom_preprocess(self, ld_mock, env_mock, rs_mock, get_mock):
+    def test_custom_preprocess(self, ld_mock, env_mock, rs_mock, get_mock,
+                               pth_mock):
         self.config.custom_preprocess = ['/bin/true']
         driver = GitRepoDriver(cfg_options=self.config)
         driver.preprocess(package_name='foo')
@@ -84,12 +90,13 @@ class TestDriverGit(base.TestCase):
         self.assertEqual(env_mock.call_args_list, expected)
         self.assertEqual(env_mock.call_count, 1)
 
+    @mock.patch('os.path.exists', side_effect=_mocked_exists)
     @mock.patch('os.environ.get', side_effect=_mocked_environ)
     @mock.patch('sh.renderspec', create=True)
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir')
     def test_custom_preprocess_multiple_commands(self, ld_mock, env_mock,
-                                                 rs_mock, get_mock):
+                                                 rs_mock, get_mock, pth_mock):
         self.config.custom_preprocess = ['/bin/true', '/bin/false']
         driver = GitRepoDriver(cfg_options=self.config)
         driver.preprocess(package_name='foo')
