@@ -9,7 +9,7 @@
     nodeset:
       nodes:
         - name: test-node
-          label: dib-centos-7
+          label: cloud-centos-7
 
 - job:
     name: dlrn-rpmbuild
