@@ -44,7 +44,16 @@
         name:
           - python-virtualenv
           - python2-devel
+          - python-setuptools
         state: present
+      become: true
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 7
+
+    - name: Ensure tox is installed in CentOS 7
+      shell:
+        cmd: |
+          easy_install pip
+          pip install tox
       become: true
       when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 7
 
