@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f5539355_82e4f273",
+        "filename": "contrib/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-09-10T16:09:38Z",
+      "side": 1,
+      "message": "iirc, it\u0027s recommended to stack all of those in a single RUN to avoid doing multiple layers",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 25
+      },
+      "revId": "49a2ad115327d7ad13fb2fe5c8a3275658627a52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "98d28000_fe6ae877",
+        "filename": "contrib/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-09-10T16:09:38Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 63
+      },
+      "revId": "49a2ad115327d7ad13fb2fe5c8a3275658627a52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f97e9ad2_23aadd6a",
+        "filename": "contrib/README.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-09-10T16:09:38Z",
+      "side": 1,
+      "message": "Perhaps document using \"--volume dlrn-data:/data\" to persist the data accross run?",
+      "revId": "49a2ad115327d7ad13fb2fe5c8a3275658627a52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "42195ce8_111b4dc5",
+        "filename": "contrib/import.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-09-10T16:09:38Z",
+      "side": 1,
+      "message": "this could use a license header",
+      "revId": "49a2ad115327d7ad13fb2fe5c8a3275658627a52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51f4f914_debb0a69",
+        "filename": "contrib/run.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-09-10T16:09:38Z",
+      "side": 1,
+      "message": "this could use a license header",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "49a2ad115327d7ad13fb2fe5c8a3275658627a52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
