@@ -128,6 +128,25 @@ class TestProcessBuildResult(base.TestCase):
         self.assertEqual(sm_mock.call_count, 1)
         self.assertEqual(sr_mock.call_count, 1)
 
+    @mock.patch('os.rename')
+    @mock.patch('os.symlink')
+    @mock.patch('dlrn.shell.export_commit_yaml')
+    @mock.patch('dlrn.shell.genreports')
+    @mock.patch('dlrn.shell.sync_repo')
+    def test_successful_build_component(self, rs_mock, gr_mock, ec_mock, sl_mock,
+                              rn_mock):
+        built_rpms = ['foo-1.2.3.rpm']
+        self.config.use_components = True
+        self.commit.component = 'foo'
+        status = [self.commit, built_rpms, 'OK', None]
+        output = shell.process_build_result(status, self.packages,
+                                            self.session, [])
+        self.assertEqual(output, 0)
+        self.assertEqual(gr_mock.call_count, 1)
+        self.assertEqual(rs_mock.call_count, 1)
+        self.assertEqual(ec_mock.call_count, 1)
+        self.assertEqual(sl_mock.call_count, 1)
+        self.assertEqual(rn_mock.call_count, 1)
 
 @mock.patch('sh.createrepo_c', create=True)
 class TestPostBuild(base.TestCase):
@@ -210,6 +229,32 @@ class TestPostBuild(base.TestCase):
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(output, 0)
+
+    def test_successful_build_no_failures_component(self, sh_mock):
+        packages = [{'upstream': 'https://github.com/openstack/foo',
+                     'name': 'foo', 'maintainers': 'test@test.com',
+                     'master-distgit':
+                     'https://github.com/rdo-packages/foo-distgit.git'}]
+        built_rpms = ['repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf'
+                      '_c31d1b18/foo-1.2.3.el7.centos.noarch.rpm',
+                      'repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edf'
+                      '_c31d1b18/foo-1.2.3.el7.centos.src.rpm']
+
+        self.config.use_components = True
+        self.commit.component = 'testcomponent'
+        status = [self.commit, built_rpms, 'OK', None]
+        # Create directory for the CSV file
+        yumdir = os.path.join(self.config.datadir, "repos",
+                              self.commit.getshardedcommitdir())
+        os.makedirs(yumdir)
+        output = shell.post_build(status, packages, self.session)
+        expected = [mock.call(yumdir)]
+
+        self.assertEqual(sh_mock.call_args_list, expected)
+        self.assertEqual(output, 0)
+        repofile = open(os.path.join(yumdir, 'delorean.repo')).read()
+        assert 'component-testcomponent' in repofile
+
 
     def test_successful_build_no_failures_nosrcrpm(self, sh_mock):
         packages = [{'upstream': 'https://github.com/openstack/foo',

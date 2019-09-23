@@ -160,6 +160,14 @@ class TestCommit(TestsWithData):
                          '3a/93/3a9326f251b9a4162eb0dfa9f1c924ef47c2c55a_'
                          '024e24f0_abcdef12')
 
+    def test_commit_getshardedcommitdir_component(self):
+        commit = db.getLastProcessedCommit(self.session, 'python-pysaml2')
+        commit.component = 'foo'
+        commit.extended_hash = None
+        directory1 = commit.getshardedcommitdir()
+        self.assertEqual(directory1,
+                         'component/foo/3a/93/3a9326f251b9a4162eb0dfa9f1c9'
+                         '24ef47c2c55a_024e24f0')
 
 class TestProject(TestsWithData):
     def test_email(self):
