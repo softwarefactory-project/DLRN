@@ -15,6 +15,7 @@
         <th>Commit Date Time</th>
         <th>Project Name</th>
         <th>Commit Hash</th>
+        <th>Component</th>
         <th>Status</th>
         <th>Repository</th>
         <th>Build Log</th>
@@ -31,6 +32,7 @@
                 {{ commit.commit_hash }}
                 </a>
           </td>
+          <td>{{ commit.component }}</td>
           <td>
             {% if commit.status == "SUCCESS"  %}
               <i class="fa fa-link pull-left" style="color:#004153"></i>SUCCESS
