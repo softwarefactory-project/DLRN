@@ -68,6 +68,25 @@ class TestSyncRepo(base.TestCase):
                               'user@host:/directory')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
+    def test_sync_repo_component(self, sh_mock):
+        self.commit.component = 'foocomp'
+        self.config.use_components = True
+        yumdir = os.path.join(self.config.datadir, 'repos', '.',
+                              self.commit.getshardedcommitdir())
+        repodir = os.path.join(self.config.datadir, 'repos', '.')
+
+        rsync.sync_repo(self.commit)
+        expected = [mock.call('-avzR', '--delete-delay', '-e',
+                              'ssh -p 30000 -o StrictHostKeyChecking=no',
+                              [yumdir,
+                               os.path.join(repodir, 'report.html'),
+                               os.path.join(repodir, 'status_report.html'),
+                               os.path.join(repodir, 'styles.css'),
+                               os.path.join(repodir, 'queue.html'),
+                               os.path.join(repodir, 'status_report.csv')],
+                              'user@host:/directory')]
+        self.assertEqual(sh_mock.call_args_list, expected)
+
     def test_sync_symlinks(self, sh_mock):
         repodir = os.path.join(self.config.datadir, 'repos', '.')
 
@@ -75,6 +94,23 @@ class TestSyncRepo(base.TestCase):
         expected = [mock.call('-avzR', '--delete-delay', '-e',
                               'ssh -p 30000 -o StrictHostKeyChecking=no',
                               [os.path.join(repodir, 'consistent'),
+                               os.path.join(repodir, 'current')],
+                              'user@host:/directory')]
+        self.assertEqual(sh_mock.call_args_list, expected)
+
+    def test_sync_symlinks_component(self, sh_mock):
+        self.commit.component = 'foocomp'
+        self.config.use_components = True
+        repodir = os.path.join(self.config.datadir, 'repos', '.')
+
+        rsync.sync_symlinks(self.commit)
+        expected = [mock.call('-avzR', '--delete-delay', '-e',
+                              'ssh -p 30000 -o StrictHostKeyChecking=no',
+                              [os.path.join(repodir, 'component/foocomp',
+                                            'consistent'),
+                               os.path.join(repodir, 'component/foocomp',
+                                            'current'),
+                               os.path.join(repodir, 'consistent'),
                                os.path.join(repodir, 'current')],
                               'user@host:/directory')]
         self.assertEqual(sh_mock.call_args_list, expected)
