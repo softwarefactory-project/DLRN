@@ -34,6 +34,7 @@ def _get_yumrepodir(commit):
 def build_worker(packages, commit, run_cmd=False, build_env=None,
                  dev_mode=False, use_public=False, order=False,
                  sequential=False):
+    config_options = getConfigOptions()
 
     if run_cmd:
         try:
@@ -43,7 +44,13 @@ def build_worker(packages, commit, run_cmd=False, build_env=None,
         except Exception as e:
             return [commit, '', '', e]
 
-    logger.info("Processing %s %s" % (commit.project_name, commit.commit_hash))
+    if config_options.use_components:
+        logger.info("Processing %s %s for component %s" %
+                    (commit.project_name, commit.commit_hash,
+                     commit.component))
+    else:
+        logger.info("Processing %s %s" % (commit.project_name,
+                                          commit.commit_hash))
 
     notes = ""
     try:
@@ -157,24 +164,17 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
         buildrpm.write_mock_config(oldcfg)
 
     # Add the most current repo, we may have dependencies in it
-    if os.path.exists(os.path.join(datadir, "repos", "current", "repodata")):
-        # Get the real path for the current repo, this could change during
-        # parallel builds
-        repolink = os.readlink(os.path.join(datadir, "repos", "current"))
-        if repolink.startswith('/'):
-            # absolute symlink
-            repopath = repolink
-        else:
-            # relative symlink
-            repopath = os.path.join(datadir, "repos", repolink)
+    current_repo = os.path.join(datadir, "repos", "current",
+                                "%s.repo" % config_options.reponame)
+    if os.path.exists(current_repo):
+        # Read the .repo file
+        with open(current_repo) as fp:
+            current_repo_contents = fp.readlines()
         with open(newcfg, "r") as fp:
             contents = fp.readlines()
         # delete the last line which must be """
         contents = contents[:-1]
-        contents = contents + ["[local]\n", "name=local\n",
-                               "baseurl=file://%s\n" % repopath,
-                               "enabled=1\n", "gpgcheck=0\n", "priority=1\n",
-                               "\"\"\""]
+        contents = contents + current_repo_contents + ["\"\"\""]
         with open(newcfg, "w") as fp:
             fp.writelines(contents)
 
