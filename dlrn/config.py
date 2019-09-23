@@ -66,6 +66,7 @@ DLRN_CORE_CONFIG = {
         'include_srpm_in_repo': {'type': 'boolean', 'default': True},
         'keep_changelog': {'type': 'boolean', 'default': False},
         'allow_force_rechecks': {'type': 'boolean', 'default': False},
+        'use_components': {'type': 'boolean', 'default': False},
     }
 }
 

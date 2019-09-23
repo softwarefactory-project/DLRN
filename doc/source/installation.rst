@@ -78,6 +78,7 @@ The configuration file looks like this:
     custom_preprocess=
     include_srpm_in_repo=true
     keep_changelog=false
+    use_components=false
 
 * ``datadir`` is the directory where the packages and repositories will be
   created. If not set, it will default to ``./data`` on the parent directory
@@ -247,6 +248,11 @@ The configuration file looks like this:
 * ``keep_changelog``, if set to true, will not clean the %changelog section from
   spec files when building the source RPM. When set to the default value of
   ``false``, DLRN will remove all changelog content from specs.
+
+* ``use_components``, if set to true, will enable component support for DLRN. This
+  is currently provided by the ``dlrn.drivers.rdoinfo.RdoInfoDriver`` driver only.
+  Please refer to the `internals <internals.html>`_ page for details on component
+  support.
 
 The optional ``[gitrepo_driver]`` section has the following configuration
 options:

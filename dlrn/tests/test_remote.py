@@ -40,13 +40,16 @@ def mocked_urlopen(url):
         return urlopen(url)
 
 
+@mock.patch('os.rename')
+@mock.patch('os.symlink')
 @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver.getpackages')
 @mock.patch.object(sh.Command, '__call__', autospec=True)
 @mock.patch('dlrn.remote.post_build')
 @mock.patch('dlrn.remote.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.remote.urlopen', side_effect=mocked_urlopen)
 class TestRemote(base.TestCase):
-    def test_remote(self, url_mock, db_mock, build_mock, sh_mock, gp_mock):
+    def test_remote(self, url_mock, db_mock, build_mock, sh_mock, gp_mock,
+                    sl_mock, rn_mock):
         testargs = ["dlrn-remote", "--config-file", "projects.ini",
                     "--repo-url", "http://example.com/1/"]
         # There should be only one call to post_build(), even though there are
