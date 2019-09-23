@@ -53,6 +53,7 @@ class Commit(Base):
     extended_hash = Column(String(64))
     commit_branch = Column(String(256))
     status = Column(String(64))
+    component = Column(String(64))
     artifacts = Column(Text)
     notes = Column(Text)
     flags = Column(Integer, default=0)
@@ -80,9 +81,14 @@ class Commit(Base):
             extended_hash_suffix = "_%s" % self.extended_hash[:8]
         else:
             extended_hash_suffix = ''
+        if self.component:
+            component_prefix = 'component/%s/' % self.component
+        else:
+            component_prefix = ''
+
         hash_dir = self.commit_hash + distro_hash_suffix + extended_hash_suffix
-        return os.path.join(self.commit_hash[:2], self.commit_hash[2:4],
-                            hash_dir)
+        return os.path.join(component_prefix, self.commit_hash[:2],
+                            self.commit_hash[2:4], hash_dir)
 
 
 class Project(Base):
