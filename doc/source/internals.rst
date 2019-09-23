@@ -232,6 +232,31 @@ In this structure, ``cdaf2c77d974d5e794909313dceb3554be69a42e`` is the commit ha
 for the source git repo, and ``4b1619fe`` is the short hash for the distgit commit.
 The first two directory levels (``cd/af``) are taken from the commit hash.
 
+*****************
+Component support
+*****************
+
+DLRN now supports the concept of *components* inside a repository. We can use
+components to divide the packages in a repo into logical aggregations. For example,
+in the OpenStack use case, we could have separate components for those packages
+related to networking, compute, storage, etc.
+
+Currently, only the ``RdoInfoDriver`` package info driver supports this. When
+components are defined, and enabled with the ``use_components=True`` option in
+``projects.ini``, DLRN will change its behavior in the following ways:
+
+- Hashed yum repositories will change their paths, including a component part. For
+  example, a commit for a package in the compute component will use hash
+  ``component/compute/cd/af/cdaf2c77d974d5e794909313dceb3554be69a42e_4b1619fe``.
+- Each component will have a separate repository (``component/compute``,
+  ``component/network``and so on), and the ``current`` and ``consistent`` symlinks
+  will also be relative to each component.
+- To preserve compatibility with instances without component support, the top-level
+  ``current`` and ``consistent`` symlinks will be replaced by a ``current`` and
+  ``consistent`` directory. Each directory will contain a single .repo file, and
+  that file will aggregate the .repo files for the current/consistent repositories
+  of all components.
+
 ******************
 Post-build actions
 ******************
