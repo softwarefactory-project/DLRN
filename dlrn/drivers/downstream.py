@@ -286,7 +286,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                             extended_hash=extended_hash,
                             dt_extended=dt_extended,
                             distgit_dir=self.distgit_dir(package['name']),
-                            commit_branch=source_branch)
+                            commit_branch=source_branch, component=None)
             project_toprocess.append(commit)
 
         return project_toprocess

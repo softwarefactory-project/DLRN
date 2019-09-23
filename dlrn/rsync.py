@@ -63,8 +63,20 @@ def sync_symlinks(commit):
         # has been copied, to avoid a race condition it they are copied first
         rsyncpaths = []
         for filename in ['consistent', 'current']:
-            filepath = os.path.join(datadir, "repos", ".", filename)
+            if config_options.use_components:
+                filepath = os.path.join(datadir, "repos", ".", "component",
+                                        commit.component, filename)
+            else:
+                filepath = os.path.join(datadir, "repos", ".", filename)
             rsyncpaths.append(filepath)
+
+        # If using components, current and consistent on the top-level dir
+        # are not symlinks, but full directories
+
+        if config_options.use_components:
+            for filename in ['consistent', 'current']:
+                filepath = os.path.join(datadir, "repos", ".", filename)
+                rsyncpaths.append(filepath)
 
         rsh_command = 'ssh -p %s -o StrictHostKeyChecking=no' % rsyncport
         try:
