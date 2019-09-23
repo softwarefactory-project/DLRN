@@ -189,13 +189,18 @@ class RdoInfoDriver(PkgInfoDriver):
 
             for line in lines:
                 dt, commit_hash = str(line).strip().strip("'").split(" ")[:2]
+                if self.config_options.use_components and 'component' in package:
+                    component = package['component']
+                else:
+                    component = None
                 commit = Commit(dt_commit=float(dt), project_name=project,
                                 type="rpm",
                                 commit_hash=commit_hash, repo_dir=repo_dir,
                                 distro_hash=distro_hash, dt_distro=dt_distro,
                                 distgit_dir=self.distgit_dir(package['name']),
                                 commit_branch=source_branch,
-                                dt_extended=0, extended_hash=None)
+                                dt_extended=0, extended_hash=None,
+                                component=component)
                 project_toprocess.append(commit)
 
         return project_toprocess
