@@ -52,7 +52,7 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
 
         # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
         # so only look at the last line for version
-        setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && rm -rf *.egg-info && (([ -x /usr/bin/python3 ] && python3 setup.py --version) || python setup.py --version)"| tail -n 1) \
+        setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && rm -rf *.egg-info && (([ -x /usr/bin/python3 ] && python3 setup.py --version 2> /dev/null) || python setup.py --version 2> /dev/null)"| tail -n 1) \
                              $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && git log --abbrev=7 -n1 --format=format:%h")
 
         /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && (([ -x /usr/bin/python3 ] && python3 setup.py sdist) || python setup.py sdist)"
