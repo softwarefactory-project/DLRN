@@ -569,6 +569,9 @@ definitions:
       repo_url:
         type: string
         description: Full URL of the promoted repository.
+      component:
+        type: string
+        description: Component associated to the commit/distro hash
 PromotionQuery:
     type: object
     properties:
@@ -584,6 +587,12 @@ PromotionQuery:
       offset:
         type: integer
         description: Skip the first <offset> promotions from the results
+      limit:
+        type: integer
+        description: If set to a value, limit the returned promotions amount to <limit>
+      component:
+        type: string
+        description: If set, only report promotions for this component
   Import:
     type: object
     properties:
