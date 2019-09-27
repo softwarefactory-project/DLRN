@@ -48,6 +48,7 @@ from dlrn.rpmspecfile import RpmSpecCollection
 from dlrn.rpmspecfile import RpmSpecFile
 from dlrn.rsync import sync_repo
 from dlrn.rsync import sync_symlinks
+from dlrn.utils import aggregate_repo_files
 from dlrn.utils import dumpshas2file
 from dlrn.utils import import_object
 from dlrn.utils import isknownerror
@@ -649,30 +650,9 @@ def process_build_result_rpm(
 
         # If using components, synchronize the upper-level repo files
         if config_options.use_components:
-            all_comp_commits = session.query(Commit).\
-                distinct(Commit.component).group_by(Commit.component).all()
-            component_list = []
-            for cmt in all_comp_commits:
-                if cmt.component is not None:
-                    component_list.append(cmt.component)
-
             for dirname in dirnames:
-                repo_content = ''
-                for component in component_list:
-                    repo_file = os.path.join(datadir, "repos/component",
-                                             component, dirname,
-                                             "%s.repo" %
-                                             config_options.reponame)
-                    if os.path.exists(repo_file):
-                        repo_content += open(repo_file).read() + '\n'
-                # Create target directory if not present
-                target_dir = os.path.join(datadir, "repos", dirname)
-                if not os.path.exists(target_dir):
-                    os.makedirs(target_dir)
-                with open(os.path.join(target_dir,
-                                       "%s.repo" %
-                                       config_options.reponame), 'w') as fp:
-                    fp.write(repo_content)
+                aggregate_repo_files(dirname, datadir, session,
+                                     config_options.reponame)
 
         # And synchronize them
         sync_symlinks(commit)
@@ -680,8 +660,6 @@ def process_build_result_rpm(
     if dev_mode is False:
         if consistent:
             # We have a consistent repo. Let's create a CIVote entry in the DB
-            # FIXME(jpena): we will need to distinguish between
-            # component/non-component
             vote = CIVote(commit_id=commit.id, ci_name='consistent',
                           ci_url='', ci_vote=True, ci_in_progress=False,
                           timestamp=int(commit.dt_build), notes='')
