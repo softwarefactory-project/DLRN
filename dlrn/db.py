@@ -134,6 +134,7 @@ class Promotion(Base):
     timestamp = Column(Integer, nullable=False)
     user = Column(String(255),
                   ForeignKey('users.username', name='prom_user_fk'))
+    component = Column(String(64))
 
 
 class User(Base):
