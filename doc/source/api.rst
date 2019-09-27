@@ -148,6 +148,8 @@ offset               integer     If set to a value, skip the initial <offset> pr
                      (optional)
 limit                integer     If set to a value, limit the returned promotions amount
                      (optional)  to <limit>.
+component            string      If set to a value, only report promotions for this component.
+                     (optional)
 ===================  ==========  ==============================================================
 
 The JSON output will contain an array where each item contains:
@@ -161,6 +163,7 @@ repo_hash       string      Repository hash, composed of the commit_hash and sho
                             distro_hash
 repo_url        string      Full URL of the promoted repository
 promote_name    string      name used for the promotion
+component       string      Component associated to the commit/distro hash
 timestamp       integer     Timestamp (in seconds since the epoch)
 user            string      user who created the promotion
 ==============  ==========  ==============================================================
@@ -342,6 +345,7 @@ repo_hash       string      Repository hash, composed of the commit_hash and sho
                             distro_hash
 repo_url        string      Full URL of the promoted repository
 promote_name    string      name used for the promotion
+component       string      Component associated to the commit/distro hash
 timestamp       integer     Timestamp (in seconds since the epoch)
 user            string      user who created the promotion
 ==============  ==========  ==============================================================

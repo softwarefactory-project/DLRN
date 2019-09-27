@@ -20,18 +20,16 @@ from dlrn.api.utils import auth
 from dlrn.api.utils import InvalidUsage
 from dlrn.api.utils import RepoDetail
 
+from dlrn.config import ConfigOptions
 from dlrn.db import CIVote
 from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getSession
 from dlrn.db import Promotion
-
-from dlrn.config import ConfigOptions
-
 from dlrn.purge import FLAG_PURGED
-
 from dlrn.remote import import_commit
+from dlrn.utils import aggregate_repo_files
 
 from flask import jsonify
 from flask import render_template
@@ -267,11 +265,14 @@ def promotions_GET():
     # promote_name(optional): only report promotions for promote_name
     # offset(optional): skip the first X promotions (only 100 are shown
     #                   per query)
+    # limit(optional): maximum number of entries to return
+    # component(optional): only report promotions for this component
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
     promote_name = request.args.get('promote_name', None)
     offset = int(request.args.get('offset', 0))
     limit = int(request.args.get('limit', 100))
+    component = request.args.get('component', None)
 
     if request.headers.get('Content-Type') == 'application/json':
         # This is the old, deprecated method of in-body parameters
@@ -286,6 +287,8 @@ def promotions_GET():
             offset = int(request.json.get('offset', 0))
         if limit == 100:
             limit = int(request.json.get('limit', 100))
+        if component is None:
+            component = request.json.get('component', None)
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
@@ -318,6 +321,8 @@ def promotions_GET():
     if promote_name is not None:
         promotions = promotions.filter(
             Promotion.promotion_name == promote_name)
+    if component is not None:
+        promotions = promotions.filter(Promotion.component == component)
 
     promotions = promotions.order_by(desc(Promotion.timestamp)).limit(limit).\
         offset(offset)
@@ -338,6 +343,7 @@ def promotions_GET():
              'repo_hash': repo_hash,
              'repo_url': repo_url,
              'promote_name': promotion.promotion_name,
+             'component': promotion.component,
              'user': promotion.user}
         data.append(d)
     closeSession(session)
@@ -565,15 +571,25 @@ def promote():
         raise InvalidUsage('commit_hash+distro_hash has been purged, cannot '
                            'promote it', status_code=410)
 
-    target_link = os.path.join(app.config['REPO_PATH'], promote_name)
+    if config_options.use_components:
+        base_directory = os.path.join(app.config['REPO_PATH'], "component/%s" %
+                                      commit.component)
+    else:
+        base_directory = app.config['REPO_PATH']
+
+    target_link = os.path.join(base_directory, promote_name)
     # Check for invalid target links, like ../promotename
     target_dir = os.path.dirname(os.path.abspath(target_link))
-    if not os.path.samefile(target_dir, app.config['REPO_PATH']):
+    if not os.path.samefile(target_dir, base_directory):
         raise InvalidUsage('Invalid promote_name %s' % promote_name,
                            status_code=403)
 
     # We should create a relative symlink
     yumrepodir = commit.getshardedcommitdir()
+    if config_options.use_components:
+        # In this case, the relative path should not include
+        # the component part
+        yumrepodir = yumrepodir.replace("component/%s/" % commit.component, '')
 
     # Remove symlink if it exists, so we can create it again
     if os.path.lexists(os.path.abspath(target_link)):
@@ -584,21 +600,30 @@ def promote():
         raise InvalidUsage("Symlink creation failed with error: %s" %
                            e, status_code=500)
 
+    # Once the updated symlink is created, if we are using components
+    # we need to update the top-level repo file
+    if config_options.use_components:
+        datadir = os.path.realpath(config_options.datadir)
+        aggregate_repo_files(promote_name, datadir, session,
+                             config_options.reponame)
+
     timestamp = time.mktime(datetime.now().timetuple())
     promotion = Promotion(commit_id=commit.id, promotion_name=promote_name,
-                          timestamp=timestamp, user=auth.username())
+                          timestamp=timestamp, user=auth.username(),
+                          component=commit.component)
 
     session.add(promotion)
     session.commit()
 
     repo_hash = _repo_hash(commit)
-    repo_url = "%s/%s" % (config_options.baseurl, yumrepodir)
+    repo_url = "%s/%s" % (config_options.baseurl, commit.getshardedcommitdir())
 
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
               'repo_hash': repo_hash,
               'repo_url': repo_url,
               'promote_name': promote_name,
+              'component': commit.component,
               'timestamp': timestamp,
               'user': auth.username()}
     closeSession(session)
