@@ -272,7 +272,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     if (config_options.pkginfo_driver ==
             'dlrn.drivers.gitrepo.GitRepoDriver' and
             config_options.keep_tarball):
-        if commit.commit_branch == config_options.source:
+        if (commit.commit_branch == config_options.source or
+                commit.commit_branch == 'master'):
             # We are following the master tarball here, use it
             os.environ['DLRN_KEEP_TARBALL'] = '1'
         else:
