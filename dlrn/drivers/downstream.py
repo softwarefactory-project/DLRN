@@ -302,6 +302,9 @@ class DownstreamInfoDriver(PkgInfoDriver):
         # In this case, we will copy the upstream distgit into downstream
         # distgit, then transform spec
         if self.config_options.use_upstream_spec:
+            if self.config_options.keep_changelog:
+                # Save the existing changelog
+                changelog = self._save_changelog(distgit_dir)
             # Copy upstream distgit to downstream distgit
             for f in os.listdir(ups_distro_dir_full):
                 # skip hidden files
@@ -312,6 +315,10 @@ class DownstreamInfoDriver(PkgInfoDriver):
             if len(self.config_options.downstream_spec_replace_list) > 0:
                 self._transform_spec(distro_dir_full)
 
+            if self.config_options.keep_changelog:
+                # Restore the old changelog, instead of replacing it with
+                # the upstream one
+                self._restore_changelog(distgit_dir, changelog)
         # If we have a jinja2 spec template, run pre-processing
         preprocess_needed = False
         for f in os.listdir(distgit_dir):
@@ -369,3 +376,32 @@ class DownstreamInfoDriver(PkgInfoDriver):
     def _upstream_distgit_clone_dir(self, package_name):
         datadir = self.config_options.datadir
         return os.path.join(datadir, package_name + "_distro_upstream")
+
+    def _save_changelog(self, distgit_dir):
+        changelog = ''
+        spec = None
+        for f in os.listdir(distgit_dir):
+            if f.endswith('.spec'):
+                with open(os.path.join(distgit_dir, f)) as fp:
+                    spec = fp.read()
+                    # This will read everything from a line starting with
+                    # %changelog, till the end of file
+                    match = re.search(r'^%changelog.*', spec,
+                                      flags=(re.MULTILINE | re.DOTALL))
+                    if match:
+                        changelog = match.group()
+
+        return changelog
+
+    def _restore_changelog(self, distgit_dir, changelog):
+        for f in os.listdir(distgit_dir):
+            if f.endswith('.spec'):
+                with open(os.path.join(distgit_dir, f)) as fp:
+                    spec = fp.read()
+                # Replace the %changelog part with the saved changelog
+                newspec = re.sub(r'^%changelog.*',
+                                 changelog,
+                                 spec,
+                                 flags=(re.MULTILINE | re.DOTALL))
+                with open(os.path.join(distgit_dir, f), 'w') as fp:
+                    fp.write(newspec)
