@@ -53,3 +53,4 @@ class RepoDetail(object):
         self.success = 0
         self.failure = 0
         self.timestamp = 0
+        self.component = None
