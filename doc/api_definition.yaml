@@ -299,6 +299,10 @@ paths:
           in: query
           description: Start after offset values. Defaults to 0.
           type: integer
+        - name: component
+          in: query
+          description: If set, only display votes related to this component.
+          type: string
       responses:
         # Response code
         200:
@@ -322,6 +326,10 @@ paths:
           in: query
           description: Start after offset values. Defaults to 0.
           type: integer
+        - name: component
+          in: query
+          description: If set, only display commits related to this component.
+          type: string
       responses:
         # Response code
         200:
@@ -521,6 +529,9 @@ definitions:
       notes:
         type: string
         description: additional notes
+      component:
+        type: string
+        description: Component associated to the commit/distro hash
   Repo:
     type: object
     properties:
