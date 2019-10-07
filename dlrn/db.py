@@ -123,6 +123,7 @@ class CIVote(Base):
     notes = Column(Text)
     user = Column(String(255),
                   ForeignKey('users.username', name='civ_user_fk'))
+    component = Column(String(64))
 
 
 class Promotion(Base):

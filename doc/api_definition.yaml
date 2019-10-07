@@ -521,6 +521,9 @@ definitions:
       notes:
         type: string
         description: additional notes
+      component:
+        type: string
+        description: Component associated to the commit/distro hash
   Repo:
     type: object
     properties:
