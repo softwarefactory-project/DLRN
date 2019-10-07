@@ -46,6 +46,7 @@
         <th>Commit Date Time</th>
         <th>Project Name</th>
         <th>Commit Hash</th>
+        <th>Component</th>
         <th>Status</th>
         <th>Repository</th>
         <th>Build Log</th>
@@ -68,6 +69,12 @@
             <i class="fa fa-git pull-left"></i>
             <i>
                 {{ commit.commit_hash }}
+          </td>
+          <td>
+            <form action="report.html" method="get">
+               <input type="hidden" name="component" value="{{ commit.component }}" />
+               <button type="submit" class="button"><i class="fa fa-link pull-left"></i>{{ commit.component }}</button>
+            </form>
           </td>
           <td>
             {% if commit.status == "SUCCESS"  %}

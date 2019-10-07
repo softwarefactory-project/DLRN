@@ -50,6 +50,7 @@
       <tr>
         <th>CI Name</th>
         <th>Repo hash (distro_commit)</th>
+        <th>Component</th>
         <th>Results URL</th>
         <th>Vote</th>
         <th>In Progress?</th>
@@ -71,6 +72,7 @@
               <button type="submit" class="button">{{ vote.commit_hash }}_{{ vote.distro_hash_short }}</button>
             </form>
           </td>
+          <td>{{ vote.component }}</td>
           <td>
             <i class="fa fa-link pull-left"></i>
             <i>

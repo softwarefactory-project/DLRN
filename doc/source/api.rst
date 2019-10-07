@@ -66,6 +66,8 @@ sequential_mode      boolean     Use the sequential mode algorithm. In this case
                                  described by previous_job_id. Defaults to false.
 previous_job_id      string      If sequential_mode is set to true, look for jobs tested by
                      (optional)  the CI identified by previous_job_id.
+component            string      Only report votes associated to this component
+                     (optional)
 ===================  ==========  ==============================================================
 
 Response:
@@ -80,6 +82,7 @@ job_id               string      name of the CI sending the vote
 in_progress          boolean     is this CI job still in-progress?
 timestamp            integer     timestamp for the repo
 user                 string      user who created the CI vote
+component            string      Component associated to the commit/distro hash
 ===================  ==========  ==============================================================
 
 
@@ -120,6 +123,7 @@ in_progress          boolean     False -> is this CI job still in-progress?
 success              boolean     Was the CI execution successful?
 notes                Text        Additional notes
 user                 string      user who created the CI vote
+component            string      Component associated to the commit/distro hash
 ===================  ==========  ==============================================================
 
 GET /api/promotions
@@ -253,6 +257,8 @@ sequential_mode      boolean     Use the sequential mode algorithm. In this case
                                  described by previous_job_id. Defaults to false.
 previous_job_id      string      If sequential_mode is set to true, look for jobs tested by
                      (optional)  the CI identified by previous_job_id.
+component            string      Only report votes associated to this component
+                     (optional)
 ===================  ==========  ==============================================================
 
 Response:
@@ -267,6 +273,7 @@ job_id               string      name of the CI sending the vote
 in_progress          boolean     True -> is this CI job still in-progress?
 timestamp            integer     Timestamp for this CI Vote (taken from the DLRN system time)
 user                 string      user who created the CI vote
+component            string      Component associated to the commit/distro hash
 ===================  ==========  ==============================================================
 
 
@@ -307,6 +314,7 @@ in_progress     boolean     False -> is this CI job still in-progress?
 success         boolean     Was the CI execution successful?
 notes           Text        Additional notes
 user            string      user who created the CI vote
+component       string      Component associated to the commit/distro hash
 ==============  ==========  ==============================================================
 
 POST /api/promote

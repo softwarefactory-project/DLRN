@@ -30,6 +30,7 @@
     <table id="dlrn">
       <tr>
         <th>Repo hash (distro_commit)</th>
+        <th>Component</th>
         <th>Last timestamp</th>
         <th>Successful jobs</th>
         <th>Failed jobs</th>
@@ -41,6 +42,12 @@
                <input type="hidden" name="commit_hash" value="{{ repo.commit_hash }}" />
                <input type="hidden" name="distro_hash" value="{{ repo.distro_hash }}" />
 <button type="submit" class="button"><i class="fa fa-link pull-left"></i>{{ repo.commit_hash }}_{{ repo.distro_hash_short }}</button>
+            </form>
+          </td>
+          <td>
+            <form action="civotes_detail.html" method="get">
+               <input type="hidden" name="component" value="{{ repo.component }}" />
+               <button type="submit" class="button"><i class="fa fa-link pull-left"></i>{{ repo.component }}</button>
             </form>
           </td>
           <td>{{ repo.timestamp | strftime }}</td>
