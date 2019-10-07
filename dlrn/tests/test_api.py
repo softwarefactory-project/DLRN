@@ -87,6 +87,7 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
         self.assertEqual(data['distro_hash'],
                          '8170b8686c38bafb6021d998e2fb268ab26ccf65')
         self.assertEqual(data['job_id'], 'consistent')
+        self.assertEqual(data['component'], None)
         self.assertEqual(response.status_code, 200)
 
     def test_get_last_tested_repo_with_age_url_params(self, db_mock, dt_mock):
@@ -209,6 +210,21 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 404)
 
+    def test_get_last_tested_repo_component(self, db_mock, dt_mock):
+        req_data = json.dumps(dict(max_age='0', success='1',
+                                   component='foo-component'))
+        dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
+        response = self.app.get('/api/last_tested_repo',
+                                data=req_data,
+                                content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(data['commit_hash'],
+                         '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc')
+        self.assertEqual(data['distro_hash'],
+                         '8170b8686c38bafb6021d998e2fb268ab26ccf65')
+        self.assertEqual(data['component'], 'foo-component')
+        self.assertEqual(response.status_code, 200)
+
 
 @mock.patch('dlrn.api.dlrn_api.datetime')
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
@@ -298,6 +314,27 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
                                  headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 404)
+
+    def test_post_last_tested_repo_component(self, db2_mock, db_mock,
+                                             dt_mock):
+        req_data = json.dumps(dict(max_age='0',
+                                   reporting_job_id='foo-ci',
+                                   component='foo-component'))
+        dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
+
+        response = self.app.post('/api/last_tested_repo',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(data['commit_hash'],
+                         '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc')
+        self.assertEqual(data['distro_hash'],
+                         '8170b8686c38bafb6021d998e2fb268ab26ccf65')
+        self.assertEqual(data['job_id'], 'foo-ci')
+        self.assertEqual(data['in_progress'], True)
+        self.assertEqual(data['component'], 'foo-component')
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
