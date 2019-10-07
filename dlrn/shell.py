@@ -662,7 +662,8 @@ def process_build_result_rpm(
             # We have a consistent repo. Let's create a CIVote entry in the DB
             vote = CIVote(commit_id=commit.id, ci_name='consistent',
                           ci_url='', ci_vote=True, ci_in_progress=False,
-                          timestamp=int(commit.dt_build), notes='')
+                          timestamp=int(commit.dt_build), notes='',
+                          component=commit.component)
             session.add(vote)
             session.commit()
     return exit_code

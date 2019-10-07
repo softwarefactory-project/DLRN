@@ -123,6 +123,7 @@ class CIVote(Base):
     notes = Column(Text)
     user = Column(String(255),
                   ForeignKey('users.username', name='civ_user_fk'))
+    component = Column(String(64))
 
 
 class Promotion(Base):
@@ -185,7 +186,7 @@ def getLastBuiltCommit(
 
 def getCommits(session, project=None, with_status=None, without_status=None,
                limit=1, order="desc", since=None, before=None, offset=0,
-               type="rpm"):
+               component=None, type="rpm"):
     commits = session.query(Commit).filter(Commit.type == type)
     if project is not None:
         commits = commits.filter(Commit.project_name == project)
@@ -193,6 +194,8 @@ def getCommits(session, project=None, with_status=None, without_status=None,
         commits = commits.filter(Commit.status == with_status)
     if without_status is not None:
         commits = commits.filter(Commit.status != without_status)
+    if component is not None:
+        commits = commits.filter(Commit.component == component)
     if since is not None:
         commits = commits.filter(Commit.dt_build > since)
     if before is not None:

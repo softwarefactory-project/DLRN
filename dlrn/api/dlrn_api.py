@@ -81,7 +81,8 @@ def handle_invalid_usage(error):
     return response
 
 
-def getVote(session, timestamp, success=None, job_id=None, fallback=True):
+def getVote(session, timestamp, success=None, job_id=None, component=None,
+            fallback=True):
     votes = session.query(CIVote)
     votes = votes.filter(CIVote.timestamp > timestamp)
     # Initially we want to get any tested repo, excluding consistent repos
@@ -90,6 +91,8 @@ def getVote(session, timestamp, success=None, job_id=None, fallback=True):
         votes = votes.filter(CIVote.ci_vote == int(success))
     if job_id is not None:
         votes = votes.filter(CIVote.ci_name == job_id)
+    if component is not None:
+        votes = votes.filter(CIVote.component == component)
     vote = votes.order_by(desc(CIVote.timestamp)).first()
 
     if vote is None and not fallback:
@@ -111,6 +114,8 @@ def getVote(session, timestamp, success=None, job_id=None, fallback=True):
         votes = session.query(CIVote).filter(CIVote.timestamp > timestamp)
         if success is not None:
             votes = votes.filter(CIVote.ci_vote == success)
+        if component is not None:
+            votes = votes.filter(CIVote.component == component)
         votes.filter(CIVote.ci_name == 'consistent')
         vote = votes.order_by(desc(CIVote.timestamp)).first()
 
@@ -172,7 +177,8 @@ def repo_status():
              'in_progress': vote.ci_in_progress,
              'url': vote.ci_url,
              'notes': vote.notes,
-             'user': vote.user}
+             'user': vote.user,
+             'component': vote.component}
         data.append(d)
     closeSession(session)
     return jsonify(data)
@@ -188,12 +194,14 @@ def last_tested_repo_GET():
     #                            search for. Defaults to false
     # previous_job_id(optional): CI name to search for, if sequential_mode is
     #                            True
+    # component(optional): only get votes for this component
 
     max_age = request.args.get('max_age', None)
     job_id = request.args.get('job_id', None)
     success = request.args.get('success', None)
     sequential_mode = request.args.get('sequential_mode', None)
     previous_job_id = request.args.get('previous_job_id', None)
+    component = request.args.get('component', None)
 
     if request.headers.get('Content-Type') == 'application/json':
         # This is the old, deprecated method of in-body parameters
@@ -208,6 +216,8 @@ def last_tested_repo_GET():
             sequential_mode = request.json.get('sequential_mode', None)
         if previous_job_id is None:
             previous_job_id = request.json.get('previous_job_id', None)
+        if component is None:
+            component = request.json.get('component', None)
 
     if success is not None:
         success = bool(strtobool(success))
@@ -234,10 +244,11 @@ def last_tested_repo_GET():
         if sequential_mode:
             # CI pipeline case
             vote = getVote(session, timestamp, success, previous_job_id,
-                           fallback=False)
+                           component=component, fallback=False)
         else:
             # Normal case
-            vote = getVote(session, timestamp, success, job_id)
+            vote = getVote(session, timestamp, success, job_id,
+                           component=component)
     except Exception as e:
         raise e
 
@@ -251,7 +262,8 @@ def last_tested_repo_GET():
               'job_id': vote.ci_name,
               'success': vote.ci_vote,
               'in_progress': vote.ci_in_progress,
-              'user': vote.user}
+              'user': vote.user,
+              'component': vote.component}
     closeSession(session)
     return jsonify(result), 200
 
@@ -424,12 +436,14 @@ def last_tested_repo_POST():
     #                            search for. Defaults to false
     # previous_job_id(optional): CI name to search for, if sequential_mode is
     #                            True
+    # component(optional): only get votes for this component
     max_age = request.json.get('max_age', None)
     my_job_id = request.json.get('reporting_job_id', None)
     job_id = request.json.get('job_id', None)
     success = request.json.get('success', None)
     sequential_mode = request.json.get('sequential_mode', None)
     previous_job_id = request.json.get('previous_job_id', None)
+    component = request.json.get('component', None)
 
     if success is not None:
         success = bool(strtobool(success))
@@ -457,17 +471,18 @@ def last_tested_repo_POST():
         if sequential_mode:
             # CI pipeline case
             vote = getVote(session, timestamp, success, previous_job_id,
-                           fallback=False)
+                           component=component, fallback=False)
         else:
             # Normal case
-            vote = getVote(session, timestamp, success, job_id)
+            vote = getVote(session, timestamp, success, job_id,
+                           component=component)
     except Exception as e:
         raise e
 
     newvote = CIVote(commit_id=vote.commit_id, ci_name=my_job_id,
                      ci_url='', ci_vote=False, ci_in_progress=True,
                      timestamp=int(time.time()), notes='',
-                     user=auth.username())
+                     user=auth.username(), component=vote.component)
     session.add(newvote)
     session.commit()
 
@@ -481,7 +496,8 @@ def last_tested_repo_POST():
               'job_id': newvote.ci_name,
               'success': newvote.ci_vote,
               'in_progress': newvote.ci_in_progress,
-              'user': newvote.user}
+              'user': newvote.user,
+              'component': newvote.component}
     closeSession(session)
     return jsonify(result), 201
 
@@ -520,7 +536,7 @@ def report_result():
     vote = CIVote(commit_id=commit_id, ci_name=job_id, ci_url=url,
                   ci_vote=bool(strtobool(success)), ci_in_progress=False,
                   timestamp=int(timestamp), notes=notes,
-                  user=auth.username())
+                  user=auth.username(), component=commit.component)
     session.add(vote)
     session.commit()
 
@@ -532,7 +548,8 @@ def report_result():
               'in_progress': False,
               'url': url,
               'notes': notes,
-              'user': auth.username()}
+              'user': auth.username(),
+              'component': vote.component}
     closeSession(session)
     return jsonify(result), 201
 
@@ -688,6 +705,7 @@ def get_civotes():
         repodetail.timestamp = votes.from_self().filter(
             CIVote.commit_id == commit_id).order_by(desc(CIVote.timestamp)).\
             first().timestamp
+        repodetail.component = commit.component
         repolist.append(repodetail)
 
     repolist = sorted(repolist, key=lambda repo: repo.timestamp, reverse=True)
@@ -707,6 +725,7 @@ def get_civotes():
 def get_civotes_detail():
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
+    component = request.args.get('component', None)
     ci_name = request.args.get('ci_name', None)
     success = request.args.get('success', None)
     offset = request.args.get('offset', 0)
@@ -720,6 +739,8 @@ def get_civotes_detail():
         votes = votes.from_self().filter(CIVote.commit_id == commit.id)
     elif ci_name:
         votes = votes.filter(CIVote.ci_name == ci_name)
+    elif component:
+        votes = votes.filter(CIVote.component == component)
     else:
         raise InvalidUsage("Please specify either commit_hash+distro_hash or "
                            "ci_name as parameters.", status_code=400)
@@ -754,6 +775,7 @@ def get_civotes_detail():
 def get_report():
     package_name = request.args.get('package', None)
     success = request.args.get('success', None)
+    component = request.args.get('component', None)
     offset = request.args.get('offset', 0)
 
     if success is not None:
@@ -767,7 +789,8 @@ def get_report():
     session = getSession(app.config['DB_PATH'])
     commits = getCommits(session, without_status="RETRY",
                          project=package_name, with_status=with_status,
-                         limit=pagination_limit, offset=offset)
+                         limit=pagination_limit, offset=offset,
+                         component=component)
 
     count = commits.count()
 

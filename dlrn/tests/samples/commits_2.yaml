@@ -71,6 +71,7 @@ civotes:
   ci_in_progress: false
   timestamp: '1441635095'
   notes: ''
+  component: 'foo-component'
 # This vote has no user, to check that we support that, too
 users:
 - username: 'foo'
