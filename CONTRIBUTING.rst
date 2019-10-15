@@ -50,7 +50,7 @@ to SoftwareFactory's Gerrit instead, using git-review. The usual workflow is:
 .. code-block:: bash
 
      $ sudo yum install git-review  (you can also use pip install if needed)
-     $ git clone https:/github.com/softwarefactory-project/DLRN
+     $ git clone https://github.com/softwarefactory-project/DLRN
      <edit your files here>
      $ git add <your edited files>
      $ git commit
