@@ -41,8 +41,9 @@ logger = logging.getLogger("dlrn-gitrepo-driver")
 version_match = re.compile('\W*set upstream_version\D+([\w.]+).*')
 wrong_match = re.compile('\W*set upstream_version\D+\(\).*')
 
-base_urls = ['https://github.com/openstack',
-             'https://github.com/openstack-dev']
+base_urls = ['https://opendev.org/openstack',
+             'https://opendev.org/x',
+             'https://opendev.org/opendev',]
 
 
 def check_url(url):
