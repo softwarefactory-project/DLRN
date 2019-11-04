@@ -66,6 +66,7 @@
     name: DLRN
     vars:
       rtd_webhook_id: '101768'
+      rtd_project_name: 'dlrn'
     check:
       jobs:
         - tox-pep8
