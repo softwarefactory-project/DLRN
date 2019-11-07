@@ -1,0 +1,13 @@
+- hosts: all
+  vars:
+    ci_tracer_args: "--min-cpu 2"
+  pre_tasks:
+    - name: Install dataclasses for python3.6
+      command: pip3 install dataclasses
+      become: yes
+  roles:
+    - ensure-output-dirs
+    - run-ci-tracer
+  post_tasks:
+    - name: Check service status
+      shell: sleep 1; systemctl status ci-tracer
