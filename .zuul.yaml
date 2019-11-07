@@ -2,14 +2,20 @@
 - job:
     name: dlrn-base
     parent: base
-    pre-run: playbooks/prepare.yaml
-    post-run: playbooks/retrieve-logs.yaml
+    pre-run:
+      - playbooks/start-tracer.yaml
+      - playbooks/prepare.yaml
+    post-run:
+      - playbooks/retrieve-logs.yaml
+      - playbooks/stop-tracer.yaml
     irrelevant-files:
       - ^doc/.*$
     nodeset:
       nodes:
         - name: test-node
           label: cloud-centos-7
+    roles:
+      - zuul: software-factory/ci-tracer
 
 - job:
     name: dlrn-rpmbuild
@@ -43,7 +49,7 @@
     nodeset:
       nodes:
         - name: test-node-rhel-8
-          label: upstream-rhel-8
+          label: cloud-fedora-30
     host-vars:
       localhost:
         ansible_python_interpreter: /usr/bin/python3
@@ -69,18 +75,7 @@
       rtd_project_name: 'dlrn'
     check:
       jobs:
-        - tox-pep8
-        - tox-py27
-        - tox-py36:
-            nodeset:
-              nodes:
-                - name: testrunner
-                  label: fedora-oci
-        - dlrn-rpmbuild
-        - dlrn-rpmbuild-python3
-        - dlrn-rpmbuild-tripleo-ci-oooq
         - dlrn-rpmbuild-tripleo-ci-oooq-rhel8
-        - dlrn-api-functional
     gate:
       jobs:
         - tox-pep8
