@@ -15,7 +15,11 @@
     name: dlrn-rpmbuild
     parent: dlrn-base
     description: Run DLRN to build a package
+    pre-run: playbooks/start-tracer.yaml
+    post-run: playbooks/stop-tracer.yaml
     run: playbooks/rpmbuild.yaml
+    roles:
+      - zuul: software-factory/ci-tracer
 
 - job:
     name: dlrn-rpmbuild-python3
@@ -69,18 +73,7 @@
       rtd_project_name: 'dlrn'
     check:
       jobs:
-        - tox-pep8
-        - tox-py27
-        - tox-py36:
-            nodeset:
-              nodes:
-                - name: testrunner
-                  label: fedora-oci
-        - dlrn-rpmbuild
-        - dlrn-rpmbuild-python3
-        - dlrn-rpmbuild-tripleo-ci-oooq
         - dlrn-rpmbuild-tripleo-ci-oooq-rhel8
-        - dlrn-api-functional
     gate:
       jobs:
         - tox-pep8
