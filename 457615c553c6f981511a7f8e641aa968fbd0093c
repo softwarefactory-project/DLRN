@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f50fc7d2_f18e0958",
+        "filename": "scripts/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 267
+      },
+      "writtenOn": "2019-11-13T17:54:22Z",
+      "side": 1,
+      "message": "data/dlrn-1.cfg",
+      "revId": "457615c553c6f981511a7f8e641aa968fbd0093c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
