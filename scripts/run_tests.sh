@@ -200,6 +200,12 @@ done
 
 # Run DLRN
 dlrn --head-only $PACKAGE_BUILD_LIST --dev --local --info-repo /tmp/rdoinfo --verbose-build --order
-copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn-1.cfg --scrub=all
+# Now try to install the generated packages, ensuring there are no build deps
+TOINSTALL=$(find data/repos/current/*rpm | grep -v src.rpm | xargs echo)
+mock -r data/dlrn-1.cfg clean
+mock -r data/dlrn-1.cfg init
+mock -r data/dlrn-1.cfg --disablerepo='*build-deps*' --install $TOINSTALL
+# Finally, copy logs
+copy_logs
