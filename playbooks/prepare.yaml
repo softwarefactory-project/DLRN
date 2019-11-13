@@ -53,7 +53,7 @@
       shell:
         cmd: |
           easy_install pip
-          pip install tox
+          pip install --ignore-installed tox
       become: true
       when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 7
 
