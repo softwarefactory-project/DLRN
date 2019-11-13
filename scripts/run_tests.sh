@@ -163,12 +163,13 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
     if [ -n "$UPSTREAM_ID" ]; then
         # Get upstream URL
         UPSTREAM_URL=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^upstream | awk '{print $2}')
-        UPSTREAM_PROJECT_NAME=$(basename ${UPSTREAM_URL})
+        UPSTREAM_URL_REDIRECTED=$(curl -Ls -w %{url_effective} -o /dev/null ${UPSTREAM_URL})
+        UPSTREAM_PROJECT_NAME=${UPSTREAM_URL_REDIRECTED/https:\/\/opendev.org\//}
         rm -rf data/${PROJECT_TO_BUILD_MAPPED}
         # Only build in the check pipeline to avoid merging a change
         # in packaging that is dependent of an non merged upstream
         # change
-        git clone ${UPSTREAM_URL} "data/${PROJECT_TO_BUILD_MAPPED}"
+        git clone ${UPSTREAM_URL_REDIRECTED} "data/${PROJECT_TO_BUILD_MAPPED}"
         if [ "${ZUUL_PIPELINE}" != "check" ]; then
             NOT_EXTRACTED=1
         fi
@@ -182,7 +183,7 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
                 REVIEW_BRANCH="master"
             fi
 
-            JSON=$(curl -s -L https://review.opendev.org/changes/openstack%2F${UPSTREAM_PROJECT_NAME}~$REVIEW_BRANCH~$UPSTREAM_ID/revisions/current/review|sed 1d)
+            JSON=$(curl -s -L https://review.opendev.org/changes/${UPSTREAM_PROJECT_NAME/\//%2F}~$REVIEW_BRANCH~$UPSTREAM_ID/revisions/current/review|sed 1d)
             COMMIT=$($PYTHON -c 'import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s["current_revision"])' <<< $JSON)
             REF=$($PYTHON -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s['revisions']['$COMMIT']['ref'])" <<< $JSON)
             GERRIT_URL=$($PYTHON -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s['revisions']['$COMMIT']['fetch']['anonymous http']['url'])" <<< $JSON)
