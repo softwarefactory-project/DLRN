@@ -104,6 +104,7 @@ sed -i "s%target=.*%target=${target}%" projects.ini
 sed -i "s%source=.*%source=${src}%" projects.ini
 sed -i "s%baseurl=.*%baseurl=${baseurl}%" projects.ini
 sed -i "s%tags=.*%tags=${tag}%" projects.ini
+sed -i "s%#install_after_build.*%install_after_build=0%" projects.ini
 
 # Prepare directories for distro repo
 mkdir -p data/repos
@@ -200,6 +201,12 @@ done
 
 # Run DLRN
 dlrn --head-only $PACKAGE_BUILD_LIST --dev --local --info-repo /tmp/rdoinfo --verbose-build --order
-copy_logs
 # Clean up mock cache, just in case there is a change for the next run
 mock -r data/dlrn-1.cfg --scrub=all
+# Now try to install the generated packages
+TOINSTALL=$(find data/repos/current/*rpm | grep -v src.rpm | xargs echo)
+mock -r data/dlrn-1.cfg clean
+mock -r data/dlrn-1.cfg init
+mock -r dlrn-1.cfg --disablerepo='*build-deps*' --install $TOINSTALL | tee data/repos/current/package_install.log
+# Finally, copy logs
+copy_logs
