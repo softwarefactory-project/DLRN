@@ -1,0 +1,10 @@
+Code-Review+2: Javier Peña <jpena@redhat.com>
+Code-Review+2: Alan Pevec <alan.pevec@redhat.com>
+Code-Review+1: Alfredo Moralejo <amoralej@redhat.com>
+Workflow+1: Javier Peña <jpena@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Fri, 15 Nov 2019 08:56:48 +0000
+Reviewed-on: https://softwarefactory-project.io/r/16989
+Project: DLRN
+Branch: refs/heads/master
