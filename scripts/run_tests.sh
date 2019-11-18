@@ -58,14 +58,10 @@ else
   PROJECTS_TO_BUILD=${PROJECT_DISTRO}
 fi
 
-# Fetch rdoinfo using zuul_cloner, if available
-
 # If we are running under Zuul v3, we can find the rdoinfo git repo under /home/zuul
 rm -rf /tmp/rdoinfo
 if [ -d $ZUUL3_HOME -a -d $ZUUL_CLONES_DIR/rdoinfo ]; then
     ln -s $ZUUL_CLONES_DIR/rdoinfo /tmp/rdoinfo
-elif type -p zuul-cloner; then
-    zuul-cloner --workspace /tmp ${GIT_BASE_URL} rdoinfo
 else
     git clone ${RDOINFO} /tmp/rdoinfo
 fi
@@ -142,9 +138,6 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
     # Clone distro repo
     if [ -d $ZUUL3_HOME -a -d $ZUUL_CLONES_DIR/$PROJECT_DISTRO ]; then
         ln -s $ZUUL_CLONES_DIR/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
-    elif type -p zuul-cloner; then
-        zuul-cloner --workspace data/ $GIT_BASE_URL $PROJECT_DISTRO --branch $PROJECT_DISTRO_BRANCH
-        mv data/$PROJECT_DISTRO data/$PROJECT_DISTRO_DIR
     else
         # We're outside the gate, just do a regular git clone
         pushd data/
