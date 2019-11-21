@@ -115,6 +115,68 @@ class TestDriverDownstream(base.TestCase):
         assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
             pi.commit_hash
 
+    @mock.patch('dlrn.drivers.downstream.refreshrepo',
+                side_effect=_mocked_refreshrepo)
+    def test_getinfo_component(self, rr_mock, uo_mock):
+        self.config.use_components = True
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'component': 'compute',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+        pkginfo = driver.getinfo(
+            package=package,
+            project='nova',
+            dev_mode=True)
+
+        pi = pkginfo[0]
+        assert pi.component == 'compute'
+
+    @mock.patch('dlrn.drivers.downstream.refreshrepo',
+                side_effect=_mocked_refreshrepo)
+    def test_getinfo_component_disabled(self, rr_mock, uo_mock):
+        self.config.use_components = False
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'component': 'compute',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+        pkginfo = driver.getinfo(
+            package=package,
+            project='nova',
+            dev_mode=True)
+
+        pi = pkginfo[0]
+        assert pi.component == None
+
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
     def test_preprocess_use_upstream_spec(self, ld_mock, uo_mock):
         self.config.use_upstream_spec = True
