@@ -279,6 +279,10 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 continue
             dt = version[5]
             commit_hash = version[1]
+            if self.config_options.use_components and 'component' in package:
+                component = package['component']
+            else:
+                component = None
             commit = Commit(dt_commit=float(dt), project_name=project,
                             type='rpm',
                             commit_hash=commit_hash, repo_dir=repo_dir,
@@ -286,7 +290,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                             extended_hash=extended_hash,
                             dt_extended=dt_extended,
                             distgit_dir=self.distgit_dir(package['name']),
-                            commit_branch=source_branch, component=None)
+                            commit_branch=source_branch, component=component)
             project_toprocess.append(commit)
 
         return project_toprocess
