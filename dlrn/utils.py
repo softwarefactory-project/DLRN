@@ -39,7 +39,8 @@ re_known_errors = re.compile('Error: Nothing to do|'
                              'Temporary failure in name resolution|'
                              'distroinfo.exception.CommandFailed: Command '
                              'failed with return code 128: git|'
-                             'Error fetching remote')
+                             'Error fetching remote|'
+                             'Connection timed out')
 
 
 logger = logging.getLogger("dlrn-utils")
