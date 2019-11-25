@@ -321,6 +321,7 @@ def run_external_preprocess(**kwargs):
 
 
 # Aggregate all .repo files from a given symlink into a top-level repo file
+# Also, aggregate the versions.csv file, this is useful for additional tooling
 def aggregate_repo_files(dirname, datadir, session, reponame):
     # The only way we have to get the components is to query the database
     all_comp_commits = session.query(Commit).\
@@ -331,18 +332,29 @@ def aggregate_repo_files(dirname, datadir, session, reponame):
             component_list.append(cmt.component)
 
     repo_content = ''
+    csv_content = []
+
     for component in component_list:
         repo_file = os.path.join(datadir, "repos/component", component,
                                  dirname, "%s.repo" % reponame)
+        csv_file = os.path.join(datadir, "repos/component", component,
+                                dirname, "versions.csv")
 
         if os.path.exists(repo_file):
             repo_content += open(repo_file).read() + '\n'
-        # Create target directory if not present
-        target_dir = os.path.join(datadir, "repos", dirname)
-        if not os.path.exists(target_dir):
-            os.makedirs(target_dir)
-        with open(os.path.join(target_dir, "%s.repo" % reponame), 'w') as fp:
-            fp.write(repo_content)
+        if os.path.exists(csv_file):
+            csv_content.extend(open(csv_file).readlines()[1:])
+
+    # Create target directory if not present
+    target_dir = os.path.join(datadir, "repos", dirname)
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+    with open(os.path.join(target_dir, "%s.repo" % reponame), 'w') as fp:
+        fp.write(repo_content)
+    with open(os.path.join(target_dir, "versions.csv"), 'w') as fp:
+        fp.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,"
+                 "Status,Last Success Timestamp,Component,Pkg NVR\n")
+        fp.writelines(csv_content)
 
 
 if __name__ == '__main__':
