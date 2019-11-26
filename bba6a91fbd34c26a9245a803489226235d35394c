@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "574f8d89_1038a8e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2019-11-26T10:10:41Z",
+      "side": 1,
+      "message": "uhm why do we do that? Isn\u0027t there local d/s info which inherits from public RDO one?\n\nAlso for public one, we should be publishing it somewhere in RDO infra, not relying on github, eventually.",
+      "revId": "bba6a91fbd34c26a9245a803489226235d35394c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
