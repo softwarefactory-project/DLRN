@@ -4,9 +4,9 @@
     working_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/..'
     dlrnapi_auth: "--username foo --password bar"
     dlrnapi_url: "--url http://localhost:5000"
-    imported_repo: "https://trunk.rdoproject.org/centos7-master/55/b0/55b056bc8acf9380c7330e777c5c8113ae875273_2aa341b3/"
-    imported_commit_hash: "55b056bc8acf9380c7330e777c5c8113ae875273"
-    imported_distro_hash: "2aa341b39ac6b73794fe75f6ac6829f2eac25287"
+    imported_repo: "https://trunk.rdoproject.org/centos7-master/6f/d1/6fd1c8e407eb57bcb42198975dd1fdb1c0de1013_fe674e08/"
+    imported_commit_hash: "6fd1c8e407eb57bcb42198975dd1fdb1c0de1013"
+    imported_distro_hash: "fe674e08f4f23370a058a0f6dbb4a4f721b79a38"
   tasks:
 # FIXME(jpena): this should be done using the pip module, however there is
 # an issue with Ansible 2.3.1 that prevents this
