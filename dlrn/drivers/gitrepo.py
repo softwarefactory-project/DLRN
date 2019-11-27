@@ -78,8 +78,8 @@ class GitRepoDriver(PkgInfoDriver):
             if pkgfile.endswith('.spec'):
                 spec = specfile.Spec(fn=os.path.join(packagepath, package,
                                                      pkgfile))
-                version = spec.get_tag('Version').encode()
-                release = spec.get_tag('Release').encode()
+                version = spec.get_tag('Version')
+                release = spec.get_tag('Release')
 
         if release.startswith('0'):
             # This is a pre-release version, so we are following trunk
