@@ -12,7 +12,8 @@
 # an issue with Ansible 2.3.1 that prevents this
 # See https://github.com/ansible/ansible-modules-core/issues/5458
     - name: Prepare virtualenv
-      command: virtualenv -p python2 "{{ working_dir }}/.venv"
+      command: |
+        {{ ansible_python_interpreter }} -m virtualenv "{{ working_dir }}/.venv"
 
     - name: Install updated pip
       shell:
