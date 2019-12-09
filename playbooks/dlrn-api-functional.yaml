@@ -8,27 +8,23 @@
     imported_commit_hash: "6fd1c8e407eb57bcb42198975dd1fdb1c0de1013"
     imported_distro_hash: "fe674e08f4f23370a058a0f6dbb4a4f721b79a38"
   tasks:
-# FIXME(jpena): this should be done using the pip module, however there is
-# an issue with Ansible 2.3.1 that prevents this
-# See https://github.com/ansible/ansible-modules-core/issues/5458
-    - name: Prepare virtualenv
-      command: virtualenv -p python2 "{{ working_dir }}/.venv"
 
-    - name: Install updated pip
-      shell:
-        cmd: |
-          . {{ working_dir }}/.venv/bin/activate
-          pip install --upgrade pip
+    # This task must be separated from reqs install
+    - name: Install updated pip in .venv
+      pip:
+        name: pip
+        version: latest
+        virtualenv: "{{ working_dir }}/.venv"
 
     - name: Install requirements for DLRN
       pip:
         requirements: "{{ working_dir }}/DLRN/requirements.txt"
-        virtualenv:   "{{ working_dir }}/.venv"
+        virtualenv: "{{ working_dir }}/.venv"
 
     - name: Install requirements for dlrnapi_client
       pip:
         requirements: "{{ working_dir }}/dlrnapi_client/requirements.txt"
-        virtualenv:   "{{ working_dir }}/.venv"
+        virtualenv: "{{ working_dir }}/.venv"
 
     - name: Install DLRN in venv
       shell:
