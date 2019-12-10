@@ -22,6 +22,30 @@
       "revId": "f128e7c55f46914ca585e0bdddbb8a7d565928c4",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97bbd5aa_6cc77328",
+        "filename": "playbooks/dlrn-api-functional.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 450
+      },
+      "writtenOn": "2019-12-10T20:09:06Z",
+      "side": 1,
+      "message": "Sure, in fact I will take care of your old FIXME note, many thing changes since.",
+      "parentUuid": "bb83e95f_86394dbd",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 35
+      },
+      "revId": "f128e7c55f46914ca585e0bdddbb8a7d565928c4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
