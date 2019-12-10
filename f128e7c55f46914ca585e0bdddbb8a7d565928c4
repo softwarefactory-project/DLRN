@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb83e95f_86394dbd",
+        "filename": "playbooks/dlrn-api-functional.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-12-10T09:24:57Z",
+      "side": 1,
+      "message": "Maybe we could try with the pip module? Looking at my comment above, the Ansible issue should be solved already. Plus, we get the python interpreter in the virtualenv by default.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 35
+      },
+      "revId": "f128e7c55f46914ca585e0bdddbb8a7d565928c4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
