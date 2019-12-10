@@ -54,7 +54,6 @@
 - job:
     name: dlrn-api-functional
     parent: dlrn-base
-    voting: false
     description: Run a DLRN functional test, using the API and dlrnapi_client
     run: playbooks/dlrn-api-functional.yaml
     post-run: playbooks/dlrn-api-functional-getlogs.yaml
