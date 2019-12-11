@@ -1,6 +1,27 @@
 ---
 - hosts: all
   tasks:
+    - name: Load operating system specific variables
+      include_vars: "{{ item }}"
+      failed_when: false
+      loop:
+          - "family-{{ ansible_os_family | lower }}.yml"
+          - "family-{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+          - "{{ ansible_distribution | lower | replace(' ', '-') }}.yml"
+          - "{{ ansible_distribution | lower | replace(' ', '-') }}-{{ ansible_distribution_major_version | lower }}.yml"
+          - "{{ ansible_distribution | lower | replace(' ', '-') }}-{{ ansible_distribution_version.split('.')[0:2] | join('-') | lower }}.yml"
+          - "{{ ansible_distribution | lower | replace(' ', '-') }}-{{ ansible_distribution_version.split('.')[0:3] | join('-') | lower }}.yml"
+      tags:
+        - always
+
+    - name: Assure EPEL is enabled (CentOS 8)
+      become: true
+      shell: |
+        yum-config-manager --enable epel || dnf install epel-release
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version | int == 8
+
     # NOTE(jpena) The Fedora image contains an exclude for python-virtualenv
     # in dnf.conf, because it installs it from PyPi. We do not need it in DLRN
     # jobs.
@@ -14,40 +35,9 @@
 
     - name: Install required dependencies
       package:
-        name:
-          - git
-          - createrepo
-          - mock
-          - gcc
-          - redhat-rpm-config
-          - rpmdevtools
-          - libffi-devel
-          - openssl-devel
-          - yum-utils
-          - policycoreutils
+        name: "{{ system_packages }}"
         state: present
       become: true
-
-    - name: Install Fedora/RHEL8-specific dependencies
-      package:
-        name:
-          - python3-virtualenv
-          - python3-devel
-          - python2-devel
-          - systemd-container
-        state: present
-      become: true
-      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora') and ansible_distribution_major_version | int > 7
-
-    - name: Install CentOS7-specific dependencies
-      package:
-        name:
-          - python-virtualenv
-          - python2-devel
-          - python-setuptools
-        state: present
-      become: true
-      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 7
 
     - name: Ensure tox is installed in CentOS 7
       shell:
