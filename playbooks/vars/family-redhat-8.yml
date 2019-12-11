@@ -1,0 +1,17 @@
+system_packages:
+  - createrepo
+  - distribution-gpg-keys  # epel
+  - gcc
+  - git
+  - libffi-devel
+  - mock
+  - openssl-devel
+  - policycoreutils
+  - python2-devel
+  - python3-devel
+  - python3-virtualenv
+  - redhat-rpm-config
+  - rpmdevtools
+  - systemd-container
+  - yum
+  - yum-utils

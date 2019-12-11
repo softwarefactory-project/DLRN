@@ -1,0 +1,14 @@
+system_packages:
+  - createrepo
+  - gcc
+  - git
+  - libffi-devel
+  - mock
+  - openssl-devel
+  - policycoreutils
+  - python-setuptools
+  - python-virtualenv
+  - python2-devel
+  - redhat-rpm-config
+  - rpmdevtools
+  - yum-utils
