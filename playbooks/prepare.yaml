@@ -76,7 +76,7 @@
         group: root
         state: link
       become: true
-      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora') and ansible_distribution_major_version | int > 7
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora') and ansible_distribution_major_version | int == 7
 
     # NOTE(jpena) This is needed by mock when building on RHEL
     - name: Make sure /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT exists (RHEL)
