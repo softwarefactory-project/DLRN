@@ -61,6 +61,18 @@
       - DLRN
       - dlrnapi_client
 
+- job:
+    name: dlrn-api-functional-centos-7
+    parent: dlrn-api-functional
+    nodeset: centos-7-cloud
+
+- job:
+    name: dlrn-api-functional-centos-8
+    parent: dlrn-api-functional
+    nodeset: centos-8-cloud
+    # TODO(ssbarnea): remove as soon we got all changes in place
+    voting: false
+
 - project:
     name: DLRN
     vars:
@@ -79,7 +91,8 @@
         - dlrn-rpmbuild-python3
         - dlrn-rpmbuild-tripleo-ci-oooq
         - dlrn-rpmbuild-tripleo-ci-oooq-rhel8
-        - dlrn-api-functional
+        - dlrn-api-functional-centos-7
+        - dlrn-api-functional-centos-8
     gate:
       jobs:
         - tox-pep8

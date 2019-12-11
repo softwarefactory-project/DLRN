@@ -66,6 +66,26 @@
       become: true
       when: ansible_distribution == "Fedora"
 
+    - name: Assure EPEL is enabled (CentOS 8)
+      become: true
+      shell: |
+        yum-config-manager --enable epel || dnf install epel-release
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version | int == 8
+
+    - name: Install dnf-yum and distribution-gpg-keys (CentOS 8)
+      package:
+        name:
+          - distribution-gpg-keys  # epel
+          - yum
+          - mock  # epel
+        state: present
+      become: true
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version | int == 8
+
     # NOTE(jpena) The python3 job will build a CentOS package, so we need
     # to have the CentOS 7 GPG key in the place mock will expect it
     - name: Create symlink for RPM-GPG-KEY-CentOS-7
