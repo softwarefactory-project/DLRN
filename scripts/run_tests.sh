@@ -76,15 +76,21 @@ baseurl="${3:-http://trunk.rdoproject.org/centos7/}"
 src="master"
 branch=""
 
+if [ ${target} = "centos" ]; then
+    baseurl_release="centos7"
+elif [ ${target} = "centos8" ]; then
+    baseurl_release="centos8"
+fi
+
 # If we're testing a commit on a specific branch, make sure we're using it
 if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
     branch=$(sed "s/rpm-//" <<< "${ZUUL_BRANCH}")
     if [[ "${branch}" = "liberty" || "${branch}" = "mitaka" ]]; then
-        baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
+        baseurl="http://trunk.rdoproject.org/${branch}/${baseurl_release}/"
         src="stable/${branch}"
     else
         # assume feature branch targeting master
-        baseurl="http://trunk.rdoproject.org/centos7-master/"
+        baseurl="http://trunk.rdoproject.org/${baseurl_release}-master/"
         src="${branch}"
         # for rdoinfo tags filter
         branch=""
@@ -93,7 +99,7 @@ if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
 # Add logic for new branches, *-rdo
 elif [[ "${ZUUL_BRANCH}" =~ -rdo ]]; then
     branch=$(sed "s/-rdo//" <<< "${ZUUL_BRANCH}")
-    baseurl="http://trunk.rdoproject.org/${branch}/centos7/"
+    baseurl="http://trunk.rdoproject.org/${branch}/${baseurl_release}/"
     src="stable/${branch}"
     PROJECT_DISTRO_BRANCH=$ZUUL_BRANCH
 fi
