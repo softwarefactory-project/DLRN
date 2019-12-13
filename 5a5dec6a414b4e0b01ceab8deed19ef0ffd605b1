@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e1305194_2e44ee57",
+        "filename": "scripts/centos8.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2019-12-13T14:06:14Z",
+      "side": 1,
+      "message": "Let\u0027s remove the tmpfs configuration part. While useful in most deployments, we\u0027re not including them in the default configuration for other platforms.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 63
+      },
+      "revId": "5a5dec6a414b4e0b01ceab8deed19ef0ffd605b1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
