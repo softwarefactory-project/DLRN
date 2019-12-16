@@ -39,12 +39,12 @@ def mocked_session_recheck(url):
 
 
 def mocked_getpackages(**kwargs):
-        return [{'upstream': 'https://github.com/openstack/foo',
-                 'name': 'foo', 'maintainers': 'test@test.com'},
-                {'upstream': 'https://github.com/openstack/test',
-                 'name': 'test', 'maintainers': 'test@test.com'},
-                {'upstream': 'https://github.com/openstack/test',
-                 'name': 'python-pysaml2', 'maintainers': 'test@test.com'}]
+    return [{'upstream': 'https://github.com/openstack/foo',
+             'name': 'foo', 'maintainers': 'test@test.com'},
+            {'upstream': 'https://github.com/openstack/test',
+             'name': 'test', 'maintainers': 'test@test.com'},
+            {'upstream': 'https://github.com/openstack/test',
+             'name': 'python-pysaml2', 'maintainers': 'test@test.com'}]
 
 
 class TestProcessBuildResult(base.TestCase):

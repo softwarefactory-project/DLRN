@@ -38,8 +38,8 @@ from six.moves.urllib.request import urlopen
 
 logger = logging.getLogger("dlrn-gitrepo-driver")
 
-version_match = re.compile('\W*set upstream_version\D+([\w.]+).*')
-wrong_match = re.compile('\W*set upstream_version\D+\(\).*')
+version_match = re.compile(r'\W*set upstream_version\D+([\w.]+).*')
+wrong_match = re.compile(r'\W*set upstream_version\D+\(\).*')
 
 base_urls = ['https://opendev.org/openstack',
              'https://opendev.org/x',
@@ -252,7 +252,7 @@ class GitRepoDriver(PkgInfoDriver):
                 filename = os.path.join(distgit_dir, specf)
                 with open(filename, 'r+') as fp:
                     spec = fp.read()
-                    spec = re.sub('-%{version}', '-%{upstream_version}', spec)
+                    spec = re.sub(r'-%{version}', '-%{upstream_version}', spec)
                     fp.seek(0)
                     fp.write(spec)
 

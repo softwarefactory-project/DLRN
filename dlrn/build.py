@@ -77,7 +77,7 @@ def build(packages, commit, env_vars, dev_mode, use_public,
 
 def build_container(packages, commit, env_vars, dev_mode, use_public,
                     bootstrap, sequential):
-    raise NotImplemented()
+    raise NotImplementedError()
 
 
 def build_rpm(packages, commit, env_vars, dev_mode, use_public,
@@ -198,7 +198,7 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
             raise Exception("No baseurl defined")
         r = urlopen(baseurl + "/delorean-deps.repo")
         delorean_deps = True
-    except Exception as e:
+    except Exception:
         logger.warning(
             "Could not open %s/delorean-deps.repo. If some dependent"
             " repositories must be included in the mock then check the"

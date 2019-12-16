@@ -102,8 +102,7 @@ def getVote(session, timestamp, success=None, job_id=None, fallback=True):
     if vote is None and job_id is not None:
         # Second chance: no votes found for job_id. Let's find any real CI
         # vote, other than 'consistent'
-        votes = session.query(CIVote).filter(CIVote.timestamp >
-                                             timestamp)
+        votes = session.query(CIVote).filter(CIVote.timestamp > timestamp)
         if success is not None:
             votes = votes.filter(CIVote.ci_vote == success)
         votes.filter(CIVote.ci_name != 'consistent')
@@ -111,8 +110,7 @@ def getVote(session, timestamp, success=None, job_id=None, fallback=True):
 
     if vote is None:
         # No votes found, let's try to find one for consistent
-        votes = session.query(CIVote).filter(CIVote.timestamp >
-                                             timestamp)
+        votes = session.query(CIVote).filter(CIVote.timestamp > timestamp)
         if success is not None:
             votes = votes.filter(CIVote.ci_vote == success)
         votes.filter(CIVote.ci_name == 'consistent')
