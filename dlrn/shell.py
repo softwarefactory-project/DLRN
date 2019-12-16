@@ -496,7 +496,7 @@ def process_build_result_container(
         dev_mode=False, run_cmd=False, stop=False,
         build_env=None, head_only=False, consistent=False,
         failures=0):
-    raise NotImplemented()
+    raise NotImplementedError()
 
 
 def process_build_result_rpm(
@@ -669,7 +669,7 @@ def post_build(status, *args, **kwargs):
 
 
 def post_build_container(status, packages, session, build_repo=None):
-    raise NotImplemented()
+    raise NotImplementedError()
 
 
 def post_build_rpm(status, packages, session, build_repo=True):

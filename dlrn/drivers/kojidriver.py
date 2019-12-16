@@ -247,7 +247,7 @@ class KojiBuildDriver(BuildRPMDriver):
                 log_content = fp.readlines()
             task_id = None
             for line in log_content:
-                m = re.search("^Created task: (\d+)$", line)
+                m = re.search(r'^Created task: (\d+)$', line)
                 if m:
                     logger.info("Created task id %s" % m.group(1))
                     task_id = m.group(1)

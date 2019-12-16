@@ -22,11 +22,11 @@ import os
 import re
 import sys
 
-name_regexp = re.compile('^Name:\s*(.+)\s*$')
-package_regexp = re.compile('^(Provides:|%package)\s+(-n)?\s*(.+)\s*$')
-define_regexp = re.compile('[^#]*%(?:define|global)\s+(.+)\s+(.+)\s*$')
-build_requires_regexp = re.compile('^(?:Build)?Requires(?:\([^\)]+\))?:'
-                                   '\s*(.+)\s*$')
+name_regexp = re.compile(r'^Name:\s*(.+)\s*$')
+package_regexp = re.compile(r'^(Provides:|%package)\s+(-n)?\s*(.+)\s*$')
+define_regexp = re.compile(r'[^#]*%(?:define|global)\s+(.+)\s+(.+)\s*$')
+build_requires_regexp = re.compile(r'^(?:Build)?Requires(?:\([^\)]+\))?:'
+                                   r'\s*(.+)\s*$')
 
 
 class RpmSpecFile(object):
@@ -53,7 +53,7 @@ class RpmSpecFile(object):
                     # lookup package
                     res = package_regexp.search(line)
                     if res:
-                        pkg = re.split('\s+|[><=]',
+                        pkg = re.split(r'\s+|[><=]',
                                        self._expand_defines(res.group(3)))[0]
                         if res.group(2) or res.group(1) == 'Provides:':
                             pkg_name = pkg
@@ -68,9 +68,9 @@ class RpmSpecFile(object):
                             # split requires on the same lines and
                             # remove >=, <= or = clauses
                             self._build_requires.extend(
-                                [re.split('\s+|[><=]',
+                                [re.split(r'\s+|[><=]',
                                           self._expand_defines(req))[0]
-                                 for req in re.split('\s*,\s*',
+                                 for req in re.split(r'\s*,\s*',
                                                      res.group(1))])
         # remove dups
         self._build_requires = list(set(self._build_requires))

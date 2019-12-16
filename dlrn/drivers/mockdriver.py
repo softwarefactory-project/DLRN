@@ -83,7 +83,7 @@ class MockBuildDriver(BuildRPMDriver):
                 with open("%s/mock.log" % output_dir, 'r') as fp:
                     mock_content = fp.readlines()
                 warn_match = re.compile(
-                    '\W*WARNING: Failed install built packages.*')
+                    r'\W*WARNING: Failed install built packages.*')
                 for line in mock_content:
                     m = warn_match.match(line)
                     if m is not None:

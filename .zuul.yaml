@@ -27,7 +27,7 @@
     nodeset:
       nodes:
         - name: testrunner
-          label: rdo-fedora-28
+          label: rdo-fedora-28-vexxhost
 
 - job:
     name: dlrn-rpmbuild-tripleo-ci-oooq
@@ -57,6 +57,7 @@
     description: Run a DLRN functional test, using the API and dlrnapi_client
     run: playbooks/dlrn-api-functional.yaml
     post-run: playbooks/dlrn-api-functional-getlogs.yaml
+    timeout: 3600
     required-projects:
       - DLRN
       - dlrnapi_client
@@ -64,12 +65,18 @@
 - job:
     name: dlrn-api-functional-centos-7
     parent: dlrn-api-functional
-    nodeset: centos-7-cloud
+    nodeset:
+      nodes:
+        - name: centos-7
+          label: rdo-centos-7-vexxhost
 
 - job:
     name: dlrn-api-functional-centos-8
     parent: dlrn-api-functional
-    nodeset: centos-8-cloud
+    nodeset:
+      nodes:
+        - name: centos-8
+          label: upstream-centos-8-vexxhost
 
 - project:
     name: DLRN

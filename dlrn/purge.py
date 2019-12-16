@@ -162,9 +162,9 @@ def purge():
                     if options.dry_run is False:
                         shutil.rmtree(datadir, ignore_errors=True)
             else:
-                    logger.info("Remove %s" % datadir)
-                    if options.dry_run is False:
-                        shutil.rmtree(datadir, ignore_errors=True)
+                logger.info("Remove %s" % datadir)
+                if options.dry_run is False:
+                    shutil.rmtree(datadir, ignore_errors=True)
             commit.flags |= FLAG_PURGED
     if options.dry_run is False:
         session.commit()
