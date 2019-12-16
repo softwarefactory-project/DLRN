@@ -81,7 +81,7 @@ class CoprBuildDriver(BuildRPMDriver):
                 log_content = fp.readlines()
             build_id = None
             for line in log_content:
-                m = re.search("^Created builds: (\d+)$", line)
+                m = re.search(r'^Created builds: (\d+)$', line)
                 if m:
                     logger.info("Created build id %s" % m.group(1))
                     build_id = m.group(1)

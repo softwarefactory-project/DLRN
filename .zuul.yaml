@@ -57,6 +57,7 @@
     description: Run a DLRN functional test, using the API and dlrnapi_client
     run: playbooks/dlrn-api-functional.yaml
     post-run: playbooks/dlrn-api-functional-getlogs.yaml
+    timeout: 3600
     required-projects:
       - DLRN
       - dlrnapi_client
