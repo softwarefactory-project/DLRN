@@ -87,6 +87,7 @@ class TestRpmSpecCollection(unittest.TestCase):
         self.assertEqual(specs.compute_order(), ['package',
                                                  'packageD'])
 
+
 BASIC_SPEC_CONTENT = '''
 Name: package
 '''

@@ -47,6 +47,7 @@ def main():
 
     migrate_db(options.source, options.dest)
 
+
 if __name__ == '__main__':
     main()
     exit(0)
