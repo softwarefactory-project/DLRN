@@ -85,16 +85,11 @@ fi
 # If we're testing a commit on a specific branch, make sure we're using it
 if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
     branch=$(sed "s/rpm-//" <<< "${ZUUL_BRANCH}")
-    if [[ "${branch}" = "liberty" || "${branch}" = "mitaka" ]]; then
-        baseurl="http://trunk.rdoproject.org/${branch}/${baseurl_release}/"
-        src="stable/${branch}"
-    else
-        # assume feature branch targeting master
-        baseurl="http://trunk.rdoproject.org/${baseurl_release}-master/"
-        src="${branch}"
-        # for rdoinfo tags filter
-        branch=""
-    fi
+    # assume feature branch targeting master
+    baseurl="http://trunk.rdoproject.org/${baseurl_release}-master/"
+    src="${branch}"
+    # for rdoinfo tags filter
+    branch=""
     PROJECT_DISTRO_BRANCH=$ZUUL_BRANCH
 # Add logic for new branches, *-rdo
 elif [[ "${ZUUL_BRANCH}" =~ -rdo ]]; then
