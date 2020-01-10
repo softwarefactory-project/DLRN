@@ -1,0 +1,48 @@
+civotes: []
+commits:
+- artifacts: repos/component/tripleo/c9/37/c937de75c28e63fba8d8738ad6a5f2ede517e53d_b60c7f2f/puppet-vlan-0.1.0-0.20200110140419.c937de7.el7.src.rpm,repos/component/tripleo/c9/37/c937de75c28e63fba8d8738ad6a5f2ede517e53d_b60c7f2f/puppet-vlan-0.1.0-0.20200110140419.c937de7.el7.noarch.rpm
+  commit_branch: master
+  commit_hash: c937de75c28e63fba8d8738ad6a5f2ede517e53d
+  component: tripleo
+  distgit_dir: ./data/puppet-vlan_distro/
+  distro_hash: b60c7f2fd9a64e968e4e3139c8f1f5aff4aa07a7
+  dt_build: '1578664973'
+  dt_commit: '1354617692'
+  dt_distro: '1489056715'
+  dt_extended: '0'
+  extended_hash: None
+  flags: '0'
+  id: '1'
+  notes: OK
+  project_name: puppet-vlan
+  repo_dir: ./data/puppet-vlan
+  status: SUCCESS
+  type: rpm
+- artifacts: repos/component/tripleo/eb/fb/ebfb108bf1a19d70aec6c52cdd1952c0e86593fa_642db7af/puppet-apache-5.3.1-0.20200110141918.ebfb108.el7.src.rpm,repos/component/tripleo/eb/fb/ebfb108bf1a19d70aec6c52cdd1952c0e86593fa_642db7af/puppet-apache-5.3.1-0.20200110141918.ebfb108.el7.noarch.rpm
+  commit_branch: master
+  commit_hash: ebfb108bf1a19d70aec6c52cdd1952c0e86593fa
+  component: tripleo
+  distgit_dir: ./data/puppet-apache_distro/
+  distro_hash: 642db7af784690c3f17d85ff85b0424001c97b82
+  dt_build: '1578665875'
+  dt_commit: '1576575518'
+  dt_distro: '1489056308'
+  dt_extended: '0'
+  extended_hash: None
+  flags: '0'
+  id: '2'
+  notes: OK
+  project_name: puppet-apache
+  repo_dir: ./data/puppet-apache
+  status: SUCCESS
+  type: rpm
+projects:
+- id: '1'
+  last_email: '1578665751'
+  project_name: puppet-apache
+promotions: []
+users:
+# passlib.hash.sha512_crypt.encrypt("test")
+- password: $6$rounds=656000$PA43St1i5YORkfco$tdLlOIsMDBKBoRJCfBWHxkAJt5jdAJjeK/8PlxT4HTyeut4S/hVlRI6s7el5pOFDZdadm3aEtJFqYT0bfy4b21
+  username: test
+

@@ -620,7 +620,7 @@ def promote():
     if config_options.use_components:
         datadir = os.path.realpath(config_options.datadir)
         aggregate_repo_files(promote_name, datadir, session,
-                             config_options.reponame)
+                             config_options.reponame, hashed_dir=True)
 
     timestamp = time.mktime(datetime.now().timetuple())
     promotion = Promotion(commit_id=commit.id, promotion_name=promote_name,
