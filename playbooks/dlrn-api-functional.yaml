@@ -8,6 +8,32 @@
     imported_commit_hash: "6fd1c8e407eb57bcb42198975dd1fdb1c0de1013"
     imported_distro_hash: "fe674e08f4f23370a058a0f6dbb4a4f721b79a38"
   tasks:
+    - name: If running on CentOS 8, set up different options
+      block:
+        - name: Set use_components for CentOS 8
+          ini_file:
+            path: "{{ working_dir }}/DLRN/projects.ini"
+            section: DEFAULT
+            option: use_components
+            value: 1
+        - name: Set target for CentOS 8
+          ini_file:
+            path: "{{ working_dir }}/DLRN/projects.ini"
+            section: DEFAULT
+            option: target
+            value: centos8
+        - name: Set baseurl for CentOS 8
+          ini_file:
+            path: "{{ working_dir }}/DLRN/projects.ini"
+            section: DEFAULT
+            option: baseurl
+            value: 'https://trunk.rdoproject.org/centos8-master/'
+        - name: Set repo to import for CentOS 8
+          set_fact:
+            imported_repo: "https://trunk.rdoproject.org/centos8-master/component/tripleo/6f/d1/6fd1c8e407eb57bcb42198975dd1fdb1c0de1013_fe674e08/"
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version | int == 8
 
     # This task must be separated from reqs install
     - name: Install updated pip in .venv
@@ -158,10 +184,19 @@
         path: "{{ working_dir }}/DLRN/data/repos/cipromotion"
       register: link
 
-    - name: Fail if symlink was not created
+    - name: Fail if symlink was not created (centos7)
       fail:
         msg: Promotion did not create symlink cipromotion
-      when: link.stat.islnk is not defined or not link.stat.islnk
+      when:
+        - link.stat.islnk is not defined or not link.stat.islnk
+        - ansible_distribution == "CentOS" and ansible_distribution_major_version | int < 8
+
+    - name: Fail if cipromotion directory was not created (centos8)
+      fail:
+        msg: Promotion did not create cipromotion directory
+      when:
+        - link.stat.isdir is not defined or not link.stat.isdir
+        - ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 8
 
     - name: Get the number of packages that were built from the API
       shell:
