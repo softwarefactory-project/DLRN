@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c479578_03945346",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 450
+      },
+      "writtenOn": "2020-01-14T18:53:27Z",
+      "side": 1,
+      "message": "Two concerns:\na) scalability: how many hashes would end-up in the same directory? do the pile-up, when/how they are recycled?\n\nb) I do not see any link to a story describing the feature being implemented, one with other related changes.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 34
+      },
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
