@@ -22,6 +22,92 @@
       "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a393e89_32b977b3",
+        "filename": "dlrn/tests/samples/commits_components.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 501
+      },
+      "writtenOn": "2020-01-14T19:25:29Z",
+      "side": 1,
+      "message": "can we have a build_id here identifying the build of components together ? the build_id would be a arbitrary hash w/ symlink to promote name/label in the root dir.\n\nbuild_id: abcd1234abcd1234abc1234",
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d313dd20_5db99898",
+        "filename": "dlrn/tests/samples/commits_components.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 501
+      },
+      "writtenOn": "2020-01-14T19:25:29Z",
+      "side": 1,
+      "message": "I would expect one component for each commit_hash entry.... am I wrong ?",
+      "range": {
+        "startLine": 3,
+        "startChar": 29,
+        "endLine": 3,
+        "endChar": 36
+      },
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0e47ad4_8785325d",
+        "filename": "dlrn/tests/samples/commits_components.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 501
+      },
+      "writtenOn": "2020-01-14T19:25:29Z",
+      "side": 1,
+      "message": "why 2 entries of the same component here?",
+      "range": {
+        "startLine": 6,
+        "startChar": 2,
+        "endLine": 6,
+        "endChar": 20
+      },
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f4620529_4595def6",
+        "filename": "dlrn/tests/samples/commits_components.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 501
+      },
+      "writtenOn": "2020-01-14T19:25:29Z",
+      "side": 1,
+      "message": "this is supposed to be another component ?",
+      "range": {
+        "startLine": 24,
+        "startChar": 2,
+        "endLine": 24,
+        "endChar": 20
+      },
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
