@@ -215,6 +215,24 @@
       "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd1af80c_a5a1964d",
+        "filename": "dlrn/utils.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-15T14:02:20Z",
+      "side": 1,
+      "message": "The md5 sum is not used to ensure authenticity, but rather to have a unique identifier we can refer to later in the process. So I guess we\u0027re fine with just hashing the file.",
+      "parentUuid": "a93a3993_65d227f7",
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
