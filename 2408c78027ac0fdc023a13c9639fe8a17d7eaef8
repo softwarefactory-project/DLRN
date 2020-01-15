@@ -198,6 +198,23 @@
       "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a93a3993_65d227f7",
+        "filename": "dlrn/utils.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 371
+      },
+      "writtenOn": "2020-01-15T13:59:19Z",
+      "side": 1,
+      "message": "If that\u0027s enough then fine, but maybe for the sake of consistency do an md5 sum on entire directory ? Something equivalent to shell:\n\ntar -cf - repo_dir | md5sum\n\nThat however may be much more cpu demanding option.",
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
