@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5d850c03_ce60c0cb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-15T09:32:43Z",
+      "side": 1,
+      "message": "About scalability, we\u0027re using the same hashed dir structure we have for repos, so we should be safe for now. You can see https://softwarefactory-project.io/logs/07/17307/2/check/dlrn-api-functional-centos-8/22b96d4/logs/DLRN/repos/cipromotion/ for an example of how it looks like.\n\nPruning of old promotions could be handled separately, similar to how we handle repo pruning. I\u0027ll create a follow-up patch for this.\n\nThe associated story is https://tree.taiga.io/project/morucci-software-factory/us/3298, I will include it in the next patchset.",
+      "parentUuid": "2c479578_03945346",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 34
+      },
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a393e89_32b977b3",
         "filename": "dlrn/tests/samples/commits_components.yaml",
         "patchSetId": 2
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "284489f8_42c62197",
+        "filename": "dlrn/tests/samples/commits_components.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-15T09:32:43Z",
+      "side": 1,
+      "message": "I don\u0027t think it would improve things. We do have a build id, which is the commit id (see line 15), and it is a unique identifier and primary key for the table.",
+      "parentUuid": "7a393e89_32b977b3",
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d313dd20_5db99898",
         "filename": "dlrn/tests/samples/commits_components.yaml",
         "patchSetId": 2
@@ -53,6 +95,30 @@
       "writtenOn": "2020-01-14T19:25:29Z",
       "side": 1,
       "message": "I would expect one component for each commit_hash entry.... am I wrong ?",
+      "range": {
+        "startLine": 3,
+        "startChar": 29,
+        "endLine": 3,
+        "endChar": 36
+      },
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4af937d6_f5cbcc2e",
+        "filename": "dlrn/tests/samples/commits_components.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-15T09:32:43Z",
+      "side": 1,
+      "message": "This is the commits table. The schema does not need to include any component table.\n\nIf you go down to line 43, there\u0027s the promotions table, which is empty in this example.",
+      "parentUuid": "d313dd20_5db99898",
       "range": {
         "startLine": 3,
         "startChar": 29,
@@ -99,6 +165,30 @@
       "writtenOn": "2020-01-14T19:25:29Z",
       "side": 1,
       "message": "this is supposed to be another component ?",
+      "range": {
+        "startLine": 24,
+        "startChar": 2,
+        "endLine": 24,
+        "endChar": 20
+      },
+      "revId": "2408c78027ac0fdc023a13c9639fe8a17d7eaef8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6786a543_7b157fbb",
+        "filename": "dlrn/tests/samples/commits_components.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-15T09:32:43Z",
+      "side": 1,
+      "message": "Well, it was just used for the tests. This is consistent with how the DLRN database is managed right now, we have two commits and both happen to be associated to the tripleo component (it was that way in the test instance I used while developing the feature). If it makes things clearer, I can use a different commit here, belonging to a different component.",
+      "parentUuid": "f4620529_4595def6",
       "range": {
         "startLine": 24,
         "startChar": 2,
