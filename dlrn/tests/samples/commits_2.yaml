@@ -72,6 +72,34 @@ civotes:
   timestamp: '1441635095'
   notes: ''
   component: 'foo-component'
+civotes_agg:
+- id: '1'
+  ref_hash: '12345678'
+  ci_name: 'phase2-ci'
+  ci_url: 'http://dummyci.example.com/phase2-ci'
+  ci_vote: true
+  ci_in_progress: false
+  timestamp: '1441635095'
+  notes: ''
+  user: 'foo'
+- id: '2'
+  ref_hash: '90abcdef'
+  ci_name: 'phase2-ci'
+  ci_url: 'http://dummyci.example.com/phase2-ci'
+  ci_vote: true
+  ci_in_progress: false
+  timestamp: '1441635099'
+  notes: ''
+  user: 'foo'
+- id: '3'
+  ref_hash: '12345678'
+  ci_name: 'phase2-ci'
+  ci_url: 'http://dummyci.example.com/phase2-ci'
+  ci_vote: false
+  ci_in_progress: false
+  timestamp: '1441635195'
+  notes: ''
+  user: 'foo'
 # This vote has no user, to check that we support that, too
 users:
 - username: 'foo'
@@ -83,8 +111,10 @@ promotions:
   promotion_name: 'another-ci'
   timestamp: '1503307094'
   user: 'foo'
+  aggregate_hash: '12345678'
 - id: '2'
   commit_id: '5627'
   promotion_name: 'foo-ci'
   timestamp: '1503307099'
+  aggregate_hash: '90abcdef'
 # This promotion has no user, to check that we support that, too
