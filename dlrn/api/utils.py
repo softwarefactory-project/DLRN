@@ -54,3 +54,11 @@ class RepoDetail(object):
         self.failure = 0
         self.timestamp = 0
         self.component = None
+
+
+class AggDetail(object):
+    def __init__(self):
+        self.ref_hash = None
+        self.success = 0
+        self.failure = 0
+        self.timestamp = 0
