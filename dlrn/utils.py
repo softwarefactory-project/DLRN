@@ -388,6 +388,8 @@ def aggregate_repo_files(dirname, datadir, session, reponame,
         os.rename(os.path.join(base_promote_dir, "versions.csv_"),
                   os.path.join(base_promote_dir, "versions.csv"))
 
+    return file_hash
+
 
 if __name__ == '__main__':
     s = getSession('sqlite:///%s' % sys.argv[1])

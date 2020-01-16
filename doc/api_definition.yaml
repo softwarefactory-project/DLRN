@@ -266,6 +266,21 @@ paths:
         # Response code
         200:
           description: An HTML page with the CI votes.
+  /api/civotes_agg.html:
+    get:
+      description: |
+        Get an overview of the CI reports on aggregated repositorires.
+      produces:
+        - text/html
+      parameters:
+        - name: offset
+          in: query
+          description: Start after offset values. Defaults to 0.
+          type: integer
+      responses:
+        # Response code
+        200:
+          description: An HTML page with the CI votes for aggregated repos.
   /api/civotes_detail.html:
     get:
       description: |
@@ -303,6 +318,38 @@ paths:
           in: query
           description: If set, only display votes related to this component.
           type: string
+      responses:
+        # Response code
+        200:
+          description: An HTML page with the CI votes detail for a repo.
+  /api/civotes_agg_detail.html:
+    get:
+      description: |
+        Get a detailed overview of the CI reports for a specific aggregated repo hash,
+        with optional filtering.
+      produces:
+        - text/html
+      parameters:
+        - name: ref_hash
+          in: query
+          description: |
+            Filter on this aggregated repo hash
+            Either ci_name or ref_hash are required.
+          type: string
+        - name: ci_name
+          in: query
+          description: |
+            Filter on this CI name.
+            Either ci_name or ref_hash are required.
+          type: string
+        - name: success
+          in: query
+          description: If set filter for successful/failed CI votes
+          type: boolean
+        - name: offset
+          in: query
+          description: Start after offset values. Defaults to 0.
+          type: integer
       responses:
         # Response code
         200:
@@ -349,8 +396,6 @@ paths:
             type: object
             required:
               - job_id
-              - commit_hash
-              - distro_hash
               - url
               - timestamp
               - success
@@ -367,6 +412,10 @@ paths:
                 description: |
                   distro_hash of tested repo.
                 type: string
+              aggregate_hash:
+                decription: |
+                  hash of the aggregated repo that was tested. Either this parameter
+                  or a commit_hash and distro_hash must be specified.
               url:
                 description: |
                   URL where to find additional information from the CI execution.
@@ -514,6 +563,9 @@ definitions:
       distro_hash:
         type: string
         description: distro_hash of tested repo
+      aggregate_hash:
+        type: string
+        description: hash of the aggregated repo
       url:
         type: string
         description: URL where to find additional information from the CI execution
@@ -565,6 +617,9 @@ definitions:
       distro_hash:
         type: string
         description: distro_hash of promoted repo
+      aggregate_hash:
+        type: string
+        description: hash of the aggregated repo, when using components
       promote_name:
         type: string
         description: name used for the promotion
