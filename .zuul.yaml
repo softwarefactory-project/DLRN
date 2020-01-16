@@ -73,10 +73,11 @@
 - job:
     name: dlrn-api-functional-centos-8
     parent: dlrn-api-functional
+    attempts: 1
     nodeset:
       nodes:
         - name: centos-8
-          label: upstream-centos-8-vexxhost
+          label: cloud-centos-8
 
 - project:
     name: DLRN
@@ -85,18 +86,6 @@
       rtd_project_name: 'dlrn'
     check:
       jobs:
-        - tox-pep8
-        - tox-py27
-        - tox-py36:
-            nodeset:
-              nodes:
-                - name: testrunner
-                  label: fedora-oci
-        - dlrn-rpmbuild
-        - dlrn-rpmbuild-python3
-        - dlrn-rpmbuild-tripleo-ci-oooq
-        - dlrn-rpmbuild-tripleo-ci-oooq-rhel8
-        - dlrn-api-functional-centos-7
         - dlrn-api-functional-centos-8
     gate:
       jobs:
