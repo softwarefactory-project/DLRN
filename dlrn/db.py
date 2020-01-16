@@ -126,6 +126,22 @@ class CIVote(Base):
     component = Column(String(64))
 
 
+class CIVote_Aggregate(Base):
+    __tablename__ = "civotes_agg"
+
+    id = Column(Integer, primary_key=True)
+    ref_hash = Column(String(64), ForeignKey('promotions.aggregate_hash'),
+                      nullable=False)
+    ci_name = Column(String(256))
+    ci_url = Column(String(1024))
+    ci_vote = Column(Boolean)
+    ci_in_progress = Column(Boolean)
+    timestamp = Column(Integer)
+    notes = Column(Text)
+    user = Column(String(255),
+                  ForeignKey('users.username'))
+
+
 class Promotion(Base):
     __tablename__ = "promotions"
 
@@ -136,6 +152,7 @@ class Promotion(Base):
     user = Column(String(255),
                   ForeignKey('users.username', name='prom_user_fk'))
     component = Column(String(64))
+    aggregate_hash = Column(String(64))
 
 
 class User(Base):
