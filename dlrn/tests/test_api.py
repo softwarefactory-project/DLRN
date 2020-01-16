@@ -365,6 +365,26 @@ class TestReportResult(DLRNAPITestCase):
                                  content_type='application/json')
         self.assertEqual(response.status_code, 404)
 
+    def test_report_result_no_commit_hash(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(distro_hash='0', job_id='foo-ci', url='',
+                                   timestamp='1941635095', success='true'))
+
+        response = self.app.post('/api/report_result',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_report_result_no_distro_hash(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='0', job_id='foo-ci', url='',
+                                   timestamp='1941635095', success='true'))
+
+        response = self.app.post('/api/report_result',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
     def test_report_result_successful(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='1c67b1ab8c6fe273d4e'
                                                '175a14f0df5d3cbbd0edc',
@@ -381,6 +401,32 @@ class TestReportResult(DLRNAPITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(data['in_progress'], False)
         self.assertEqual(data['success'], True)
+
+    def test_report_result_aggregate(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(aggregate_hash='12345678',
+                                   job_id='phase2-ci', url='',
+                                   timestamp='1941635095', success='true'))
+
+        response = self.app.post('/api/report_result',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(data['in_progress'], False)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['aggregate_hash'], '12345678')
+
+    def test_report_result_agg_and_hash(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(aggregate_hash='12345678',
+                                   job_id='phase2-ci', url='',
+                                   timestamp='1941635095', success='true',
+                                   commit_hash='123456'))
+        response = self.app.post('/api/report_result',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
@@ -523,6 +569,33 @@ class TestRepoStatus(DLRNAPITestCase):
         self.assertEqual(len(data), 1)
 
 
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestAggStatus(DLRNAPITestCase):
+    def test_agg_status_missing_hash(self, db2_mock, db_mock):
+        response = self.app.get('/api/agg_status?success=true')
+        self.assertEqual(response.status_code, 400)
+
+    def test_agg_status_multiple_votes(self, db2_mock, db_mock):
+        response = self.app.get('/api/agg_status?aggregate_hash=12345678')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 2)
+
+    def test_agg_status_with_success(self, db2_mock, db_mock):
+        response = self.app.get('/api/agg_status?aggregate_hash=12345678&'
+                                'success=true')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
+    def test_agg_status_hash_not_found(self, db2_mock, db_mock):
+        response = self.app.get('/api/agg_status?aggregate_hash=000000000')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 0)
+
+
 @mock.patch('dlrn.remote.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
 class TestRemoteImport(DLRNAPITestCase):
@@ -579,6 +652,32 @@ class TestGetCIVotes(DLRNAPITestCase):
     def test_get_civotes_detail_with_ci(self, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/civotes_detail.html?'
                                 'ci_name=another-ci')
+        self.assertEqual(rt_mock.call_count, 1)
+        self.assertEqual(response.status_code, 200)
+
+
+@mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestGetCIAggVotes(DLRNAPITestCase):
+    def test_get_ciaggvotes(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/civotes_agg.html')
+        self.assertEqual(rt_mock.call_count, 1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_ciaggvotes_detail_fail(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/civotes_agg_detail.html')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_ciaggvotes_detail_ok(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/civotes_agg_detail.html?'
+                                'ref_hash=12345678')
+        self.assertEqual(rt_mock.call_count, 1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_ciaggvotes_detail_with_ci(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/civotes_agg_detail.html?'
+                                'ci_name=phase2-ci')
         self.assertEqual(rt_mock.call_count, 1)
         self.assertEqual(response.status_code, 200)
 

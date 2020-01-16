@@ -210,6 +210,41 @@ paths:
             type: array
             items:
               $ref: '#/definitions/CIVote'
+  /api/agg_status:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Get all the CI reports for a specific aggregated repository.
+      parameters:
+        - name: params
+          in: query
+          description: The params to post
+          required: true
+          schema:
+            type: object
+            required:
+              - aggregate_hash
+            properties:
+              aggregate_hash:
+                description: |
+                  hash of the aggregated repo to fetch information for.
+                type: string
+              success:
+                description: |
+                  If set to a value, only return the CI reports with the
+                  specified vote. If not set, return all CI reports.
+                type: boolean
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: An array of votes
+          schema:
+            title: ArrayOfAggVotes
+            type: array
+            items:
+              $ref: '#/definitions/AggVote'
   /api/metrics/builds:
     # This is a HTTP operation
     get:
@@ -266,6 +301,21 @@ paths:
         # Response code
         200:
           description: An HTML page with the CI votes.
+  /api/civotes_agg.html:
+    get:
+      description: |
+        Get an overview of the CI reports on aggregated repositorires.
+      produces:
+        - text/html
+      parameters:
+        - name: offset
+          in: query
+          description: Start after offset values. Defaults to 0.
+          type: integer
+      responses:
+        # Response code
+        200:
+          description: An HTML page with the CI votes for aggregated repos.
   /api/civotes_detail.html:
     get:
       description: |
@@ -303,6 +353,38 @@ paths:
           in: query
           description: If set, only display votes related to this component.
           type: string
+      responses:
+        # Response code
+        200:
+          description: An HTML page with the CI votes detail for a repo.
+  /api/civotes_agg_detail.html:
+    get:
+      description: |
+        Get a detailed overview of the CI reports for a specific aggregated repo hash,
+        with optional filtering.
+      produces:
+        - text/html
+      parameters:
+        - name: ref_hash
+          in: query
+          description: |
+            Filter on this aggregated repo hash
+            Either ci_name or ref_hash are required.
+          type: string
+        - name: ci_name
+          in: query
+          description: |
+            Filter on this CI name.
+            Either ci_name or ref_hash are required.
+          type: string
+        - name: success
+          in: query
+          description: If set filter for successful/failed CI votes
+          type: boolean
+        - name: offset
+          in: query
+          description: Start after offset values. Defaults to 0.
+          type: integer
       responses:
         # Response code
         200:
@@ -349,8 +431,6 @@ paths:
             type: object
             required:
               - job_id
-              - commit_hash
-              - distro_hash
               - url
               - timestamp
               - success
@@ -367,6 +447,10 @@ paths:
                 description: |
                   distro_hash of tested repo.
                 type: string
+              aggregate_hash:
+                decription: |
+                  hash of the aggregated repo that was tested. Either this parameter
+                  or a commit_hash and distro_hash must be specified.
               url:
                 description: |
                   URL where to find additional information from the CI execution.
@@ -456,7 +540,11 @@ paths:
                 type: string
               distro_hash:
                 description: |
-                  If set, commit_hash of the repo to use as filter key. Requires commit_hash.
+                  If set, distro_hash of the repo to use as filter key. Requires commit_hash.
+                type: string
+              aggregate_hash:
+                description: |
+                  If set, filter for promotions that generated this aggregate_hash.
                 type: string
               promote_name:
                 description: |
@@ -514,6 +602,9 @@ definitions:
       distro_hash:
         type: string
         description: distro_hash of tested repo
+      aggregate_hash:
+        type: string
+        description: hash of the aggregated repo
       url:
         type: string
         description: URL where to find additional information from the CI execution
@@ -532,6 +623,30 @@ definitions:
       component:
         type: string
         description: Component associated to the commit/distro hash
+  AggVote:
+    type: object
+    properties:
+      job_id:
+        type: string
+        description: name of the CI sending the vote
+      aggregate_hash:
+        type: string
+        description: hash of the aggregated repo
+      url:
+        type: string
+        description: URL where to find additional information from the CI execution
+      timestamp:
+        type: integer
+        description: Timestamp (in seconds since the epoch)
+      in_progress:
+        type: boolean
+        description: is this CI job still in-progress?
+      success:
+        type: boolean
+        description: Was the CI execution successful?
+      notes:
+        type: string
+        description: additional notes
   Repo:
     type: object
     properties:
@@ -565,6 +680,9 @@ definitions:
       distro_hash:
         type: string
         description: distro_hash of promoted repo
+      aggregate_hash:
+        type: string
+        description: hash of the aggregated repo, when using components
       promote_name:
         type: string
         description: name used for the promotion
@@ -583,7 +701,7 @@ definitions:
       component:
         type: string
         description: Component associated to the commit/distro hash
-PromotionQuery:
+  PromotionQuery:
     type: object
     properties:
       commit_hash:
@@ -592,6 +710,9 @@ PromotionQuery:
       distro_hash:
         type: string
         description: distro_hash of promoted repo
+      aggregate_hash:
+        type: string
+        description: hash of the aggregated repo, when using components
       promote_name:
         type: string
         description: name used for the promotion

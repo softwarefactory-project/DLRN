@@ -14,6 +14,7 @@
 from mock import call
 from mock import MagicMock
 
+import hashlib
 import os
 import shutil
 import tempfile
@@ -103,14 +104,15 @@ class TestAggregateRepo(base.TestCase):
         os.close(self.db_fd)
 
     def test_aggregate_repo_files(self):
-        utils.aggregate_repo_files('test1', self.datadir, self.session,
-                                   'delorean')
+        result = utils.aggregate_repo_files('test1', self.datadir,
+                                            self.session, 'delorean')
         expected_file = os.path.join(self.datadir, 'repos', 'test1',
                                      'delorean.repo')
         assert os.path.exists(expected_file)
         with open(expected_file, 'r') as fp:
             contents = fp.read()
         assert contents == 'TESTING ONE TWO THREE\n'
+        assert result == hashlib.md5(b'TESTING ONE TWO THREE\n').hexdigest()
 
     def test_aggregate_repo_files_hashed_dir(self):
         utils.aggregate_repo_files('test1', self.datadir, self.session,
