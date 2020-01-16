@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CI Votes for Aggregates</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
+  </head>
+  <body>
+    <h1>
+      <i class='fa fa-chevron-circle-right pull-left'></i>
+      {{ target | capitalize }}
+    </h1>
+    <table id="navigation1">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes_agg_detail.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           {% if request.args.get('ci_name') != None %}
+             <input type="hidden" name="ci_name" value="{{ request.args.get('ci_name') }}" />
+           {% else %}
+             <input type="hidden" name="ref_hash" value="{{ request.args.get('ref_hash') }}" />
+           {% endif %}
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
+          <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    {% if count == limit %}
+    <td>
+        <form action="civotes_agg_detail.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           {% if request.args.get('ci_name') != None %}
+             <input type="hidden" name="ci_name" value="{{ request.args.get('ci_name') }}" />
+           {% else %}
+             <input type="hidden" name="ref_hash" value="{{ request.args.get('ref_hash') }}" />
+           {% endif %}
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
+          <button type="submit" class="button"><h4>Next</h4></button>
+        </form>    </td>
+    {% endif %}
+    </tr></table>
+
+    <table id="dlrn">
+      <tr>
+        <th>CI Name</th>
+        <th>Aggregate hash</th>
+        <th>Results URL</th>
+        <th>Vote</th>
+        <th>In Progress?</th>
+        <th>Timestamp</th>
+        <th>notes</th>
+      </tr>
+      {% for vote in votes %}
+        <tr {% if vote.ci_vote == True %}class="success"{% endif %}>
+          <td>
+            <form action="civotes_agg_detail.html" method="get">
+               <input type="hidden" name="ci_name" value="{{ vote.ci_name }}" />
+              <button type="submit" class="button">{{ vote.ci_name }}</button>
+            </form>
+          </td>
+          <td>
+            <form action="civotes_agg_detail.html" method="get">
+               <input type="hidden" name="ref_hash" value="{{ vote.ref_hash }}" />
+              <button type="submit" class="button">{{ vote.ref_hash }}</button>
+            </form>
+          </td>
+          <td>
+            <i class="fa fa-link pull-left"></i>
+            <i>
+              <a href="{{ vote.ci_url }}">
+                {{ vote.ci_url }}
+              </a>
+          </td>
+          <td>
+            {% if vote.ci_vote  %}
+              <i class="fa pull-left" style="color:#004153">SUCCESS</i>
+            {% else %}
+              <i class="fa pull-left" style="color:red">FAILED</i>
+            {% endif %}
+          </td>
+          <td>
+            {% if vote.ci_in_progress  %}
+              <i class="fa pull-left" style="color:red">IN PROGRESS</i>
+            {% else %}
+              <i class="fa pull-left" style="color:#004153">FINISHED</i>
+            {% endif %}
+          </td>
+          <td>{{ vote.timestamp | strftime }}</td>
+          <td>{{ vote.notes }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    <table id="navigation2">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes_agg_detail.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           {% if request.args.get('ci_name') != None %}
+             <input type="hidden" name="ci_name" value="{{ request.args.get('ci_name') }}" />
+           {% else %}
+             <input type="hidden" name="ref_hash" value="{{ request.args.get('ref_hash') }}" />
+           {% endif %}
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
+          <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    {% if count == limit %}
+    <td>
+        <form action="civotes_agg_detail.html" method="get">
+           {% if request.args.get('success') != None %}
+             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
+           {% endif %}
+           {% if request.args.get('ci_name') != None %}
+             <input type="hidden" name="ci_name" value="{{ request.args.get('ci_name') }}" />
+           {% else %}
+             <input type="hidden" name="ref_hash" value="{{ request.args.get('ref_hash') }}" />
+           {% endif %}
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
+          <button type="submit" class="button"><h4>Next</h4></button>
+        </form>    </td>
+    {% endif %}
+    </tr></table>
+  </body>
+</html>

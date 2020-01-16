@@ -16,12 +16,14 @@ from distutils.util import strtobool
 from functools import wraps
 
 from dlrn.api import app
+from dlrn.api.utils import AggDetail
 from dlrn.api.utils import auth
 from dlrn.api.utils import InvalidUsage
 from dlrn.api.utils import RepoDetail
 
 from dlrn.config import ConfigOptions
 from dlrn.db import CIVote
+from dlrn.db import CIVote_Aggregate
 from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
@@ -184,6 +186,50 @@ def repo_status():
     return jsonify(data)
 
 
+@app.route('/api/agg_status', methods=['GET'])
+def agg_status():
+    # aggregate_hash: aggregate hash
+    # success(optional): only report successful/unsuccessful votes
+    agg_hash = request.args.get('aggregate_hash', None)
+    success = request.args.get('success', None)
+
+    if request.headers.get('Content-Type') == 'application/json':
+        # This is the old, deprecated method of in-body parameters
+        # We will keep it for backwards compatibility
+        if agg_hash is None:
+            agg_hash = request.json.get('aggregate_hash', None)
+        if success is None:
+            success = request.json.get('success', None)
+
+    if agg_hash is None:
+        raise InvalidUsage('Missing parameters', status_code=400)
+
+    if success is not None:
+        success = bool(strtobool(success))
+
+    # Find the aggregates
+    session = getSession(app.config['DB_PATH'])
+    votes = session.query(CIVote_Aggregate)
+    votes = votes.filter(CIVote_Aggregate.ref_hash == agg_hash)
+    if success is not None:
+        votes = votes.filter(CIVote_Aggregate.ci_vote == int(success))
+
+    # And format the output
+    data = []
+    for vote in votes:
+        d = {'timestamp': vote.timestamp,
+             'aggregate_hash': agg_hash,
+             'job_id': vote.ci_name,
+             'success': bool(vote.ci_vote),
+             'in_progress': vote.ci_in_progress,
+             'url': vote.ci_url,
+             'notes': vote.notes,
+             'user': vote.user}
+        data.append(d)
+    closeSession(session)
+    return jsonify(data)
+
+
 @app.route('/api/last_tested_repo', methods=['GET'])
 def last_tested_repo_GET():
     # max_age: Maximum age in hours, used as base for the search
@@ -272,6 +318,7 @@ def last_tested_repo_GET():
 def promotions_GET():
     # commit_hash(optional): commit hash
     # distro_hash(optional): distro hash
+    # aggregate_hash(optional): aggregate hash
     # promote_name(optional): only report promotions for promote_name
     # offset(optional): skip the first X promotions (only 100 are shown
     #                   per query)
@@ -279,6 +326,7 @@ def promotions_GET():
     # component(optional): only report promotions for this component
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
+    agg_hash = request.args.get('aggregate_hash', None)
     promote_name = request.args.get('promote_name', None)
     offset = int(request.args.get('offset', 0))
     limit = int(request.args.get('limit', 100))
@@ -291,6 +339,8 @@ def promotions_GET():
             commit_hash = request.json.get('commit_hash', None)
         if distro_hash is None:
             distro_hash = request.json.get('distro_hash', None)
+        if agg_hash is None:
+            agg_hash = request.json.get('aggregate_hash', None)
         if promote_name is None:
             promote_name = request.json.get('promote_name', None)
         if offset == 0:
@@ -331,6 +381,8 @@ def promotions_GET():
     if promote_name is not None:
         promotions = promotions.filter(
             Promotion.promotion_name == promote_name)
+    if agg_hash is not None:
+        promotions = promotions.filter(Promotion.aggregate_hash == agg_hash)
     if component is not None:
         promotions = promotions.filter(Promotion.component == component)
 
@@ -350,6 +402,7 @@ def promotions_GET():
         d = {'timestamp': promotion.timestamp,
              'commit_hash': commit.commit_hash,
              'distro_hash': commit.distro_hash,
+             'aggregate_hash': promotion.aggregate_hash,
              'repo_hash': repo_hash,
              'repo_url': repo_url,
              'promote_name': promotion.promotion_name,
@@ -509,13 +562,13 @@ def report_result():
     # job_id: name of CI
     # commit_hash: commit hash
     # distro_hash: distro hash
+    # aggregate_hash: hash of aggregate.
     # url: URL where more information can be found
     # timestamp: CI execution timestamp
     # success: boolean
     # notes(optional): notes
+    # Either commit_hash+distro_hash or aggregate_hash must be provided
     try:
-        commit_hash = request.json['commit_hash']
-        distro_hash = request.json['distro_hash']
         timestamp = request.json['timestamp']
         job_id = request.json['job_id']
         success = request.json['success']
@@ -523,25 +576,61 @@ def report_result():
     except KeyError:
         raise InvalidUsage('Missing parameters', status_code=400)
 
+    commit_hash = request.json.get('commit_hash', None)
+    distro_hash = request.json.get('distro_hash', None)
+    aggregate_hash = request.json.get('aggregate_hash', None)
+
+    if not commit_hash and not distro_hash and not aggregate_hash:
+        raise InvalidUsage('Missing parameters', status_code=400)
+
+    if commit_hash and not distro_hash:
+        raise InvalidUsage('If commit_hash is provided, distro_hash '
+                           'must be provided too', status_code=400)
+
+    if distro_hash and not commit_hash:
+        raise InvalidUsage('If distro_hash is provided, commit_hash '
+                           'must be provided too', status_code=400)
+
+    if (aggregate_hash and distro_hash) or (aggregate_hash and commit_hash):
+        raise InvalidUsage('aggregate_hash and commit/distro_hash cannot be '
+                           'combined', status_code=400)
+
     notes = request.json.get('notes', '')
 
     session = getSession(app.config['DB_PATH'])
-    commit = _get_commit(session, commit_hash, distro_hash)
-    if commit is None:
-        raise InvalidUsage('commit_hash+distro_hash combination not found',
-                           status_code=404)
+    # We have two paths here: one for votes on commit/distro hash, another
+    # for votes on aggregate_hash
+    component = None
+    if commit_hash:
+        commit = _get_commit(session, commit_hash, distro_hash)
+        if commit is None:
+            raise InvalidUsage('commit_hash+distro_hash combination not found',
+                               status_code=404)
 
-    commit_id = commit.id
+        commit_id = commit.id
+        component = commit.component
+        vote = CIVote(commit_id=commit_id, ci_name=job_id, ci_url=url,
+                      ci_vote=bool(strtobool(success)), ci_in_progress=False,
+                      timestamp=int(timestamp), notes=notes,
+                      user=auth.username(), component=component)
+    else:
+        prom = session.query(Promotion).filter(
+            Promotion.aggregate_hash == aggregate_hash).first()
+        if prom is None:
+            raise InvalidUsage('aggregate_hash not found',
+                               status_code=400)
 
-    vote = CIVote(commit_id=commit_id, ci_name=job_id, ci_url=url,
-                  ci_vote=bool(strtobool(success)), ci_in_progress=False,
-                  timestamp=int(timestamp), notes=notes,
-                  user=auth.username(), component=commit.component)
+        vote = CIVote_Aggregate(ref_hash=aggregate_hash, ci_name=job_id,
+                                ci_url=url, ci_vote=bool(strtobool(success)),
+                                ci_in_progress=False, timestamp=int(timestamp),
+                                notes=notes, user=auth.username())
+
     session.add(vote)
     session.commit()
 
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
+              'aggregate_hash': aggregate_hash,
               'timestamp': timestamp,
               'job_id': job_id,
               'success': bool(strtobool(success)),
@@ -549,7 +638,7 @@ def report_result():
               'url': url,
               'notes': notes,
               'user': auth.username(),
-              'component': vote.component}
+              'component': component}
     closeSession(session)
     return jsonify(result), 201
 
@@ -617,15 +706,18 @@ def promote():
 
     # Once the updated symlink is created, if we are using components
     # we need to update the top-level repo file
+    repo_checksum = None
     if config_options.use_components:
         datadir = os.path.realpath(config_options.datadir)
-        aggregate_repo_files(promote_name, datadir, session,
-                             config_options.reponame, hashed_dir=True)
+        repo_checksum = aggregate_repo_files(promote_name, datadir, session,
+                                             config_options.reponame,
+                                             hashed_dir=True)
 
     timestamp = time.mktime(datetime.now().timetuple())
     promotion = Promotion(commit_id=commit.id, promotion_name=promote_name,
                           timestamp=timestamp, user=auth.username(),
-                          component=commit.component)
+                          component=commit.component,
+                          aggregate_hash=repo_checksum)
 
     session.add(promotion)
     session.commit()
@@ -640,7 +732,8 @@ def promote():
               'promote_name': promote_name,
               'component': commit.component,
               'timestamp': timestamp,
-              'user': auth.username()}
+              'user': auth.username(),
+              'aggregate_hash': repo_checksum}
     closeSession(session)
     return jsonify(result), 201
 
@@ -765,6 +858,88 @@ def get_civotes_detail():
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     return render_template('votes.j2',
+                           target=config_options.target,
+                           votes=votelist,
+                           count=count,
+                           limit=pagination_limit)
+
+
+@app.route('/api/civotes_agg.html', methods=['GET'])
+def get_civotes_agg():
+    session = getSession(app.config['DB_PATH'])
+    offset = request.args.get('offset', 0)
+
+    votes = session.query(CIVote_Aggregate)
+    votes = votes.order_by(desc(CIVote_Aggregate.timestamp))
+    votes = votes.offset(offset).limit(pagination_limit)
+    count = votes.count()
+    # Let's find all individual aggregate_hashes
+    agg_id_list = []
+    for vote in votes:
+        if vote.ref_hash not in agg_id_list:
+            agg_id_list.append(vote.ref_hash)
+
+    # Populate list for aggregates
+    agglist = []
+    for ref_hash in agg_id_list:
+        aggdetail = AggDetail()
+        aggdetail.ref_hash = ref_hash
+        aggdetail.success = votes.from_self().filter(
+            CIVote_Aggregate.ref_hash == ref_hash,
+            CIVote_Aggregate.ci_vote == 1).count()
+        aggdetail.failure = votes.from_self().filter(
+            CIVote_Aggregate.ref_hash == ref_hash,
+            CIVote_Aggregate.ci_vote == 0).count()
+        aggdetail.timestamp = votes.from_self().filter(
+            CIVote_Aggregate.ref_hash == ref_hash).\
+            order_by(desc(CIVote_Aggregate.timestamp)).\
+            first().timestamp
+        agglist.append(aggdetail)
+
+    agglist = sorted(agglist, key=lambda repo: repo.timestamp, reverse=True)
+
+    closeSession(session)
+
+    config_options = _get_config_options(app.config['CONFIG_FILE'])
+
+    return render_template('votes_general_agg.j2',
+                           target=config_options.target,
+                           aggdetail=agglist,
+                           count=count,
+                           limit=pagination_limit)
+
+
+@app.route('/api/civotes_agg_detail.html', methods=['GET'])
+def get_civotes_agg_detail():
+    ref_hash = request.args.get('ref_hash', None)
+    ci_name = request.args.get('ci_name', None)
+    success = request.args.get('success', None)
+    offset = request.args.get('offset', 0)
+
+    session = getSession(app.config['DB_PATH'])
+    votes = session.query(CIVote_Aggregate)
+
+    if ref_hash:
+        votes = votes.from_self().filter(CIVote_Aggregate.ref_hash == ref_hash)
+    elif ci_name:
+        votes = votes.filter(CIVote_Aggregate.ci_name == ci_name)
+    else:
+        raise InvalidUsage("Please specify either ref_hash or "
+                           "ci_name as parameters.", status_code=400)
+
+    votes = votes.offset(offset).limit(pagination_limit)
+
+    if success is not None:
+        votes = votes.from_self().filter(
+            CIVote_Aggregate.ci_vote == bool(strtobool(success)))
+
+    votelist = votes.all()
+    count = votes.count()
+
+    closeSession(session)
+    config_options = _get_config_options(app.config['CONFIG_FILE'])
+
+    return render_template('votes_agg.j2',
                            target=config_options.target,
                            votes=votelist,
                            count=count,
