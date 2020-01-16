@@ -16,8 +16,14 @@
 
     - name: Assure EPEL is enabled (CentOS 8)
       become: true
-      shell: |
-        yum-config-manager --enable epel || dnf install epel-release
+      block:
+        - name: Ensure epel-release package is installed
+          package:
+            name: epel-release
+
+        # The yum_repository module does not allow to just enable a repo because... reasons
+        - name: Enable epel repo
+          command: yum-config-manager --enable epel
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version | int == 8
@@ -68,13 +74,15 @@
       become: true
       when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora') and ansible_distribution_major_version | int > 7
 
-    # NOTE(jpena) This is needed by mock when building on RHEL
-    - name: Make sure /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT exists (RHEL)
-      shell:
-        cmd: |
-          touch /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT
+    # NOTE(jpena) This is needed by mock when building on RHEL, and it looks like CentOS 8.1 too??
+    - name: Make sure /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT exists (RHEL 8)
+      file:
+        path: /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT
+        state: touch
       become: true
-      when: ansible_distribution == 'RedHat' and ansible_distribution_major_version | int > 7
+      when: 
+        - ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS'
+        - ansible_distribution_major_version | int > 7
 
     - name: Set up mock configuration
       shell:
