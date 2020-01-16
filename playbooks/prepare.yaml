@@ -16,8 +16,14 @@
 
     - name: Assure EPEL is enabled (CentOS 8)
       become: true
-      shell: |
-        yum-config-manager --enable epel || dnf install epel-release
+      block:
+        - name: Ensure epel-release package is installed
+          package:
+            name: epel-release
+
+        # The yum_repository module does not allow to just enable a repo because... reasons
+        - name: Enable epel repo
+          command: yum-config-manager --enable epel
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version | int == 8
