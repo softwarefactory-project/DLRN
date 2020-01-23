@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb10631a_027252c2",
+        "filename": "dlrn/utils.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 271
+      },
+      "writtenOn": "2020-01-23T12:42:07Z",
+      "side": 1,
+      "message": "NOt sure why you create a link to a file, then rename the link to the file, or maybe I\u0027m misreading the parameters.",
+      "revId": "d05339526a3207a2d738eb5418863d618db0cbb7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
