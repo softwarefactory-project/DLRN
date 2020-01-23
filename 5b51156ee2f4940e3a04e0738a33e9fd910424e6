@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0fbda129_7eb10727",
+        "filename": "dlrn/utils.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-01-23T11:13:40Z",
+      "side": 1,
+      "message": "I\u0027m wondering why earlier was not created help function for that. Each query seems to be similar.",
+      "revId": "5b51156ee2f4940e3a04e0738a33e9fd910424e6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
