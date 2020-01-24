@@ -24,12 +24,16 @@ and also Docker:
 Running
 -------
 
-The container image exposes the DLRN API on port 5000, using HTTP. It support
+The container image exposes the DLRN API on port 5000, using HTTP. It supports
 the following environment variables:
 
 - ``DLRNAPI_USE_SAMPLE_DATA``: if set to any value, the container will
   pre-create some basic data (commits, CI votes and a user ``foo``, with
   password ``bar``). This can be useful for tests.
+
+- ``CONFIG_FILE``: if set to any value, the API will read that file to get its
+  configuration options. See `https://raw.githubusercontent.com/softwarefactory-project/DLRN/master/dlrn/api/config.py`_
+  for a configuration file example.
 
 An example command-line using podman, where we use the sample data:
 
