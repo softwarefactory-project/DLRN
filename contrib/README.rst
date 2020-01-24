@@ -24,7 +24,7 @@ and also Docker:
 Running
 -------
 
-The container image exposes the DLRN API on port 5000, using HTTP. It support
+The container image exposes the DLRN API on port 5000, using HTTP. It supports
 the following environment variables:
 
 - ``DLRNAPI_USE_SAMPLE_DATA``: if set to any value, the container will

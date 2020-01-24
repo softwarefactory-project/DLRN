@@ -1,13 +1,30 @@
-FROM centos:7
+FROM centos:8
 LABEL maintainer="jpena@redhat.com"
 
-RUN yum -y install epel-release && yum -y update && yum -y install git createrepo mock gcc redhat-rpm-config rpmdevtools httpd libffi-devel openssl-devel yum-utils python-pip && yum clean all && rm -rf /var/cache/yum
-RUN git clone https://github.com/softwarefactory-project/DLRN && pushd DLRN && pip install -r requirements.txt && pip install . && popd && sed -i 's/^app.run.*/app.run(debug=True, host="0.0.0.0")/' DLRN/scripts/api.py
+RUN \
+    yum -y install epel-release && \
+    yum -y update && \
+    yum -y install git createrepo mock redhat-rpm-config rpmdevtools yum-utils python3-pip && \
+    yum clean all -y && \
+    rm -rf /var/cache/yum && \
+    git clone https://github.com/softwarefactory-project/DLRN && \
+    pushd DLRN && \
+    sed -i 's/^DB_PATH.*/DB_PATH = "sqlite:\/\/\/\/data\/commits.sqlite"/' dlrn/api/config.py && \
+    sed -i 's/^REPO_PATH.*/REPO_PATH = "\/data\/repos"/' dlrn/api/config.py &&  \
+    sed -i 's/^app.run.*/app.run(debug=True, host="0.0.0.0")/' scripts/api.py && \
+    pip3 install -r requirements.txt && \
+    pip3 install . && \
+    popd && \
+    mkdir /data && \
+    chgrp -R 0 /data && \
+    chmod -R g=u /data
 
 COPY import.py /
 COPY run.sh /
+
 RUN chmod 755 /run.sh
 
+VOLUME ["/data"]
 EXPOSE 5000
 
 CMD ["/run.sh"]
