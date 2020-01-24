@@ -27,6 +27,7 @@ from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getSession
+from dlrn.db import Promotion
 
 FLAG_PURGED = 0x2
 
@@ -49,6 +50,57 @@ def is_commit_in_dirs(commit, dirlist):
                 return True
 
     return False
+
+
+def purge_promoted_hashes(config, timestamp, dry_run=True):
+    session = getSession(config.get('DEFAULT', 'database_connection'))
+    basedir = os.path.join(config.get('DEFAULT', 'datadir'), 'repos')
+
+    # Get list of all promote names
+    all_promotions = session.query(Promotion).\
+        distinct(Promotion.promotion_name).\
+        group_by(Promotion.promotion_name).all()
+
+    promotion_list = []
+    for prom in all_promotions:
+        promotion_list.append(prom.promotion_name)
+
+    reponame = config.get('DEFAULT', 'reponame')
+
+    # Now go through all directories
+    for prom in promotion_list:
+        directory = os.path.join(basedir, prom)
+        logger.info("Looking into directory: %s" % directory)
+        if os.path.islink(os.path.join(directory, reponame + '.repo')):
+            protected_path = os.path.dirname(
+                os.path.realpath(os.path.join(directory, reponame + '.repo')))
+        else:
+            logger.warning('No symlinks at %s' % directory)
+            protected_path = ''
+        # We have to traverse a 3-level hash structure
+        # Not deleting the first two levels (xx/yy), just the final level,
+        # where the files are located
+        for level1_dir in os.listdir(directory):
+            level1 = os.path.join(directory, level1_dir)
+            if os.path.isdir(level1):
+                for level2_dir in os.listdir(level1):
+                    level2 = os.path.join(level1, level2_dir)
+                    if os.path.isdir(level2):
+                        for level3_dir in os.listdir(level2):
+                            level3 = os.path.join(level2, level3_dir)
+                            if os.path.isdir(level3):
+                                dirstats = os.stat(level3)
+                                if timestamp > dirstats.st_mtime:
+                                    if os.path.realpath(level3) == \
+                                        protected_path:
+                                        logger.info('Not deleting %s, '
+                                                    'it is protected' % level3)
+                                        continue
+                                    logger.info("Remove %s" % level3)
+                                    if not dry_run:
+                                        shutil.rmtree(level3,
+                                                      ignore_errors=True)
+    closeSession(session)
 
 
 def purge():
@@ -169,3 +221,7 @@ def purge():
     if options.dry_run is False:
         session.commit()
     closeSession(session)
+
+    if cp.getboolean('DEFAULT', 'use_components'):
+        purge_promoted_hashes(cp, mktime(timeparsed.timetuple()),
+                              dry_run=options.dry_run)
