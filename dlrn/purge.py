@@ -11,6 +11,7 @@
 # under the License.
 
 import argparse
+import glob
 import logging
 import os
 import shutil
@@ -27,6 +28,7 @@ from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getSession
+from dlrn.db import Promotion
 from dlrn.utils import get_component_list
 
 FLAG_PURGED = 0x2
@@ -57,6 +59,48 @@ def is_commit_in_dirs(commit, dirlist, basedir, component_list=None):
                     if os.path.exists(os.path.join(newpath, rpm)):
                         return True
     return False
+
+
+def purge_promoted_hashes(config, timestamp, dry_run=True):
+    session = getSession(config.get('DEFAULT', 'database_connection'))
+    basedir = os.path.join(config.get('DEFAULT', 'datadir'), 'repos')
+
+    # Get list of all promote names
+    all_promotions = session.query(Promotion).\
+        distinct(Promotion.promotion_name).\
+        group_by(Promotion.promotion_name).all()
+
+    promotion_list = ['current', 'consistent']
+    for prom in all_promotions:
+        promotion_list.append(prom.promotion_name)
+
+    reponame = config.get('DEFAULT', 'reponame')
+
+    # Now go through all directories
+    for prom in promotion_list:
+        directory = os.path.join(basedir, prom)
+        logger.info("Looking into directory: %s" % directory)
+        if os.path.islink(os.path.join(directory, reponame + '.repo')):
+            protected_path = os.path.dirname(
+                os.path.realpath(os.path.join(directory, reponame + '.repo')))
+        else:
+            logger.warning('No symlinks at %s' % directory)
+            protected_path = ''
+        # We have to traverse a 3-level hash structure
+        # Not deleting the first two levels (xx/yy), just the final level,
+        # where the files are located
+        for path in glob.glob('%s/??/??/*' % directory):
+            if os.path.isdir(path):
+                dirstats = os.stat(path)
+                if timestamp > dirstats.st_mtime:
+                    if os.path.realpath(path) == protected_path:
+                        logger.info('Not deleting %s, it is protected' % path)
+                        continue
+                    logger.info("Remove %s" % path)
+                    if not dry_run:
+                        shutil.rmtree(path, ignore_errors=True)
+
+    closeSession(session)
 
 
 def purge():
@@ -188,3 +232,7 @@ def purge():
     if options.dry_run is False:
         session.commit()
     closeSession(session)
+
+    if cp.getboolean('DEFAULT', 'use_components'):
+        purge_promoted_hashes(cp, mktime(timeparsed.timetuple()),
+                              dry_run=options.dry_run)
