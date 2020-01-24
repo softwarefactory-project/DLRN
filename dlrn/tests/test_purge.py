@@ -13,8 +13,11 @@
 # under the License.
 
 import mock
+import os
+import shutil
 import sys
 import tempfile
+import time
 
 from dlrn.tests import base
 
@@ -22,6 +25,7 @@ from datetime import datetime
 from dlrn import db
 from dlrn import purge
 from dlrn import utils
+from six.moves import configparser
 
 expected_repos = [
     './data/repos/ae/9d/ae9d27e5100f002f55ad6eb2b252a0aa5f16a336_024e24f0',
@@ -36,6 +40,13 @@ def mocked_session(url):
     db_fd, filepath = tempfile.mkstemp()
     session = db.getSession("sqlite:///%s" % filepath)
     utils.loadYAML(session, './dlrn/tests/samples/commits_1.yaml')
+    return session
+
+
+def mocked_session_2(url):
+    db_fd, filepath = tempfile.mkstemp()
+    session = db.getSession("sqlite:///%s" % filepath)
+    utils.loadYAML(session, './dlrn/tests/samples/commits_2.yaml')
     return session
 
 
@@ -111,3 +122,47 @@ class TestIsCommitInDirs(base.TestCase):
                                 component_list=['bar'])
 
         self.assertEqual(ex_mock.call_args_list, expected)
+
+
+@mock.patch('shutil.rmtree')
+@mock.patch('dlrn.purge.getSession', side_effect=mocked_session_2)
+class TestAggPurge(base.TestCase):
+    def setUp(self):
+        super(TestAggPurge, self).setUp()
+        self.config = configparser.RawConfigParser()
+        self.config.read("projects.ini")
+        self.temp_dir = tempfile.mkdtemp()
+        self.config.set('DEFAULT', 'datadir', self.temp_dir)
+        os.makedirs(os.path.join(self.temp_dir, 'repos',
+                                 'another-ci/12/34/12345678'))
+        os.makedirs(os.path.join(self.temp_dir, 'repos',
+                                 'foo-ci/90/ab/90abcdef'))
+
+    def tearDown(self):
+        super(TestAggPurge, self).tearDown()
+        shutil.rmtree(self.temp_dir)
+
+    def test_purge_promoted(self, db_mock, rm_mock):
+        purge.purge_promoted_hashes(self.config, time.time(), dry_run=False)
+        self.assertEqual(rm_mock.call_count, 2)
+
+    def test_purge_promoted_only_one(self, db_mock, rm_mock):
+        current_time = time.time()
+        time.sleep(1)
+        # Update modification time on one of the dirs
+        os.utime(os.path.join(self.temp_dir, 'repos',
+                              'foo-ci/90/ab/90abcdef'), None)
+        purge.purge_promoted_hashes(self.config, current_time, dry_run=False)
+        self.assertEqual(rm_mock.call_count, 1)
+
+    def test_purge_promoted_dry_run(self, db_mock, rm_mock):
+        purge.purge_promoted_hashes(self.config, time.time(), dry_run=True)
+        self.assertEqual(rm_mock.call_count, 0)
+
+    def test_purge_promoted_protected_path(self, db_mock, rm_mock):
+        orig_path = os.path.join(self.temp_dir, 'repos',
+                                 'foo-ci/90/ab/90abcdef', 'delorean.repo')
+        dst_path = os.path.join(self.temp_dir, 'repos', 'foo-ci/delorean.repo')
+        os.symlink(orig_path, dst_path)
+        purge.purge_promoted_hashes(self.config, time.time(), dry_run=False)
+        self.assertEqual(rm_mock.call_count, 1)
