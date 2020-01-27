@@ -16,6 +16,24 @@
       "revId": "d05339526a3207a2d738eb5418863d618db0cbb7",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "740ebf15_cdb0028d",
+        "filename": "dlrn/utils.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-27T10:14:13Z",
+      "side": 1,
+      "message": "This is meant to avoid race conditions, where the .repo symlink is removed prior to creating the new one. It works similarly in other parts of the DLRN codebase.",
+      "parentUuid": "fb10631a_027252c2",
+      "revId": "d05339526a3207a2d738eb5418863d618db0cbb7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
