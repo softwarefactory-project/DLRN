@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ecc28f03_f6329a11",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-29T14:02:05Z",
+      "side": 1,
+      "message": "Up to this line, we\u0027re mostly sanitizing input. Yes, we could move that to line 214, but I prefer to keep it separate for clarity.",
+      "parentUuid": "e6bffc97_21945ba1",
+      "range": {
+        "startLine": 207,
+        "startChar": 1,
+        "endLine": 208,
+        "endChar": 42
+      },
+      "revId": "62ec90f24ffc694077c294739f916bde80daae93",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4c12f5e5_3154d6a3",
         "filename": "dlrn/api/dlrn_api.py",
         "patchSetId": 6
@@ -36,6 +60,24 @@
       "writtenOn": "2020-01-29T10:50:28Z",
       "side": 1,
       "message": "is not required to check \n\n    not commit_hash and distro_hash\n\nThats what I understand from L563. But if commit_hash will be every time available, so condition in L593 is not required or?",
+      "revId": "62ec90f24ffc694077c294739f916bde80daae93",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d357ae80_cf739e09",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-29T14:02:05Z",
+      "side": 1,
+      "message": "You\u0027re right, I need to check that as well. Thanks!",
+      "parentUuid": "4c12f5e5_3154d6a3",
       "revId": "62ec90f24ffc694077c294739f916bde80daae93",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
