@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f650aa_45a61573",
+        "filename": "contrib/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-01-29T12:51:11Z",
+      "side": 1,
+      "message": "it will be not safer to use # instead of / ?",
+      "range": {
+        "startLine": 12,
+        "startChar": 11,
+        "endLine": 12,
+        "endChar": 71
+      },
+      "revId": "ccebd1f0faaa30dfecf25553de237d5e8de1e6cd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c13ed17_a232dcf1",
+        "filename": "contrib/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-01-29T12:51:11Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 13,
+        "startChar": 13,
+        "endLine": 13,
+        "endChar": 55
+      },
+      "revId": "ccebd1f0faaa30dfecf25553de237d5e8de1e6cd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
