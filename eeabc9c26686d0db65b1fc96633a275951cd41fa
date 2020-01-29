@@ -22,6 +22,30 @@
       "revId": "eeabc9c26686d0db65b1fc96633a275951cd41fa",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "252b0c45_94dc8114",
+        "filename": "dlrn/purge.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-29T16:51:12Z",
+      "side": 1,
+      "message": "Yes, it\u0027s quite terrible :). I\u0027ve found a better way, stay tuned!",
+      "parentUuid": "20d5f80f_aac71e01",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 73
+      },
+      "revId": "eeabc9c26686d0db65b1fc96633a275951cd41fa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
