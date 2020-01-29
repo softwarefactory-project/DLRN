@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "20d5f80f_aac71e01",
+        "filename": "dlrn/purge.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-01-29T14:38:18Z",
+      "side": 1,
+      "message": "it scares me.\nIt will be not better to create help function, e.g.:\n\n        def _merge_dir_path(dir, level_dir):                                                                                                                                                                       \n          level \u003d os.path.join(dir, level_dir)                                  \n          if os.path.isdir(level):                                              \n            return level                                                        \n                                                                                \n                                                                                \n        # where the files are located                                           \n        for level1_dir in os.listdir(directory):                                \n            level1 \u003d _merge_dir_path(directory, level1_dir)                     \n            for level2_dir in os.listdir(level1):                               \n                level2 \u003d  _merge_dir_path(level1, level2_dir)                   \n                for level3_dir in os.listdir(level2):                           \n                    level3 \u003d _merge_dir_path(level2, level3_dir)                \n                    dirstats \u003d os.stat(level3)                                  \n...",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 73
+      },
+      "revId": "eeabc9c26686d0db65b1fc96633a275951cd41fa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
