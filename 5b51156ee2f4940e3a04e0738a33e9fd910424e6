@@ -16,6 +16,24 @@
       "revId": "5b51156ee2f4940e3a04e0738a33e9fd910424e6",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "349f09cc_65e7986d",
+        "filename": "dlrn/utils.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-01-29T14:02:05Z",
+      "side": 1,
+      "message": "Yes, it might make sense to add this as a follow-up patch. Probably it was never added because the function has been updated incrementally, and what was a 2 or 3 item repetition is now too much :).",
+      "parentUuid": "0fbda129_7eb10727",
+      "revId": "5b51156ee2f4940e3a04e0738a33e9fd910424e6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
