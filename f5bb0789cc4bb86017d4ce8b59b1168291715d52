@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "6ecd9236_c6dffec1",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 271
+      },
+      "writtenOn": "2020-02-04T17:27:04Z",
+      "side": 1,
+      "message": "If I understand correctly, since a single commit will always come from a component and will generate an aggregated commit, and promotions point to commits, the response from this query will always contain all the information of commit, distro, component, everything.\n\nWhat\u0027s difficult form me to grasp is how something that is supposed to point to a collection of commit/distro hashes, is tied to a particular commit/distro hash. It\u0027s like adding to a set a member that is the set itself.\nIf a name is now assigned to aggregated_hash and is decoupled from a commit/distro hash now, the entire mechanics of the promotion has to be rearranged.\nI\u0027m trying to imagine what happens if you promote that particular commit/hash to another name, does it mean that the associate aggregated_hash will be promoted too ? And if not how can I promote an aggregated hash to a name, by promoting only the components ? will the API recognize that all the components have been promoted to a name and automatically promote the aggregated hash to a name ?\nWhat if components change over time ? what if a component is removed, what happens to the aggregated hash ?",
+      "revId": "f5bb0789cc4bb86017d4ce8b59b1168291715d52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "653361f3_63ccf949",
         "filename": "dlrn/api/dlrn_api.py",
         "patchSetId": 8
