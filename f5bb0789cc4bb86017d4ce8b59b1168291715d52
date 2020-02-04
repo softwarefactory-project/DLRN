@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "653361f3_63ccf949",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 271
+      },
+      "writtenOn": "2020-02-04T16:58:54Z",
+      "side": 1,
+      "message": "I think we need to include the aggregated_hash from the promotion in the response here.",
+      "revId": "f5bb0789cc4bb86017d4ce8b59b1168291715d52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a129b7b_a333155f",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 271
+      },
+      "writtenOn": "2020-02-04T16:58:54Z",
+      "side": 1,
+      "message": "If this API doesn\u0027t take an aggregated hash as input, what\u0027s the exact procedure to promote a repo from a name to another name ? get the dlrn.repo file in the dlrn repository pointed by that name, scrape the commit/distro hashes from all sections of repo file and promote those commit/distro to a different name ? Is full distro available from the repo section ? or we need a second passage to get the commits.yaml from repo pointed by the dlrn commit_distro[:8] hash ?",
+      "revId": "f5bb0789cc4bb86017d4ce8b59b1168291715d52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "af1b8485_9babf5d7",
+        "filename": "doc/source/api.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 271
+      },
+      "writtenOn": "2020-02-04T16:58:54Z",
+      "side": 1,
+      "message": "If aggregated hash is returned in this api, this doc is missing the parameter here",
+      "revId": "f5bb0789cc4bb86017d4ce8b59b1168291715d52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9d185cfd_ed9cfc49",
+        "filename": "doc/source/api.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 271
+      },
+      "writtenOn": "2020-02-04T16:58:54Z",
+      "side": 1,
+      "message": "aggregate with 1 g",
+      "revId": "f5bb0789cc4bb86017d4ce8b59b1168291715d52",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
