@@ -186,8 +186,10 @@ def getLastBuiltCommit(
 
 def getCommits(session, project=None, with_status=None, without_status=None,
                limit=1, order="desc", since=None, before=None, offset=0,
-               component=None, type="rpm"):
-    commits = session.query(Commit).filter(Commit.type == type)
+               component=None, type=None):
+    commits = session.query(Commit)
+    if type is not None:
+        commits = commits.filter(Commit.type == type)
     if project is not None:
         commits = commits.filter(Commit.project_name == project)
     if with_status is not None:

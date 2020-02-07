@@ -193,8 +193,13 @@ class RdoInfoDriver(PkgInfoDriver):
                     component = package['component']
                 else:
                     component = None
+                if 'container' in package and package['container'] == True:
+                    prj_type = 'container'
+                else:
+                    prj_type = 'rpm'
+
                 commit = Commit(dt_commit=float(dt), project_name=project,
-                                type="rpm",
+                                type=prj_type,
                                 commit_hash=commit_hash, repo_dir=repo_dir,
                                 distro_hash=distro_hash, dt_distro=dt_distro,
                                 distgit_dir=self.distgit_dir(package['name']),
