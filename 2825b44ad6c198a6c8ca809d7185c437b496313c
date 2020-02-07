@@ -22,6 +22,23 @@
       "revId": "2825b44ad6c198a6c8ca809d7185c437b496313c",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ac6fa43a_f9c37f6b",
+        "filename": "dlrn/drivers/dockerfile.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-02-07T18:16:41Z",
+      "side": 1,
+      "message": "perhaps add `--layers` too, it\u0027s the default behavior of `docker build` and `podman build`",
+      "revId": "2825b44ad6c198a6c8ca809d7185c437b496313c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
