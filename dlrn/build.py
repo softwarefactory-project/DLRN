@@ -84,7 +84,24 @@ def build(packages, commit, env_vars, dev_mode, use_public,
 
 def build_container(packages, commit, env_vars, dev_mode, use_public,
                     bootstrap, sequential):
-    raise NotImplementedError()
+    config_options = getConfigOptions()
+    container_build_driver = config_options.container_build_driver
+    datadir = os.path.realpath(config_options.datadir)
+    repodir = os.path.join(datadir, _get_yumrepodir(commit))
+    if not container_build_driver:
+        raise RuntimeError("No container_build_driver configured!")
+    build_drv = import_object(container_build_driver,
+                              cfg_options=config_options)
+    try:
+        built_containers = build_drv.build_container(
+            commit=commit,
+            output_directory=repodir,
+            package_name=commit.project_name)
+    except Exception as e:
+        raise Exception("Error in build_container for %s: %s" %
+                        (commit.project_name, e))
+
+    return built_containers, "OK"
 
 
 def build_rpm(packages, commit, env_vars, dev_mode, use_public,

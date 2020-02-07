@@ -69,7 +69,6 @@ def _jinja2_filter_get_commit_url(commit, packages):
 
 def genreports(packages, head_only, session, all_commits):
     config_options = getConfigOptions()
-
     # Generate report of the last 300 package builds
     target = config_options.target
     src = config_options.source
