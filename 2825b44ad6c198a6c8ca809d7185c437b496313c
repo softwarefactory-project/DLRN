@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "78b63423_3eceb608",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-02-07T18:15:27Z",
+      "side": 1,
+      "message": "How about using the more vendor neutral `Containerfile` (with fallback to Dockerfile) ?",
+      "range": {
+        "startLine": 10,
+        "startChar": 15,
+        "endLine": 10,
+        "endChar": 25
+      },
+      "revId": "2825b44ad6c198a6c8ca809d7185c437b496313c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
