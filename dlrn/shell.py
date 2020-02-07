@@ -497,7 +497,39 @@ def process_build_result_container(
         dev_mode=False, run_cmd=False, stop=False,
         build_env=None, head_only=False, consistent=False,
         failures=0):
-    raise NotImplementedError()
+    commit = status[0]
+    built_containers = status[1]
+    notes = status[2]
+    exception = status[3]
+    project = commit.project_name
+    project_info = session.query(Project).filter(
+        Project.project_name == project).first()
+    if not project_info:
+        project_info = Project(project_name=project, last_email=0)
+    exit_code = 0
+    if run_cmd:
+        if exception is not None:
+            exit_code = 1
+            if stop:
+                return exit_code
+        return exit_code
+
+    if exception is None:
+        commit.status = "SUCCESS"
+        commit.notes = notes
+        commit.artifacts = ",".join(built_containers)
+    else:
+        logger.error("Received exception %s" % exception)
+        commit.status = "FAILED"
+        commit.notes = str(exception)
+    # Add commit to the session
+    session.add(commit)
+
+    genreports(packages, head_only, session, packages_to_process)
+    # Export YAML file containing commit metadata
+    export_commit_yaml(commit)
+    session.commit()
+    return exit_code
 
 
 def process_build_result_rpm(
@@ -688,7 +720,7 @@ def post_build(status, *args, **kwargs):
 
 
 def post_build_container(status, packages, session, build_repo=None):
-    raise NotImplementedError()
+    return 0
 
 
 def post_build_rpm(status, packages, session, build_repo=True):

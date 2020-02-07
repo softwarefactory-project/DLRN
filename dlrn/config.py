@@ -55,6 +55,8 @@ DLRN_CORE_CONFIG = {
         'project_name': {'default': 'RDO'},
         'pkginfo_driver': {'default': 'dlrn.drivers.rdoinfo.RdoInfoDriver'},
         'build_driver': {'default': 'dlrn.drivers.mockdriver.MockBuildDriver'},
+        'container_build_driver': {'default': 'dlrn.drivers.dockerfile.'
+                                              'DockerfileDriver'},
         'workers': {'type': 'int', 'default': 1},
         'gerrit_topic': {'default': 'rdo-FTBFS'},
         'database_connection': {'default': 'sqlite:///commits.sqlite'},
@@ -97,6 +99,7 @@ class ConfigOptions(object):
         drivers = [
             self.pkginfo_driver,
             self.build_driver,
+            self.container_build_driver,
         ]
         for d in drivers:
             # import driver specific config options
