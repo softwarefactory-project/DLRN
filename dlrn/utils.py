@@ -22,6 +22,7 @@ import sqlalchemy
 
 from contextlib import contextmanager
 from dlrn.db import CIVote
+from dlrn.db import CIVote_Aggregate
 from dlrn.db import Commit
 from dlrn.db import getSession
 from dlrn.db import Project
@@ -94,6 +95,13 @@ def loadYAML(session, yamlfile):
             session.commit()
     except KeyError:
         pass   # No civotes in yaml, just ignore
+    try:
+        for civote in data['civotes_agg']:
+            vote = CIVote_Aggregate(**civote)
+            session.add(vote)
+            session.commit()
+    except KeyError:
+        pass   # No civotes_agg in yaml, just ignore
     try:
         for user in data['users']:
             my_user = User(**user)
@@ -171,6 +179,18 @@ def saveYAML(session, yamlfile):
         for a in attrs:
             d[a] = str(getattr(vote, a))
         data['civotes'].append(d)
+
+    attrs = []
+    for a in dir(CIVote_Aggregate):
+        if type(getattr(CIVote_Aggregate, a)) == \
+                sqlalchemy.orm.attributes.InstrumentedAttribute:
+            attrs.append(a)
+    data['civotes_agg'] = []
+    for vote in session.query(CIVote_Aggregate).all():
+        d = {}
+        for a in attrs:
+            d[a] = str(getattr(vote, a))
+        data['civotes_agg'].append(d)
 
     attrs = []
     for a in dir(User):
@@ -387,6 +407,8 @@ def aggregate_repo_files(dirname, datadir, session, reponame,
                    os.path.join(base_promote_dir, "versions.csv_"))
         os.rename(os.path.join(base_promote_dir, "versions.csv_"),
                   os.path.join(base_promote_dir, "versions.csv"))
+
+    return file_hash
 
 
 if __name__ == '__main__':

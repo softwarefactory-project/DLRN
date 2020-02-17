@@ -126,6 +126,43 @@ user                 string      user who created the CI vote
 component            string      Component associated to the commit/distro hash
 ===================  ==========  ==============================================================
 
+GET /api/agg_status
+--------------------
+
+Get all the CI reports for a specific aggregated repository.
+
+Normal response codes: 200
+
+Error response codes: 400, 404
+
+
+Request:
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+aggregate_hash       string      hash of the aggregated repo to fetch information for
+success              boolean     If set to a value, only return the CI reports with the
+                     (optional)  specified vote. If not set, return all CI reports.
+===================  ==========  ==============================================================
+
+Response:
+
+The JSON output will contain an array where each item contains:
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+job_id               string      name of the CI sending the vote
+aggregate_hash       string      hash of tested aggregated repo
+url                  string      URL where to find additional information from the CI execution
+timestamp            integer     Timestamp (in seconds since the epoch)
+in_progress          boolean     False -> is this CI job still in-progress?
+success              boolean     Was the CI execution successful?
+notes                Text        Additional notes
+user                 string      user who created the CI vote
+===================  ==========  ==============================================================
+
 GET /api/promotions
 -------------------
 
@@ -146,6 +183,8 @@ commit_hash          string      If set, commit_hash of the repo to use as filte
                      (optional)  Requires distro_hash.
 distro_hash          string      If set, commit_hash of the repo to use as filter key.
                      (optional)  Requires commit_hash.
+aggregate_hash       string      If set, use the generated aggregate_hash as filter key.
+                     (optional)  Only makes sense when components are enabled.
 promote_name         string      If set to a value, filter results by the specified promotion
                      (optional)  name.
 offset               integer     If set to a value, skip the initial <offset> promotions.
@@ -163,6 +202,7 @@ Parameter         Type                             Description
 ==============  ==========  ==============================================================
 commit_hash     string      commit_hash of the promoted repo
 distro_hash     string      distro_hash of the promoted repo
+agggregate_hash string      Hash of the aggregated repo file, when using components
 repo_hash       string      Repository hash, composed of the commit_hash and short
                             distro_hash
 repo_url        string      Full URL of the promoted repository
@@ -282,6 +322,14 @@ POST /api/report_result
 
 Report the result of a CI job.
 
+It is possible to report results on two sets of objets:
+
+- A commit, represented by a ``commit_hash`` and a ``distro_hash``.
+- An aggregated repo, represented by an ``aggregate_hash``.
+
+One of those two parameters needs to be specified, otherwise the call will
+return an error.
+
 Normal response codes: 201
 
 Error response codes: 400, 404, 415, 500
@@ -294,6 +342,7 @@ Request:
 job_id          string      name of the CI sending the vote
 commit_hash     string      commit_hash of tested repo
 distro_hash     string      distro_hash of tested repo
+aggregate_hash  string      hash of the aggregated repo that was tested
 url             string      URL where to find additional information from the CI execution
 timestamp       integer     Timestamp (in seconds since the epoch)
 success         boolean     Was the CI execution successful?
@@ -327,6 +376,11 @@ Note the API will refuse to promote using promote_name="consistent" or "current"
 those are reserved keywords for DLRN. Also, a commit that has been purged from the
 database cannot be promoted.
 
+When the projects.ini ``use_components`` option is set to ``true``, an aggregated repo
+file will be created, including the repo files of all components that were promoted with
+the same promotion name. The hash of that file will be returned as ``aggregated_hash``.
+If the option is set to ``false``, a null value will be returned.
+
 Normal response codes: 201
 
 Error response codes: 400, 403, 404, 410, 415, 500
@@ -356,6 +410,7 @@ promote_name    string      name used for the promotion
 component       string      Component associated to the commit/distro hash
 timestamp       integer     Timestamp (in seconds since the epoch)
 user            string      user who created the promotion
+agggregate_hash string      Hash of the aggregated repo file, when using components
 ==============  ==========  ==============================================================
 
 POST /api/remote/import

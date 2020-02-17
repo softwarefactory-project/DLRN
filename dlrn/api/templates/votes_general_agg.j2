@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CI Votes for Aggregates</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
+  </head>
+  <body>
+    <h1>
+      <i class='fa fa-chevron-circle-right pull-left'></i>
+      {{ target | capitalize }}
+    </h1>
+    <table id="navigation1">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes_agg.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
+           <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    {% if count == limit %}
+    <td>
+        <form action="civotes_agg.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
+           <button type="submit" class="button"><h4>Next</h4></button>
+        </form>
+    </td>
+    {% endif %}</tr></table>
+    <table id="dlrn">
+      <tr>
+        <th>Aggregate hash</th>
+        <th>Last timestamp</th>
+        <th>Successful jobs</th>
+        <th>Failed jobs</th>
+      </tr>
+      {% for repo in aggdetail %}
+        <tr {% if repo.failure == 0%}class="success"{% endif %}>
+          <td>
+            <form action="civotes_agg_detail.html" method="get">
+               <input type="hidden" name="ref_hash" value="{{ repo.ref_hash }}" />
+<button type="submit" class="button"><i class="fa fa-link pull-left"></i>{{ repo.ref_hash }}</button>
+            </form>
+          </td>
+          <td>{{ repo.timestamp | strftime }}</td>
+          <td>
+            <form action="civotes_agg_detail.html" method="get">
+               <input type="hidden" name="ref_hash" value="{{ repo.ref_hash }}" />
+               <input type="hidden" name="success" value="True" />
+              <button type="submit" class="button"><i class="fa fa-link pull-left" style="color:#004153">   {{ repo.success }}</i></button>
+            </form>
+          </td>
+          <td>
+            <form action="civotes_agg_detail.html" method="get">
+               <input type="hidden" name="ref_hash" value="{{ repo.ref_hash }}" />
+               <input type="hidden" name="success" value="False" />
+              <button type="submit" class="button"><i class="fa fa-link pull-left" style="color:red">  {{ repo.failure }}</i></button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+    <table id="navigation2">
+    <tr>
+    {% if request.args.get('offset') | int != 0  %}
+    <td>
+        <form action="civotes_agg.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
+           <button type="submit" class="button"><h4>Previous</h4></button>
+        </form>
+    </td>
+    {% endif %}
+    {% if count == limit %}
+    <td>
+        <form action="civotes_agg.html" method="get">
+           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
+           <button type="submit" class="button"><h4>Next</h4></button>
+        </form>
+    </td>{% endif %}
+    </tr></table>
+  </body>
+</html>
