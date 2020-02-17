@@ -15,6 +15,7 @@ from mock import call
 from mock import MagicMock
 
 import os
+import shutil
 import tempfile
 
 from dlrn import db
@@ -80,3 +81,44 @@ class TestIsKnownError(base.TestCase):
             fp.write("Success")
         self.assertFalse(utils.isknownerror(self.logfile),
                          msg="isknownerror found unknown error")
+
+
+class TestAggregateRepo(base.TestCase):
+    def setUp(self):
+        super(base.TestCase, self).setUp()
+        self.db_fd, filepath = tempfile.mkstemp()
+        self.session = db.getSession("sqlite:///%s" % filepath)
+        utils.loadYAML(self.session,
+                       './dlrn/tests/samples/commits_components.yaml')
+        self.datadir = tempfile.mkdtemp()
+        self.repodir = os.path.join(self.datadir,
+                                    'repos/component/tripleo/test1')
+        os.makedirs(self.repodir)
+        with open(os.path.join(self.repodir, "delorean.repo"), 'w') as fp:
+            fp.write("TESTING ONE TWO THREE")
+
+    def tearDown(self):
+        super(base.TestCase, self).tearDown()
+        shutil.rmtree(self.datadir)
+        os.close(self.db_fd)
+
+    def test_aggregate_repo_files(self):
+        utils.aggregate_repo_files('test1', self.datadir, self.session,
+                                   'delorean')
+        expected_file = os.path.join(self.datadir, 'repos', 'test1',
+                                     'delorean.repo')
+        assert os.path.exists(expected_file)
+        with open(expected_file, 'r') as fp:
+            contents = fp.read()
+        assert contents == 'TESTING ONE TWO THREE\n'
+
+    def test_aggregate_repo_files_hashed_dir(self):
+        utils.aggregate_repo_files('test1', self.datadir, self.session,
+                                   'delorean', hashed_dir=True)
+        expected_file = os.path.join(self.datadir, 'repos', 'test1',
+                                     'delorean.repo')
+        assert os.path.exists(expected_file)
+        assert os.path.islink(expected_file)
+        with open(expected_file, 'r') as fp:
+            contents = fp.read()
+        assert contents == 'TESTING ONE TWO THREE\n'

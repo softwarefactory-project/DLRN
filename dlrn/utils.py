@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import fcntl
+import hashlib
 import logging
 import os
 import re
@@ -322,7 +323,8 @@ def run_external_preprocess(**kwargs):
 
 # Aggregate all .repo files from a given symlink into a top-level repo file
 # Also, aggregate the versions.csv file, this is useful for additional tooling
-def aggregate_repo_files(dirname, datadir, session, reponame):
+def aggregate_repo_files(dirname, datadir, session, reponame,
+                         hashed_dir=False):
     # The only way we have to get the components is to query the database
     all_comp_commits = session.query(Commit).\
         distinct(Commit.component).group_by(Commit.component).all()
@@ -345,16 +347,46 @@ def aggregate_repo_files(dirname, datadir, session, reponame):
         if os.path.exists(csv_file):
             csv_content.extend(open(csv_file).readlines()[1:])
 
+    file_hash = hashlib.md5(repo_content.encode()).hexdigest()
+
+    if hashed_dir:
+        target_dir = os.path.join(datadir, "repos", dirname, file_hash[:2],
+                                  file_hash[2:4], file_hash)
+    else:
+        target_dir = os.path.join(datadir, "repos", dirname)
+
     # Create target directory if not present
-    target_dir = os.path.join(datadir, "repos", dirname)
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
     with open(os.path.join(target_dir, "%s.repo" % reponame), 'w') as fp:
         fp.write(repo_content)
+    with open(os.path.join(target_dir, "%s.repo.md5" % reponame), 'w') as fp:
+        fp.write(file_hash)
     with open(os.path.join(target_dir, "versions.csv"), 'w') as fp:
         fp.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,"
                  "Status,Last Success Timestamp,Component,Pkg NVR\n")
         fp.writelines(csv_content)
+
+    # If we created the file in a hashed dir, create the symlinks now
+    if hashed_dir:
+        base_promote_dir = os.path.join(datadir, "repos", dirname)
+        os.symlink(os.path.relpath(os.path.join(target_dir,
+                                                "%s.repo" % reponame),
+                                   base_promote_dir),
+                   os.path.join(base_promote_dir, "%s.repo_" % reponame))
+        os.rename(os.path.join(base_promote_dir, "%s.repo_" % reponame),
+                  os.path.join(base_promote_dir, "%s.repo" % reponame))
+        os.symlink(os.path.relpath(os.path.join(target_dir,
+                                                "%s.repo.md5" % reponame),
+                                   base_promote_dir),
+                   os.path.join(base_promote_dir, "%s.repo.md5_" % reponame))
+        os.rename(os.path.join(base_promote_dir, "%s.repo.md5_" % reponame),
+                  os.path.join(base_promote_dir, "%s.repo.md5" % reponame))
+        os.symlink(os.path.relpath(os.path.join(target_dir, 'versions.csv'),
+                                   base_promote_dir),
+                   os.path.join(base_promote_dir, "versions.csv_"))
+        os.rename(os.path.join(base_promote_dir, "versions.csv_"),
+                  os.path.join(base_promote_dir, "versions.csv"))
 
 
 if __name__ == '__main__':
