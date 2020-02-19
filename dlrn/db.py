@@ -130,8 +130,7 @@ class CIVote_Aggregate(Base):
     __tablename__ = "civotes_agg"
 
     id = Column(Integer, primary_key=True)
-    ref_hash = Column(String(64), ForeignKey('promotions.aggregate_hash'),
-                      nullable=False)
+    ref_hash = Column(String(64), nullable=False)
     ci_name = Column(String(256))
     ci_url = Column(String(1024))
     ci_vote = Column(Boolean)

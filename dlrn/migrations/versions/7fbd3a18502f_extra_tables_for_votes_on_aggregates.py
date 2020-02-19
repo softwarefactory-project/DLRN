@@ -38,9 +38,7 @@ def upgrade():
 
     op.create_table('civotes_agg',
                     sa.Column('id', sa.Integer(), nullable=False),
-                    sa.Column('ref_hash', sa.String(64),
-                              sa.ForeignKey('promotions.aggregate_hash'),
-                              nullable=False),
+                    sa.Column('ref_hash', sa.String(64), nullable=False),
                     sa.Column('ci_name', sa.String(256), nullable=True),
                     sa.Column('ci_url', sa.String(1024), nullable=True),
                     sa.Column('ci_vote', sa.Boolean(), nullable=True),
