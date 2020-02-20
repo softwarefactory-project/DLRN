@@ -45,12 +45,17 @@ class KojiBuildDriver(BuildRPMDriver):
             'koji_exe': {'default': 'koji'},
             'fetch_mock_config': {'type': 'boolean'},
             'mock_base_packages': {'default': ''},
+            'koji_extra_tags': {'name': 'extra_tags', 'type': 'list',
+                                'default': []},
         }
     }
 
     def __init__(self, *args, **kwargs):
         super(KojiBuildDriver, self).__init__(*args, **kwargs)
         self.exe_name = self.config_options.koji_exe
+        # Check for empty extra_tags value
+        if self.config_options.koji_extra_tags == ['']:
+            self.config_options.koji_extra_tags = []
 
     # We are using this method to "tee" koji output to a log file and stdout
     def _process_koji_output(self, line):
@@ -255,6 +260,32 @@ class KojiBuildDriver(BuildRPMDriver):
 
             if not task_id:
                 raise Exception('Failed to find task id for the koji build')
+
+            # Also find package name if we need to add extra tags
+            if len(self.config_options.koji_extra_tags) > 0:
+                # Get build name
+                m = re.search(r'([0-9a-zA-Z._+-]+)\.src\.rpm', src_rpm)
+                package_nvr = None
+                if m:
+                    logger.info("Adding extra tags for %s" % m.group(1))
+                    package_nvr = m.group(1)
+                if not package_nvr:
+                    raise Exception('Failed to find package nvr when tagging')
+
+                for tag in self.config_options.koji_extra_tags:
+                    run_cmd = []
+                    run_cmd.extend(
+                        [self.exe_name, 'tag-build', tag, package_nvr])
+
+                    with io.open("%s/extra_tags.log" % output_dir, 'a',
+                                 encoding='utf-8',
+                                 errors='replace') as self.koji_fp:
+                        try:
+                            sh.env(run_cmd, _err=self._process_koji_output,
+                                   _out=self._process_koji_output,
+                                   _cwd=output_dir, _env={'PATH': '/usr/bin/'})
+                        except Exception as e:
+                            raise e
 
             # Download build artifacts and logs
             run_cmd = []

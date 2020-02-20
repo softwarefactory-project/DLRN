@@ -383,6 +383,7 @@ following configuration options are included:
     use_rhpkg=False
     fetch_mock_config=False
     mock_base_packages=basesystem rpm-build
+    extra_tags=tag1,tag2
 
 * ``koji_exe`` defines the executable to use. Some Koji instances create their
   own client packages to add their default configuration, such as
@@ -420,6 +421,8 @@ following configuration options are included:
   when creating the source RPM. This list of packages will override the one
   fetched in the mock configuration, if set. If not set, no overriding will
   be done.
+* ``extra_tags``, if set, will assign the build the extra tags defined in the
+  list.
 
 The optional ``[coprbuild_driver]`` section has the following configuration
 options:
