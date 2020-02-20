@@ -275,3 +275,46 @@ class TestDriverKoji(base.TestCase):
                     self.assertEqual(expected, line)
 
         self.assertEqual(env_mock.call_count, 1)
+
+    def test_extra_tags(self, ld_mock, env_mock, rc_mock):
+        self.config.koji_extra_tags = ['foo', 'bar']
+        self.config.koji_exe = 'brew'
+
+        driver = KojiBuildDriver(cfg_options=self.config)
+        driver.build_package(output_directory=self.temp_dir)
+        expected = [mock.call(['brew',
+                               '--principal', self.config.koji_krb_principal,
+                               '--keytab', self.config.koji_krb_keytab,
+                               'build', '--wait',
+                               self.config.koji_build_target,
+                               '%s/python-pysaml2-3.0-1a.el7.centos.src.rpm' %
+                               self.temp_dir],
+                              _err=driver._process_koji_output,
+                              _out=driver._process_koji_output,
+                              scratch=True,
+                              _cwd=self.temp_dir,
+                              _env={'PATH': '/usr/bin/'}),
+                    mock.call(['brew', 'tag-build', 'foo',
+                               'python-pysaml2-3.0-1a.el7.centos'],
+                              _err=driver._process_koji_output,
+                              _out=driver._process_koji_output,
+                              _cwd=self.temp_dir,
+                              _env={'PATH': '/usr/bin/'}),
+                    mock.call(['brew', 'tag-build', 'bar',
+                               'python-pysaml2-3.0-1a.el7.centos'],
+                              _err=driver._process_koji_output,
+                              _out=driver._process_koji_output,
+                              _cwd=self.temp_dir,
+                              _env={'PATH': '/usr/bin/'}),
+                    mock.call(['brew', 'download-task', '--logs', '1234'],
+                              _err=driver._process_koji_output,
+                              _out=driver._process_koji_output,
+                              _cwd=self.temp_dir,
+                              _env={'PATH': '/usr/bin/'})]
+        # 1- koji build (handled by env_mock)
+        # 2 and 3- koji tag (handled by env_mock)
+        # 4- koji download (handled by env_mock)
+        # 5- restorecon (handled by rc_mock)
+        self.assertEqual(env_mock.call_count, 4)
+        self.assertEqual(rc_mock.call_count, 1)
+        self.assertEqual(env_mock.call_args_list, expected)
