@@ -341,10 +341,8 @@ def run_external_preprocess(**kwargs):
         raise RuntimeError('Custom pre-process failed: %s' % msg)
 
 
-# Aggregate all .repo files from a given symlink into a top-level repo file
-# Also, aggregate the versions.csv file, this is useful for additional tooling
-def aggregate_repo_files(dirname, datadir, session, reponame,
-                         hashed_dir=False):
+# Return the list of all components that had a package built
+def get_component_list(session):
     # The only way we have to get the components is to query the database
     all_comp_commits = session.query(Commit).\
         distinct(Commit.component).group_by(Commit.component).all()
@@ -352,6 +350,14 @@ def aggregate_repo_files(dirname, datadir, session, reponame,
     for cmt in all_comp_commits:
         if cmt.component is not None:
             component_list.append(cmt.component)
+    return component_list
+
+
+# Aggregate all .repo files from a given symlink into a top-level repo file
+# Also, aggregate the versions.csv file, this is useful for additional tooling
+def aggregate_repo_files(dirname, datadir, session, reponame,
+                         hashed_dir=False):
+    component_list = get_component_list(session)
 
     repo_content = ''
     csv_content = []

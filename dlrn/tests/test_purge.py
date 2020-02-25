@@ -47,10 +47,14 @@ def mocked_islink(path):
     return False
 
 
-def mocked_is_commit_in_dirs(commit, dirlist):
+def mocked_is_commit_in_dirs(commit, dirlist, basedir, component_list=None):
     # We are making one of the commit hashes be in the excluded dir list
     if commit.commit_hash == '6abf557aa1d8fff0aa21f8eba6cd18302c2c86ff':
         return True
+    return False
+
+
+def mocked_exists_false(path):
     return False
 
 
@@ -74,3 +78,36 @@ class TestPurge(base.TestCase):
             for repo in expected_repos:
                 expected.append(mock.call(repo, ignore_errors=True))
             self.assertEqual(sh_mock.call_args_list, expected)
+
+
+@mock.patch('os.path.exists', side_effect=mocked_exists_false)
+class TestIsCommitInDirs(base.TestCase):
+    def test_is_commit_in_dirs_component(self, ex_mock):
+        commit = db.Commit(dt_commit=123, project_name='foo', type="rpm",
+                           component='bar',
+                           commit_hash='1c67b1ab8c6fe273d4e175a14f0df5'
+                                       'd3cbbd0edf',
+                           repo_dir='/home/dlrn/data/foo',
+                           distro_hash='c31d1b18eb5ab5aed6721fc4fad06c9'
+                                       'bd242490f',
+                           dt_distro=123,
+                           distgit_dir='/home/dlrn/data/foo_distro',
+                           commit_branch='master', dt_build=1441245153,
+                           artifacts='foo-1.0.0.rpm')
+
+        dirlist = ('/home/dlrn/data/repos/consistent,'
+                   '/home/dlrn/data/repos/foo-ci')
+        basedir = '/home/dlrn/data/repos/'
+        expected = [mock.call('/home/dlrn/data/repos/consistent/'
+                              'foo-1.0.0.rpm'),
+                    mock.call('/home/dlrn/data/repos/component/bar/consistent/'
+                              'foo-1.0.0.rpm'),
+                    mock.call('/home/dlrn/data/repos/foo-ci/'
+                              'foo-1.0.0.rpm'),
+                    mock.call('/home/dlrn/data/repos/component/bar/foo-ci/'
+                              'foo-1.0.0.rpm')]
+
+        purge.is_commit_in_dirs(commit, dirlist, basedir,
+                                component_list=['bar'])
+
+        self.assertEqual(ex_mock.call_args_list, expected)

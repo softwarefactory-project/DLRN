@@ -27,13 +27,14 @@ from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
 from dlrn.db import getSession
+from dlrn.utils import get_component_list
 
 FLAG_PURGED = 0x2
 
 logger = logging.getLogger("dlrn-purge")
 
 
-def is_commit_in_dirs(commit, dirlist):
+def is_commit_in_dirs(commit, dirlist, basedir, component_list=None):
     if dirlist is None:
         return False
     if commit.artifacts is None:
@@ -47,7 +48,14 @@ def is_commit_in_dirs(commit, dirlist):
         for directory in directories:
             if os.path.exists(os.path.join(directory, rpm)):
                 return True
-
+            # If using components, search for the relative component paths too
+            if component_list:
+                relpath = os.path.relpath(directory, basedir)
+                for component in component_list:
+                    newpath = os.path.join(basedir, 'component', component,
+                                           relpath)
+                    if os.path.exists(os.path.join(newpath, rpm)):
+                        return True
     return False
 
 
@@ -89,6 +97,16 @@ def purge():
             return
 
     session = getSession(cp.get('DEFAULT', 'database_connection'))
+    try:
+        use_components = cp.getboolean('DEFAULT', 'use_components')
+    except ValueError:
+        use_components = False
+    basedir = os.path.abspath(os.path.join(cp.get('DEFAULT', 'datadir'),
+                                           'repos'))
+    if use_components:
+        component_list = get_component_list(session)
+    else:
+        component_list = None
 
     # To remove builds we have to start at a point in time and move backwards
     # builds with no build date are also purged as these are legacy
@@ -105,7 +123,8 @@ def purge():
         if commit.flags & FLAG_PURGED:
             continue
 
-        if is_commit_in_dirs(commit, options.exclude_dirs):
+        if is_commit_in_dirs(commit, options.exclude_dirs, basedir,
+                             component_list=component_list):
             # The commit RPMs are in one of the directories
             # that should not be touched.
             logger.info("Ignoring commit %s for %s, it is in one of the"
