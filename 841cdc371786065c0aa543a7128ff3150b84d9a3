@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "428fab80_6f20a5db",
+        "filename": "dlrn/purge.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-02-25T14:11:08Z",
+      "side": 1,
+      "message": "is not better to merge try with the condition? Like:\n    try:\n        use_components \u003d cp.getboolean(\u0027DEFAULT\u0027, \u0027use_components\u0027)\n        component_list \u003d get_component_list(session)\n    except ValueError:\n        component_list \u003d None\n\n    basedir \u003d os.path.abspath(os.path.join(cp.get(\u0027DEFAULT\u0027, \u0027datadir\u0027),\n                                           \u0027repos\u0027))",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 29
+      },
+      "revId": "841cdc371786065c0aa543a7128ff3150b84d9a3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
