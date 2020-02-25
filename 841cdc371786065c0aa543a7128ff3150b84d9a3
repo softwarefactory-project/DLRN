@@ -22,6 +22,30 @@
       "revId": "841cdc371786065c0aa543a7128ff3150b84d9a3",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cad98c9b_cba2e854",
+        "filename": "dlrn/purge.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-02-25T14:27:29Z",
+      "side": 1,
+      "message": "We can\u0027t do that exactly, because the use_components option might be set to \"False\". So we need to check the value anyway.",
+      "parentUuid": "428fab80_6f20a5db",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 29
+      },
+      "revId": "841cdc371786065c0aa543a7128ff3150b84d9a3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
