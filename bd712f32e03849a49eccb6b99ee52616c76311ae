@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "743b0eff_01c052d6",
+        "filename": "dlrn/purge.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-02-25T14:12:29Z",
+      "side": 1,
+      "message": "is not better to merge try with the condition? (same question in https://softwarefactory-project.io/r/#/c/17638 )",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 153,
+        "endChar": 29
+      },
+      "revId": "bd712f32e03849a49eccb6b99ee52616c76311ae",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
