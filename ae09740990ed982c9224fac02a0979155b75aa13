@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0347f72_2024a0dc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2020-02-28T15:28:40Z",
+      "side": 1,
+      "message": "sorry about the naming bikeshed :)\nThis confuses me since there is \"Extra\" tag in Koji builds metadata where distgit commit is stored:\nExtra\t{\u0027source\u0027: {\u0027original_url\u0027: \u0027git+https://src.fedoraproject.org/rpms/python-passlib.git#431547c1663d57e5ce89b1018e2d4b101824691a\u0027}}\n\ne.g. https://koji.fedoraproject.org/koji/buildinfo?buildID\u003d1472044\n\n\nwhile this is about _cross-tagging_ in Koji i.e. \"Tags\" build metadata, in above example:\n\nTags \tf33\n\nCould we reconsider cross_tags or something else to make distinction?",
+      "range": {
+        "startLine": 10,
+        "startChar": 58,
+        "endLine": 10,
+        "endChar": 68
+      },
+      "revId": "ae09740990ed982c9224fac02a0979155b75aa13",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
