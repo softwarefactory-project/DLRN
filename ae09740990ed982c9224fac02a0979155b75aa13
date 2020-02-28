@@ -22,6 +22,30 @@
       "revId": "ae09740990ed982c9224fac02a0979155b75aa13",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2515a422_4d5f486c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-02-28T15:40:33Z",
+      "side": 1,
+      "message": "So... What about \"additional_tags\"? I\u0027m also fine with \"cross_tags\".",
+      "parentUuid": "b0347f72_2024a0dc",
+      "range": {
+        "startLine": 10,
+        "startChar": 58,
+        "endLine": 10,
+        "endChar": 68
+      },
+      "revId": "ae09740990ed982c9224fac02a0979155b75aa13",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
