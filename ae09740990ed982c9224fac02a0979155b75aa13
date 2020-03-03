@@ -46,6 +46,30 @@
       "revId": "ae09740990ed982c9224fac02a0979155b75aa13",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "081b7a41_d98292e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2020-03-03T12:11:37Z",
+      "side": 1,
+      "message": "let\u0027s make it explicit? additional_koji_tags",
+      "parentUuid": "2515a422_4d5f486c",
+      "range": {
+        "startLine": 10,
+        "startChar": 58,
+        "endLine": 10,
+        "endChar": 68
+      },
+      "revId": "ae09740990ed982c9224fac02a0979155b75aa13",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
