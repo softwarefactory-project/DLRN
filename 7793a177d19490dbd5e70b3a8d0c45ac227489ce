@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2bc7f84a_5e11ffcf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 535
+      },
+      "writtenOn": "2020-03-03T14:29:26Z",
+      "side": 1,
+      "message": "Commit message still has the old name even though that\u0027s where it all started ;)",
+      "range": {
+        "startLine": 10,
+        "startChar": 58,
+        "endLine": 10,
+        "endChar": 68
+      },
+      "revId": "7793a177d19490dbd5e70b3a8d0c45ac227489ce",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e79d620_73b02fb8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 535
+      },
+      "writtenOn": "2020-03-03T14:29:26Z",
+      "side": 1,
+      "message": "Tiny typo here too",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 6
+      },
+      "revId": "7793a177d19490dbd5e70b3a8d0c45ac227489ce",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
