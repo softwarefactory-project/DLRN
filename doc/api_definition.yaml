@@ -518,6 +518,42 @@ paths:
           # Use JSON Schema format
           schema:
             $ref: '#/definitions/Promotion'
+  /api/promote-batch:
+    post:
+      security:
+       - basicAuth: []
+      description: |
+        Promote a list of commits. This is the equivalent of calling /api/promote
+        multiple times, one with each commit/distro_hash combination. The only
+        difference is that the call is atomic, and when components are enabled,
+        the aggregated repo files are only updated once.
+
+        If any of the individual promotions fail, the API call will try its best
+        to undo all the changes to the file system (e.g. symlinks).
+
+        Note the API will refuse to promote using promote_name="consistent" or "current", since
+        those are reserved keywords for DLRN. Also, a commit that has been purged from the
+        database cannot be promoted.
+
+        The API call will return the last Promotion.
+      parameters:
+        - name: params
+          in: body
+          description: The JSON params to post
+          required: true
+          schema:
+            title: ArrayOfVotes
+            type: array
+            items:
+              $ref: '#/definitions/CIVote'
+      responses:
+        201:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            $ref: '#/definitions/Promotion'
+
   /api/promotions:
     # This is a HTTP operation
     get:
@@ -725,6 +761,18 @@ definitions:
       component:
         type: string
         description: If set, only report promotions for this component
+  PromotionParam:
+    type: object
+    properties:
+      commit_hash:
+        type: string
+        description: commit_hash of promoted repo
+      distro_hash:
+        type: string
+        description: distro_hash of promoted repo
+      promote_name:
+        type: string
+        description: name used for the promotion
   Import:
     type: object
     properties:
