@@ -1,6 +1,7 @@
 commits:
 - commit_hash: 17234e9ab9dfab4cf5600f67f1d24db5064f1025
   distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  component: tripleo
   dt_build: '1441635089'
   dt_commit: '1441634092'
   dt_distro: '1431949433'
