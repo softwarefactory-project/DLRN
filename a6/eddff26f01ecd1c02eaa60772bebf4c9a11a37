@@ -1,0 +1,11 @@
+Code-Review+1: Julie Pichon <jpichon@redhat.com>
+Code-Review+1: Jason Joyce <fuzzball81@gmail.com>
+Code-Review+1: Daniel Pawlik <dpawlik@redhat.com>
+Code-Review+2: Alan Pevec <alan.pevec@redhat.com>
+Workflow+1: Alan Pevec <alan.pevec@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Thu, 05 Mar 2020 08:40:05 +0000
+Reviewed-on: https://softwarefactory-project.io/r/17597
+Project: DLRN
+Branch: refs/heads/master
