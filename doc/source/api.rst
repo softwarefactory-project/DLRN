@@ -413,6 +413,55 @@ user            string      user who created the promotion
 agggregate_hash string      Hash of the aggregated repo file, when using components
 ==============  ==========  ==============================================================
 
+POST /api/promote-batch
+-----------------------
+Promote a list of commits. This is the equivalent of calling /api/promote multiple times,
+one with each commit/distro_hash combination. The only difference is that the call is
+atomic, and when components are enabled, the aggregated repo files are only updated once.
+
+If any of the individual promotions fail, the API call will try its best to undo all the
+changes to the file system (e.g. symlinks).
+
+Note the API will refuse to promote using promote_name="consistent" or "current", since
+those are reserved keywords for DLRN. Also, a commit that has been purged from the
+database cannot be promoted.
+
+Normal response codes: 201
+
+Error response codes: 400, 403, 404, 410, 415, 500
+
+Request:
+
+The JSON input will contain an array where each item contains:
+
+==============  ==========  ==============================================================
+  Parameter       Type                             Description
+==============  ==========  ==============================================================
+commit_hash     string      commit_hash of the repo to be promoted
+distro_hash     string      distro_hash of the repo to be promoted
+promote_name    string      name to be used for the promotion. In the current
+                            implementation, this is the name of the symlink to be created
+==============  ==========  ==============================================================
+
+Response:
+
+==============  ==========  ==============================================================
+Parameter         Type                             Description
+==============  ==========  ==============================================================
+commit_hash     string      commit_hash of the promoted repo
+distro_hash     string      distro_hash of the promoted repo
+repo_hash       string      Repository hash, composed of the commit_hash and short
+                            distro_hash
+repo_url        string      Full URL of the promoted repository
+promote_name    string      name used for the promotion
+component       string      Component associated to the commit/distro hash
+timestamp       integer     Timestamp (in seconds since the epoch)
+user            string      user who created the promotion
+agggregate_hash string      Hash of the aggregated repo file, when using components
+==============  ==========  ==============================================================
+
+This is the last promoted commit.
+
 POST /api/remote/import
 -----------------------
 

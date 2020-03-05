@@ -14,14 +14,17 @@ import base64
 import mock
 import os
 import sh
+import shutil
 import tempfile
 
 from datetime import datetime
 from dlrn.api import app
+from dlrn.config import ConfigOptions
 from dlrn import db
 from dlrn.tests import base
 from dlrn import utils
 from flask import json
+from six.moves import configparser
 from six.moves.urllib.request import urlopen
 
 
@@ -38,6 +41,18 @@ def mocked_urlopen(url):
         return fp
     else:
         return urlopen(url)
+
+
+def mock_opt(config_file):
+    cp = configparser.RawConfigParser()
+    cp.read(config_file)
+    co = ConfigOptions(cp)
+    co.use_components = True
+    return co
+
+
+def mock_ag(dirname, datadir, session, reponame, hashed_dir=False):
+    return 'abc123'
 
 
 class DLRNAPITestCase(base.TestCase):
@@ -505,6 +520,108 @@ class TestPromote(DLRNAPITestCase):
                                  content_type='application/json')
 
         self.assertEqual(response.status_code, 403)
+
+
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestPromoteBatch(DLRNAPITestCase):
+    def setUp(self):
+        super(TestPromoteBatch, self).setUp()
+        os.makedirs('/tmp/component/None')
+        os.makedirs('/tmp/component/tripleo')
+
+    def tearDown(self):
+        shutil.rmtree('/tmp/component/None')
+        shutil.rmtree('/tmp/component/tripleo')
+        super(TestPromoteBatch, self).tearDown()
+
+    def test_promote_batch_needs_auth(self, db2_mock, db_mock):
+        response = self.app.post('/api/promote-batch')
+        self.assertEqual(response.status_code, 401)
+
+    def test_promote_batch_missing_commit(self, db2_mock, db_mock):
+        req_data = json.dumps([dict(commit_hash='abc123', distro_hash='abc123',
+                                    promote_name='foo'),
+                               dict(commit_hash='abc456', distro_hash='abc456',
+                                    promote_name='foo')])
+        response = self.app.post('/api/promote-batch',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+
+    @mock.patch('os.symlink')
+    def test_promote_batch_successful_1(self, sl_mock, db2_mock, db_mock):
+        req_data = json.dumps([dict(commit_hash='1c67b1ab8c6fe273d4e'
+                                                '175a14f0df5d3cbbd0edc',
+                                    distro_hash='8170b8686c38bafb6021'
+                                                'd998e2fb268ab26ccf65',
+                                    promote_name='foo-ci')])
+        response = self.app.post('/api/promote-batch',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+
+        expected = [mock.call('1c/67/1c67b1ab8c6fe273d4e175a'
+                              '14f0df5d3cbbd0edc_8170b868', '/tmp/foo-ci')]
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(sl_mock.call_args_list, expected)
+
+    @mock.patch('os.symlink')
+    def test_promote_batch_successful_2(self, sl_mock, db2_mock, db_mock):
+        req_data = json.dumps([dict(commit_hash='1c67b1ab8c6fe273d4e'
+                                                '175a14f0df5d3cbbd0edc',
+                                    distro_hash='8170b8686c38bafb6021'
+                                                'd998e2fb268ab26ccf65',
+                                    promote_name='foo-ci'),
+                               dict(commit_hash='17234e9ab9dfab4cf560'
+                                                '0f67f1d24db5064f1025',
+                                    distro_hash='024e24f0cf4366c2290c'
+                                                '22f24e42de714d1addd1',
+                                    promote_name='foo-ci'),
+                               ])
+        response = self.app.post('/api/promote-batch',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+
+        expected = [mock.call('1c/67/1c67b1ab8c6fe273d4e175a'
+                              '14f0df5d3cbbd0edc_8170b868', '/tmp/foo-ci'),
+                    mock.call('component/tripleo/17/23/17234e9ab9dfab4cf56'
+                              '00f67f1d24db5064f1025_024e24f0', '/tmp/foo-ci')]
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(sl_mock.call_args_list, expected)
+
+    @mock.patch('dlrn.api.dlrn_api.aggregate_repo_files', side_effect=mock_ag)
+    @mock.patch('dlrn.api.dlrn_api._get_config_options', side_effect=mock_opt)
+    @mock.patch('os.symlink')
+    def test_promote_batch_successful_2_cmp(self, sl_mock, co_mock, ag_mock,
+                                            db2_mock, db_mock):
+        req_data = json.dumps([dict(commit_hash='1c67b1ab8c6fe273d4e'
+                                                '175a14f0df5d3cbbd0edc',
+                                    distro_hash='8170b8686c38bafb6021'
+                                                'd998e2fb268ab26ccf65',
+                                    promote_name='foo-ci'),
+                               dict(commit_hash='17234e9ab9dfab4cf560'
+                                                '0f67f1d24db5064f1025',
+                                    distro_hash='024e24f0cf4366c2290c'
+                                                '22f24e42de714d1addd1',
+                                    promote_name='foo-ci')])
+        response = self.app.post('/api/promote-batch',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+
+        expected = [mock.call('1c/67/1c67b1ab8c6fe273d4e175a'
+                              '14f0df5d3cbbd0edc_8170b868',
+                              '/tmp/component/None/foo-ci'),
+                    mock.call('17/23/17234e9ab9dfab4cf5600f67f1d24db5064'
+                              'f1025_024e24f0',
+                              '/tmp/component/tripleo/foo-ci')]
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(sl_mock.call_args_list, expected)
+        self.assertEqual(ag_mock.call_count, 1)
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)

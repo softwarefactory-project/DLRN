@@ -76,6 +76,25 @@ def _get_commit(session, commit_hash, distro_hash):
     return commit
 
 
+def _rollback_batch_promotion(rollback_list):
+    # We want to roll everything back in reverse order
+    # We will try our best, but there is never a 100% guarantee
+    for item in reversed(rollback_list):
+        target_link = item['target_link']
+        previous_link = item['previous_link']
+        # Remove new link
+        try:
+            os.remove(target_link)
+        except Exception:
+            pass    # yes, ignore errors
+        # Re-establish old link, if it existed
+        if previous_link:
+            try:
+                os.symlink(previous_link, target_link)
+            except Exception:
+                pass    # yes, ignore errors
+
+
 @app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
@@ -725,6 +744,138 @@ def promote():
     repo_hash = _repo_hash(commit)
     repo_url = "%s/%s" % (config_options.baseurl, commit.getshardedcommitdir())
 
+    result = {'commit_hash': commit_hash,
+              'distro_hash': distro_hash,
+              'repo_hash': repo_hash,
+              'repo_url': repo_url,
+              'promote_name': promote_name,
+              'component': commit.component,
+              'timestamp': timestamp,
+              'user': auth.username(),
+              'aggregate_hash': repo_checksum}
+    closeSession(session)
+    return jsonify(result), 201
+
+
+@app.route('/api/promote-batch', methods=['POST'])
+@auth.login_required
+@_json_media_type
+def promote_batch():
+    # hash_pairs: list of commit/distro hash pairs
+    # promote_name: symlink name
+    hash_list = []
+    try:
+        for pair in request.json:
+            commit_hash = pair['commit_hash']
+            distro_hash = pair['distro_hash']
+            promote_name = pair['promote_name']
+            hash_item = [commit_hash, distro_hash, promote_name]
+            hash_list.append(hash_item)
+    except KeyError:
+        raise InvalidUsage('Missing parameters', status_code=400)
+
+    config_options = _get_config_options(app.config['CONFIG_FILE'])
+    session = getSession(app.config['DB_PATH'])
+    # Now we will be running all checks for each combination
+    # Check for invalid promote names
+    for hash_item in hash_list:
+        commit_hash = hash_item[0]
+        distro_hash = hash_item[1]
+        promote_name = hash_item[2]
+        if (promote_name == 'consistent' or promote_name == 'current'):
+            raise InvalidUsage('Invalid promote_name %s for hash %s_%s' % (
+                               promote_name, commit_hash, distro_hash),
+                               status_code=403)
+        commit = _get_commit(session, commit_hash, distro_hash)
+        if commit is None:
+            raise InvalidUsage('commit_hash+distro_hash combination not found'
+                               ' for %s_%s' % (commit_hash, distro_hash),
+                               status_code=404)
+
+        # If the commit has been purged, do not move on
+        if commit.flags & FLAG_PURGED:
+            raise InvalidUsage('commit_hash+distro_hash %s_%s has been purged,'
+                               ' cannot promote it' % (commit_hash,
+                                                       distro_hash),
+                               status_code=410)
+
+        if config_options.use_components:
+            base_directory = os.path.join(app.config['REPO_PATH'],
+                                          "component/%s" % commit.component)
+        else:
+            base_directory = app.config['REPO_PATH']
+
+        target_link = os.path.join(base_directory, promote_name)
+        # Check for invalid target links, like ../promotename
+        target_dir = os.path.dirname(os.path.abspath(target_link))
+        if not os.path.samefile(target_dir, base_directory):
+            raise InvalidUsage('Invalid promote_name %s' % promote_name,
+                               status_code=403)
+
+    # After all checks have been performed, do all promotions
+    rollback_list = []
+    for hash_item in hash_list:
+        rollback_item = {}
+        commit_hash = hash_item[0]
+        distro_hash = hash_item[1]
+        promote_name = hash_item[2]
+        commit = _get_commit(session, commit_hash, distro_hash)
+        # We should create a relative symlink
+        yumrepodir = commit.getshardedcommitdir()
+        if config_options.use_components:
+            base_directory = os.path.join(app.config['REPO_PATH'],
+                                          "component/%s" %
+                                          commit.component)
+            # In this case, the relative path should not include
+            # the component part
+            yumrepodir = yumrepodir.replace("component/%s/" % commit.component,
+                                            '')
+        else:
+            base_directory = app.config['REPO_PATH']
+
+        target_link = os.path.join(base_directory, promote_name)
+        rollback_item['target_link'] = target_link
+        rollback_item['previous_link'] = None
+        # Remove symlink if it exists, so we can create it again
+        if os.path.lexists(os.path.abspath(target_link)):
+            rollback_item['previous_link'] = os.readlink(
+                os.path.abspath(target_link))
+            os.remove(target_link)
+
+        rollback_list.append(rollback_item)
+        # This is the only destructive operation. If something fails here,
+        # we will try to roll everything back
+        try:
+            os.symlink(yumrepodir, target_link)
+        except Exception as e:
+            _rollback_batch_promotion(rollback_list)
+            raise InvalidUsage("Symlink creation failed with error: %s" %
+                               e, status_code=500)
+
+        timestamp = time.mktime(datetime.now().timetuple())
+        promotion = Promotion(commit_id=commit.id,
+                              promotion_name=promote_name,
+                              timestamp=timestamp, user=auth.username(),
+                              component=commit.component,
+                              aggregate_hash=None)
+        session.add(promotion)
+
+    # And finally, if we are using components, update the top-level
+    # repo file
+    repo_checksum = None
+    if config_options.use_components:
+        datadir = os.path.realpath(config_options.datadir)
+        repo_checksum = aggregate_repo_files(promote_name, datadir, session,
+                                             config_options.reponame,
+                                             hashed_dir=True)
+        promotion.aggregate_hash = repo_checksum
+        session.add(promotion)
+
+    # Close session and return the last promotion we did (which includes the
+    # repo checksum)
+    session.commit()
+    repo_hash = _repo_hash(commit)
+    repo_url = "%s/%s" % (config_options.baseurl, commit.getshardedcommitdir())
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
               'repo_hash': repo_hash,
