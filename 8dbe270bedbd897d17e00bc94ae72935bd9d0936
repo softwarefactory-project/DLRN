@@ -62,6 +62,30 @@
       "revId": "8dbe270bedbd897d17e00bc94ae72935bd9d0936",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "07c5e7d6_84c3150b",
+        "filename": "doc/source/api.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 588
+      },
+      "writtenOn": "2020-03-16T09:39:48Z",
+      "side": 1,
+      "message": "the \u0027agg\u0027 bit is after seeing the client side at https://softwarefactory-project.io/r/gitweb?p\u003ddlrnapi_client.git;a\u003dcommitdiff;h\u003d4d8d23e946dfc1f5d83d916176833d5d90a33a62 but \u0027aggregate\u0027 needs less explanation ;)",
+      "parentUuid": "3beb847c_468a3266",
+      "range": {
+        "startLine": 416,
+        "startChar": 18,
+        "endLine": 416,
+        "endChar": 23
+      },
+      "revId": "8dbe270bedbd897d17e00bc94ae72935bd9d0936",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
