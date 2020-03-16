@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c63ca24e_de74148b",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 588
+      },
+      "writtenOn": "2020-03-16T09:31:14Z",
+      "side": 1,
+      "message": "perhaps add something in logs/in the response that you attempted the rollback to consistent state",
+      "revId": "8dbe270bedbd897d17e00bc94ae72935bd9d0936",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
