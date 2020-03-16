@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "3a8ed210_4981c3bc",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-03-16T10:03:40Z",
+      "side": 1,
+      "message": "I like that idea, thanks! I\u0027ll add it to the next patchset.",
+      "parentUuid": "c63ca24e_de74148b",
+      "revId": "8dbe270bedbd897d17e00bc94ae72935bd9d0936",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3beb847c_468a3266",
         "filename": "doc/source/api.rst",
         "patchSetId": 2
@@ -77,6 +95,30 @@
       "side": 1,
       "message": "the \u0027agg\u0027 bit is after seeing the client side at https://softwarefactory-project.io/r/gitweb?p\u003ddlrnapi_client.git;a\u003dcommitdiff;h\u003d4d8d23e946dfc1f5d83d916176833d5d90a33a62 but \u0027aggregate\u0027 needs less explanation ;)",
       "parentUuid": "3beb847c_468a3266",
+      "range": {
+        "startLine": 416,
+        "startChar": 18,
+        "endLine": 416,
+        "endChar": 23
+      },
+      "revId": "8dbe270bedbd897d17e00bc94ae72935bd9d0936",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7b932221_c18db5e0",
+        "filename": "doc/source/api.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-03-16T10:03:40Z",
+      "side": 1,
+      "message": "I think that would be confusing, because that would imply that we are promoting an aggregate (which in essence we are, but not necessarily).\n\nIf we say we are promoting an aggregate, we would expect to simply provide the aggregate hash, which is complicated to do on the API side, since we do not have a full aggregate-to-all-commits association in the database.\n\nAlso, we could use this call to promote a subset of an aggregate, for example, if we wanted to.",
+      "parentUuid": "07c5e7d6_84c3150b",
       "range": {
         "startLine": 416,
         "startChar": 18,
