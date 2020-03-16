@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "ecd3b539_e5cfb9de",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 588
+      },
+      "writtenOn": "2020-03-16T09:38:57Z",
+      "side": 1,
+      "message": "why not stick to one term \u0027aggregate\u0027 vs \u0027batch\u0027",
+      "range": {
+        "startLine": 7,
+        "startChar": 10,
+        "endLine": 7,
+        "endChar": 15
+      },
+      "revId": "8dbe270bedbd897d17e00bc94ae72935bd9d0936",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c63ca24e_de74148b",
         "filename": "dlrn/api/dlrn_api.py",
         "patchSetId": 2
@@ -13,6 +36,29 @@
       "writtenOn": "2020-03-16T09:31:14Z",
       "side": 1,
       "message": "perhaps add something in logs/in the response that you attempted the rollback to consistent state",
+      "revId": "8dbe270bedbd897d17e00bc94ae72935bd9d0936",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3beb847c_468a3266",
+        "filename": "doc/source/api.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 588
+      },
+      "writtenOn": "2020-03-16T09:38:57Z",
+      "side": 1,
+      "message": "could be \u0027promote-aggregate\u0027 or just \u0027agg\u0027",
+      "range": {
+        "startLine": 416,
+        "startChar": 18,
+        "endLine": 416,
+        "endChar": 23
+      },
       "revId": "8dbe270bedbd897d17e00bc94ae72935bd9d0936",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
