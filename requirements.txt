@@ -9,7 +9,8 @@ PyYAML
 rdopkg>=0.45.0
 distroinfo
 alembic>=0.7.0
-renderspec
+renderspec<2.0.0;python_version=='2.7'
+renderspec;python_version>='3.3'
 pymod2pkg>=0.5.5
 requests
 Flask
