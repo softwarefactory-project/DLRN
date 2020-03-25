@@ -652,7 +652,7 @@ def process_build_result_rpm(
         if config_options.use_components:
             for dirname in dirnames:
                 aggregate_repo_files(dirname, datadir, session,
-                                     config_options.reponame)
+                                     config_options.reponame, hashed_dir=True)
 
         # And synchronize them
         sync_symlinks(commit)
