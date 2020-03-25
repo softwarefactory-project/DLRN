@@ -145,8 +145,9 @@ class TestProcessBuildResult(base.TestCase):
         self.assertEqual(gr_mock.call_count, 1)
         self.assertEqual(rs_mock.call_count, 1)
         self.assertEqual(ec_mock.call_count, 1)
-        self.assertEqual(sl_mock.call_count, 1)
-        self.assertEqual(rn_mock.call_count, 1)
+        # 3 additional symlinks due to the current/ directory
+        self.assertEqual(sl_mock.call_count, 4)
+        self.assertEqual(rn_mock.call_count, 4)
 
 
 @mock.patch('sh.createrepo_c', create=True)
