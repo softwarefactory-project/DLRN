@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "500a1d6f_f89ff3e8",
+        "filename": ".zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-03-25T14:52:45Z",
+      "side": 1,
+      "message": "Actually, let\u0027s move this one to use rdo-centos-8. It makes more sense.",
+      "range": {
+        "startLine": 27,
+        "startChar": 12,
+        "endLine": 27,
+        "endChar": 32
+      },
+      "revId": "3f3e8be6748b0f5134da578f1fe601b9c11b8ee7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
