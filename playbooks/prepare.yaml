@@ -47,6 +47,11 @@
       become: true
       when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 7
 
+    - name: Ensure latest tox is installed in Fedora
+      command: python3 -m pip3 install --upgrade tox
+      become: true
+      when: ansible_distribution == 'Fedora'
+
     - name: Install dnf-yum and distribution-gpg-keys (Fedora)
       package:
         name:
