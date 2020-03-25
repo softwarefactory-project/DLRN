@@ -24,10 +24,7 @@
     run: playbooks/rpmbuild.yaml
     vars:
       python_version: py36
-    nodeset:
-      nodes:
-        - name: testrunner
-          label: rdo-fedora-28-vexxhost
+    nodeset: fedora-latest-cloud
 
 - job:
     name: dlrn-rpmbuild-tripleo-ci-oooq
@@ -85,13 +82,12 @@
       rtd_project_name: 'dlrn'
     check:
       jobs:
-        - tox-pep8
-        - tox-py27
+        - tox-pep8:
+            nodeset: fedora-latest-pod
+        - tox-py27:
+            nodeset: centos-7-pod
         - tox-py36:
-            nodeset:
-              nodes:
-                - name: testrunner
-                  label: fedora-oci
+            nodeset: fedora-latest-pod
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
         - dlrn-rpmbuild-tripleo-ci-oooq
@@ -100,13 +96,12 @@
         - dlrn-api-functional-centos-8
     gate:
       jobs:
-        - tox-pep8
-        - tox-py27
+        - tox-pep8:
+            nodeset: fedora-latest-pod
+        - tox-py27:
+            nodeset: centos-7-pod
         - tox-py36:
-            nodeset:
-              nodes:
-                - name: testrunner
-                  label: fedora-oci
+            nodeset: fedora-latest-pod
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
     post:
