@@ -1,6 +1,7 @@
 pbr>=0.5.6
 Jinja2
-oslo.config
+oslo.config<=7.0.0;python_version=='2.7' # Apache-2.0
+oslo.config;python_version>='3.6' # Apache-2.0
 sh>=1.12.6
 six
 SQLAlchemy
