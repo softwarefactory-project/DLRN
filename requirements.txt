@@ -1,6 +1,5 @@
 pbr>=0.5.6
 Jinja2
-oslo.config
 sh>=1.12.6
 six
 SQLAlchemy
