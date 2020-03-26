@@ -20,6 +20,20 @@
       command: virtualenv -p python3 "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv"
       when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora') and ansible_distribution_major_version | int > 7
 
+    - name: Set constraints fact for CentOS 7
+      set_fact:
+        constraints_file: https://github.com/openstack/requirements/blob/stable/train/upper-constraints.txt
+      when:
+        - ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+        - ansible_distribution_major_version | int == 7
+
+    - name: Set constraints fact for CentOS/RHEL 8
+      set_fact:
+        constraints_file: https://raw.githubusercontent.com/openstack/requirements/master/upper-constraints.txt
+      when:
+        - ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+        - ansible_distribution_major_version | int > 7
+
     - name: Install updated pip
       shell:
         cmd: |
@@ -38,13 +52,13 @@
     - name: Install tripleo-quickstart in venv
       shell:
         cmd: |
-          {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin/pip install .
+          {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin/pip install . -c {{ constraints_file }}
         chdir: '{{ ansible_user_dir }}/tripleo-quickstart'
 
     - name: Install tripleo-quickstart-extras in venv
       shell:
         cmd: |
-          {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin/pip install .
+          {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin/pip install . -c {{ constraints_file }}
         chdir: '{{ ansible_user_dir }}/tripleo-quickstart-extras'
 
     - name: Copy ansible configuration file
