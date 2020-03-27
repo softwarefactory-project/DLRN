@@ -16,6 +16,24 @@
       "revId": "24f49ddb95b1f0bab7f0daa86a44b7a7f8418d1c",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c95e5a7b_9911118e",
+        "filename": "playbooks/tripleo-ci-oooq.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-03-27T08:44:03Z",
+      "side": 1,
+      "message": "It was the first URL that came to my mind. Happy to change to opendev once the current PS passes CI.",
+      "parentUuid": "1f4cd88c_a4f3218f",
+      "revId": "24f49ddb95b1f0bab7f0daa86a44b7a7f8418d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
