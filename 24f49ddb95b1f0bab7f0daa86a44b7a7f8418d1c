@@ -34,6 +34,24 @@
       "revId": "24f49ddb95b1f0bab7f0daa86a44b7a7f8418d1c",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4cb38c61_cb8686fc",
+        "filename": "playbooks/tripleo-ci-oooq.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 89
+      },
+      "writtenOn": "2020-03-27T08:44:15Z",
+      "side": 1,
+      "message": "We can use this link directly https://opendev.org/openstack/requirements/raw/branch/master/upper-constraints.txt",
+      "parentUuid": "1f4cd88c_a4f3218f",
+      "revId": "24f49ddb95b1f0bab7f0daa86a44b7a7f8418d1c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
