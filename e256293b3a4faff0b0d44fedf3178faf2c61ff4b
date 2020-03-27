@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a75fcad5_017fef23",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-03-27T08:24:17Z",
+      "side": 1,
+      "message": "Actually, let\u0027s remove oslo.config from the requirements. I don\u0027t see it being used anywhere, so it must be a relic from the past.",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 46
+      },
+      "revId": "e256293b3a4faff0b0d44fedf3178faf2c61ff4b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
