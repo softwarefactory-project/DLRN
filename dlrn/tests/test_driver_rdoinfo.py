@@ -80,9 +80,10 @@ class TestDriverRdoInfo(base.TestCase):
 
         self.assertEqual(di_mock.call_args_list, expected)
 
+    @mock.patch('os.environ.get', side_effect=['myuser'])
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
-    def test_custom_preprocess(self, ld_mock, sh_mock):
+    def test_custom_preprocess(self, ld_mock, sh_mock, get_mock):
         self.config.custom_preprocess = ['/bin/true']
         driver = RdoInfoDriver(cfg_options=self.config)
         driver.preprocess(package_name='foo')
@@ -90,6 +91,7 @@ class TestDriverRdoInfo(base.TestCase):
         expected = [mock.call(['DLRN_PACKAGE_NAME=foo',
                                'DLRN_DISTGIT=%s/foo_distro/' % self.temp_dir,
                                'DLRN_SOURCEDIR=%s/foo' % self.temp_dir,
+                               'DLRN_USER=myuser',
                                '/bin/true'],
                               _cwd='%s/foo_distro/' % self.temp_dir,
                               _env={'LANG': 'C'})]

@@ -535,8 +535,10 @@ class TestPromoteBatch(DLRNAPITestCase):
         os.makedirs('/tmp/component/tripleo')
 
     def tearDown(self):
-        shutil.rmtree('/tmp/component/None')
-        shutil.rmtree('/tmp/component/tripleo')
+        if os.path.exists('/tmp/component/None'):
+            shutil.rmtree('/tmp/component/None')
+        if os.path.exists('/tmp/component/tripleo'):
+            shutil.rmtree('/tmp/component/tripleo')
         super(TestPromoteBatch, self).tearDown()
 
     def test_promote_batch_needs_auth(self, db2_mock, db_mock):
