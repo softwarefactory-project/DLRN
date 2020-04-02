@@ -17,7 +17,7 @@ if you want to understand the code:
 
 - **Distgit**: spec files are assumed to be present in a Git repository. DLRN has a
   driver-based mechanism to allow different options for the distgit location,
-  see the `Drivers`_ section.
+  see the `Package Info Drivers`_ section.
 
 - **Project**: each project corresponds with a package to be built. A package may
   define a number of subpackages in the spec file, but a single source RPM file
@@ -28,6 +28,7 @@ if you want to understand the code:
 
 - **Commit**: a commit is the main abstraction used by DLRN. It aggregates all
   information related to each package built, such as:
+
   - Project name
   - Hash of the commit from the source git
   - Hash of the commit from the distgit
@@ -48,11 +49,11 @@ The DLRN codebase is structured as follows:
     `Building packages`_ section).
   * *submit_review.sh*: script to open a Gerrit review after a build failure (see
     the `Error reporting`_ section).
-  * *centos.cfg*, *fedora.cfg* and *redhat.cfg*: base mock configurations for
-    CentOS 7, Fedora and RHEL 8 builders. For a RHEL 8 builder, you will have
-    to make sure the appropriate base repos are configured, since those are not
-    publicly available. These base configurations can be located in a separate
-    directory, defined by the ``configdir`` option in projects.ini.
+  * *centos.cfg*, *centos8.cfg*, *fedora.cfg* and *redhat.cfg*: base mock 
+    configurations for  CentOS 7, CentOS 8, Fedora and RHEL 8 builders. For a RHEL 8
+    builder, you will have to make sure the appropriate base repos are configured,
+    since those are not publicly available. These base configurations can be located
+    in a separate directory, defined by the ``configdir`` option in projects.ini.
 
 - **dlrn/**: main DLRN code
 
@@ -76,7 +77,8 @@ The DLRN codebase is structured as follows:
   * *utils.py*: miscellaneous utilities.
   * **api/**: DLRN API code, described in detail in `its own <api.html>`_ page.
   * **drivers/**: modular drivers for project listing and distgit location,
-    described in the `Drivers`_ section.
+    described in the `Package Info Drivers`_ section. We are also including modular
+    drivers for different build methods.
   * **migrations/**: Alembic scripts for database maintenance.
   * **stylesheets/**: contains a CSS file used by the reporting module.
   * **templates/**: contains Jinja2 templates, also used by the reporting module.
@@ -151,9 +153,9 @@ Each driver must provide the following methods:
   given package name.
 
 You can check the code of the existing
-`rdoinfo <https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/rdoinfo.py>`_
-and `gitrepo <https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/gitrepo.py>`_
-drivers to see their implementation specifics. If you create a new driver, you
+`rdoinfo driver <https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/rdoinfo.py>`_
+and `gitrepo driver <https://github.com/softwarefactory-project/DLRN/blob/master/dlrn/drivers/gitrepo.py>`_
+to see their implementation specifics. If you create a new driver, you
 need to add the project name to the ``projects.ini`` configuration file, and
 if you need any new options, be sure to add them to a driver-specific section
 (see the `Configuration`_ section for details).
@@ -219,7 +221,7 @@ required to build it, specifically:
   ``gem build`` for Ruby gems, and tar for any other project. Then, the spec file
   is updated to use this tarball as ``Source0``, and a source RPM is created.
 
-The a binary RPM is built from the SRPM using a the build driver specified in
+The binary RPM is built from the SRPM using a the build driver specified in
 ``projects.ini``. This can be done using Mock, Copr, Brew, or any other tool,
 provided that the required driver is available.
 
@@ -241,9 +243,10 @@ components to divide the packages in a repo into logical aggregations. For examp
 in the OpenStack use case, we could have separate components for those packages
 related to networking, compute, storage, etc.
 
-Currently, only the ``RdoInfoDriver`` package info driver supports this. When
-components are defined, and enabled with the ``use_components=True`` option in
-``projects.ini``, DLRN will change its behavior in the following ways:
+Currently, only the ``RdoInfoDriver`` and ``DownstreamInfoDriver`` package info
+drivers supports this. When components are defined, and enabled with the
+``use_components=True`` option in ``projects.ini``, DLRN will change its behavior
+in the following ways:
 
 - Hashed yum repositories will change their paths, including a component part. For
   example, a commit for a package in the compute component will use hash
