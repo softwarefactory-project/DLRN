@@ -10,5 +10,4 @@ testtools>=0.9.32
 
 # docs requirements
 sphinx>=1.1.2
-oslosphinx
 sphinx-rtd-theme
