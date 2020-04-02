@@ -197,20 +197,20 @@ component            string      If set to a value, only report promotions for t
 
 The JSON output will contain an array where each item contains:
 
-==============  ==========  ==============================================================
-Parameter         Type                             Description
-==============  ==========  ==============================================================
-commit_hash     string      commit_hash of the promoted repo
-distro_hash     string      distro_hash of the promoted repo
-agggregate_hash string      Hash of the aggregated repo file, when using components
-repo_hash       string      Repository hash, composed of the commit_hash and short
-                            distro_hash
-repo_url        string      Full URL of the promoted repository
-promote_name    string      name used for the promotion
-component       string      Component associated to the commit/distro hash
-timestamp       integer     Timestamp (in seconds since the epoch)
-user            string      user who created the promotion
-==============  ==========  ==============================================================
+===============  ==========  ==============================================================
+Parameter          Type                             Description
+===============  ==========  ==============================================================
+commit_hash      string      commit_hash of the promoted repo
+distro_hash      string      distro_hash of the promoted repo
+agggregate_hash  string      Hash of the aggregated repo file, when using components
+repo_hash        string      Repository hash, composed of the commit_hash and short
+                             distro_hash
+repo_url         string      Full URL of the promoted repository
+promote_name     string      name used for the promotion
+component        string      Component associated to the commit/distro hash
+timestamp        integer     Timestamp (in seconds since the epoch)
+user             string      user who created the promotion
+===============  ==========  ==============================================================
 
 The array will be sorted by the promotion timestamp, with the newest first.
 
@@ -398,20 +398,20 @@ promote_name    string      name to be used for the promotion. In the current
 
 Response:
 
-==============  ==========  ==============================================================
+===============  ==========  ==============================================================
 Parameter         Type                             Description
-==============  ==========  ==============================================================
-commit_hash     string      commit_hash of the promoted repo
-distro_hash     string      distro_hash of the promoted repo
-repo_hash       string      Repository hash, composed of the commit_hash and short
-                            distro_hash
-repo_url        string      Full URL of the promoted repository
-promote_name    string      name used for the promotion
-component       string      Component associated to the commit/distro hash
-timestamp       integer     Timestamp (in seconds since the epoch)
-user            string      user who created the promotion
-agggregate_hash string      Hash of the aggregated repo file, when using components
-==============  ==========  ==============================================================
+===============  ==========  ==============================================================
+commit_hash      string      commit_hash of the promoted repo
+distro_hash      string      distro_hash of the promoted repo
+repo_hash        string      Repository hash, composed of the commit_hash and short
+                             distro_hash
+repo_url         string      Full URL of the promoted repository
+promote_name     string      name used for the promotion
+component        string      Component associated to the commit/distro hash
+timestamp        integer     Timestamp (in seconds since the epoch)
+user             string      user who created the promotion
+agggregate_hash  string      Hash of the aggregated repo file, when using components
+===============  ==========  ==============================================================
 
 POST /api/promote-batch
 -----------------------
@@ -445,20 +445,20 @@ promote_name    string      name to be used for the promotion. In the current
 
 Response:
 
-==============  ==========  ==============================================================
-Parameter         Type                             Description
-==============  ==========  ==============================================================
-commit_hash     string      commit_hash of the promoted repo
-distro_hash     string      distro_hash of the promoted repo
-repo_hash       string      Repository hash, composed of the commit_hash and short
-                            distro_hash
-repo_url        string      Full URL of the promoted repository
-promote_name    string      name used for the promotion
-component       string      Component associated to the commit/distro hash
-timestamp       integer     Timestamp (in seconds since the epoch)
-user            string      user who created the promotion
-agggregate_hash string      Hash of the aggregated repo file, when using components
-==============  ==========  ==============================================================
+===============  ==========  ==============================================================
+Parameter          Type                             Description
+===============  ==========  ==============================================================
+commit_hash      string      commit_hash of the promoted repo
+distro_hash      string      distro_hash of the promoted repo
+repo_hash        string      Repository hash, composed of the commit_hash and short
+                             distro_hash
+repo_url         string      Full URL of the promoted repository
+promote_name     string      name used for the promotion
+component        string      Component associated to the commit/distro hash
+timestamp        integer     Timestamp (in seconds since the epoch)
+user             string      user who created the promotion
+agggregate_hash  string      Hash of the aggregated repo file, when using components
+===============  ==========  ==============================================================
 
 This is the last promoted commit.
 
@@ -579,6 +579,7 @@ User management
 There is a command-line tool to manage DLRN API users:
 
 .. code-block:: console
+
     usage: dlrn-user [-h] [--config-file CONFIG_FILE] {create,delete,update} ...
 
     arguments:
