@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54b547dd_e283c85d",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-04-07T08:26:34Z",
+      "side": 1,
+      "message": "Here should be also SQLAlchemy\u003c1.3.14",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 10
+      },
+      "revId": "630c65442911882487dc56f2efb6e2e53d6b610e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
