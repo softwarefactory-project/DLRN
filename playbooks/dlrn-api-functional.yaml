@@ -4,9 +4,9 @@
     working_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/..'
     dlrnapi_auth: "--username foo --password bar"
     dlrnapi_url: "--url http://localhost:5000"
-    imported_repo: "https://trunk.rdoproject.org/centos7-master/6f/d1/6fd1c8e407eb57bcb42198975dd1fdb1c0de1013_fe674e08/"
+    imported_repo: "https://trunk.rdoproject.org/centos7-train/6f/d1/6fd1c8e407eb57bcb42198975dd1fdb1c0de1013_61f38711/"
     imported_commit_hash: "6fd1c8e407eb57bcb42198975dd1fdb1c0de1013"
-    imported_distro_hash: "fe674e08f4f23370a058a0f6dbb4a4f721b79a38"
+    imported_distro_hash: "61f387110530b332a803754b6e53dd8a9ef6caca"
   tasks:
     - name: If running on CentOS 8, set up different options
       block:
@@ -34,6 +34,30 @@
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version | int == 8
+
+    - name: Set options for CentOS 7, we will use stable/train
+      block:
+        - name: Set baseurl for CentOS 7 Train
+          ini_file:
+            path: "{{ working_dir }}/DLRN/projects.ini"
+            section: DEFAULT
+            option: baseurl
+            value: 'https://trunk.rdoproject.org/centos7-train/'
+        - name: Set distro for train
+          ini_file:
+            path: "{{ working_dir }}/DLRN/projects.ini"
+            section: DEFAULT
+            option: distro
+            value: train-rdo
+        - name: Set source for train
+          ini_file:
+            path: "{{ working_dir }}/DLRN/projects.ini"
+            section: DEFAULT
+            option: source
+            value: stable/train
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version | int == 7
 
     # This task must be separated from reqs install
     - name: Install updated pip in .venv
