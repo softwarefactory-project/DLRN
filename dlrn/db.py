@@ -81,7 +81,7 @@ class Commit(Base):
             extended_hash_suffix = "_%s" % self.extended_hash[:8]
         else:
             extended_hash_suffix = ''
-        if self.component:
+        if self.component is not None and self.component != 'None':
             component_prefix = 'component/%s/' % self.component
         else:
             component_prefix = ''
