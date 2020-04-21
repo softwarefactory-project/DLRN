@@ -525,6 +525,11 @@ def process_build_result_rpm(
                 return exit_code
         return exit_code
 
+    try:
+        built_rpms.append(commit.repo_dir.rsplit('/')[2])
+    except IndexError:
+        pass
+
     if exception is None:
         commit.status = "SUCCESS"
         commit.notes = notes

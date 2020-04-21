@@ -416,6 +416,18 @@ def aggregate_repo_files(dirname, datadir, session, reponame,
 
     return file_hash
 
+def _refactor_build_dir(build_dir):
+    splitted_name = build_dir.rsplit('-')
+    if splitted_name[0] == 'centos':
+        splitted_name[0] = 'centos7'
+    if splitted_name[0] == 'rhel':
+        splitted_name[0] = 'rhel7'
+    return '-'.join(splitted_name)
+
+def get_build_dir(artifacts):
+    if artifacts is not None and len(artifacts.rsplit(',')) > 2:
+        return _refactor_build_dir(artifacts.rsplit(',')[2])
+
 
 if __name__ == '__main__':
     s = getSession('sqlite:///%s' % sys.argv[1])

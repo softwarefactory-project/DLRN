@@ -97,10 +97,18 @@
           </td>
           <td>
             <i class="fa fa-link pull-left" style='color:#004153'></i>
+          {% if commit.commit_hash in commits_build_dir and commits_build_dir[commit.commit_hash] != None  %}
+            <a href="../../{{ commits_build_dir[commit.commit_hash] }}/{{ commit.getshardedcommitdir() }}">repo</a>
+          {% else %}
             <a href="../{{ commit.getshardedcommitdir() }}">repo</a>
+          {% endif %}
           </td>
           <td>
+	      {% if commit.commit_hash in commits_build_dir and commits_build_dir[commit.commit_hash] != None  %}
+	        <a href="../../{{ commits_build_dir[commit.commit_hash] }}/{{ commit.getshardedcommitdir() }}/rpmbuild.log">build log</a>
+	      {% else %}
             <a href="../{{ commit.getshardedcommitdir() }}/rpmbuild.log">build log</a>
+          {% endif %}
           </td>
         </tr>
       {% endfor %}
