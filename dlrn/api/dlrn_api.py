@@ -1125,6 +1125,12 @@ def get_report():
     config_options = _get_config_options(app.config['CONFIG_FILE'])
     closeSession(session)
 
+    commits_build_dir = {}
+    for commit in commits:
+        commit_dir = commit.getshardedcommitdir()
+        commits_build_dir[commit.commit_hash] = (
+            "%s/%s" % (config_options.baseurl, commit_dir))
+
     return render_template('report.j2',
                            reponame='Detailed build report',
                            target=config_options.target,
@@ -1132,4 +1138,5 @@ def get_report():
                            project_name=config_options.project_name,
                            commits=commits,
                            count=count,
-                           limit=pagination_limit)
+                           limit=pagination_limit,
+                           commits_build_dir=commits_build_dir)
