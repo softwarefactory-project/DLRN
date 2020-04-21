@@ -97,10 +97,10 @@
           </td>
           <td>
             <i class="fa fa-link pull-left" style='color:#004153'></i>
-            <a href="../{{ commit.getshardedcommitdir() }}">repo</a>
+            <a href="{{ commits_build_dir[commit.commit_hash] }}">repo</a>
           </td>
           <td>
-            <a href="../{{ commit.getshardedcommitdir() }}/rpmbuild.log">build log</a>
+            <a href="{{ commits_build_dir[commit.commit_hash] }}/rpmbuild.log">build log</a>
           </td>
         </tr>
       {% endfor %}
