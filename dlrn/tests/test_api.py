@@ -819,16 +819,21 @@ class TestGetCIAggVotes(DLRNAPITestCase):
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
 class TestGetReport(DLRNAPITestCase):
-    def test_get_report(self, db2_mock, db_mock, rt_mock):
+
+    @mock.patch('dlrn.db.Commit.getshardedcommitdir')
+    def test_get_report(self, commit_mock, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/report.html')
         self.assertEqual(rt_mock.call_count, 1)
         self.assertEqual(response.status_code, 200)
+        assert commit_mock.called
 
-    def test_get_report_detail(self, db2_mock, db_mock, rt_mock):
+    @mock.patch('dlrn.db.Commit.getshardedcommitdir')
+    def test_get_report_detail(self, commit_mock, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/report.html?package=python-pysaml2'
                                 '&success=1')
         self.assertEqual(1, rt_mock.call_args.kwargs['count'])
         self.assertEqual(response.status_code, 200)
+        assert commit_mock.called
 
     def test_get_report_detail_wrong_query(self, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/report.html?project=python-pysaml2'
