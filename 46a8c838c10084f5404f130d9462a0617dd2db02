@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d1d917b_2ba59df6",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1135,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-04-22T16:18:51Z",
+      "side": 1,
+      "message": "This is not a right assumption.\n\nLooking at the db from a local test, I see it is the last one in my case... Which makes the version be \"doc-16.0.0\" :)\n\nI would just try to find \".src.rpm\" in commit.artifacts.split(\u0027,\u0027) and use the entry that matches this.",
+      "range": {
+        "startLine": 1135,
+        "startChar": 12,
+        "endLine": 1135,
+        "endChar": 56
+      },
+      "revId": "46a8c838c10084f5404f130d9462a0617dd2db02",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cf2ba71f_f8ad4fe5",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1141,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-04-22T16:18:51Z",
+      "side": 1,
+      "message": "This could be a wrong assumption if we are building for non-RHEL or non-CentOS. So it would work for now, but maybe we could find a better regexp.",
+      "range": {
+        "startLine": 1141,
+        "startChar": 61,
+        "endLine": 1141,
+        "endChar": 63
+      },
+      "revId": "46a8c838c10084f5404f130d9462a0617dd2db02",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "588a2b22_4f6c2da2",
+        "filename": "dlrn/tests/test_api.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 847,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-04-22T16:18:51Z",
+      "side": 1,
+      "message": "why this \"wrong_name\"?",
+      "range": {
+        "startLine": 847,
+        "startChar": 32,
+        "endLine": 847,
+        "endChar": 43
+      },
+      "revId": "46a8c838c10084f5404f130d9462a0617dd2db02",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
