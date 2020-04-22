@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ef47843c_636dad9b",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1136,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2020-04-22T12:31:51Z",
+      "side": 1,
+      "message": "You use the raw string notation r\u0027\u0027 to keep regular expressions readable.",
+      "revId": "e487e72c507b92824dee7e1933744abfbe901175",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
