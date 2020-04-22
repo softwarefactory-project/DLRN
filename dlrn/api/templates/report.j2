@@ -45,6 +45,8 @@
         <th>Build Date Time</th>
         <th>Commit Date Time</th>
         <th>Project Name</th>
+        <th>Version</th>
+        <th>Release</th>
         <th>Commit Hash</th>
         <th>Component</th>
         <th>Status</th>
@@ -64,6 +66,12 @@
                {% endif %}
               <button type="submit" class="button">{{ commit.project_name }}</button>
             </form>
+          </td>
+          <td>
+            {{ commits_build_dir[commit.commit_hash]['version'] }}
+          </td>
+          <td>
+            {{ commits_build_dir[commit.commit_hash]['release'] }}
           </td>
           <td class="commit">
             <i class="fa fa-git pull-left"></i>
@@ -97,10 +105,10 @@
           </td>
           <td>
             <i class="fa fa-link pull-left" style='color:#004153'></i>
-            <a href="{{ commits_build_dir[commit.commit_hash] }}">repo</a>
+            <a href="{{ commits_build_dir[commit.commit_hash]['build_dir'] }}">repo</a>
           </td>
           <td>
-            <a href="{{ commits_build_dir[commit.commit_hash] }}/rpmbuild.log">build log</a>
+            <a href="{{ commits_build_dir[commit.commit_hash]['build_dir'] }}/rpmbuild.log">build log</a>
           </td>
         </tr>
       {% endfor %}
