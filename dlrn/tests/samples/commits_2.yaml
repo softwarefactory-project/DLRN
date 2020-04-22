@@ -36,6 +36,19 @@ commits:
   repo_dir: /home/centos-master/data/python-alembic
   artifacts: repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0e77_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.noarch.rpm,repos/1c/67/1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0e77_8170b868/python-alembic-0.8.3-0.99.20150907.2338git.el7.centos.src.rpm
   status: SUCCESS
+- commit_hash: 93eee77657978547f5fad1cb8cd30b570da83e68
+  distro_hash: 008678d7b0e20fbae185f2bb1bd0d9d167586211
+  component: tripleo
+  dt_build: '1441635090'
+  dt_commit: '1441634093'
+  dt_distro: '1431949434'
+  flags: '0'
+  id: '5628'
+  notes: OK
+  project_name: puppet-stdlib
+  repo_dir: /home/centos-master/data/puppet-stdlib
+  artifacts: repos/5a/a8/5aa891c2ef8efce6eb6d1ff12e976b4753b3c4d9_008678d7/puppet-stdlib-6.1.1-0.20200421095106.5aa891c.el7.src.rpm,repos/5a/a8/5aa891c2ef8efce6eb6d1ff12e976b4753b3c4d9_008678d7/puppet-stdlib-6.1.1-0.20200421095106.5aa891c.el7.noarch.rpm
+  status: SUCCESS
 civotes:
 - id: '1'
   commit_id: '5627'

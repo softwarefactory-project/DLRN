@@ -32,6 +32,7 @@ from dlrn.db import Promotion
 from dlrn.purge import FLAG_PURGED
 from dlrn.remote import import_commit
 from dlrn.utils import aggregate_repo_files
+from dlrn.utils import find_in_artifacts
 
 from flask import jsonify
 from flask import render_template
@@ -39,6 +40,7 @@ from flask import request
 
 import calendar
 import os
+import re
 from six.moves import configparser
 from sqlalchemy import desc
 import time
@@ -1127,9 +1129,24 @@ def get_report():
 
     commits_build_dir = {}
     for commit in commits:
+        version = ''
+        release = ''
         commit_dir = commit.getshardedcommitdir()
-        commits_build_dir[commit.commit_hash] = (
-            "%s/%s" % (config_options.baseurl, commit_dir))
+        src_package = find_in_artifacts(commit.artifacts, r'\w+.src.rpm')
+        if src_package:
+            splitted_name = re.split(r'-0\.[0-9]{14}.[0-9a-f]{7}\.',
+                                     src_package.split('/')[-1])
+            # NOTE(dpawlik): Release is predictable, but versioning not.
+            # So better is to take value after the split.
+            version = splitted_name[0].replace(commit.project_name + '-', '')
+            release = re.findall(r'0\.[0-9]{14}.[0-9a-f]{7}\.\w+',
+                                 src_package.split('/')[-1])
+
+        commits_build_dir[commit.commit_hash] = {
+            'build_dir': "%s/%s" % (config_options.baseurl, commit_dir),
+            'version': version,
+            'release': ''.join(release)
+        }
 
     return render_template('report.j2',
                            reponame='Detailed build report',
