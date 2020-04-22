@@ -45,6 +45,7 @@ class KojiBuildDriver(BuildRPMDriver):
             'koji_exe': {'default': 'koji'},
             'fetch_mock_config': {'type': 'boolean'},
             'mock_base_packages': {'default': ''},
+            'mock_package_manager': {'default': ''},
             'koji_add_tags': {'name': 'additional_koji_tags', 'type': 'list',
                               'default': []},
         }
@@ -95,6 +96,9 @@ class KojiBuildDriver(BuildRPMDriver):
                     lines.append(line)
                 else:
                     lines.append(line)
+            if self.config_options.mock_package_manager != '':
+                lines.append("config_opts['package_manager'] = '%s'\n" %
+                             self.config_options.mock_package_manager)
         with open(filename, 'w') as fp:
             fp.write(''.join(lines))
 

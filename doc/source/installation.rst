@@ -383,6 +383,7 @@ following configuration options are included:
     use_rhpkg=False
     fetch_mock_config=False
     mock_base_packages=basesystem rpm-build
+    mock_package_manager=yum
     additional_koji_tags=tag1,tag2
 
 * ``koji_exe`` defines the executable to use. Some Koji instances create their
@@ -416,11 +417,16 @@ following configuration options are included:
   mock configuration for the build target from Koji, and use it when building
   the source RPM. If set to ``false``, DLRN will use its internally defined mock
   configuration, based on the ``DEFAULT/target`` configuration option.
-* ``mock_base_packages``, if  ``fetch_mock_config`` is set to ``true``, will
+* ``mock_base_packages``, if ``fetch_mock_config`` is set to ``true``, will
   define the set of base packages that will be installed in the mock configuration
   when creating the source RPM. This list of packages will override the one
   fetched in the mock configuration, if set. If not set, no overriding will
   be done.
+* ``mock_package_manager``, if ``fetch_mock_config`` is set to ``true``, will
+  override the ``config_ops['package_manager']`` option from the fetched mock
+  configuration. This allows us to have different package managers if we are
+  building for different operating system releases, such as CentOS 7 (yum) and
+  CentOS 8 (dnf).
 * ``additional_koji_tags``, if set, will assign the build the additional tags
   defined in the list.
 
