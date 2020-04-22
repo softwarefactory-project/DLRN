@@ -48,6 +48,8 @@
         <th>Commit Hash</th>
         <th>Component</th>
         <th>Status</th>
+        <th>Version</th>
+        <th>Release</th>
         <th>Repository</th>
         <th>Build Log</th>
       </tr>
@@ -96,11 +98,17 @@
             {% endif %}
           </td>
           <td>
-            <i class="fa fa-link pull-left" style='color:#004153'></i>
-            <a href="{{ commits_build_dir[commit.commit_hash] }}">repo</a>
+            {{ commits_build_dir[commit.commit_hash]['version'] }}
           </td>
           <td>
-            <a href="{{ commits_build_dir[commit.commit_hash] }}/rpmbuild.log">build log</a>
+            {{ commits_build_dir[commit.commit_hash]['release'] }}
+          </td>
+          <td>
+            <i class="fa fa-link pull-left" style='color:#004153'></i>
+            <a href="{{ commits_build_dir[commit.commit_hash]['build_dir'] }}">repo</a>
+          </td>
+          <td>
+            <a href="{{ commits_build_dir[commit.commit_hash]['build_dir'] }}/rpmbuild.log">build log</a>
           </td>
         </tr>
       {% endfor %}
