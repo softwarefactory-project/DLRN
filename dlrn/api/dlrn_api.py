@@ -38,6 +38,7 @@ from flask import render_template
 from flask import request
 
 import calendar
+import re
 import os
 from six.moves import configparser
 from sqlalchemy import desc
@@ -1127,9 +1128,24 @@ def get_report():
 
     commits_build_dir = {}
     for commit in commits:
+        version = ''
+        release = ''
         commit_dir = commit.getshardedcommitdir()
-        commits_build_dir[commit.commit_hash] = (
-            "%s/%s" % (config_options.baseurl, commit_dir))
+        if commit.artifacts is not None:
+            src_package = commit.artifacts.split(',')[0]
+            splitted_name = re.split(r'-0\.[0-9]{14}.[0-9a-f]{7}\.',
+                                     src_package.split('/')[-1])
+            # NOTE(dpawlik): Release is predictable, but versioning not.
+            # So better is to take value after the split.
+            version = splitted_name[0].replace(commit.project_name + '-', '')
+            release = re.findall(r'0\.[0-9]{14}.[0-9a-f]{7}\.el[0-9]{1,2}',
+                                 src_package.split('/')[-1])[0]
+
+        commits_build_dir[commit.commit_hash] = {
+            'build_dir': "%s/%s" % (config_options.baseurl, commit_dir),
+            'version': version,
+            'release': release
+        }
 
     return render_template('report.j2',
                            reponame='Detailed build report',
