@@ -276,6 +276,32 @@ class TestDriverKoji(base.TestCase):
 
         self.assertEqual(env_mock.call_count, 1)
 
+    def test_write_mock_config_pkg_mgr(self, ld_mock, env_mock, rc_mock):
+        self.config.koji_build_target = 'foo-target'
+        self.config.koji_arch = 'aarch64'
+        self.config.fetch_mock_config = True
+        self.config.mock_base_packages = 'foo bar'
+        self.config.mock_package_manager = 'apt'
+        driver = KojiBuildDriver(cfg_options=self.config)
+        output_file = os.path.join(self.temp_dir, 'dlrn-1.cfg')
+
+        # Create sample downloaded config file
+        with open(output_file, "w") as fp:
+            fp.write("config_opts['root'] = 'dlrn-centos7-x86_64-1'\n")
+            fp.write("config_opts['chroot_setup_cmd'] = 'install abc def\n")
+            fp.write("'''")
+
+        expected = "config_opts['package_manager'] = 'apt'\n"
+
+        driver.write_mock_config(output_file)
+
+        with open(output_file, "r") as fp:
+            for line in fp.readlines():
+                if line.startswith("config_opts['package_manager']"):
+                    self.assertEqual(expected, line)
+
+        self.assertEqual(env_mock.call_count, 1)
+
     def test_additional_tags(self, ld_mock, env_mock, rc_mock):
         self.config.koji_add_tags = ['foo', 'bar']
         self.config.koji_exe = 'brew'
