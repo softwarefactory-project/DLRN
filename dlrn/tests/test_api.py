@@ -815,12 +815,13 @@ class TestGetCIAggVotes(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
 
 
-@mock.patch('dlrn.db.Commit.getshardedcommitdir')
 @mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
 class TestGetReport(DLRNAPITestCase):
-    def test_get_report(self, db2_mock, db_mock, rt_mock, commit_mock):
+
+    @mock.patch('dlrn.db.Commit.getshardedcommitdir')
+    def test_get_report(self, commit_mock, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/report.html')
         self.assertEqual(rt_mock.call_count, 1)
         self.assertEqual(response.status_code, 200)
@@ -837,7 +838,25 @@ class TestGetReport(DLRNAPITestCase):
                                 '&success=1')
         self.assertTrue(rt_mock.call_args.kwargs['count'] != 1)
         self.assertEqual(response.status_code, 200)
-        assert commit_mock.called
+
+    def test_get_package_version(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/report.html')
+        package_info = rt_mock.call_args.kwargs['commits_build_dir'].get(
+            '93eee77657978547f5fad1cb8cd30b570da83e68')
+        self.assertEqual('6.1.1', package_info.get('version'))
+        self.assertEqual('0.20200421095106.5aa891c.el7',
+                         package_info.get('release'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_package_version_wrong_version(self, db2_mock, db_mock,
+                                               rt_mock):
+        response = self.app.get('/api/report.html')
+        package_info = rt_mock.call_args.kwargs['commits_build_dir'].get(
+            '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0e77')
+        self.assertEqual('0.8.3-0.99.20150907.2338git.el7.centos.src.rpm',
+                         package_info.get('version'))
+        self.assertEqual('', package_info.get('release'))
+        self.assertEqual(response.status_code, 200)
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
@@ -983,8 +1002,8 @@ class TestMetrics(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(data['total'], 3)
-        self.assertEqual(data['succeeded'], 3)
+        self.assertEqual(data['total'], 4)
+        self.assertEqual(data['succeeded'], 4)
         self.assertEqual(data['failed'], 0)
 
     def test_metrics_success_url_param(self, db2_mock, db_mock):
@@ -992,8 +1011,8 @@ class TestMetrics(DLRNAPITestCase):
                                 '&end_date=2015-09-09')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(data['total'], 3)
-        self.assertEqual(data['succeeded'], 3)
+        self.assertEqual(data['total'], 4)
+        self.assertEqual(data['succeeded'], 4)
         self.assertEqual(data['failed'], 0)
 
     def test_metrics_filtered(self, db2_mock, db_mock):

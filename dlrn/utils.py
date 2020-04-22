@@ -417,6 +417,14 @@ def aggregate_repo_files(dirname, datadir, session, reponame,
     return file_hash
 
 
+def find_in_artifacts(artifacts, word):
+    if not artifacts:
+        return
+    for artifact in artifacts.split(','):
+        if re.findall(word, artifact):
+            return artifact
+
+
 if __name__ == '__main__':
     s = getSession('sqlite:///%s' % sys.argv[1])
     saveYAML(s, sys.argv[1] + ".yaml")
