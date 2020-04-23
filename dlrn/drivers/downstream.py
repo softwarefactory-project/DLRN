@@ -138,6 +138,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
         vers = {}
         r = urlopen(versions_url)
         content = [x.decode('utf-8') for x in r.readlines()]
+        r.close()
         # first line is headers
         for row in csv.reader(content[1:]):
             vers[row[0]] = row[1:]

@@ -198,8 +198,9 @@ class TestDriverDownstream(base.TestCase):
 
         # This checks that the spec file got copied over, and modified with
         # downstream_spec_replace_list
-        result = open(os.path.join(self.temp_dir, 'openstack-nova_distro',
-                      'openstack-nova.spec'), 'r').read()
+        with open(os.path.join(self.temp_dir, 'openstack-nova_distro',
+                  'openstack-nova.spec'), 'r') as fp:
+            result = fp.read()
         expected = '%global with_doc 0\nfoo'
         self.assertEqual(result, expected)
 

@@ -253,7 +253,8 @@ class TestPostBuild(base.TestCase):
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(output, 0)
-        repofile = open(os.path.join(yumdir, 'delorean.repo')).read()
+        with open(os.path.join(yumdir, 'delorean.repo')) as fp:
+            repofile = fp.read()
         assert 'component-testcomponent' in repofile
 
     def test_successful_build_no_failures_nosrcrpm(self, sh_mock):

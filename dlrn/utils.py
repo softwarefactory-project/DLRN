@@ -369,9 +369,11 @@ def aggregate_repo_files(dirname, datadir, session, reponame,
                                 dirname, "versions.csv")
 
         if os.path.exists(repo_file):
-            repo_content += open(repo_file).read() + '\n'
+            with open(repo_file, 'r') as fp:
+                repo_content += fp.read() + '\n'
         if os.path.exists(csv_file):
-            csv_content.extend(open(csv_file).readlines()[1:])
+            with open(csv_file, 'r') as fp:
+                csv_content.extend(fp.readlines()[1:])
 
     file_hash = hashlib.md5(repo_content.encode()).hexdigest()
 

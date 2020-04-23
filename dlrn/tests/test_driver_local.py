@@ -58,9 +58,8 @@ class TestDriverLocal(base.TestCase):
         distgit_dir = os.path.join(self.base_dir, package)
         os.mkdir(distgit_dir)
         os.mkdir(os.path.join(distgit_dir, '.git'))
-        open(os.path.join(distgit_dir, 'hello-world.spec'), 'w').write(
-            'Version: 1.0.0'
-        )
+        with open(os.path.join(distgit_dir, 'hello-world.spec'), 'w') as fp:
+            fp.write('Version: 1.0.0')
         # We expect to call DLRN from the local distgit directory
         driver = LocalDriver(cfg_options=self.config)
         packages = driver.getpackages(src_dir=distgit_dir)

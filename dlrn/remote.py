@@ -99,6 +99,7 @@ def import_commit(repo_url, config_file, db_connection=None,
             try:
                 r = urlopen(logfile_url)
                 contents = map(lambda x: x.decode('utf8'), r.readlines())
+                r.close()
                 with open(os.path.join(yumrepodir, logfile), "w") as fp:
                     fp.writelines(contents)
             except urllib.error.HTTPError:
@@ -112,6 +113,7 @@ def import_commit(repo_url, config_file, db_connection=None,
                 try:
                     r = urlopen(rpm_url)
                     contents = r.read()
+                    r.close()
                     with open(os.path.join(datadir, rpm), "wb") as fp:
                         fp.write(contents)
                 except urllib.error.HTTPError:
