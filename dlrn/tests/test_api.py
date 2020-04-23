@@ -825,9 +825,15 @@ class TestGetReport(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_get_report_detail(self, db2_mock, db_mock, rt_mock):
+        response = self.app.get('/api/report.html?package=python-pysaml2'
+                                '&success=1')
+        self.assertEqual(1, rt_mock.call_args.kwargs['count'])
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_report_detail_wrong_query(self, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/report.html?project=python-pysaml2'
                                 '&success=1')
-        self.assertEqual(rt_mock.call_count, 1)
+        self.assertTrue(rt_mock.call_args.kwargs['count'] != 1)
         self.assertEqual(response.status_code, 200)
 
 
