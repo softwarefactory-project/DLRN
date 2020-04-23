@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c118ba83_34fb9ca5",
+        "filename": "dlrn/purge.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-04-23T08:59:04Z",
+      "side": 1,
+      "message": "why not to add that in db.py?",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 48
+      },
+      "revId": "1c4f9eea29cd3b9bbd8641fc311c8767ffd6629b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8a2df6c1_18ab2711",
+        "filename": "dlrn/purge.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-04-23T08:59:04Z",
+      "side": 1,
+      "message": "I suggest to move that after basedir where you define other variables that reads config file",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 48
+      },
+      "revId": "1c4f9eea29cd3b9bbd8641fc311c8767ffd6629b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d6e9cbd_27085007",
+        "filename": "dlrn/purge.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-04-23T08:59:04Z",
+      "side": 1,
+      "message": "why not move that to L72?",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 25
+      },
+      "revId": "1c4f9eea29cd3b9bbd8641fc311c8767ffd6629b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
