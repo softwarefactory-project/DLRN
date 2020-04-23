@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "79831b4a_0734df02",
+        "filename": "dlrn/tests/test_api.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-04-23T08:07:20Z",
+      "side": 1,
+      "message": "missing comma",
+      "revId": "a754bc404f747cbb3f20b85b9729c4c89c86bc96",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "70ebd8a2_1b0cc985",
+        "filename": "dlrn/tests/test_api.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 835,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-04-23T08:07:20Z",
+      "side": 1,
+      "message": "missing comma",
+      "revId": "a754bc404f747cbb3f20b85b9729c4c89c86bc96",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fd59ccd5_f5b1019e",
+        "filename": "dlrn/utils.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-04-23T08:07:20Z",
+      "side": 1,
+      "message": "Maybe \"return None\" to be more explicit?",
+      "revId": "a754bc404f747cbb3f20b85b9729c4c89c86bc96",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
