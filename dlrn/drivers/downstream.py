@@ -25,6 +25,7 @@ import re
 import sh
 import shutil
 
+from contextlib import closing
 from distroinfo import info
 from distroinfo import query
 from six.moves.urllib.request import urlopen
@@ -138,8 +139,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
 
         # return versions.csv as a dict with package name as a key
         vers = {}
-        r = urlopen(versions_url)
-        content = [x.decode('utf-8') for x in r.readlines()]
+        with closing(urlopen(versions_url)) as r:
+            content = [x.decode('utf-8') for x in r.readlines()]
         # first line is headers
         for row in csv.reader(content[1:]):
             vers[row[0]] = row[1:]
@@ -152,8 +153,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
         versions_url = self.config_options.versions_url
         commit_url = re.sub('/versions.csv$', '/commit.yaml', versions_url)
         try:
-            r = urlopen(commit_url)
-            content = [x.decode('utf-8') for x in r.readlines()]
+            with closing(urlopen(commit_url)) as r:
+                content = [x.decode('utf-8') for x in r.readlines()]
             return content
         except Exception:
             # We do not want to fail on this
