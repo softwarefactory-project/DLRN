@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc75800b_63913656",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-04-23T08:52:39Z",
+      "side": 1,
+      "message": "why not:\nif self.config_options.mock_package_manager:\n...",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 62
+      },
+      "revId": "a5de4ab287f5d0a904e1a3995a85b27de53e952d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
