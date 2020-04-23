@@ -22,6 +22,30 @@
       "revId": "a5de4ab287f5d0a904e1a3995a85b27de53e952d",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "53fc27e8_ab3351b2",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-04-23T08:56:39Z",
+      "side": 1,
+      "message": "Hm, I wasn\u0027t sure an empty string made the statement False, but it seems like it does. I\u0027ll change it.",
+      "parentUuid": "cc75800b_63913656",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 62
+      },
+      "revId": "a5de4ab287f5d0a904e1a3995a85b27de53e952d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
