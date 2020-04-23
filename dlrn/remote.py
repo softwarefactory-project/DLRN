@@ -48,13 +48,12 @@ def import_commit(repo_url, config_file, db_connection=None,
                                    dev_mode=False)
 
     remote_yaml = repo_url + '/' + 'commit.yaml'
-    r = urlopen(remote_yaml)
-    contents = map(lambda x: x.decode('utf8'), r.readlines())
+    with urlopen(remote_yaml) as r:
+        contents = map(lambda x: x.decode('utf8'), r.readlines())
 
     osfd, tmpfilename = mkstemp()
-    fp = os.fdopen(osfd, 'w')
-    fp.writelines(contents)
-    fp.close()
+    with os.fdopen(osfd, 'w') as fp:
+        fp.writelines(contents)
 
     commits = loadYAML_list(tmpfilename)
     os.remove(tmpfilename)
@@ -97,8 +96,8 @@ def import_commit(repo_url, config_file, db_connection=None,
                         'rpmbuild.log', 'state.log']:
             logfile_url = repo_url + '/' + logfile
             try:
-                r = urlopen(logfile_url)
-                contents = map(lambda x: x.decode('utf8'), r.readlines())
+                with urlopen(logfile_url) as r:
+                    contents = map(lambda x: x.decode('utf8'), r.readlines())
                 with open(os.path.join(yumrepodir, logfile), "w") as fp:
                     fp.writelines(contents)
             except urllib.error.HTTPError:
@@ -110,8 +109,8 @@ def import_commit(repo_url, config_file, db_connection=None,
             for rpm in commit.artifacts.split(","):
                 rpm_url = repo_url + '/' + rpm.split('/')[-1]
                 try:
-                    r = urlopen(rpm_url)
-                    contents = r.read()
+                    with urlopen(rpm_url) as r:
+                        contents = r.read()
                     with open(os.path.join(datadir, rpm), "wb") as fp:
                         fp.write(contents)
                 except urllib.error.HTTPError:
