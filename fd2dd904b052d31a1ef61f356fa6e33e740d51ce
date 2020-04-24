@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "60bfec04_05844dec",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1143,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2020-04-24T09:18:07Z",
+      "side": 1,
+      "message": "why don\u0027t we just store that in dlrndb instead of parsing from srpm filename?\n\nBTW safest way to extract RPM name out of N-V-R string is to reverse it, in shell-speak:\nrev|cut -d- -f3-|rev",
+      "revId": "fd2dd904b052d31a1ef61f356fa6e33e740d51ce",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
