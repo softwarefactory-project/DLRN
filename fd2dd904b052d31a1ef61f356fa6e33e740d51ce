@@ -16,6 +16,24 @@
       "revId": "fd2dd904b052d31a1ef61f356fa6e33e740d51ce",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b9ee0e6_a7f7107d",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1143,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-04-24T09:28:55Z",
+      "side": 1,
+      "message": "We would need to use a similar code snippet to get the version/release and store it in the DB (we only get that info when running build_srpm.sh). Plus, it requires a db schema update, which I\u0027d rather keep to a minimum.",
+      "parentUuid": "60bfec04_05844dec",
+      "revId": "fd2dd904b052d31a1ef61f356fa6e33e740d51ce",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
