@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f2b16163_d69d26a4",
+        "filename": "dlrn/remote.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-04-24T07:09:35Z",
+      "side": 1,
+      "message": "could you add fp.close()",
+      "range": {
+        "startLine": 104,
+        "startChar": 19,
+        "endLine": 104,
+        "endChar": 43
+      },
+      "revId": "363f920a01d9edc7577bf3f0695df6e6b91f10c0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
