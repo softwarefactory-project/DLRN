@@ -16,6 +16,10 @@
     parent: dlrn-base
     description: Run DLRN to build a package
     run: playbooks/rpmbuild.yaml
+    vars:
+      python_version: py27
+      tag: train
+      centos_version: 'centos7'
 
 - job:
     name: dlrn-rpmbuild-python3
@@ -24,6 +28,8 @@
     run: playbooks/rpmbuild.yaml
     vars:
       python_version: py36
+      tag: ''
+      centos_version: 'centos8'
     nodeset:
       nodes:
         - name: rdo-centos-8

@@ -4,7 +4,20 @@
     - name: Build package
       shell:
         cmd: |
+          export TAG="{{  tag | default('') }}"
+          export CENTOS_VERS="{{  centos_version | default('centos7') }}"
+          export REPO_SERVER="https://trunk.rdoproject.org"
           export PYTHON_VERSION="{{ python_version | default('py27') }}"
-          timeout --signal=SIGKILL 3600 ./scripts/run_tests.sh http://review.rdoproject.org/r/p/rdoinfo.git
+          if [ ${CENTOS_VERS} = "centos8" ]; then
+             export TARGET="centos8"
+          else
+              export TARGET="centos"
+          fi
+          if [ -z "$TAG" ];then
+              ARGS="$TARGET ${REPO_SERVER}/${CENTOS_VERS}/"
+          else
+              ARGS="$TARGET ${REPO_SERVER}/${CENTOS_VERS}/ $TAG"
+          fi
+          timeout --signal=SIGKILL 3600 ./scripts/run_tests.sh http://review.rdoproject.org/r/p/rdoinfo.git $ARGS
       args:
-        chdir: "{{ zuul.project.src_dir }}/"
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['softwarefactory-project.io/DLRN'].src_dir }}"
