@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "28dd7d60_affff68d",
+        "filename": "playbooks/rpmbuild.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-04-29T13:48:53Z",
+      "side": 1,
+      "message": "imho better to set environment vars instead of setting export in cmd, but for now we can take like it is",
+      "range": {
+        "startLine": 7,
+        "startChar": 10,
+        "endLine": 9,
+        "endChar": 16
+      },
+      "revId": "1cda2538d05a6e69b0f8ef279b32227d79b774f3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
