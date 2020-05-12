@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e1d21f04_f56a365b",
+        "filename": "dlrn/api/utils.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-05-12T08:26:36Z",
+      "side": 1,
+      "message": "IMHO it is not required, because on the end it will return False, but there will be still multiple iterations in the loop, so ok.",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 32
+      },
+      "revId": "f8ed733d3a794d4d35ce71bb7447d62895570528",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
