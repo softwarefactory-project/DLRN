@@ -73,7 +73,7 @@
           localhost ansible_connection=local {% if ansible_python.version.major == 3 %}ansible_python_interpreter=/usr/bin/python3{% endif %}
         dest: '{{ ansible_user_dir }}/hosts'
 
-    - name: Create custom playbook
+    - name: Create custom playbook for CentOS 8
       copy:
         content: |
           ---
@@ -92,6 +92,28 @@
               dlrn_pre_installed: true
               release: 'master'
         dest: '{{ ansible_user_dir }}/build-packages.yaml'
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 8
+
+    - name: Create custom playbook for CentOS 7
+      copy:
+        content: |
+          ---
+          - name: Build custom RPMs
+            hosts: localhost
+            roles:
+              - build-test-packages
+            vars:
+              artg_change_list:
+               - project: openstack/tripleo-heat-templates
+                 branch: stable/train
+                 refspec: stable/train
+                 host: https://review.opendev.org
+              artg_compressed_gating_repo: '/tmp/gating_repo.tar.gz'
+              build_repo_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/..'
+              dlrn_pre_installed: true
+              release: 'stable/train'
+        dest: '{{ ansible_user_dir }}/build-packages.yaml'
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 8
 
     - name: Execute oooq Ansible playbook
       shell:
