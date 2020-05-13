@@ -76,6 +76,8 @@ def purge_promoted_hashes(config, timestamp, dry_run=True):
     for prom in all_promotions:
         promotion_list.append(prom.promotion_name)
 
+    logger.debug("Promotion list: %s" % promotion_list)
+
     # Now go through all directories
     for prom in promotion_list:
         directory = os.path.join(basedir, prom)
@@ -86,6 +88,8 @@ def purge_promoted_hashes(config, timestamp, dry_run=True):
         else:
             logger.warning('No symlinks at %s' % directory)
             protected_path = ''
+
+        logger.debug("Setting protected path: %s" % protected_path)
         # We have to traverse a 3-level hash structure
         # Not deleting the first two levels (xx/yy), just the final level,
         # where the files are located
@@ -149,6 +153,7 @@ def purge():
         component_list = get_component_list(session)
     else:
         component_list = None
+    logger.debug("Used components: %s" % component_list)
 
     # To remove builds we have to start at a point in time and move backwards
     # builds with no build date are also purged as these are legacy
@@ -160,9 +165,13 @@ def purge():
                          before=int(mktime(timeparsed.timetuple()))
                          ).all()
 
+    logger.debug("Commmits from %s days ago: %s" % (options.older_than,
+                                                    topurge))
+
     fullpurge = []
     for commit in topurge:
         if commit.flags & FLAG_PURGED:
+            logger.debug("Commit %s was purged" % commit)
             continue
 
         if is_commit_in_dirs(commit, options.exclude_dirs, basedir,
@@ -192,6 +201,7 @@ def purge():
                 for entry in os.listdir(datadir):
                     entry = os.path.join(datadir, entry)
                     if entry.endswith(".rpm") and not os.path.islink(entry):
+                        logger.debug("Skipping dir or file %s" % entry)
                         continue
                     if os.path.isdir(entry):
                         logger.info("Remove %s" % entry)
