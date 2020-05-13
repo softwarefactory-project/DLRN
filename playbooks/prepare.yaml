@@ -87,6 +87,7 @@
           config_opts['plugin_conf']['tmpfs_opts']['mode'] = '0755'
           config_opts['plugin_conf']['tmpfs_opts']['keep_mounted'] = True
           config_opts['use_bootstrap'] = False
+          config_opts[''dnf_warning'] = False
           EOF
       become: true
 
