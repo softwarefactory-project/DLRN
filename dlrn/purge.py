@@ -149,6 +149,7 @@ def purge():
         component_list = get_component_list(session)
     else:
         component_list = None
+    logger.debug("Used components: %s" % component_list)
 
     # To remove builds we have to start at a point in time and move backwards
     # builds with no build date are also purged as these are legacy
@@ -160,9 +161,12 @@ def purge():
                          before=int(mktime(timeparsed.timetuple()))
                          ).all()
 
+    logger.debug("Commmits from %s days ago: %s" % (options.older_than, topurge))
+
     fullpurge = []
     for commit in topurge:
         if commit.flags & FLAG_PURGED:
+            logger.debug("Commit %s was purged" % commit)
             continue
 
         if is_commit_in_dirs(commit, options.exclude_dirs, basedir,
@@ -192,6 +196,7 @@ def purge():
                 for entry in os.listdir(datadir):
                     entry = os.path.join(datadir, entry)
                     if entry.endswith(".rpm") and not os.path.islink(entry):
+                        logger.debug("Skipping dir or file %s" % entry)
                         continue
                     if os.path.isdir(entry):
                         logger.info("Remove %s" % entry)
