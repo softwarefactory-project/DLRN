@@ -158,9 +158,15 @@ cp *.spec ${TOP_DIR}/SPECS/
 cd ${TOP_DIR}/SPECS/
 
 if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
-    sed -i -e "1i%define upstream_version $UPSTREAMVERSION\\" *.spec
-    sed -i -e "1i%global dlrn 1\\" *.spec
-    sed -i -e "1i%global dlrn_nvr $(basename $SOURCEWITHREL $SOURCEEXT)\\" *.spec
+    grep "^%define upstream_version.*" *.spec > /dev/null 2>&1 && \
+        sed -i -e "s/^%define upstream_version.*/%define upstream_version $UPSTREAMVERSION/" *.spec || \
+        sed -i -e "1i%define upstream_version $UPSTREAMVERSION\\" *.spec
+    grep "^%global dlrn .*" *.spec > /dev/null 2>&1 && \
+        sed -i -e "s/^%global dlrn .*/%global dlrn 1/" *.spec || \
+        sed -i -e "1i%global dlrn 1\\" *.spec
+    grep "^%global dlrn_nvr .*" *.spec > /dev/null 2>&1 && \
+        sed -i -e "s/^%global dlrn_nvr .*/%global dlrn_nvr $(basename $SOURCEWITHREL $SOURCEEXT)/" *.spec || \
+        sed -i -e "1i%global dlrn_nvr $(basename $SOURCEWITHREL $SOURCEEXT)\\" *.spec
     sed -i -e "s/UPSTREAMVERSION/$UPSTREAMVERSION/g" *.spec
     VERSION=${VERSION/-/.}
     sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
