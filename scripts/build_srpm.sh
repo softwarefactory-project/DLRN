@@ -119,12 +119,11 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
 
         setversionandrelease "$version" $(git log --abbrev=7 -n1 --format=format:%h)
         if [ -r metadata.json ]; then
-            # Detect if this is am OpenStack puppet module
-            TARBALLS_OPS=$(egrep -c -e "^Source0.*tarballs.openstack.org" -e "^Source0.*github.com\/openstack" -e "^Source0.*git.openstack.org\/openstack" -e "^Source0.*opendev.org\/openstack" ${DISTGIT_DIR}/*spec||true)
-            echo $TARBALLS_OPS
+            # Detect if this is an OpenStack puppet module
             # We know OpenStack puppet modules have a common style for metadata.json
-            if [ $TARBALLS_OPS -ne 0 ]; then
-                TARNAME=$($PYTHON -c "import json; print(json.loads(open('metadata.json').read(-1))['name'])")
+            MODULE_NAME=$($PYTHON -c "import json; print(json.loads(open('metadata.json').read(-1))['name'])")
+            if [[ "$MODULE_NAME" =~ openstack-* ]]; then
+                TARNAME=$MODULE_NAME
             else
                 TARNAME=$(git remote -v|head -1|awk '{print $2;}'|sed 's@.*/@@;s@\.git$@@')
             fi
