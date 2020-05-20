@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f030c932_50aa727c",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2020-05-20T16:08:30Z",
+      "side": 1,
+      "message": "that\u0027s hard to read, what about\nif grep -qc ...",
+      "revId": "3e26014a9b1d74692326751b6b5c7855c89ffcd8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
