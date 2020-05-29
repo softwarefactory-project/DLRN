@@ -57,6 +57,12 @@
             section: DEFAULT
             option: source
             value: stable/train
+        - name: Set target for CentOS 7
+          ini_file:
+            path: "{{ working_dir }}/DLRN/projects.ini"
+            section: DEFAULT
+            option: target
+            value: centos
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version | int == 7
