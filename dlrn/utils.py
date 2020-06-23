@@ -240,15 +240,16 @@ def saveYAML_commit(commit, yamlfile):
 
 def dumpshas2file(shafile, commit, source_repo, distgit_repo,
                   status, timestamp, component, rpmlist):
-    shafile.write("%s,%s,%s,%s,%s,%s,%d,%s,%s\n" % (commit.project_name,
-                                                    source_repo,
-                                                    commit.commit_hash,
-                                                    distgit_repo,
-                                                    commit.distro_hash,
-                                                    status,
-                                                    timestamp,
-                                                    component,
-                                                    getNVRfromlist(rpmlist))
+    shafile.write("%s,%s,%s,%s,%s,%s,%d,%s,%s,%s\n" % (commit.project_name,
+                                                       source_repo,
+                                                       commit.commit_hash,
+                                                       distgit_repo,
+                                                       commit.distro_hash,
+                                                       status,
+                                                       timestamp,
+                                                       component,
+                                                       commit.extended_hash,
+                                                       getNVRfromlist(rpmlist))
                   )
 
 
