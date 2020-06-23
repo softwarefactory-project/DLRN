@@ -96,7 +96,7 @@
         - tox-py27:
             nodeset: centos-7-pod
         - tox-py36:
-            nodeset: fedora-latest-pod
+            nodeset: centos-latest-pod
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
         - dlrn-rpmbuild-tripleo-ci-oooq
@@ -110,7 +110,7 @@
         - tox-py27:
             nodeset: centos-7-pod
         - tox-py36:
-            nodeset: fedora-latest-pod
+            nodeset: centos-latest-pod
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
     post:
