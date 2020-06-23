@@ -240,15 +240,16 @@ def saveYAML_commit(commit, yamlfile):
 
 def dumpshas2file(shafile, commit, source_repo, distgit_repo,
                   status, timestamp, component, rpmlist):
-    shafile.write("%s,%s,%s,%s,%s,%s,%d,%s,%s\n" % (commit.project_name,
-                                                    source_repo,
-                                                    commit.commit_hash,
-                                                    distgit_repo,
-                                                    commit.distro_hash,
-                                                    status,
-                                                    timestamp,
-                                                    component,
-                                                    getNVRfromlist(rpmlist))
+    shafile.write("%s,%s,%s,%s,%s,%s,%d,%s,%s,%s\n" % (commit.project_name,
+                                                       source_repo,
+                                                       commit.commit_hash,
+                                                       distgit_repo,
+                                                       commit.distro_hash,
+                                                       status,
+                                                       timestamp,
+                                                       component,
+                                                       commit.extended_hash,
+                                                       getNVRfromlist(rpmlist))
                   )
 
 
@@ -390,7 +391,8 @@ def aggregate_repo_files(dirname, datadir, session, reponame,
         fp.write(file_hash)
     with open(os.path.join(target_dir, "versions.csv"), 'w') as fp:
         fp.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,"
-                 "Status,Last Success Timestamp,Component,Pkg NVR\n")
+                 "Status,Last Success Timestamp,Component,Extended Sha,"
+                 "Pkg NVR\n")
         fp.writelines(csv_content)
 
     # If we created the file in a hashed dir, create the symlinks now
