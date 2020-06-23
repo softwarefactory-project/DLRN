@@ -96,13 +96,16 @@
         - tox-py27:
             nodeset: centos-7-pod
         - tox-py36:
-            nodeset: fedora-latest-pod
-        - dlrn-rpmbuild
-        - dlrn-rpmbuild-python3
-        - dlrn-rpmbuild-tripleo-ci-oooq
-        - dlrn-rpmbuild-tripleo-ci-oooq-centos8
-        - dlrn-api-functional-centos-7
-        - dlrn-api-functional-centos-8
+            nodeset:
+              nodes:
+                - name: rdo-centos-8
+                  label: rdo-centos-8
+#        - dlrn-rpmbuild
+#        - dlrn-rpmbuild-python3
+#        - dlrn-rpmbuild-tripleo-ci-oooq
+#        - dlrn-rpmbuild-tripleo-ci-oooq-centos8
+#        - dlrn-api-functional-centos-7
+#        - dlrn-api-functional-centos-8
     gate:
       jobs:
         - tox-pep8:
@@ -110,7 +113,7 @@
         - tox-py27:
             nodeset: centos-7-pod
         - tox-py36:
-            nodeset: fedora-latest-pod
+            nodeset: centos-latest-pod
         - dlrn-rpmbuild
         - dlrn-rpmbuild-python3
     post:
