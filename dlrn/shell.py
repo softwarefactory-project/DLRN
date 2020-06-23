@@ -703,7 +703,8 @@ def post_build_rpm(status, packages, session, build_repo=True):
 
     shafile = open(os.path.join(yumrepodir_abs, "versions.csv"), "w")
     shafile.write("Project,Source Repo,Source Sha,Dist Repo,Dist Sha,"
-                  "Status,Last Success Timestamp,Component,Pkg NVR\n")
+                  "Status,Last Success Timestamp,Component,Extended Sha,"
+                  "Pkg NVR\n")
     failures = 0
 
     for otherproject in packages:
