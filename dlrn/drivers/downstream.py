@@ -277,8 +277,22 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 # list of commits to be processed, so we can ignore it and
                 # move on to the next repo
                 continue
-            dt = version[5]
-            commit_hash = version[1]
+            if not local:
+                # This is the default behavior
+                dt = version[5]
+                commit_hash = version[1]
+            else:
+                # When running with --local, we really want to use the local
+                # source git, regardless of the upstream versions.csv info
+                git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
+                lines = git.log("--pretty=format:'%ct %H'",
+                                "-1", "--first-parent",
+                                "--reverse")
+                for line in lines:
+                    # There is only one line
+                    dt, commit_hash = str(line).strip().strip("'").\
+                                        split(" ")[:2]
+
             if self.config_options.use_components and 'component' in package:
                 component = package['component']
             else:
