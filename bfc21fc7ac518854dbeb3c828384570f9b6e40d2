@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "edaa8c34_196853e0",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-06-24T11:08:25Z",
+      "side": 1,
+      "message": "not required, but it can be :)",
+      "range": {
+        "startLine": 290,
+        "startChar": 31,
+        "endLine": 290,
+        "endChar": 43
+      },
+      "revId": "bfc21fc7ac518854dbeb3c828384570f9b6e40d2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
