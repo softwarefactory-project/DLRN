@@ -82,6 +82,7 @@ The configuration file looks like this:
     nonfallback_branches=^master$,^rpm-master$,^rhos-
     coprid=account/repo
     release_numbering=0.date.hash
+    release_minor=0
     custom_preprocess=
     include_srpm_in_repo=true
     keep_changelog=false
@@ -224,6 +225,13 @@ The configuration file looks like this:
   * ``0.date.hash`` if the old method is used: 0.<date>.<hash>
   * ``0.1.date.hash`` if the new method is used: 0.1.<date>.<hash>. This new
     method provides better compatibility with the Fedora packaging guidelines.
+  * ``minor.date.hash`` allows you to specify the minor version to be used, which
+    can be different from 0. If this release numbering schema is used, the value
+    of ``minor`` will be determined by ``release_minor``.
+
+* ``release_minor`` only takes place when ``release_numbering`` is set to
+  ``minor.date.hash``. For example, if this value is set to ``3``, the release number
+  for all packages will be computed as 3.minor.hash.
 
 * ``custom_preprocess``, if set, defines a comma-separated list of custom programs
   or scripts to be called as part of the pre-process step. The custom programs will

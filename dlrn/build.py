@@ -254,6 +254,9 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     # Set release numbering option
     if config_options.release_numbering == '0.1.date.hash':
         os.environ['RELEASE_NUMBERING'] = '0.1.date.hash'
+    elif config_options.release_numbering == 'minor.date.hash':
+        os.environ['RELEASE_NUMBERING'] = 'minor.date.hash'
+        os.environ['RELEASE_MINOR'] = config_options.release_minor
     else:
         os.environ['RELEASE_NUMBERING'] = '0.date.hash'
 

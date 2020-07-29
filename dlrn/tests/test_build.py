@@ -69,6 +69,11 @@ class TestBuild(base.TestCase):
         shutil.rmtree(self.config.datadir)
         shutil.rmtree(self.config.scriptsdir)
         os.close(self.db_fd)
+        # Make sure env vars are cleaned up
+        if 'RELEASE_NUMBERING' in os.environ:
+            del os.environ['RELEASE_NUMBERING']
+        if 'RELEASE_MINOR' in os.environ:
+            del os.environ['RELEASE_MINOR']
 
     @mock.patch('os.listdir', side_effect=mocked_listdir)
     def test_build_rpm_wrapper(self, ld_mock, sh_mock, env_mock, rc_mock):
@@ -85,6 +90,21 @@ class TestBuild(base.TestCase):
         self.assertEqual(rc_mock.call_count, 1)
         self.assertTrue(os.path.exists(os.path.join(self.config.datadir,
                                                     "dlrn-1.cfg")))
+
+    @mock.patch('os.listdir', side_effect=mocked_listdir)
+    def test_build_rpm_wrapper_release_numbering(self, ld_mock, sh_mock,
+                                                 env_mock, rc_mock):
+        self.configfile.set('DEFAULT', 'build_driver',
+                            'dlrn.drivers.mockdriver.MockBuildDriver')
+        self.configfile.set('DEFAULT', 'release_numbering',
+                            'minor.date.hash')
+        self.configfile.set('DEFAULT', 'release_minor',
+                            '2')
+        self.config = ConfigOptions(self.configfile)
+        commit = db.getCommits(self.session)[-1]
+        build_rpm_wrapper(commit, False, False, False, None, True)
+        self.assertEqual(os.environ['RELEASE_NUMBERING'], 'minor.date.hash')
+        self.assertEqual(os.environ['RELEASE_MINOR'], '2')
 
     @mock.patch('os.listdir', side_effect=mocked_listdir)
     def test_build(self, ld_mock, sh_mock, env_mock, rc_mock):
