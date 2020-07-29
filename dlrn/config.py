@@ -62,6 +62,7 @@ DLRN_CORE_CONFIG = {
         'nonfallback_branches': {'type': 'list',
                                  'default': ['^master$', '^rpm-master$']},
         'release_numbering': {'default': '0.date.hash'},
+        'release_minor':     {'default': '0'},
         'custom_preprocess': {'type': 'list'},
         'include_srpm_in_repo': {'type': 'boolean', 'default': True},
         'keep_changelog': {'type': 'boolean', 'default': False},

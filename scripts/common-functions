@@ -46,6 +46,8 @@ function setversionandrelease(){
     RELEASE_DATE=$(date --utc "+%Y%m%d%H%M%S")
     if [ "${RELEASE_NUMBERING-}" = "0.1.date.hash" ] ; then
         RELEASE=0.1.${RELEASE_DATE}.$2
+    elif [ "${RELEASE_NUMBERING-}" = "minor.date.hash" ] ; then        
+        RELEASE=${RELEASE_MINOR}.${RELEASE_DATE}.$2        
     else
         # Default to 0.date.hash release numbers
         RELEASE=0.${RELEASE_DATE}.$2
