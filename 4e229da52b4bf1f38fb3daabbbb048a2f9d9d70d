@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "67e89cab_02ee40e9",
+        "filename": "scripts/common-functions",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-07-30T11:41:37Z",
+      "side": 1,
+      "message": "white char",
+      "range": {
+        "startLine": 49,
+        "startChar": 63,
+        "endLine": 49,
+        "endChar": 71
+      },
+      "revId": "4e229da52b4bf1f38fb3daabbbb048a2f9d9d70d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
