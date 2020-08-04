@@ -90,40 +90,4 @@
       rtd_webhook_id: '101768'
       rtd_project_name: 'dlrn'
     check:
-      jobs:
-        - tox-pep8:
-            nodeset: fedora-latest-pod
-        - tox-py27:
-            nodeset: centos-7-pod
-        - tox-py36:
-            nodeset: centos-latest-pod
-            vars:
-                tox_install_bindep: false
-        - dlrn-rpmbuild
-        - dlrn-rpmbuild-python3
-        - dlrn-rpmbuild-tripleo-ci-oooq
-        - dlrn-rpmbuild-tripleo-ci-oooq-centos8
-        - dlrn-api-functional-centos-7
-        - dlrn-api-functional-centos-8
-    gate:
-      jobs:
-        - tox-pep8:
-            nodeset: fedora-latest-pod
-        - tox-py27:
-            nodeset: centos-7-pod
-        - tox-py36:
-            nodeset: centos-latest-pod
-            vars:
-                tox_install_bindep: false
-        - dlrn-rpmbuild
-        - dlrn-rpmbuild-python3
-    post:
-      jobs:
-        - publish-readthedocs
-    release:
-      jobs:
-        - upload-pypi:
-            vars:
-              release_python: python3
-              twine_python: python3
-        - publish-readthedocs
+      jobs: []
