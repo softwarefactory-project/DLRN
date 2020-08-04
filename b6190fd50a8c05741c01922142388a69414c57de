@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09484dd0_9bf2d94b",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 535
+      },
+      "writtenOn": "2020-08-04T12:16:51Z",
+      "side": 1,
+      "message": "3.date.hash?",
+      "range": {
+        "startLine": 234,
+        "startChar": 41,
+        "endLine": 234,
+        "endChar": 46
+      },
+      "revId": "b6190fd50a8c05741c01922142388a69414c57de",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
