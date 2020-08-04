@@ -231,7 +231,7 @@ The configuration file looks like this:
 
 * ``release_minor`` only takes place when ``release_numbering`` is set to
   ``minor.date.hash``. For example, if this value is set to ``3``, the release number
-  for all packages will be computed as 3.minor.hash.
+  for all packages will be computed as 3.date.hash.
 
 * ``custom_preprocess``, if set, defines a comma-separated list of custom programs
   or scripts to be called as part of the pre-process step. The custom programs will
