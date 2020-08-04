@@ -22,6 +22,30 @@
       "revId": "b6190fd50a8c05741c01922142388a69414c57de",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ec0c9480_d5fedf9b",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-08-04T13:13:42Z",
+      "side": 1,
+      "message": "Oops! Thanks for that. I\u0027ll send a follow-up review to fix this.",
+      "parentUuid": "09484dd0_9bf2d94b",
+      "range": {
+        "startLine": 234,
+        "startChar": 41,
+        "endLine": 234,
+        "endChar": 46
+      },
+      "revId": "b6190fd50a8c05741c01922142388a69414c57de",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
