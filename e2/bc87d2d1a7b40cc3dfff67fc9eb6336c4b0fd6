@@ -1,0 +1,10 @@
+Code-Review+2: Javier Peña <jpena@redhat.com>
+Code-Review+1: Yatin Karel <ykarel@redhat.com>
+Code-Review+1: Daniel Pawlik <dpawlik@redhat.com>
+Workflow+1: Javier Peña <jpena@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Wed, 05 Aug 2020 11:44:14 +0000
+Reviewed-on: https://softwarefactory-project.io/r/18473
+Project: DLRN
+Branch: refs/heads/master
