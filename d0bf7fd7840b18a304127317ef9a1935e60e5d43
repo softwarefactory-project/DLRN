@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6dd316a3_b1522d3d",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 532
+      },
+      "writtenOn": "2020-08-13T12:40:53Z",
+      "side": 1,
+      "message": "After doing \u0027import\u0027, I actually think we should do \u0027rhpkg srpm\u0027 to grab the RPM name.\n\nThis is because what we import may be from somewhere where the disttag is different; \"rhpkg srpm\" ensures the nvr is copy/paste ready.\n\nI checked to ensure that changes are not required to be committed or pushed run \u0027rhpkg srpm\u0027.",
+      "revId": "d0bf7fd7840b18a304127317ef9a1935e60e5d43",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
