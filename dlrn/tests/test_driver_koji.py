@@ -229,7 +229,9 @@ class TestDriverKoji(base.TestCase):
                                  '-m',
                                  'DLRN build at %s\n\n'
                                  'Source SHA: 1234567890abcdef\n'
-                                 'Dist SHA: 1234567890abcdef\n' % pkg_date),
+                                 'Dist SHA: 1234567890abcdef\n'
+                                 'NVR: python-pysaml2-3.0-1a.el7.centos\n' %
+                                 pkg_date),
                        mock.call('/usr/bin/git log', '--pretty=format:%H %ct',
                                  '-1', '.'),
                        mock.call('%s/rhpkg' % self.temp_dir, 'build',
