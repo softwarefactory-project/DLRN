@@ -16,6 +16,24 @@
       "revId": "d0bf7fd7840b18a304127317ef9a1935e60e5d43",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d3278d50_05bf95ab",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-08-13T13:08:40Z",
+      "side": 1,
+      "message": "For our use case, we don\u0027t really need this. The srpm used to import was created using the mock configuration downloaded from brew, so the disttag is already correct.\n\nFor a more general case... Yes, if the mock configuration is not downloaded, we could have different disttags, but I\u0027m not sure if this would justify the extra effort.",
+      "parentUuid": "6dd316a3_b1522d3d",
+      "revId": "d0bf7fd7840b18a304127317ef9a1935e60e5d43",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
