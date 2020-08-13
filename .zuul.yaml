@@ -94,7 +94,8 @@
         - tox-pep8:
             nodeset: fedora-latest-pod
         - tox-py27:
-            nodeset: centos-7-pod
+            nodeset:
+              nodes: centos-7-epel-pod
         - tox-py36:
             nodeset: centos-latest-pod
             vars:
@@ -110,7 +111,7 @@
         - tox-pep8:
             nodeset: fedora-latest-pod
         - tox-py27:
-            nodeset: centos-7-pod
+            nodeset: centos-7-epel-pod
         - tox-py36:
             nodeset: centos-latest-pod
             vars:
