@@ -148,10 +148,19 @@ class KojiBuildDriver(BuildRPMDriver):
         with io.open("%s/rhpkgimport.log" % output_dir, 'a',
                      encoding='utf-8', errors='replace') as self.koji_fp:
             rhpkg('import', '--skip-diff', src_rpm)
+            # Get build NVR
+            m = re.search(r'([0-9a-zA-Z._+-]+)\.src\.rpm', src_rpm)
+            if m and m.group(1):
+                package_nvr = m.group(1)
+            else:
+                package_nvr = 'XXX-XXX'
+
             pkg_date = strftime("%Y-%m-%d-%H%M%S", localtime(time()))
             rhpkg('commit', '-p', '-m',
-                  'DLRN build at %s\n\nSource SHA: %s\nDist SHA: %s\n' %
-                  (pkg_date, commit.commit_hash, commit.distro_hash))
+                  'DLRN build at %s\n\nSource SHA: %s\nDist SHA: %s\n'
+                  'NVR: %s\n' %
+                  (pkg_date, commit.commit_hash, commit.distro_hash,
+                   package_nvr))
 
         # After running rhpkg commit, we have a different commit hash, so
         # let's update it
