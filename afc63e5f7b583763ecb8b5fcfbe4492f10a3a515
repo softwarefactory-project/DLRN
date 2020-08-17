@@ -46,6 +46,29 @@
       "revId": "afc63e5f7b583763ecb8b5fcfbe4492f10a3a515",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54cb8850_b7fad37b",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-08-17T10:16:15Z",
+      "side": 1,
+      "message": "I prefer small change like:\n\n    if m and m.group(1):\n        package_nvr \u003d m.group(1)\n    else\n        package_nvr \u003d \u0027XXX-XXX\u0027\n\nand then package_nvr \u003d None is not required in L153",
+      "range": {
+        "startLine": 154,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 39
+      },
+      "revId": "afc63e5f7b583763ecb8b5fcfbe4492f10a3a515",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
