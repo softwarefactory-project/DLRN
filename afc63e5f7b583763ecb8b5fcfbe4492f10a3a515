@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f410bb9_338e928e",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-08-17T10:13:02Z",
+      "side": 1,
+      "message": "is not better to use elif ?\nIn that case package_nvr will be always XXX-XXX",
+      "range": {
+        "startLine": 156,
+        "startChar": 12,
+        "endLine": 156,
+        "endChar": 31
+      },
+      "revId": "afc63e5f7b583763ecb8b5fcfbe4492f10a3a515",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
