@@ -171,6 +171,14 @@ class KojiBuildDriver(BuildRPMDriver):
         logger.info("Updated git: %s" % repoinfo)
         commit.extended_hash = repoinfo[0]
         commit.dt_extended = repoinfo[1]
+        # When using rhpkg with a pkginfo driver other than downstreamdriver,
+        # we also want to overwrite the distro_hash. Otherwise, The distgit
+        # update will trigger yet another build on the next run, causing an
+        # endless loop
+        if (self.config_options.pkginfo_driver !=
+                'dlrn.drivers.downstream.DownstreamInfoDriver'):
+            commit.distro_hash = commit.extended_hash
+            commit.dt_distro = commit.dt_extended
 
         # Since we are changing the extended_hash, we need to rename the
         # output directory to match the updated value
