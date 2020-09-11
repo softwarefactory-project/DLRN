@@ -63,7 +63,7 @@ class TestDriverKoji(base.TestCase):
         with open("%s/kojibuild.log" % self.temp_dir, 'a') as fp:
             fp.write("Created task: 1234")
         # In the rhpkg case, we need to create a full dir structure
-        self.rhpkg_extra_dir = "%s/repos/12/34/1234567890abcdef_12345678_1"\
+        self.rhpkg_extra_dir = "%s/repos/12/34/1234567890abcdef_1_12345678"\
                                % self.temp_dir
         os.makedirs(self.rhpkg_extra_dir)
         with open("%s/rhpkgbuild.log"
