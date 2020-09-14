@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f9b76353_a272fbb0",
+        "filename": "dlrn/drivers/kojidriver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-09-14T10:08:38Z",
+      "side": 1,
+      "message": "the\nbut don\u0027t do a new ps for fixing that",
+      "range": {
+        "startLine": 174,
+        "startChar": 21,
+        "endLine": 174,
+        "endChar": 24
+      },
+      "revId": "648c1f51d70ba3d5724574614a68d19ee96f1c51",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
