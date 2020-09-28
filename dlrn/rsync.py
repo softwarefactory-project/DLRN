@@ -57,6 +57,7 @@ def sync_symlinks(commit):
     rsyncdest = config_options.rsyncdest
     rsyncport = config_options.rsyncport
     datadir = os.path.realpath(config_options.datadir)
+    reponame = config_options.reponame
 
     if rsyncdest != '':
         # We want to sync the symlinks in a second pass, once all content
@@ -74,17 +75,54 @@ def sync_symlinks(commit):
         # are not symlinks, but full directories
 
         if config_options.use_components:
+            exclude_list = []
+            extra_include_list = []
             for filename in ['consistent', 'current']:
                 filepath = os.path.join(datadir, "repos", ".", filename)
                 rsyncpaths.append(filepath)
 
+                exclude_list.extend(['--exclude', '%s/%s.repo' %
+                                     (filename, reponame)])
+                exclude_list.extend(['--exclude', '%s/%s.repo.md5' %
+                                     (filename, reponame)])
+                exclude_list.extend(['--exclude', '%s/versions.csv' %
+                                    filename])
+                extra_include_list.append('%s/%s.repo' % (filepath, reponame))
+                extra_include_list.append('%s/%s.repo.md5' %
+                                          (filepath, reponame))
+                extra_include_list.append('%s/versions.csv' % filepath)
+
         rsh_command = 'ssh -p %s -o StrictHostKeyChecking=no' % rsyncport
-        try:
-            sh.rsync('-avzR', '--delete-delay',
-                     '-e', rsh_command,
-                     rsyncpaths, rsyncdest)
-        except Exception as e:
-            # We are not raising exceptions for symlink rsyncs, these will
-            # be fixed after another build
-            logger.warn('Failed to rsync symlinks to %s ,'
-                        'got error %s' % (rsyncdest, e))
+
+        if config_options.use_components:
+            try:
+                # First, rsync everything except the top-level symlinks
+                sh.rsync('-avzR', '--delete-delay',
+                         '-e', rsh_command,
+                         exclude_list,
+                         rsyncpaths, rsyncdest)
+            except Exception as e:
+                # We are not raising exceptions for symlink rsyncs, these will
+                # be fixed after another build
+                logger.warn('Failed to rsync symlinks to %s ,'
+                            'got error %s' % (rsyncdest, e))
+            try:
+                # Then, the top-level symlinks
+                sh.rsync('-avzR', '--delete-delay',
+                         '-e', rsh_command,
+                         extra_include_list, rsyncdest)
+            except Exception as e:
+                # We are not raising exceptions for symlink rsyncs, these will
+                # be fixed after another build
+                logger.warn('Failed to rsync symlinks to %s ,'
+                            'got error %s' % (rsyncdest, e))
+        else:
+            try:
+                sh.rsync('-avzR', '--delete-delay',
+                         '-e', rsh_command,
+                         rsyncpaths, rsyncdest)
+            except Exception as e:
+                # We are not raising exceptions for symlink rsyncs, these will
+                # be fixed after another build
+                logger.warn('Failed to rsync symlinks to %s ,'
+                            'got error %s' % (rsyncdest, e))
