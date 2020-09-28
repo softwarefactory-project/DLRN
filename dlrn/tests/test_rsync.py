@@ -106,11 +106,32 @@ class TestSyncRepo(base.TestCase):
         rsync.sync_symlinks(self.commit)
         expected = [mock.call('-avzR', '--delete-delay', '-e',
                               'ssh -p 30000 -o StrictHostKeyChecking=no',
+                              ['--exclude', 'consistent/delorean.repo',
+                               '--exclude', 'consistent/delorean.repo.md5',
+                               '--exclude', 'consistent/versions.csv',
+                               '--exclude', 'current/delorean.repo',
+                               '--exclude', 'current/delorean.repo.md5',
+                               '--exclude', 'current/versions.csv'],
                               [os.path.join(repodir, 'component/foocomp',
                                             'consistent'),
                                os.path.join(repodir, 'component/foocomp',
                                             'current'),
                                os.path.join(repodir, 'consistent'),
+                               os.path.join(repodir, 'current')],
+                              'user@host:/directory'),
+                    mock.call('-avzR', '--delete-delay', '-e',
+                              'ssh -p 30000 -o StrictHostKeyChecking=no',
+                              ['%s/delorean.repo' %
+                               os.path.join(repodir, 'consistent'),
+                               '%s/delorean.repo.md5' %
+                               os.path.join(repodir, 'consistent'),
+                               '%s/versions.csv' %
+                               os.path.join(repodir, 'consistent'),
+                               '%s/delorean.repo' %
+                               os.path.join(repodir, 'current'),
+                               '%s/delorean.repo.md5' %
+                               os.path.join(repodir, 'current'),
+                               '%s/versions.csv' %
                                os.path.join(repodir, 'current')],
                               'user@host:/directory')]
         self.assertEqual(sh_mock.call_args_list, expected)
