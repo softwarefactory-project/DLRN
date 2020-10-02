@@ -335,8 +335,12 @@ def main():
             # Preprocess spec if needed
             pkginfo.preprocess(package_name=project_name)
 
+            filename = None
+            for f in os.listdir(pkginfo.distgit_dir(project_name)):
+                if f.endswith('.spec'):
+                    filename = f
             specpath = os.path.join(pkginfo.distgit_dir(project_name),
-                                    project_name + '.spec')
+                                    filename)
             speclist.append(sh.rpmspec('-D', 'repo_bootstrap 1',
                                        '-P', specpath))
 
@@ -366,8 +370,10 @@ def main():
                 _a = a.dt_commit
                 _b = b.dt_commit
             else:
-                _a = orders.index(a.project_name)
-                _b = orders.index(b.project_name)
+                _a = orders.index(a.project_name) if a.project_name in \
+                    orders else sys.maxsize
+                _b = orders.index(b.project_name) if b.project_name in \
+                    orders else sys.maxsize
             # cmp is no longer available in python3 so replace it. See Ordering
             # Comparisons on:
             # https://docs.python.org/3.0/whatsnew/3.0.html
