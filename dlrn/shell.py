@@ -335,16 +335,24 @@ def main():
             # Preprocess spec if needed
             pkginfo.preprocess(package_name=project_name)
 
-            specpath = os.path.join(pkginfo.distgit_dir(project_name),
-                                    project_name + '.spec')
-            speclist.append(sh.rpmspec('-D', 'repo_bootstrap 1',
-                                       '-P', specpath))
+            filename = None
+            for f in os.listdir(pkginfo.distgit_dir(project_name)):
+                if f.endswith('.spec'):
+                    filename = f
 
-            # Check if repo_bootstrap is defined in the package.
-            # If so, we'll need to rebuild after the whole bootstrap exercise
-            rawspec = open(specpath).read(-1)
-            if 'repo_bootstrap' in rawspec:
-                bootstraplist.append(project_name)
+            if filename:
+                specpath = os.path.join(pkginfo.distgit_dir(project_name),
+                                        filename)
+                speclist.append(sh.rpmspec('-D', 'repo_bootstrap 1',
+                                           '-P', specpath))
+                # Check if repo_bootstrap is defined in the package.
+                # If so, we'll need to rebuild after the whole bootstrap
+                rawspec = open(specpath).read(-1)
+                if 'repo_bootstrap' in rawspec:
+                    bootstraplist.append(project_name)
+            else:
+                logger.warning("Could not find a spec for package %s" %
+                               project_name)
 
         logger.debug("Packages to rebuild: %s" % bootstraplist)
 
@@ -366,8 +374,10 @@ def main():
                 _a = a.dt_commit
                 _b = b.dt_commit
             else:
-                _a = orders.index(a.project_name)
-                _b = orders.index(b.project_name)
+                _a = orders.index(a.project_name) if a.project_name in \
+                    orders else sys.maxsize
+                _b = orders.index(b.project_name) if b.project_name in \
+                    orders else sys.maxsize
             # cmp is no longer available in python3 so replace it. See Ordering
             # Comparisons on:
             # https://docs.python.org/3.0/whatsnew/3.0.html
