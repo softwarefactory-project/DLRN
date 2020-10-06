@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b3be756f_c2ed9b9d",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 536
+      },
+      "writtenOn": "2020-10-06T13:01:49Z",
+      "side": 1,
+      "message": "probably should add a check for filename \u003d\u003d none. Not that it\u0027s likely to happen but it could",
+      "revId": "65774edced36a2562d593f5d2442a6c9467877aa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
