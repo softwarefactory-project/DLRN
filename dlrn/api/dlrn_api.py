@@ -1142,7 +1142,9 @@ def get_report():
             release = re.findall(r'0\.[0-9]{14}.[0-9a-f]{7}\.\w+',
                                  src_package.split('/')[-1])
 
-        commits_build_dir[commit.commit_hash] = {
+        key = "%s_%s_%s" % (commit.commit_hash, commit.distro_hash,
+                            commit.extended_hash)
+        commits_build_dir[key] = {
             'build_dir': "%s/%s" % (config_options.baseurl, commit_dir),
             'version': version,
             'release': ''.join(release)

@@ -1,3 +1,4 @@
+{% macro commit_key(commit) -%}{{ commit.commit_hash}}_{{ commit.distro_hash }}_{{ commit.extended_hash }}{%- endmacro %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -68,10 +69,10 @@
             </form>
           </td>
           <td>
-            {{ commits_build_dir[commit.commit_hash]['version'] }}
+            {{ commits_build_dir[commit_key(commit)]['version'] }}
           </td>
           <td>
-            {{ commits_build_dir[commit.commit_hash]['release'] }}
+            {{ commits_build_dir[commit_key(commit)]['release'] }}
           </td>
           <td class="commit">
             <i class="fa fa-git pull-left"></i>
@@ -105,10 +106,10 @@
           </td>
           <td>
             <i class="fa fa-link pull-left" style='color:#004153'></i>
-            <a href="{{ commits_build_dir[commit.commit_hash]['build_dir'] }}">repo</a>
+            <a href="{{ commits_build_dir[commit_key(commit)]['build_dir'] }}">repo</a>
           </td>
           <td>
-            <a href="{{ commits_build_dir[commit.commit_hash]['build_dir'] }}/rpmbuild.log">build log</a>
+            <a href="{{ commits_build_dir[commit_key(commit)]['build_dir'] }}/rpmbuild.log">build log</a>
           </td>
         </tr>
       {% endfor %}

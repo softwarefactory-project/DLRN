@@ -843,8 +843,9 @@ class TestGetReport(DLRNAPITestCase):
 
     def test_get_package_version(self, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/report.html')
-        package_info = rt_mock.call_args.kwargs['commits_build_dir'].get(
-            '93eee77657978547f5fad1cb8cd30b570da83e68')
+        key = ('93eee77657978547f5fad1cb8cd30b570da83e68_'
+               '008678d7b0e20fbae185f2bb1bd0d9d167586211_None')
+        package_info = rt_mock.call_args.kwargs['commits_build_dir'].get(key)
         self.assertEqual('6.1.1', package_info.get('version'))
         self.assertEqual('0.20200421095106.5aa891c.el7',
                          package_info.get('release'))
@@ -853,8 +854,9 @@ class TestGetReport(DLRNAPITestCase):
     def test_get_package_version_wrong_version(self, db2_mock, db_mock,
                                                rt_mock):
         response = self.app.get('/api/report.html')
-        package_info = rt_mock.call_args.kwargs['commits_build_dir'].get(
-            '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0e77')
+        key = ('1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc_'
+               '8170b8686c38bafb6021d998e2fb268ab26ccf65_None')
+        package_info = rt_mock.call_args.kwargs['commits_build_dir'].get(key)
         self.assertEqual('0.8.3-0.99.20150907.2338git.el7.centos.src.rpm',
                          package_info.get('version'))
         self.assertEqual('', package_info.get('release'))
