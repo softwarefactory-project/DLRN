@@ -16,6 +16,24 @@
       "revId": "65774edced36a2562d593f5d2442a6c9467877aa",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9970a180_488a6cc1",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-10-06T13:29:24Z",
+      "side": 1,
+      "message": "Right, it\u0027s unlikely to happen, but we should check for it. I\u0027ll fix it.",
+      "parentUuid": "b3be756f_c2ed9b9d",
+      "revId": "65774edced36a2562d593f5d2442a6c9467877aa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
