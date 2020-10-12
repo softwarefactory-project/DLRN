@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "723305c1_68d13244",
+        "filename": "dlrn/templates/report.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-10-12T15:11:16Z",
+      "side": 1,
+      "message": "of course we should put the styles and js scripts into the repo dir.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 111
+      },
+      "revId": "1b0a7b26d91a2a798dff4d9a4a33ed9c24d66503",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
