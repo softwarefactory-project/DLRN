@@ -1,46 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="utf-8">
     <title>{{ project_name }} Packaging By DLRN</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js" integrity="sha384-qPGCkCPOuGBUt/edB/0Dab3wE62dCo5HskKmbabea0YxTq2fhWoKXO8ItrP6qZu+" crossorigin="anonymous"></script>
     <h1>
       <i class='fa fa-chevron-circle-right pull-left'></i>
       {{ reponame | capitalize }} - {{ target | capitalize }} ({{ src }})
     </h1>
-    <table id="dlrn">
+    <table id="dlrn" class="pf-c-table pf-m-compact pf-m-grid-md cell-border hover" role="grid" aria-label="dlrntable">
+      <thead>
       <tr>
         <th>Project Name</th>
         <th>Status</th>
         <th>First failure after success {{ msg }}</th>
         <th>Number of days since last success</th>
       </tr>
+      </thead>
+      <tbody>
       {% for pkg in pkgs %}
-        <tr {% if pkg["last_build"].status == "SUCCESS" %}class="success"{% endif %}>
+        <tr {% if pkg["last_build"].status == "FAILED" %}class="failure"{% endif %}>
           <td>{{ pkg["name"] }}</td>
           {% if pkg["last_build"].status == "SUCCESS"  %}
             <td>
-              <i class="fa fa-thumbs-o-up pull-left" style="color:green"></i>
+              <i class="fas fa-thumbs-up pull-left" style="color:green"></i>
               <a href="{{ pkg["last_build"].getshardedcommitdir() }}/rpmbuild.log">SUCCESS</a>
             </td>
             <td></td>
             <td></td>
           {% elif pkg["last_build"].status == "RETRY"  %}
             <td>
-              <i class="fa fa-warning pull-left" style="color:yellow"></i>
+              <i class="fas fa-exclamation-triangle pull-left" style="color:yellow"></i>
               <a href="{{ pkg["last_build"].getshardedcommitdir() }}/rpmbuild.log">RETRY</a>
             </td>
             <td></td>
             <td></td>
           {% else %}
             <td>
-              <i class="fa fa-thumbs-o-down pull-left" style="color:red"></i>
+              <i class="fas fa-thumbs-down pull-left" style="color:red"></i>
               <a href="{{ pkg["last_build"].getshardedcommitdir() }}/rpmbuild.log">FAILED</a>
             </td>
             <td>
               {% if "first_failure" in pkg %}
-                <i class="fa fa-git pull-left"></i>
+                <i class="fas fa-link pull-left"></i>
                 <a href="{{ pkg["first_failure"] | get_commit_url }}{{ pkg["first_failure"].commit_hash }}">{{ pkg["first_failure"].commit_hash }}</a> (<a href="{{pkg["first_failure"].getshardedcommitdir() }}/rpmbuild.log">build log</a>)
               {% else %}
                 ??????
@@ -56,6 +62,16 @@
           {% endif %}
         </tr>
       {% endfor %}
+      </tbody>
     </table>
+    <script>
+        $(document).ready( function () {
+            $('#dlrn').DataTable({
+              "paging": false,
+              "searching": false,
+               "order": [[0, 'asc']],
+            });
+         } );
+    </script>
   </body>
 </html>
