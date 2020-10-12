@@ -79,11 +79,25 @@ def genreports(packages, head_only, session, all_commits):
     datadir = config_options.datadir
     repodir = os.path.join(datadir, "repos")
 
-    css_file = os.path.join(templatedir, 'stylesheets/styles.css')
+    content_files = ['css/patternfly.min.css',
+                     'css/patternfly-additions.min.css',
+                     'js/datatables.min.js',
+                     'js/jquery-3.5.1.min.js'
+                     'fonts/fontawesome-webfont.woff',
+                     'fonts/fontawesome-webfont.woff2']
 
     # create directories
     if not os.path.exists(repodir):
         os.makedirs(repodir)
+
+    if not os.path.exists("%s/js" % repodir):
+        os.makedirs("%s/js" % repodir)
+
+    if not os.path.exists("%s/css" % repodir):
+        os.makedirs("%s/css" % repodir)
+
+    if not os.path.exists("%s/fonts" % repodir):
+        os.makedirs("%s/fonts" % repodir)
 
     # configure jinja and filters
     jinja_env = jinja2.Environment(
@@ -100,7 +114,9 @@ def genreports(packages, head_only, session, all_commits):
                                     project_name=project_name,
                                     target=target,
                                     commits=commits)
-    shutil.copy2(css_file, os.path.join(repodir, "styles.css"))
+    for content_file in content_files:
+        shutil.copy2(os.path.join(templatedir, content_file),
+                     os.path.join(repodir, content_file))
     report_file = os.path.join(repodir, "report.html")
     with open(report_file, "w") as fp:
         fp.write(content)
