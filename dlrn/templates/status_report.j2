@@ -2,14 +2,15 @@
 <html lang="en">
   <head>
     <title>{{ project_name }} Packaging By DLRN</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="css/patternfly.min.css">
+    <link rel="stylesheet" type="text/css" href="css/patternfly-additions.min.css">
   </head>
   <body>
     <h1>
       <i class='fa fa-chevron-circle-right pull-left'></i>
       {{ reponame | capitalize }} - {{ target | capitalize }} ({{ src }})
     </h1>
-    <table id="dlrn">
+    <table id="dlrn" class="table">
       <tr>
         <th>Project Name</th>
         <th>Status</th>
@@ -57,5 +58,12 @@
         </tr>
       {% endfor %}
     </table>
+    <script>
+        $(document).ready( function () {
+            $('#dlrn').DataTable({
+              "paging": false
+            });
+         } );
+    </script>
   </body>
 </html>
