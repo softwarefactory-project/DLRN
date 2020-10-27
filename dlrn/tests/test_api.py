@@ -894,13 +894,13 @@ class TestGetPromotions(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data), 3)
 
     def test_get_promotions_multiple_votes_url_params(self, db2_mock, db_mock):
         response = self.app.get('/api/promotions')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data), 3)
 
     def test_get_promotions_with_promote_name(self, db2_mock, db_mock):
         req_data = json.dumps(dict(promote_name='another-ci'))
@@ -937,13 +937,13 @@ class TestGetPromotions(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 1)
+        self.assertEqual(len(data), 2)
 
     def test_get_promotions_with_offset_url_params(self, db2_mock, db_mock):
         response = self.app.get('/api/promotions?offset=1')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 1)
+        self.assertEqual(len(data), 2)
 
     def test_get_promotions_with_limit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(limit=1))
@@ -959,6 +959,16 @@ class TestGetPromotions(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
+
+    def test_get_promotions_same_timestamp(self, db2_mock, db_mock):
+        response = self.app.get('/api/promotions?promote_name=foo-ci&limit=2')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data[0]['aggregate_hash'], 'abcd1234')
+        # This proves that the second commit, with the same timestamp, is the
+        # one with a lower id
+        self.assertEqual(data[1]['aggregate_hash'], None)
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)

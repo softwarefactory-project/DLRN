@@ -130,5 +130,9 @@ promotions:
   commit_id: '5627'
   promotion_name: 'foo-ci'
   timestamp: '1503307099'
-  aggregate_hash: '90abcdef'
-# This promotion has no user, to check that we support that, too
+# This promotion has no user and no aggregate hash, to check that we support that, too
+- id: '3'
+  commit_id: '5628'
+  promotion_name: 'foo-ci'
+  timestamp: '1503307099'
+  aggregate_hash: 'abcd1234'

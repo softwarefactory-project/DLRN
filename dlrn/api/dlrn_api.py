@@ -407,7 +407,7 @@ def promotions_GET():
     if component is not None:
         promotions = promotions.filter(Promotion.component == component)
 
-    promotions = promotions.order_by(desc(Promotion.timestamp)).limit(limit).\
+    promotions = promotions.order_by(desc(Promotion.id)).limit(limit).\
         offset(offset)
 
     # And format the output
