@@ -22,6 +22,7 @@ except KeyError:
     pass
 
 from dlrn.api import dlrn_api  # noqa
+from dlrn.api import graphql # noqa
 from dlrn.config import setup_logging  # noqa
 
 
