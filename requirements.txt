@@ -15,3 +15,7 @@ requests
 Flask
 Flask-HTTPAuth
 passlib>=1.6.5
+graphene
+graphene-sqlalchemy
+flask-sqlalchemy
+flask-graphql
