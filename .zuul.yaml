@@ -84,6 +84,16 @@
         - name: centos-8
           label: upstream-centos-8-vexxhost
 
+- job:
+    name: docs-build
+    description: Build the DLRN docs
+    run: playbooks/dlrndocbuild.yaml
+    success-url: 'docs-html/index.html'
+    nodeset:
+      nodes:
+        - name: container
+          label: pod-python-f32
+
 - project:
     name: DLRN
     vars:
