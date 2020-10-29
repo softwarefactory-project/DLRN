@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'DLRN'
-copyright = '2016, RDO Project'
+copyright = '2016-2020, RDO Project'
 author = 'RDO Community'
 
 # The version info for the project you're documenting, acts as replacement for
