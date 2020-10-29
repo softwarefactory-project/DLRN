@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0b6b8ebb_fdb6ec72",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-10-29T14:14:07Z",
+      "side": 1,
+      "message": "Once it has been tested, maybe we could add the following so it only runs when something is changed in the documentation:\n\n    files:\n      - ^doc/.*$",
+      "revId": "d8caa9cd36a47631a44dfd70e87f973818652cb6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
