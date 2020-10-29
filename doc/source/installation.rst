@@ -361,7 +361,8 @@ options:
   used:
 
 .. code-block:: ini
-    downstream_spec_replace_list=^%global with_doc.+/%global with_doc 0
+
+   downstream_spec_replace_list=^%global with_doc.+/%global with_doc 0
 
   Multiple regular expressions can be used, separated by commas.
 
@@ -419,6 +420,7 @@ following configuration options are included:
   retrieving mock configuration from Koji instance).
 * ``use_rhpkg`` allows us to use ``rhpkg`` as the build tool in combination with
   ``koji_exe``. That involves some changes in the workflow:
+
   * Instead of using ``koji_exe`` to trigger the build, DLRN will generate the
     source RPM, and upload it to the distgit path using ``rhpkg import``.
   * DLRN will run ``rhpkg build`` to actually trigger the build.
@@ -499,7 +501,7 @@ For MariaDB, use a mysql+pymysql driver, with the following string:
 
     database_connection=mysql+pymysql://user:password@serverIP/dlrn
 
-That requires you to pre-create the ``dlrn``database.
+That requires you to pre-create the ``dlrn`` database.
 
 If your MariaDB database is placed on a publicly accessible server, you will want to
 secure it as a first step:
