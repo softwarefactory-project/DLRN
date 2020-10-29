@@ -113,7 +113,7 @@ timestamps of the commits.
 
 
 Advanced single package build
-----------------------------
+-----------------------------
 
 Run DLRN for the package you are trying to build.
 
