@@ -1,0 +1,15 @@
+---
+- hosts: all
+  vars:
+    working_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}'
+  tasks:
+    - name: Install test-requirements for building Spinx doc
+      pip:
+        requirements: "{{ working_dir }}/test-requirements.txt"
+
+    # FIXME(dpawlik): Add flag '-W' when warning messages are fixed.
+    - name: "Run sphinx-build"
+      command:
+        "sphinx-build -b html -d build/doctrees doc/source {{ ansible_user_dir }}/zuul-output/logs/docs-html/"
+      args:
+        chdir: "{{ working_dir }}"
