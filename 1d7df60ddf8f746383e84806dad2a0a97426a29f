@@ -34,6 +34,24 @@
       "revId": "1d7df60ddf8f746383e84806dad2a0a97426a29f",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c49545a1_ee265779",
+        "filename": "doc/source/graphql.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-10-29T14:48:38Z",
+      "side": 1,
+      "message": "I found a way to do it with the following script:\n\nfrom dlrn.api.graphql import schema\nfrom graphql.utils import schema_printer\n\nschema_str \u003d schema_printer.print_schema(schema)\nprint(schema_str)\n\nBut maybe its output should be modified a bit to look better in rst.",
+      "parentUuid": "da694d95_f03aeaa5",
+      "revId": "1d7df60ddf8f746383e84806dad2a0a97426a29f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
