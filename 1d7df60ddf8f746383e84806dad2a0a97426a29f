@@ -16,6 +16,24 @@
       "revId": "1d7df60ddf8f746383e84806dad2a0a97426a29f",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da694d95_f03aeaa5",
+        "filename": "doc/source/graphql.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-10-29T14:17:40Z",
+      "side": 1,
+      "message": "Let me see if I can find a way. I copy/pasted some stuff from the GraphiQL page, but I don\u0027t know if there\u0027s a better way.",
+      "parentUuid": "1b534a78_7b5731ca",
+      "revId": "1d7df60ddf8f746383e84806dad2a0a97426a29f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
