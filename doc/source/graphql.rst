@@ -23,7 +23,7 @@ script:
 Types
 -----
 
-.. code-block:: none
+.. code-block::
 
     type Commit {
         type: String
@@ -47,6 +47,20 @@ Types
 
 The Commit type is converted from its schema in the database.
 
+.. code-block::
+
+   type civotes {
+        commitId: Int
+        ciName: String
+        ciVote: String
+        ciInProgress: Bool
+        timestamp: Int
+        user: String
+        component: String
+   }
+
+Like Commit type, CIVote is converted from its schema to database.
+
 Queries
 -------
 
@@ -54,7 +68,11 @@ All queries should conform to the GraphQL language. Note that you will need to s
 which fields from the return type you want to get. See `the GraphQL tutorial <https://graphql.org/learn/queries/>`_
 for additional details.
 
-.. code-block:: none
+Available queries:
+
+* commits
+
+.. code-block::
 
     commits(
         projectName: String
@@ -71,6 +89,32 @@ Arguments:
 - status: limit the results to the commits with the specified status.
 - offset: return the results after the specified entry.
 - limit: return a maximum amount of commits (100 by default, cannot be higher than 100).
+
+
+* civotes
+
+.. code-block::
+
+   civotes(
+        commitId: Int
+        ciName: String
+        ciVote: Boolean
+        ciInProgress: Boolean
+        timestamp: Int
+        user: String
+        component: String
+    ): [CIVote]
+
+Arguments:
+
+- commitId: limit the results to the civotes beloging to the commit id.
+- ciName: limit the results to the civotes beloging to the CI name.
+- ciVote: limit the results to the civotes beloging to the voting CI.
+- ciInProgress: limit the results to the civotes beloging to "In Progress" state.
+- timestamp: limit the results to the civotes beloging to the specified timestamp.
+- user: limit the results to the civotes beloging to the specified user.
+- component: limit the results to the civotes beloging to the specified component.
+
 
 *****************************
 Querying the GraphQL endpoint

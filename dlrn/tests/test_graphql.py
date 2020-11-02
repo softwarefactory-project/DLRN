@@ -163,3 +163,78 @@ class TestCommitsQuery(DLRNAPIGraphQLTestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data['data']['commits']), 2)
+
+
+@mock.patch('dlrn.api.graphql.getSession', side_effect=mocked_session)
+class TestCIVotesQuery(DLRNAPIGraphQLTestCase):
+    def test_basic_query(self, db_mock):
+        response = self.app.get('/api/graphql?query={ civotes { id } }')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civotes']), 4)
+
+    def test_filtered_query(self, db_mock):
+        query = """
+            query {
+                civotes(commitId: 5627)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civotes']), 2)
+
+    def test_filtered_query_component(self, db_mock):
+        query = """
+            query {
+                civotes(ciName: "another-ci")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civotes']), 1)
+
+    def test_badfiltered_query(self, db_mock):
+        query = """
+            query {
+                civotes(commitId: "TextnotInt")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_multiple_fields(self, db_mock):
+        query = """
+            query {
+                civotes(commitId: 5627)
+                {
+                    commitId
+                    ciName
+                    ciVote
+                    ciInProgress
+                    timestamp
+                    user
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civotes']), 2)
+        self.assertEqual(data['data']['civotes'][0]['commitId'], 5627)
+        self.assertEqual(data['data']['civotes'][0]['ciName'], 'consistent')
+        self.assertEqual(data['data']['civotes'][0]['ciVote'], True)
+        self.assertEqual(data['data']['civotes'][0]['ciInProgress'], False)
+        self.assertEqual(data['data']['civotes'][0]['timestamp'], 1441635089)
+        self.assertEqual(data['data']['civotes'][0]['user'], 'foo')
+        assert 'component' not in data['data']['civotes'][0]
