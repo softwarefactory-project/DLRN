@@ -27,10 +27,10 @@ from flask import g
 
 from dlrn.api import app
 from dlrn.api.utils import InvalidUsage
+from dlrn.db import CIVote as CIVoteModel
 from dlrn.db import closeSession
 from dlrn.db import Commit as CommitModel
 from dlrn.db import getSession
-
 
 # These values are the same as in dlrn_api.py
 pagination_limit = 100
@@ -53,6 +53,11 @@ if graphene:
             model = CommitModel
             interfaces = (relay.Node, )
 
+    class CIVote(SQLAlchemyObjectType):
+        class Meta:
+            model = CIVoteModel
+            interfaces = (relay.Node, )
+
     class Query(graphene.ObjectType):
         node = relay.Node.Field()
         commits = graphene.List(Commit,
@@ -61,6 +66,14 @@ if graphene:
                                 status=graphene.String(),
                                 offset=graphene.Int(),
                                 limit=graphene.Int())
+        civote = graphene.List(CIVote,
+                               commitId=graphene.Int(),
+                               ciName=graphene.String(),
+                               ciVote=graphene.Boolean(),
+                               ciInProgress=graphene.Boolean(),
+                               timestamp=graphene.Int(),
+                               user=graphene.String(),
+                               component=graphene.String())
 
         def resolve_commits(self, info, **args):
             project_name = args.get("projectName", None)
@@ -82,6 +95,44 @@ if graphene:
                 query = query.filter(CommitModel.status == status)
 
             # Enforce pagination limit and offset
+            query = query.limit(limit).offset(offset)
+            return query.all()
+
+        def resolve_civote(self, info, **args):
+            # common variables
+            offset = args.get("offset", 0)
+            limit = args.get("limit", pagination_limit)
+
+            # civote query params
+            commit_id = args.get("commitId", None)
+            ci_name = args.get("ciName", None)
+            ci_vote = args.get("ciVote", None)
+            ci_in_progress = args.get("ciInProgress", None)
+            timestamp = args.get("timestamp", None)
+            user = args.get("user", None)
+            component = args.get("component", None)
+
+            # Make sure we do not exceed the pagination limit
+            if limit > max_limit:
+                limit = max_limit
+            query = CIVote.get_query(info)
+
+            if commit_id:
+                query = query.filter(CIVoteModel.commit_id == commit_id)
+            if ci_name:
+                query = query.filter(CIVoteModel.ci_name == ci_name)
+            if ci_vote:
+                query = query.filter(CIVoteModel.ci_vote == ci_vote)
+            if ci_in_progress:
+                query = query.filter(CIVoteModel.ci_in_progress ==
+                                     ci_in_progress)
+            if timestamp:
+                query = query.filter(CIVoteModel.timestamp == timestamp)
+            if user:
+                query = query.filter(CIVoteModel.user == user)
+            if component:
+                query = query.filter(CIVoteModel.component == component)
+
             query = query.limit(limit).offset(offset)
             return query.all()
 
