@@ -44,6 +44,7 @@ Types
         artifacts: String
         notes: String
         flags: Int
+        civotes(before: String, after: String, first: Int, last: Int): CIVoteConnection
     }
 
 The Commit type is converted from its schema in the database.
@@ -54,11 +55,14 @@ The Commit type is converted from its schema in the database.
         id: ID!
         commitId: Int!
         ciName: String
-        ciVote: String
-        ciInProgress: Bool
+        ciUrl: String
+        ciVote: Boolean
+        ciInProgress: Boolean
         timestamp: Int
+        notes: String
         user: String
         component: String
+        commit: Commit
    }
 
 Like Commit type, CIVote is converted from its schema to database.
@@ -70,7 +74,7 @@ Like Commit type, CIVote is converted from its schema to database.
         refHash: String!
         ciName: String
         ciUrl: String
-        ciVote: String
+        ciVote: Boolean
         ciInProgress: Boolean
         timestamp: Int
         notes: String
