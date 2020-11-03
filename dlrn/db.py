@@ -28,6 +28,7 @@ from sqlalchemy import String
 from sqlalchemy import Text
 
 from sqlalchemy.engine.base import Engine
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import synonym
 from sqlalchemy.pool import NullPool
@@ -40,23 +41,37 @@ class Commit(Base):
 
     id = Column(Integer, primary_key=True)
     # Type has a default value for safety, this may be dropped in the future
-    type = Column(String(18), default="rpm")
-    dt_commit = Column(Integer)
-    dt_distro = Column(Integer)
-    dt_extended = Column(Integer)
-    dt_build = Column(Integer)
-    project_name = Column(String(256))
-    repo_dir = Column(String(1024))
-    distgit_dir = Column(String(1024))
-    commit_hash = Column(String(64))
-    distro_hash = Column(String(64))
-    extended_hash = Column(String(64))
-    commit_branch = Column(String(256))
-    status = Column(String(64))
-    component = Column(String(64))
-    artifacts = Column(Text)
-    notes = Column(Text)
-    flags = Column(Integer, default=0)
+    type = Column(String(18), default="rpm",
+                  doc="Type of the commit, can be rpm or container")
+    dt_commit = Column(Integer,
+                       doc="Timestamp for the source commit, in seconds since"
+                           " the UNIX epoch")
+    dt_distro = Column(Integer,
+                       doc="Timestamp for the distro commit, in seconds since"
+                           " the UNIX epoch")
+    dt_extended = Column(Integer,
+                         doc="Timestamp for the extended commit, in seconds "
+                             "since the UNIX epoch")
+    dt_build = Column(Integer,
+                      doc="Timestamp for the build, in seconds since the "
+                          "UNIX epoch")
+    project_name = Column(String(256), doc="Name of the project")
+    repo_dir = Column(String(1024), doc="Path to the repository")
+    distgit_dir = Column(String(1024), doc="Directory where the distro git "
+                                           "is located")
+    commit_hash = Column(String(64), doc="Git hash of the source commit")
+    distro_hash = Column(String(64), doc="Git hash of the distro commit")
+    extended_hash = Column(String(64), doc="Git hash of the extended commit")
+    commit_branch = Column(String(256),
+                           doc="Branch for the source commit")
+    status = Column(String(64), doc="Build status, can be SUCCESS, FAILED "
+                                    "or RETRY")
+    component = Column(String(64), doc="Component for the package")
+    artifacts = Column(Text, doc="Path to generated artifacts")
+    notes = Column(Text, doc="Notes, free-form")
+    flags = Column(Integer, default=0, docs="Internal flags")
+    civotes = relationship("CIVote", back_populates="commit")
+    promotions = relationship("Promotion", back_populates="commit")
 
     # For backwards compatibility when importing commits
     rpms = synonym("artifacts")
@@ -95,8 +110,8 @@ class Project(Base):
     __tablename__ = "projects"
 
     id = Column(Integer, primary_key=True)
-    project_name = Column(String(256))
-    last_email = Column(Integer)
+    project_name = Column(String(256), doc="Name of the project")
+    last_email = Column(Integer, doc="Time when the last email was sent")
 
     # Returns True if the last email sent for this project
     # was less then 24 hours ago
@@ -114,44 +129,70 @@ class CIVote(Base):
     __tablename__ = "civotes"
 
     id = Column(Integer, primary_key=True)
-    commit_id = Column(Integer, ForeignKey('commits.id'), nullable=False)
-    ci_name = Column(String(256))
-    ci_url = Column(String(1024))
-    ci_vote = Column(Boolean)
-    ci_in_progress = Column(Boolean)
-    timestamp = Column(Integer)
-    notes = Column(Text)
+    commit_id = Column(Integer, ForeignKey('commits.id'), nullable=False,
+                       doc="Id of the commit that received the vote")
+    ci_name = Column(String(256),
+                     doc="Name of the CI sending the vote")
+    ci_url = Column(String(1024),
+                    doc="Name of the CI sending the vote")
+    ci_vote = Column(Boolean,
+                     doc="True if the CI job succeeded, False if not")
+    ci_in_progress = Column(Boolean,
+                            doc="True if the CI job is still running")
+    timestamp = Column(Integer,
+                       doc="Timestamp of the vote, in seconds since the "
+                           "UNIX epoch")
+    notes = Column(Text, doc="Additional notes, free-form")
     user = Column(String(255),
-                  ForeignKey('users.username', name='civ_user_fk'))
-    component = Column(String(64))
+                  ForeignKey('users.username', name='civ_user_fk'),
+                  doc="User sending the vote")
+    component = Column(String(64),
+                       doc="Component for the commit")
+    commit = relationship("Commit", back_populates="civotes")
 
 
 class CIVote_Aggregate(Base):
     __tablename__ = "civotes_agg"
 
     id = Column(Integer, primary_key=True)
-    ref_hash = Column(String(64), nullable=False)
-    ci_name = Column(String(256))
-    ci_url = Column(String(1024))
-    ci_vote = Column(Boolean)
-    ci_in_progress = Column(Boolean)
-    timestamp = Column(Integer)
-    notes = Column(Text)
+    ref_hash = Column(String(64), nullable=False,
+                      doc="Aggregate hash that received the vote")
+    ci_name = Column(String(256),
+                     doc="Name of the CI sending the vote")
+    ci_url = Column(String(1024),
+                    doc="Name of the CI sending the vote")
+    ci_vote = Column(Boolean,
+                     doc="True if the CI job succeeded, False if not")
+    ci_in_progress = Column(Boolean,
+                            doc="True if the CI job is still running")
+    timestamp = Column(Integer,
+                       doc="Timestamp of the vote, in seconds since the "
+                           "UNIX epoch")
+    notes = Column(Text, doc="Additional notes, free-form")
     user = Column(String(255),
-                  ForeignKey('users.username'))
+                  ForeignKey('users.username'),
+                  doc="User sending the vote")
 
 
 class Promotion(Base):
     __tablename__ = "promotions"
 
     id = Column(Integer, primary_key=True)
-    commit_id = Column(Integer, ForeignKey('commits.id'), nullable=False)
-    promotion_name = Column(String(256), nullable=False)
-    timestamp = Column(Integer, nullable=False)
+    commit_id = Column(Integer, ForeignKey('commits.id'), nullable=False,
+                       doc="Id of the commit that was promoted, optional")
+    promotion_name = Column(String(256), nullable=False,
+                            doc="Name of the promotion")
+    timestamp = Column(Integer, nullable=False,
+                       doc="Timestamp of the promotion, in seconds since the "
+                           "UNIX epoch")
     user = Column(String(255),
-                  ForeignKey('users.username', name='prom_user_fk'))
-    component = Column(String(64))
-    aggregate_hash = Column(String(64))
+                  ForeignKey('users.username', name='prom_user_fk'),
+                  doc="User running the promotion")
+    component = Column(String(64),
+                       doc="Component for the commit")
+    aggregate_hash = Column(String(64),
+                            doc="Aggregate hash that was promoted, optional")
+    commit = relationship("Commit", back_populates="promotions")
 
 
 class User(Base):
