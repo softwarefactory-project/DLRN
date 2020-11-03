@@ -163,3 +163,67 @@ class TestCommitsQuery(DLRNAPIGraphQLTestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data['data']['commits']), 2)
+
+
+@mock.patch('dlrn.api.graphql.getSession', side_effect=mocked_session)
+class TestCIVoteAggregationQuery(DLRNAPIGraphQLTestCase):
+    def test_basic_query(self, db_mock):
+        response = self.app.get('/api/graphql?query={ civoteAgg { id } }')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 3)
+
+    def test_filtered_query(self, db_mock):
+        query = """
+            query {
+                civoteAgg(refHash: "12345678")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 2)
+
+    def test_badfiltered_query(self, db_mock):
+        query = """
+            query {
+                civoteAgg(commit_id: "TextnotInt")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_multiple_fields(self, db_mock):
+        query = """
+            query {
+                civoteAgg(refHash: "12345678")
+                {
+                    id
+                    refHash
+                    ciName
+                    ciUrl
+                    ciVote
+                    ciInProgress
+                    timestamp
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 2)
+        self.assertEqual(data['data']['civoteAgg'][0]['refHash'], '12345678')
+        self.assertEqual(data['data']['civoteAgg'][0]['ciName'], 'phase2-ci')
+        self.assertEqual(data['data']['civoteAgg'][0]['ciUrl'],
+                         'http://dummyci.example.com/phase2-ci')
+        self.assertEqual(data['data']['civoteAgg'][0]['ciVote'], True)
+        self.assertEqual(data['data']['civoteAgg'][0]['ciInProgress'], False)
+        self.assertEqual(data['data']['civoteAgg'][0]['timestamp'],
+                         1441635095)
+        assert 'user' not in data['data']['civoteAgg'][0]
