@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7759fe25_39bc56eb",
+        "filename": "doc/source/graphql.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-03T18:02:19Z",
+      "side": 1,
+      "message": "missing \u0027:\u0027, I think",
+      "revId": "229fc6d230c94c2badcded8d1ee2839c95894ff6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
