@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f39561fd_b125c235",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-03T14:49:24Z",
+      "side": 1,
+      "message": "Actually, I see we can run \"tox -epy3\" without this patch. \n\nIf we want to make sure this support is explicit, I would suggest to add py3 and keep py36 (which is important for CentOS 8 support), instead of replacing.",
+      "revId": "e58173f1242e20e733989099e7217c7cb2c99032",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
