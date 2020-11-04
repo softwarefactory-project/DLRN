@@ -28,6 +28,17 @@ def mocked_session(url):
     return session
 
 
+def mocked_getpackages(**kwargs):
+    return [{'upstream': 'https://github.com/openstack/python-pysaml2',
+             'name': 'python-pysaml2', 'maintainers': 'test@test.com'},
+            {'upstream': 'https://github.com/openstack/python-alembic',
+             'name': 'python-alembic', 'maintainers': 'test@test.com'},
+            {'upstream': 'https://github.com/openstack/puppet-stdlib',
+             'name': 'puppet-stdlib', 'maintainers': 'test@test.com'},
+            {'upstream': 'https://github.com/openstack/puppet-apache',
+             'name': 'puppet-apache', 'maintainers': 'test@test.com'}]
+
+
 class DLRNAPIGraphQLTestCase(base.TestCase):
     def setUp(self):
         super(DLRNAPIGraphQLTestCase, self).setUp()
@@ -304,3 +315,90 @@ class TestCIVoteAggregationQuery(DLRNAPIGraphQLTestCase):
                          1441635095)
         self.assertEqual(data['data']['civoteAgg'][0]['notes'], '')
         assert 'user' not in data['data']['civoteAgg'][0]
+
+
+@mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver.getpackages',
+            side_effect=mocked_getpackages)
+@mock.patch('dlrn.api.graphql.getSession', side_effect=mocked_session)
+class TestPackageStatusQuery(DLRNAPIGraphQLTestCase):
+    def test_basic_query(self, db_mock, gp_mock):
+        response = self.app.get('/api/graphql?query={ packageStatus { id } }')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['packageStatus']), 4)
+
+    def test_filtered_query(self, db_mock, gp_mock):
+        query = """
+            query {
+                packageStatus(projectName: "python-alembic")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['packageStatus']), 1)
+
+    def test_filtered_query_status(self, db_mock, gp_mock):
+        query = """
+            query {
+                packageStatus(status: "NO_BUILD")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['packageStatus']), 1)
+
+    def test_filtered_query_missing(self, db_mock, gp_mock):
+        query = """
+            query {
+                packageStatus(status: "FAILED")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['packageStatus']), 0)
+
+    def test_badfiltered_query(self, db_mock, gp_mock):
+        query = """
+            query {
+                packageStatus(statuserror: "RETRY")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_multiple_fields(self, db_mock, gp_mock):
+        query = """
+            query {
+                packageStatus(status: "SUCCESS")
+                {
+                    id
+                    projectName
+                    status
+                    lastSuccess
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['packageStatus']), 3)
+        self.assertEqual(data['data']['packageStatus'][0]['projectName'],
+                         'python-pysaml2')
+        self.assertEqual(data['data']['packageStatus'][0]['status'],
+                         'SUCCESS')
+        self.assertEqual(data['data']['packageStatus'][0]['lastSuccess'], None)
+        assert 'firstFailureCommit' not in data['data']['packageStatus'][0]

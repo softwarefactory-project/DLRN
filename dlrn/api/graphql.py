@@ -23,15 +23,20 @@ try:
 except ImportError:
     graphene = None
 
+from datetime import datetime
 from flask import g
+from six.moves import configparser
 
 from dlrn.api import app
 from dlrn.api.utils import InvalidUsage
+from dlrn.config import ConfigOptions
 from dlrn.db import CIVote as CIVoteModel
 from dlrn.db import CIVote_Aggregate as CIVoteAggModel
 from dlrn.db import closeSession
 from dlrn.db import Commit as CommitModel
+from dlrn.db import getCommits
 from dlrn.db import getSession
+from dlrn.utils import import_object
 
 # These values are the same as in dlrn_api.py
 pagination_limit = 100
@@ -46,6 +51,12 @@ def _get_db():
     if 'db' not in g:
         g.db = getSession(app.config['DB_PATH'])
     return g.db
+
+
+def _get_config_options(config_file):
+    cp = configparser.RawConfigParser()
+    cp.read(config_file)
+    return ConfigOptions(cp)
 
 
 if graphene:
@@ -63,6 +74,23 @@ if graphene:
         class Meta:
             model = CIVoteAggModel
             interfaces = (relay.Node, )
+
+    class PackageStatus(graphene.ObjectType):
+        id = graphene.NonNull(graphene.ID,
+                              description="Unique identifier for package "
+                                          "status")
+        project_name = graphene.NonNull(graphene.String,
+                                        description="Name of the project")
+        status = graphene.NonNull(graphene.String,
+                                  description="Build status, can be one of "
+                                              "SUCCESS, FAILED, RETRY or "
+                                              "NO_BUILD")
+        last_success = graphene.DateTime(
+            description="If status is FAILED, date and time of the "
+                        "last successful build")
+        first_failure_commit = graphene.String(
+            description="If status is FAILED, source commit has of the "
+                        "first failed build")
 
     class Query(graphene.ObjectType):
         node = relay.Node.Field()
@@ -88,6 +116,10 @@ if graphene:
                                   ciInProgress=graphene.Boolean(),
                                   timestamp=graphene.Int(),
                                   user=graphene.String())
+
+        packageStatus = graphene.List(PackageStatus,
+                                      projectName=graphene.String(),
+                                      status=graphene.String())
 
         def resolve_commits(self, info, **args):
             project_name = args.get("projectName", None)
@@ -186,13 +218,69 @@ if graphene:
             query = query.limit(limit).offset(offset)
             return query.all()
 
+        def resolve_packageStatus(self, info, **args):
+            project_name = args.get("projectName", None)
+            status = args.get("status", None)
+
+            if project_name:
+                packages = [{'name': project_name}]
+            else:
+                # The only canonical source of information for the package list
+                # is rdoinfo (or whatever pkginfo driver we use)
+                config_options = _get_config_options(app.config['CONFIG_FILE'])
+                pkginfo_driver = config_options.pkginfo_driver
+                pkginfo = import_object(pkginfo_driver,
+                                        cfg_options=config_options)
+                packages = pkginfo.getpackages(tags=config_options.tags)
+
+            i = 0
+            result = []
+            session = _get_db()
+            for package in packages:
+                pkg = package['name']
+                commits = getCommits(session, project=pkg, limit=1)
+                # No builds
+                if commits.count() == 0:
+                    if not status or status == 'NO_BUILD':
+                        result.append({'id': i,
+                                       'project_name': pkg,
+                                       'status': 'NO_BUILD'})
+                    i += 1
+                    continue
+                last_build = commits.first()
+                # last build was successul
+                if last_build.status == "SUCCESS":
+                    if not status or status == 'SUCCESS':
+                        result.append({'id': i,
+                                       'project_name': pkg,
+                                       'status': 'SUCCESS'})
+                else:
+                    if not status or status == last_build.status:
+                        # Retrieve last successful build
+                        commits = getCommits(session, project=pkg,
+                                             with_status="SUCCESS", limit=1)
+                        # No successful builds
+                        if commits.count() == 0:
+                            last_success = datetime(1970, 1, 1, 0, 0, 0)
+                        else:
+                            last_success = datetime.fromtimestamp(
+                                commits.first().dt_build)
+                        result.append({'id': i,
+                                       'project_name': pkg,
+                                       'status': 'FAILED',
+                                       'last_success': last_success,
+                                       'first_failure_commit':
+                                       last_build.commit_hash})
+                i += 1
+            return result
+
     schema = graphene.Schema(query=Query, types=[])
     # NOTE(jpena): set graphiql=True to enable the GraphiQL page, which is
     #              very useful for testing
     app.add_url_rule('/api/graphql', view_func=GraphQLView.as_view(
         'graphql',
         schema=schema,
-        graphiql=False,
+        graphiql=True,
         get_context=lambda: {'session': _get_db()}
     ))
 
