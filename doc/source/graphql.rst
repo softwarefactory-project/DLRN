@@ -26,6 +26,7 @@ Types
 .. code-block::
 
     type Commit {
+        id: ID!
         type: String
         dtCommit: Int
         dtDistro: Int
@@ -49,8 +50,9 @@ The Commit type is converted from its schema in the database.
 
 .. code-block::
 
-   type civote {
-        commitId: Int
+   type CIVote {
+        id: ID!
+        commitId: Int!
         ciName: String
         ciVote: String
         ciInProgress: Bool
@@ -63,8 +65,9 @@ Like Commit type, CIVote is converted from its schema to database.
 
 .. code-block::
 
-    type civoteAgg {
-        refHash: String
+    type CIVoteAgg {
+        id: ID!
+        refHash: String!
         ciName: String
         ciUrl: String
         ciVote: String
@@ -74,8 +77,19 @@ Like Commit type, CIVote is converted from its schema to database.
         user: String
     }
 
-The civoteAgg is converted from CIVote_Aggregate DB schema.
+The CIVoteAgg is converted from CIVote_Aggregate DB schema.
 
+.. code-block::
+
+    type PackageStatus {
+        id: ID!
+        projectName: String!
+        status: String!
+        lastSuccess: DateTime
+        firstFailureCommit: String
+    }
+
+The PackageStatus type is generated directly in Graphene.
 
 Queries
 -------
@@ -152,6 +166,18 @@ Arguments:
 - timestamp: limit the results to the civote_aggregation beloging to the specified timestamp.
 - user: limit the results to the civote_aggregation beloging to the specified user.
 
+* packageStatus
+
+.. code-block::
+
+    packageStatus(
+        projectName: String,
+        status: String
+    ): [PackageStatus]
+
+Arguments:
+- projectName: limit the results to the status of the specified project name.
+- status: limit the results to the packages with the specified status.
 
 *****************************
 Querying the GraphQL endpoint
