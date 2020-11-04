@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "a35263a8_ecd24e25",
+        "filename": "dlrn/tests/test_graphql.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-04T09:08:20Z",
+      "side": 1,
+      "message": "Why remove this? Even if we\u0027re not filtering on ciUrl anymore, we can still get the field.",
+      "range": {
+        "startLine": 222,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 64
+      },
+      "revId": "229fc6d230c94c2badcded8d1ee2839c95894ff6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba6f81d1_038158b8",
+        "filename": "doc/source/graphql.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-04T09:08:20Z",
+      "side": 1,
+      "message": "ciUrl is still part of the type, even if we removed it from the query. This field is obtained from the SQLAlchemy schema.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 21
+      },
+      "revId": "229fc6d230c94c2badcded8d1ee2839c95894ff6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7759fe25_39bc56eb",
         "filename": "doc/source/graphql.rst",
         "patchSetId": 2
