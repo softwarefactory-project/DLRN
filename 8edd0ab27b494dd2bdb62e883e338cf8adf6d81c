@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "245e8041_7448dd0f",
+        "filename": "dlrn/api/graphql.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-06T11:45:24Z",
+      "side": 1,
+      "message": "Ok, makes sense.",
+      "parentUuid": "f8f9ebc9_786734cc",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 93,
+        "endChar": 45
+      },
+      "revId": "8edd0ab27b494dd2bdb62e883e338cf8adf6d81c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7b083c64_c27533ea",
         "filename": "dlrn/api/graphql.py",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2020-11-06T10:17:08Z",
       "side": 1,
       "message": "the is only increased,but nowhere is returned, or?",
+      "range": {
+        "startLine": 236,
+        "startChar": 12,
+        "endLine": 236,
+        "endChar": 17
+      },
+      "revId": "8edd0ab27b494dd2bdb62e883e338cf8adf6d81c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "095c7a59_a1f7f553",
+        "filename": "dlrn/api/graphql.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-06T11:45:24Z",
+      "side": 1,
+      "message": "It is returned as the id, see line 268",
+      "parentUuid": "7b083c64_c27533ea",
       "range": {
         "startLine": 236,
         "startChar": 12,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "b40f77a9_29a9c0b2",
+        "filename": "dlrn/api/graphql.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-06T11:45:24Z",
+      "side": 1,
+      "message": "Not really. We want to increase i anyway in line 248, so that package is skipped if we are filtering for another status.",
+      "parentUuid": "a6284c63_445f7843",
+      "range": {
+        "startLine": 243,
+        "startChar": 0,
+        "endLine": 244,
+        "endChar": 58
+      },
+      "revId": "8edd0ab27b494dd2bdb62e883e338cf8adf6d81c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b683c0e6_75ebbc88",
         "filename": "dlrn/api/graphql.py",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2020-11-06T10:17:08Z",
       "side": 1,
       "message": ":)",
+      "range": {
+        "startLine": 283,
+        "startChar": 17,
+        "endLine": 283,
+        "endChar": 21
+      },
+      "revId": "8edd0ab27b494dd2bdb62e883e338cf8adf6d81c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a1a12575_7c3aa922",
+        "filename": "dlrn/api/graphql.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-06T11:45:24Z",
+      "side": 1,
+      "message": "Oops :)",
+      "parentUuid": "b683c0e6_75ebbc88",
       "range": {
         "startLine": 283,
         "startChar": 17,
