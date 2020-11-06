@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f8f9ebc9_786734cc",
+        "filename": "dlrn/api/graphql.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-11-06T10:17:08Z",
+      "side": 1,
+      "message": "maybe try to use such idention:\n\n    class PackageStatus(graphene.ObjectType):\n        id \u003d graphene.NonNull(\n            graphene.ID, description\u003d\"Unique identifier for package status\")\n        project_name \u003d graphene.NonNull(graphene.String,\n                                        description\u003d\"Name of the project\")\n        status \u003d graphene.NonNull(\n            graphene.String,\n            description\u003d\n            \"Build status, can be one of SUCCESS, FAILED, RETRY or NO_BUILD\")\n        last_success \u003d graphene.DateTime(\n            description\u003d\n            \"If status is FAILED, date and time of the last successful build\")\n        first_failure_commit \u003d graphene.String(\n            description\u003d\n            \"If status is FAILED, source commit has of the first failed build\")",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 93,
+        "endChar": 45
+      },
+      "revId": "8edd0ab27b494dd2bdb62e883e338cf8adf6d81c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7b083c64_c27533ea",
+        "filename": "dlrn/api/graphql.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-11-06T10:17:08Z",
+      "side": 1,
+      "message": "the is only increased,but nowhere is returned, or?",
+      "range": {
+        "startLine": 236,
+        "startChar": 12,
+        "endLine": 236,
+        "endChar": 17
+      },
+      "revId": "8edd0ab27b494dd2bdb62e883e338cf8adf6d81c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a6284c63_445f7843",
+        "filename": "dlrn/api/graphql.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-11-06T10:17:08Z",
+      "side": 1,
+      "message": "the conditions can be merged",
+      "range": {
+        "startLine": 243,
+        "startChar": 0,
+        "endLine": 244,
+        "endChar": 58
+      },
+      "revId": "8edd0ab27b494dd2bdb62e883e338cf8adf6d81c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b683c0e6_75ebbc88",
+        "filename": "dlrn/api/graphql.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-11-06T10:17:08Z",
+      "side": 1,
+      "message": ":)",
+      "range": {
+        "startLine": 283,
+        "startChar": 17,
+        "endLine": 283,
+        "endChar": 21
+      },
+      "revId": "8edd0ab27b494dd2bdb62e883e338cf8adf6d81c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
