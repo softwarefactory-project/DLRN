@@ -61,6 +61,22 @@ The Commit type is converted from its schema in the database.
 
 Like Commit type, CIVote is converted from its schema to database.
 
+.. code-block::
+
+    type civoteAgg {
+        refHash: String
+        ciName: String
+        ciUrl: String
+        ciVote: String
+        ciInProgress: Boolean
+        timestamp: Int
+        notes: String
+        user: String
+    }
+
+The civoteAgg is converted from CIVote_Aggregate DB schema.
+
+
 Queries
 -------
 
@@ -114,6 +130,27 @@ Arguments:
 - timestamp: limit the results to the civote beloging to the specified timestamp.
 - user: limit the results to the civote beloging to the specified user.
 - component: limit the results to the civote beloging to the specified component.
+
+* civoteAgg
+
+.. code-block::
+
+    civoteAgg (
+        refHash: String
+        ciName: String
+        ciVote: String
+        ciInProgress: Boolean
+        timestamp: Int
+        user: String
+    ): [CIVote_Aggregate]
+
+Arguments:
+- refHash: limit the results to the civote_aggregation beloging to the specified reference hash.
+- ciName: limit the results to the civote_aggregation beloging to the specified CI name.
+- ciVote: limit the results to the civote_aggregation beloging to the specified CI vote.
+- ciInProgress: limit the results to the civote_aggregation beloging to the specified CI in progress state.
+- timestamp: limit the results to the civote_aggregation beloging to the specified timestamp.
+- user: limit the results to the civote_aggregation beloging to the specified user.
 
 
 *****************************
