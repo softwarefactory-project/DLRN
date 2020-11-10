@@ -61,7 +61,7 @@ class Commit(Base):
                                            "is located")
     commit_hash = Column(String(64), doc="Git hash of the source commit")
     distro_hash = Column(String(64), doc="Git hash of the distro commit")
-    extended_hash = Column(String(64), doc="Git hash of the extended commit")
+    extended_hash = Column(String(128), doc="Git hash of the extended commit")
     commit_branch = Column(String(256),
                            doc="Branch for the source commit")
     status = Column(String(64), doc="Build status, can be SUCCESS, FAILED "
@@ -90,10 +90,18 @@ class Commit(Base):
         if self.distro_hash:
             distro_hash_suffix = "_%s" % self.distro_hash[:8]
         if self.extended_hash:
-            # The extended hash is assumed to be a git-like hash, however
-            # there is nothing preventing pkginfo drivers from using a
-            # different format (such as YYYYMMDD).
-            extended_hash_suffix = "_%s" % self.extended_hash[:8]
+            if len(self.extended_hash) < 49:
+                # The extended hash is assumed to be a git-like hash, however
+                # there is nothing preventing pkginfo drivers from using a
+                # different format (such as YYYYMMDD).
+                # Assuming a short extended hash, not a dual commit one
+                extended_hash_suffix = "_%s" % self.extended_hash[:8]
+            else:
+                # Long extended hash, with two hashes separated by an
+                # underscore
+                extended_hash_suffix = "_%s_%s" % (
+                    self.extended_hash[:8],
+                    self.extended_hash[41:49])
         else:
             extended_hash_suffix = ''
         if self.component is not None and self.component != 'None':

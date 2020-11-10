@@ -115,6 +115,10 @@ class KojiBuildDriver(BuildRPMDriver):
             self.config_options.datadir,
             package_name + "_distro")
 
+        ds_source_git = os.path.join(
+            self.config_options.datadir,
+            package_name + "_downstream")
+
         build_exception = None
 
         # if we are using rhpkg, we need to create a kerberos ticket
@@ -168,6 +172,10 @@ class KojiBuildDriver(BuildRPMDriver):
         repoinfo = str(git.log("--pretty=format:%H %ct", "-1", ".")).\
             strip().split(" ")
 
+        git = sh.git.bake(_cwd=ds_source_git, _tty_out=False, _timeout=3600)
+        repoinfo_ds_git = str(git.log("--pretty=format:%H %ct", "-1", ".")).\
+            strip().split(" ")
+
         logger.info("Updated git: %s" % repoinfo)
         # When using rhpkg with a pkginfo driver other than downstreamdriver,
         # we want to overwrite the distro_hash instead of extended_hash.
@@ -178,7 +186,7 @@ class KojiBuildDriver(BuildRPMDriver):
             commit.distro_hash = repoinfo[0]
             commit.dt_distro = repoinfo[1]
         else:
-            commit.extended_hash = repoinfo[0]
+            commit.extended_hash = '%s_%s' % (repoinfo[0], repoinfo_ds_git[0])
             commit.dt_extended = repoinfo[1]
 
         # Since we are changing the extended_hash, we need to rename the
@@ -193,9 +201,6 @@ class KojiBuildDriver(BuildRPMDriver):
         with io.open("%s/rhpkgbuild.log" % output_dir, 'a',
                      encoding='utf-8', errors='replace') as self.koji_fp:
             try:
-                # NOTE(jpena): we are using --skip-nvr-check to avoid
-                # issues when building RHEL8 packages on RHEL7, due to
-                # new RPM features.
                 rhpkg('build', '--skip-nvr-check', scratch=scratch)
             except Exception as e:
                 build_exception = e
