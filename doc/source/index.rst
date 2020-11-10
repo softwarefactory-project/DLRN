@@ -18,6 +18,7 @@ Contents:
    usage
    troubleshooting
    api
+   graphql
    contributing
    internals
 

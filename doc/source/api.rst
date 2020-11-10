@@ -247,6 +247,12 @@ failed               integer     Number of commits that failed to build in the p
 total                integer     Total number of commits processed in the period
 ===================  ==========  ==============================================================
 
+GET /api/graphql
+----------------
+
+Query the `GraphQL interface <https://graphql.org/>`_. The available GraphQL schema is described
+in detail in `its own <graphql.html>`_ documentation.
+
 
 POST /api/last_tested_repo
 --------------------------
