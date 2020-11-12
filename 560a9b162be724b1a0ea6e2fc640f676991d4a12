@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "a230ea30_20da7ba4",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-12T09:42:04Z",
+      "side": 1,
+      "message": "Ok, makes sense and it makes the code a bit more readable (although I\u0027ll struggle with the 80-char limit :D). I\u0027ll go for it.",
+      "parentUuid": "c95fd147_695085bf",
+      "range": {
+        "startLine": 246,
+        "startChar": 19,
+        "endLine": 246,
+        "endChar": 34
+      },
+      "revId": "560a9b162be724b1a0ea6e2fc640f676991d4a12",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "67f24292_6dcf5287",
         "filename": "dlrn/tests/test_driver_koji.py",
         "patchSetId": 1
@@ -59,6 +83,30 @@
       "writtenOn": "2020-11-12T09:36:23Z",
       "side": 1,
       "message": "I understand that similar hash example was earlier, but for others can be better to set another one or just revers the commit_hash",
+      "range": {
+        "startLine": 277,
+        "startChar": 40,
+        "endLine": 277,
+        "endChar": 56
+      },
+      "revId": "560a9b162be724b1a0ea6e2fc640f676991d4a12",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e899e3c_6874980b",
+        "filename": "dlrn/tests/test_driver_koji.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-12T09:42:04Z",
+      "side": 1,
+      "message": "Ok, I\u0027ll change it in the next PS.",
+      "parentUuid": "67f24292_6dcf5287",
       "range": {
         "startLine": 277,
         "startChar": 40,
