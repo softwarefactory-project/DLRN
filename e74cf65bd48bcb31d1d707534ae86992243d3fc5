@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "56fd958a_ebf3a612",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 201
+      },
+      "writtenOn": "2020-11-12T17:19:50Z",
+      "side": 1,
+      "message": "bikeshedding WARN, feel free to ignore!\n* \"ds\" might not be clear that it stands for downstream\n* in \"upstream\" hash we have source_distro order while downstream extended hash will be reversed dsdist_dssource (I assume to keep it compatible-looking with current source_distro_dsdist)",
+      "range": {
+        "startLine": 242,
+        "startChar": 44,
+        "endLine": 242,
+        "endChar": 51
+      },
+      "revId": "e74cf65bd48bcb31d1d707534ae86992243d3fc5",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
