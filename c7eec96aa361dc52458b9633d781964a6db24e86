@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ca6de91e_2a7f3f43",
+        "filename": "scripts/centos.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 267
+      },
+      "writtenOn": "2020-11-12T08:11:29Z",
+      "side": 1,
+      "message": "In centos7 there is no separated git-core but git is providing git-core so this will work but it will not change the packages installed.",
+      "range": {
+        "startLine": 4,
+        "startChar": 208,
+        "endLine": 4,
+        "endChar": 216
+      },
+      "revId": "c7eec96aa361dc52458b9633d781964a6db24e86",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
