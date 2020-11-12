@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b43e64e_5e85630e",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-11-12T09:36:23Z",
+      "side": 1,
+      "message": "could it be: extended_hash_distro instead of adding _1 suffix?",
+      "range": {
+        "startLine": 242,
+        "startChar": 31,
+        "endLine": 242,
+        "endChar": 46
+      },
+      "revId": "560a9b162be724b1a0ea6e2fc640f676991d4a12",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c95fd147_695085bf",
+        "filename": "dlrn/drivers/downstream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-11-12T09:36:23Z",
+      "side": 1,
+      "message": "and here could it be extended_hash_downstream or extended_hash_dstream instead of adding _2 suffix?",
+      "range": {
+        "startLine": 246,
+        "startChar": 19,
+        "endLine": 246,
+        "endChar": 34
+      },
+      "revId": "560a9b162be724b1a0ea6e2fc640f676991d4a12",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "67f24292_6dcf5287",
+        "filename": "dlrn/tests/test_driver_koji.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-11-12T09:36:23Z",
+      "side": 1,
+      "message": "I understand that similar hash example was earlier, but for others can be better to set another one or just revers the commit_hash",
+      "range": {
+        "startLine": 277,
+        "startChar": 40,
+        "endLine": 277,
+        "endChar": 56
+      },
+      "revId": "560a9b162be724b1a0ea6e2fc640f676991d4a12",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
