@@ -184,7 +184,8 @@ def genreports(packages, head_only, session, all_commits):
         old_commit = getCommits(session, project=commit.project_name,
                                 without_status="RETRY", limit=None).filter(
             Commit.commit_hash == commit.commit_hash).filter(
-            Commit.distro_hash == commit.distro_hash).first()
+            Commit.distro_hash == commit.distro_hash).filter(
+            Commit.extended_hash == commit.extended_hash).first()
         if not old_commit:
             pending_commits.append(commit)
 
