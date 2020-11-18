@@ -20,7 +20,8 @@
 # - 'maintainers': list of e-mail addresses for package maintainers
 #
 # getinfo(). This function will return a list of commits to be processed for a
-#            specific package.
+#            specific package, and True if the package was skipped due to any
+#            git clone error, False if not.
 #
 # preprocess(). This function will run any required pre-processing for the spec
 #               files.
@@ -38,7 +39,7 @@ class PkgInfoDriver(object):
         return self.packages
 
     def getinfo(self):
-        return None
+        return None, False
 
     def preprocess(self):
         return

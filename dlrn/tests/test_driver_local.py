@@ -47,11 +47,12 @@ class TestDriverLocal(base.TestCase):
         package = {
             'upstream': 'Unknown', 'name': 'hello-world',
             'master-distgit': '/tmp/hello-world', 'source-branch': '1.0.0'}
-        info = driver.getinfo(
+        info, skipped = driver.getinfo(
             package=package, project="hello-world")
         self.assertEqual(len(info), 1)
         self.assertEqual(info[0].commit_hash, 'hello-world-1.0.0')
         self.assertEqual(info[0].commit_branch, '1.0.0')
+        self.assertEqual(skipped, False)
 
     def test_getpackages(self):
         package = 'hello-world'

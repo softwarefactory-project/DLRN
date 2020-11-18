@@ -14,6 +14,7 @@
 
 import mock
 import os
+import sh
 import shutil
 import tempfile
 
@@ -25,6 +26,16 @@ from six.moves import configparser
 
 def _mocked_listdir(path):
     return ['foo.spec']
+
+
+def _mocked_refreshrepo_ok(*args, **kwargs):
+    return 'a', 'b', 'c'
+
+
+def _mocked_git_log(*args, **kwargs):
+    return ['1605006232 d2ddfd9c5d7bfea3055ec5d51b4cb11ad12a02f3',
+            '1605167482 c7eec96aa361dc52458b9633d781964a6db24e86',
+            '1605774411 896f7544a70028ff5db1d5a2d0f3619b62218dd6']
 
 
 class TestDriverRdoInfo(base.TestCase):
@@ -157,3 +168,70 @@ class TestDriverRdoInfo(base.TestCase):
         os.mkdir(os.path.join(self.temp_dir, 'foo_distro'))
 
         self.assertRaises(RuntimeError, driver.preprocess, package_name='foo')
+
+    @mock.patch.object(sh.Command, '__call__', autospec=True,
+                       side_effect=_mocked_git_log)
+    @mock.patch('dlrn.drivers.rdoinfo.refreshrepo',
+                side_effect=_mocked_refreshrepo_ok)
+    def test_getinfo_basic(self, rr_mock, git_mock):
+        driver = RdoInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+
+        pkginfo, skipped = driver.getinfo(
+            package=package,
+            project='nova',
+            dev_mode=False)
+
+        self.assertEqual(skipped, False)
+        self.assertEqual(len(pkginfo), 3)
+        pi = pkginfo[0]
+        self.assertEqual(pi.commit_hash,
+                         'd2ddfd9c5d7bfea3055ec5d51b4cb11ad12a02f3')
+
+    @mock.patch.object(sh.Command, '__call__', autospec=True,
+                       side_effect=_mocked_git_log)
+    @mock.patch('dlrn.drivers.rdoinfo.refreshrepo',
+                side_effect=Exception('Failed to clone git repository'))
+    def test_getinfo_git_failure(self, rr_mock, git_mock):
+        driver = RdoInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+
+        pkginfo, skipped = driver.getinfo(
+            package=package,
+            project='nova',
+            dev_mode=False)
+
+        self.assertEqual(skipped, True)
+        self.assertEqual(pkginfo, [])

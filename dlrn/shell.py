@@ -255,6 +255,7 @@ def main():
         options.head_only = True
     # Build a list of commits we need to process
     toprocess = []
+    skipped_list = []
 
     def add_commits(project_toprocess):
         # The first entry in the list of commits is a commit we have
@@ -285,7 +286,7 @@ def main():
         iterator = pool.imap(getinfo_wrapper, packages)
         while True:
             try:
-                project_toprocess, updated_pkg = iterator.next()
+                project_toprocess, updated_pkg, skipped = iterator.next()
                 for package in packages:
                     if package['name'] == updated_pkg['name']:
                         if package['upstream'] == 'Unknown':
@@ -294,6 +295,8 @@ def main():
                                 "Updated upstream for package %s to %s",
                                 package['name'], package['upstream'])
                         break
+                if skipped:
+                    skipped_list.append(updated_pkg['name'])
                 add_commits(project_toprocess)
             except StopIteration:
                 break
@@ -302,11 +305,14 @@ def main():
     else:
         for package in packages:
             if package['name'] in pkg_names:
-                project_toprocess, _ = getinfo(package, local=options.local,
-                                               dev_mode=options.dev,
-                                               head_only=options.head_only,
-                                               db_connection=config_options.
-                                               database_connection)
+                project_toprocess, _, skipped = getinfo(
+                    package, local=options.local,
+                    dev_mode=options.dev,
+                    head_only=options.head_only,
+                    db_connection=config_options.
+                    database_connection)
+                if skipped:
+                    skipped_list.append(package['name'])
                 add_commits(project_toprocess)
     closeSession(session)   # Close session, will reopen during post_build
 
@@ -487,6 +493,12 @@ def main():
             session.commit()
     genreports(packages, options.head_only, session, [])
     closeSession(session)
+
+    # Store skip list
+    datadir = os.path.realpath(config_options.datadir)
+    with open(os.path.join(datadir, 'repos', 'skiplist.txt'), 'w') as fp:
+        for pkg in skipped_list:
+            fp.write(pkg + '\n')
 
     if options.dev:
         os.remove(tmpdb_path)
@@ -822,9 +834,10 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
                 # In any case, we just want to build the last commit, if any
                 head_only = True
 
-    project_toprocess = pkginfo.getinfo(project=project, package=package,
-                                        since=since, local=local,
-                                        dev_mode=dev_mode, type=type)
+    project_toprocess, skipped = pkginfo.getinfo(
+        project=project, package=package,
+        since=since, local=local,
+        dev_mode=dev_mode, type=type)
 
     closeSession(session)
     # If since == -1, then we only want to trigger a build for the
@@ -832,4 +845,4 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
     if since == "-1" or head_only:
         del project_toprocess[:-1]
 
-    return project_toprocess, package
+    return project_toprocess, package, skipped
