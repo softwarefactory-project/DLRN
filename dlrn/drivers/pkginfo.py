@@ -20,7 +20,8 @@
 # - 'maintainers': list of e-mail addresses for package maintainers
 #
 # getinfo(). This function will return a list of commits to be processed for a
-#            specific package.
+#            specific package, and True if the package was skipped due to any
+#            git clone error, False if not.
 #
 # preprocess(). This function will run any required pre-processing for the spec
 #               files.
@@ -28,8 +29,12 @@
 # distgit_dir(). This function will return the distgit repo directory for a
 #                given package name.
 
+from collections import namedtuple
+
 
 class PkgInfoDriver(object):
+    Info = namedtuple('Info', ['commits', 'skipped'])
+
     def __init__(self, *args, **kwargs):
         self.packages = []
         self.config_options = kwargs.get('cfg_options')
@@ -38,7 +43,7 @@ class PkgInfoDriver(object):
         return self.packages
 
     def getinfo(self):
-        return None
+        return Info(None, False)
 
     def preprocess(self):
         return
