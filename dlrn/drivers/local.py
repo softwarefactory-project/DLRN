@@ -105,7 +105,7 @@ class LocalDriver(PkgInfoDriver):
             dt_extended=0, extended_hash=None, component=None)
         project_toprocess.append(commit)
 
-        return project_toprocess
+        return PkgInfoDriver.Info(project_toprocess, False)
 
     def preprocess(self, **kwargs):
         pass
