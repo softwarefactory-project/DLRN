@@ -85,7 +85,7 @@ class TestDriverDownstream(base.TestCase):
                 'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
             ]
         }
-        pkginfo = driver.getinfo(
+        pkginfo, skipped = driver.getinfo(
             package=package,
             project='nova',
             dev_mode=True)
@@ -110,6 +110,7 @@ class TestDriverDownstream(base.TestCase):
             # distro_dir already exists
             expected = expected[1:]
         self.assertEqual(rr_mock.call_args_list, expected)
+        self.assertEqual(skipped, False)
 
         pi = pkginfo[0]
         assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
@@ -138,7 +139,7 @@ class TestDriverDownstream(base.TestCase):
                 'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
             ]
         }
-        pkginfo = driver.getinfo(
+        pkginfo, skipped = driver.getinfo(
             package=package,
             project='nova',
             dev_mode=True)
@@ -169,7 +170,7 @@ class TestDriverDownstream(base.TestCase):
                 'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
             ]
         }
-        pkginfo = driver.getinfo(
+        pkginfo, skipped = driver.getinfo(
             package=package,
             project='nova',
             dev_mode=True)

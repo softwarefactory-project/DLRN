@@ -216,7 +216,7 @@ class GitRepoDriver(PkgInfoDriver):
                 # side-effect is that we are not adding this commit to the
                 # list of commits to be processed, so we can ignore it and
                 # move on to the next repo
-                continue
+                return [], True
 
             git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
             # Git gives us commits already sorted in the right order
@@ -235,7 +235,7 @@ class GitRepoDriver(PkgInfoDriver):
                                 component=None)
                 project_toprocess.append(commit)
 
-        return project_toprocess
+        return project_toprocess, False
 
     def preprocess(self, **kwargs):
         package_name = kwargs.get('package_name')
