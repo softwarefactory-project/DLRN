@@ -88,7 +88,7 @@ class TestDriverDownstream(base.TestCase):
                 'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
             ]
         }
-        pkginfo = driver.getinfo(
+        pkginfo, skipped = driver.getinfo(
             package=package,
             project='nova',
             dev_mode=True)
@@ -113,10 +113,66 @@ class TestDriverDownstream(base.TestCase):
             # distro_dir already exists
             expected = expected[1:]
         self.assertEqual(rr_mock.call_args_list, expected)
+        self.assertEqual(skipped, False)
 
         pi = pkginfo[0]
         assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
             pi.commit_hash
+
+    @mock.patch('dlrn.drivers.downstream.refreshrepo',
+                side_effect=Exception('Failed to clone git repository'))
+    def test_getinfo_exception(self, rr_mock, uo_mock):
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+        pkginfo, skipped = driver.getinfo(
+            package=package,
+            project='nova',
+            dev_mode=False)
+
+        self.assertEqual(pkginfo, [])
+        self.assertEqual(skipped, True)
+
+    def test_getinfo_notinversions(self, uo_mock):
+        self.config.use_components = True
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-neutron',
+            'project': 'neutron',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/neutron',
+            'patches': 'http://review.rdoproject.org/r/openstack/neutron.git',
+            'distgit': 'git://git.example.com/rpms/neutron',
+            'master-distgit':
+                'git://git.example.com/rpms/neutron',
+            'name': 'openstack-neutron',
+            'component': 'network',
+            'buildsys-tags': []
+        }
+        pkginfo, skipped = driver.getinfo(
+            package=package,
+            project='neutron',
+            dev_mode=False)
+
+        # Neutron is not in the mocked versions.csv file, so it will be marked
+        # as skipped
+        self.assertEqual(pkginfo, [])
+        self.assertEqual(skipped, True)
 
     @mock.patch('dlrn.drivers.downstream.refreshrepo',
                 side_effect=_mocked_refreshrepo)
@@ -140,7 +196,7 @@ class TestDriverDownstream(base.TestCase):
                 'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
             ]
         }
-        pkginfo = driver.getinfo(
+        pkginfo, skipped = driver.getinfo(
             package=package,
             project='nova',
             dev_mode=False)
@@ -196,7 +252,7 @@ class TestDriverDownstream(base.TestCase):
                 'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
             ]
         }
-        pkginfo = driver.getinfo(
+        pkginfo, skipped = driver.getinfo(
             package=package,
             project='nova',
             dev_mode=True)
@@ -228,7 +284,7 @@ class TestDriverDownstream(base.TestCase):
                 'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
             ]
         }
-        pkginfo = driver.getinfo(
+        pkginfo, skipped = driver.getinfo(
             package=package,
             project='nova',
             dev_mode=True)

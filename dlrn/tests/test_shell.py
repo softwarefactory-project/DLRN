@@ -12,12 +12,14 @@
 
 import mock
 import os
+import sh
 import shutil
 import sys
 import tempfile
 
 from dlrn.config import ConfigOptions
 from dlrn import db
+from dlrn.drivers.rdoinfo import RdoInfoDriver
 from dlrn import shell
 from dlrn.tests import base
 from dlrn import utils
@@ -45,6 +47,16 @@ def mocked_getpackages(**kwargs):
              'name': 'test', 'maintainers': 'test@test.com'},
             {'upstream': 'https://github.com/openstack/test',
              'name': 'python-pysaml2', 'maintainers': 'test@test.com'}]
+
+
+def _mocked_refreshrepo(*args, **kwargs):
+    return 'a', 'b', 'c'
+
+
+def _mocked_git_log(*args, **kwargs):
+    return ['1605006232 d2ddfd9c5d7bfea3055ec5d51b4cb11ad12a02f3',
+            '1605167482 c7eec96aa361dc52458b9633d781964a6db24e86',
+            '1605774411 896f7544a70028ff5db1d5a2d0f3619b62218dd6']
 
 
 class TestProcessBuildResult(base.TestCase):
@@ -347,3 +359,72 @@ class TestRecheck(base.TestCase):
             e = self.assertRaises(SystemExit, shell.main)
             # It will work this time
             self.assertEqual(e.code, 0)
+
+
+@mock.patch('dlrn.shell.getSession', side_effect=mocked_session_recheck)
+class TestGetinfo(base.TestCase):
+    def setUp(self):
+        super(TestGetinfo, self).setUp()
+        config = configparser.RawConfigParser()
+        config.read("projects.ini")
+        config.set("DEFAULT", "pkginfo_driver",
+                   "dlrn.drivers.rdoinfo.RdoInfoDriver")
+        self.config = ConfigOptions(config)
+
+    @mock.patch.object(sh.Command, '__call__', autospec=True,
+                       side_effect=_mocked_git_log)
+    @mock.patch('dlrn.drivers.rdoinfo.refreshrepo',
+                side_effect=_mocked_refreshrepo)
+    def test_getinfo_basic(self, rr_mock, git_mock, db_mock):
+        driver = RdoInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+
+        with mock.patch.object(shell, 'pkginfo', driver, create=True):
+            project_toprocess, _, skipped = shell.getinfo(package)
+            # There is no commit in the database, so only 1 commit will be
+            # returned
+            self.assertEqual(len(project_toprocess), 1)
+            self.assertEqual(skipped, False)
+
+    @mock.patch('dlrn.drivers.rdoinfo.refreshrepo',
+                side_effect=Exception('Failed to clone git repository'))
+    def test_getinfo_failure(self, rr_mock, db_mock):
+        driver = RdoInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+
+        with mock.patch.object(shell, 'pkginfo', driver, create=True):
+            project_toprocess, _, skipped = shell.getinfo(package)
+            self.assertEqual(len(project_toprocess), 0)
+            self.assertEqual(skipped, True)

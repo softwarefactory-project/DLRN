@@ -31,6 +31,7 @@ import logging
 import os
 import sh
 
+from collections import namedtuple
 from distroinfo import query
 from distroinfo import info
 
@@ -139,7 +140,7 @@ class RdoInfoDriver(PkgInfoDriver):
                 # The error was already logged by refreshrepo, and we want
                 # to avoid halting the whole run because this distgit repo
                 # failed, so return an empty list
-                return []
+                return PkgInfoDriver.Info([], True)
         else:
             distro_hash = "dev"
             dt_distro = 0  # Doesn't get used in dev mode
@@ -167,7 +168,7 @@ class RdoInfoDriver(PkgInfoDriver):
                 # side-effect is that we are not adding this commit to the
                 # list of commits to be processed, so we can ignore it and
                 # move on to the next repo
-                continue
+                return PkgInfoDriver.Info([], True)
 
             git = sh.git.bake(_cwd=repo_dir, _tty_out=False)
             # Git gives us commits already sorted in the right order
@@ -203,7 +204,7 @@ class RdoInfoDriver(PkgInfoDriver):
                                 component=component)
                 project_toprocess.append(commit)
 
-        return project_toprocess
+        return PkgInfoDriver.Info(project_toprocess, False)
 
     def preprocess(self, **kwargs):
         # Pre-processing is only required if we have a jinja2 spec template
