@@ -54,8 +54,22 @@ class TestDriverGit(base.TestCase):
         refresh_mock.return_value = [None, None, None]
         driver = GitRepoDriver(cfg_options=self.config)
         package = {'upstream': 'test', 'name': 'test'}
-        info = driver.getinfo(package=package, project="test", dev_mode=True)
+        info, skipped = driver.getinfo(package=package,
+                                       project="test", dev_mode=True)
         self.assertEqual(info, [])
+        self.assertEqual(skipped, False)
+
+    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('dlrn.drivers.gitrepo.refreshrepo',
+                side_effect=Exception('Failed to clone git repository'))
+    def test_getinfo_failure(self, refresh_mock, sh_mock):
+        refresh_mock.return_value = [None, None, None]
+        driver = GitRepoDriver(cfg_options=self.config)
+        package = {'upstream': 'test', 'name': 'test'}
+        info, skipped = driver.getinfo(package=package,
+                                       project="test", dev_mode=True)
+        self.assertEqual(info, [])
+        self.assertEqual(skipped, True)
 
     @mock.patch.object(sh.Command, '__call__', autospec=True)
     @mock.patch('os.listdir')
