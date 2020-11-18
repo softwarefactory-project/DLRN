@@ -54,7 +54,8 @@ class TestDriverGit(base.TestCase):
         refresh_mock.return_value = [None, None, None]
         driver = GitRepoDriver(cfg_options=self.config)
         package = {'upstream': 'test', 'name': 'test'}
-        info = driver.getinfo(package=package, project="test", dev_mode=True)
+        info, skipped = driver.getinfo(package=package,
+                                       project="test", dev_mode=True)
         self.assertEqual(info, [])
 
     @mock.patch.object(sh.Command, '__call__', autospec=True)
