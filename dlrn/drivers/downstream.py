@@ -222,7 +222,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
         if package['name'] not in versions:
             logger.warning('Package %s not present in %s - skipping.' % (
                 package['name'], self.config_options.versions_url))
-            return []
+            return PkgInfoDriver.Info([], True)
         version = versions[package['name']]
 
         dt_distro = 0  # In this driver we do not care about dt_distro
@@ -243,7 +243,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 # The error was already logged by refreshrepo, and we want
                 # to avoid halting the whole run because this distgit repo
                 # failed, so return an empty list
-                return []
+                return PkgInfoDriver.Info([], True)
         else:
             distro_hash = "dev"
             extended_hash = "dev"
@@ -276,7 +276,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 # side-effect is that we are not adding this commit to the
                 # list of commits to be processed, so we can ignore it and
                 # move on to the next repo
-                continue
+                return PkgInfoDriver.Info([], True)
             if not local:
                 # This is the default behavior
                 dt = version[5]
@@ -307,7 +307,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                             commit_branch=source_branch, component=component)
             project_toprocess.append(commit)
 
-        return project_toprocess
+        return PkgInfoDriver.Info(project_toprocess, False)
 
     def preprocess(self, **kwargs):
         package_name = kwargs.get('package_name')
