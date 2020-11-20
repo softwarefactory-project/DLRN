@@ -22,6 +22,30 @@
       "revId": "896f7544a70028ff5db1d5a2d0f3619b62218dd6",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9b105896_7fa756df",
+        "filename": "dlrn/drivers/pkginfo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-11-20T09:36:33Z",
+      "side": 1,
+      "message": "I see it is available in Python 2.7 too, so we could use it. I\u0027ll give it a look, thanks for the suggestion.",
+      "parentUuid": "6b17a92e_a14e0300",
+      "range": {
+        "startLine": 42,
+        "startChar": 15,
+        "endLine": 42,
+        "endChar": 26
+      },
+      "revId": "896f7544a70028ff5db1d5a2d0f3619b62218dd6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
