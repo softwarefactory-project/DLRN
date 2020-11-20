@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6b17a92e_a14e0300",
+        "filename": "dlrn/drivers/pkginfo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-11-20T00:29:22Z",
+      "side": 1,
+      "message": "Would this be easier to follow if the return value was a namedtuple, e.g. `namedtuple(\u0027Info\u0027, [\u0027list\u0027, \u0027skipped\u0027])` ( https://docs.python.org/3/library/collections.html#collections.namedtuple )",
+      "range": {
+        "startLine": 42,
+        "startChar": 15,
+        "endLine": 42,
+        "endChar": 26
+      },
+      "revId": "896f7544a70028ff5db1d5a2d0f3619b62218dd6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
