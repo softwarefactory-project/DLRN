@@ -55,6 +55,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
             'downstream_distro_branch': {},
             'downstream_tag': {},
             'downstream_distgit_key': {},
+            'downstream_source_git_key': {},
+            'downstream_source_git_branch': {},
             'use_upstream_spec': {'type': 'boolean'},
             'downstream_spec_replace_list': {'type': 'list'},
             'cache_dir': {},
@@ -218,6 +220,14 @@ class DownstreamInfoDriver(PkgInfoDriver):
         ups_distro_dir_full = self.upstream_distgit_dir(package['name'])
         ups_distro_branch = getdistrobranch(package)
 
+        # Downstream source git
+        dsgit_attr = self.config_options.downstream_source_git_key
+        ds_source = package.get(dsgit_attr)
+        if not distro:
+            fail_req_attr_missing(dsgit_attr, package)
+        dsgit_dir = self._downstream_git_clone_dir(package['name'])
+        dsgit_branch = self.config_options.downstream_source_git_branch
+
         # only process packages present in versions.csv
         if package['name'] not in versions:
             logger.warning('Package %s not present in %s - skipping.' % (
@@ -229,9 +239,17 @@ class DownstreamInfoDriver(PkgInfoDriver):
 
         if dev_mode is False:
             try:
-                distro_branch, extended_hash, dt_extended = refreshrepo(
+                distro_branch, extended_hash_dsdist, dt_extended = refreshrepo(
                     distro, distro_dir, distro_branch, local=local,
                     full_path=distro_dir_full)
+
+                _, extended_hash_dssource, _ = refreshrepo(
+                    ds_source, dsgit_dir, dsgit_branch, local=local,
+                    full_path=dsgit_dir)
+
+                extended_hash = '%s_%s' % (extended_hash_dsdist,
+                                           extended_hash_dssource)
+
                 # extract distro_hash from versions.csv
                 distro_hash = version[3]
                 # Also download upstream distgit
@@ -378,6 +396,10 @@ class DownstreamInfoDriver(PkgInfoDriver):
     def _distgit_clone_dir(self, package_name):
         datadir = self.config_options.datadir
         return os.path.join(datadir, package_name + "_distro")
+
+    def _downstream_git_clone_dir(self, package_name):
+        datadir = self.config_options.datadir
+        return os.path.join(datadir, package_name + "_downstream")
 
     def upstream_distgit_dir(self, package_name):
         datadir = self.config_options.datadir

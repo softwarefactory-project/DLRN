@@ -50,6 +50,8 @@ class TestDriverDownstream(base.TestCase):
             'https://trunk.rdoproject.org/centos7-master/current/versions.csv'
         self.config.downstream_distro_branch = 'testbranch'
         self.config.downstream_distgit_base = 'git://git.example.com/rpms'
+        self.config.downstream_source_git_key = 'ds-patches'
+        self.config.downstream_source_git_branch = 'dsbranch'
         self.config.datadir = self.temp_dir
         self.config.use_upstream_spec = False
 
@@ -78,6 +80,7 @@ class TestDriverDownstream(base.TestCase):
             'master-distgit':
                 'git://git.example.com/rpms/nova',
             'name': 'openstack-nova',
+            'ds-patches': 'git://git.example.com/downstream/nova',
             'buildsys-tags': [
                 'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
                 'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
@@ -117,6 +120,60 @@ class TestDriverDownstream(base.TestCase):
 
     @mock.patch('dlrn.drivers.downstream.refreshrepo',
                 side_effect=_mocked_refreshrepo)
+    def test_getinfo_nodevmode(self, rr_mock, uo_mock):
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-nova',
+            'project': 'nova',
+            'conf': 'rpmfactory-core',
+            'upstream': 'git://git.openstack.org/openstack/nova',
+            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'distgit': 'git://git.example.com/rpms/nova',
+            'master-distgit':
+                'git://git.example.com/rpms/nova',
+            'name': 'openstack-nova',
+            'ds-patches': 'git://git.example.com/downstream/nova',
+            'buildsys-tags': [
+                'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-pike-testing: openstack-nova-16.1.4-1.el7',
+                'cloud7-openstack-queens-release: openstack-nova-17.0.5-1.el7',
+                'cloud7-openstack-queens-testing: openstack-nova-17.0.5-1.el7',
+            ]
+        }
+        pkginfo = driver.getinfo(
+            package=package,
+            project='nova',
+            dev_mode=False)
+
+        expected = [mock.call('git://git.example.com/rpms/nova',
+                              self.temp_dir + '/openstack-nova_distro',
+                              'testbranch',
+                              full_path=self.temp_dir + '/openstack-nova_'
+                                                        'distro/',
+                              local=None),
+                    mock.call('git://git.example.com/downstream/nova',
+                              self.temp_dir + '/openstack-nova_downstream',
+                              'dsbranch',
+                              full_path=self.temp_dir + '/openstack-nova'
+                                                        '_downstream',
+                              local=None),
+                    mock.call('git://git.example.com/rpms/nova',
+                              self.temp_dir + '/openstack-nova_distro_'
+                                              'upstream',
+                              '8fce438abdd12cba33bd9fa4f7d16c098e10094f',
+                              full_path=self.temp_dir + '/openstack-nova'
+                                                        '_distro_upstream/',
+                              local=None),
+                    mock.call('git://git.openstack.org/openstack/nova',
+                              self.temp_dir + '/nova', 'master', local=None)]
+        self.assertEqual(rr_mock.call_args_list, expected)
+
+        pi = pkginfo[0]
+        assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
+            pi.commit_hash
+
+    @mock.patch('dlrn.drivers.downstream.refreshrepo',
+                side_effect=_mocked_refreshrepo)
     def test_getinfo_component(self, rr_mock, uo_mock):
         self.config.use_components = True
         driver = DownstreamInfoDriver(cfg_options=self.config)
@@ -130,6 +187,7 @@ class TestDriverDownstream(base.TestCase):
             'master-distgit':
                 'git://git.example.com/rpms/nova',
             'name': 'openstack-nova',
+            'ds-patches': 'git://git.example.com/downstream/nova',
             'component': 'compute',
             'buildsys-tags': [
                 'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',
@@ -161,6 +219,7 @@ class TestDriverDownstream(base.TestCase):
             'master-distgit':
                 'git://git.example.com/rpms/nova',
             'name': 'openstack-nova',
+
             'component': 'compute',
             'buildsys-tags': [
                 'cloud7-openstack-pike-release: openstack-nova-16.1.4-1.el7',

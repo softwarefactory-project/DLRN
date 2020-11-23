@@ -187,9 +187,10 @@ The configuration file looks like this:
     while reusing ``distro_hash`` and ``commit_hash`` from a remote
     ``versions.csv`` file specified by ``versions_url`` config option in the
     ``[downstream_driver]`` section. It will also use a separate distgit to
-    build the driver. The distgit URL will be defined by the ``downstream_distgit_base``
-    URL + the package name, and the distgit branch to use will be defined by
-    the ``downstream_distro_branch`` variable.
+    build the driver, as well as a downstream source git. The distgit URL
+    will be defined by the ``downstream_distgit_base`` URL + the package name,
+    and the distgit branch to use will be defined by the ``downstream_distro_branch``
+    variable.
   * ``dlrn.drivers.gitrepo.GitRepoDriver``, which uses a single Git repository
     with per-distgit directories, following the same schema used by the
     `RPM Packaging for OpenStack <https://github.com/openstack/rpm-packaging>`_
@@ -335,6 +336,8 @@ options:
     use_upstream_spec=False
     downstream_spec_replace_list=^foo/bar,string1/string2
     cache_dir=~/.distroinfo/cache
+    downstream_source_git_key=bar-distgit
+    downstream_source_git_branch=ds-master
 
 * ``repo`` selects a distroinfo repository to get package information from.
 * ``info_files`` selects an info file (or a list of info files) to get package
@@ -359,6 +362,10 @@ options:
   downstream DLRN instance has special requirements, such as building without
   documentation. in that case, a regular expresion like the following could be
   used:
+* ``downstream_source_git_key`` is the key used to find the downstream source
+  git in the ``packages`` section of the packaging metadata (from ``repo``/``info_files``).
+* ``downstream_source_git_branch`` defines which branch to use when cloning
+  the downstream source git.
 
 .. code-block:: ini
 
