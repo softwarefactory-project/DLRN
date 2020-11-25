@@ -82,7 +82,7 @@
     nodeset:
       nodes:
         - name: centos-8
-          label: upstream-centos-8-vexxhost
+          label: rdo-centos-8-vexxhost
 
 - job:
     name: docs-build
