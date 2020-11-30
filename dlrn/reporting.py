@@ -43,6 +43,12 @@ def get_commit_url(commit, pkg):
                           "%s/commit/" % upstream_url.path,
                           "", "", "")
             commit_url = parse.urlunparse(commit_url)
+        elif upstream_url.netloc == "opendev.org":
+            commit_url = ("https",
+                          upstream_url.netloc,
+                          "%s/commit/" % upstream_url.path,
+                          "", "", "")
+            commit_url = parse.urlunparse(commit_url)
         else:
             # Fallback when no cgit URL can be defined
             commit_url = pkg["upstream"]
