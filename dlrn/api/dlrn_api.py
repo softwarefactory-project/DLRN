@@ -1134,12 +1134,12 @@ def get_report():
         commit_dir = commit.getshardedcommitdir()
         src_package = find_in_artifacts(commit.artifacts, r'\w+.src.rpm')
         if src_package:
-            splitted_name = re.split(r'-0\.[0-9]{14}.[0-9a-f]{7}\.',
+            splitted_name = re.split(r'-\d+\.[0-9]{14}.[0-9a-f]{7}\.',
                                      src_package.split('/')[-1])
             # NOTE(dpawlik): Release is predictable, but versioning not.
             # So better is to take value after the split.
             version = splitted_name[0].replace(commit.project_name + '-', '')
-            release = re.findall(r'0\.[0-9]{14}.[0-9a-f]{7}\.\w+',
+            release = re.findall(r'\d+\.[0-9]{14}.[0-9a-f]{7}\.\w+',
                                  src_package.split('/')[-1])
 
         key = "%s_%s_%s" % (commit.commit_hash, commit.distro_hash,
