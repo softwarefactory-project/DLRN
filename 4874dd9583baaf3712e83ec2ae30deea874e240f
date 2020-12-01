@@ -16,6 +16,24 @@
       "revId": "4874dd9583baaf3712e83ec2ae30deea874e240f",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e1743105_908f74d3",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-12-01T15:26:18Z",
+      "side": 1,
+      "message": "That would be very rare, because the session is opened/closed for each request, due to the usage of the flask application context.\n\nI think it could only happen if there is a connectivity error in the middle of a query, which would raise an exception just like it does now.",
+      "parentUuid": "3646f517_7d300c34",
+      "revId": "4874dd9583baaf3712e83ec2ae30deea874e240f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
