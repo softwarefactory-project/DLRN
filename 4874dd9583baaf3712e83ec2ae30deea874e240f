@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3646f517_7d300c34",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-12-01T15:13:00Z",
+      "side": 1,
+      "message": "Could the session becomes stalled and needs to be re-opened?",
+      "revId": "4874dd9583baaf3712e83ec2ae30deea874e240f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
