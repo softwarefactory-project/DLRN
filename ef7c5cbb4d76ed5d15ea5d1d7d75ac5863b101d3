@@ -22,6 +22,30 @@
       "revId": "ef7c5cbb4d76ed5d15ea5d1d7d75ac5863b101d3",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d00e099b_82976b0f",
+        "filename": "scripts/centos8-stream.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-12-14T14:32:13Z",
+      "side": 1,
+      "message": "This is the default configuration for mock.cfg, I don\u0027t see why we should need something specific. Any proposal?",
+      "parentUuid": "234b5b24_a4223e6f",
+      "range": {
+        "startLine": 39,
+        "startChar": 11,
+        "endLine": 39,
+        "endChar": 27
+      },
+      "revId": "ef7c5cbb4d76ed5d15ea5d1d7d75ac5863b101d3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
