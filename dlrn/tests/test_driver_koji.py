@@ -242,8 +242,6 @@ class TestDriverKoji(base.TestCase):
                                  pkg_date),
                        mock.call('/usr/bin/git log', '--pretty=format:%H %ct',
                                  '-1', '.'),
-                       mock.call('/usr/bin/git log', '--pretty=format:%H %ct',
-                                 '-1', '.'),
                        mock.call('%s/rhpkg' % self.temp_dir, 'build',
                                  '--skip-nvr-check', scratch=True)]
 
@@ -256,7 +254,7 @@ class TestDriverKoji(base.TestCase):
         # 6- koji download (handled by env_mock)
         # 7- restorecon (handled by rc_mock)
         self.assertEqual(ki_mock.call_count, 1)
-        self.assertEqual(rh_mock.call_count, 5)
+        self.assertEqual(rh_mock.call_count, 4)
         self.assertEqual(env_mock.call_count, 1)
         self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(rn_mock.call_count, 1)
@@ -306,8 +304,6 @@ class TestDriverKoji(base.TestCase):
                                  pkg_date),
                        mock.call('/usr/bin/git log', '--pretty=format:%H %ct',
                                  '-1', '.'),
-                       mock.call('/usr/bin/git log', '--pretty=format:%H %ct',
-                                 '-1', '.'),
                        mock.call('%s/rhpkg' % self.temp_dir, 'build',
                                  '--skip-nvr-check', scratch=True)]
 
@@ -321,7 +317,7 @@ class TestDriverKoji(base.TestCase):
         # 6- koji download (handled by env_mock)
         # 7- restorecon (handled by rc_mock)
         self.assertEqual(ki_mock.call_count, 1)
-        self.assertEqual(rh_mock.call_count, 5)
+        self.assertEqual(rh_mock.call_count, 4)
         self.assertEqual(env_mock.call_count, 1)
         self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(rn_mock.call_count, 1)

@@ -172,9 +172,12 @@ class KojiBuildDriver(BuildRPMDriver):
         repoinfo = str(git.log("--pretty=format:%H %ct", "-1", ".")).\
             strip().split(" ")
 
-        git = sh.git.bake(_cwd=ds_source_git, _tty_out=False, _timeout=3600)
-        repoinfo_ds_git = str(git.log("--pretty=format:%H %ct", "-1", ".")).\
-            strip().split(" ")
+        if (self.config_options.pkginfo_driver ==
+                'dlrn.drivers.downstream.DownstreamInfoDriver'):
+            git = sh.git.bake(_cwd=ds_source_git, _tty_out=False,
+                              _timeout=3600)
+            repoinfo_ds_git = str(git.log("--pretty=format:%H %ct",
+                                          "-1", ".")).strip().split(" ")
 
         logger.info("Updated git: %s" % repoinfo)
         # When using rhpkg with a pkginfo driver other than downstreamdriver,
