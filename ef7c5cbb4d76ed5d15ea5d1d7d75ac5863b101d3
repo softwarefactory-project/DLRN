@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "e5442dd0_d1fa3141",
+        "filename": "scripts/centos8-stream.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-12-15T10:21:17Z",
+      "side": 1,
+      "message": "The reason was https://bugzilla.redhat.com/show_bug.cgi?id\u003d1677583. I see it has been fixed some time ago, so we can revisit it and leave the default.",
+      "parentUuid": "05fcdf60_62b9e1f1",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 6
+      },
+      "revId": "ef7c5cbb4d76ed5d15ea5d1d7d75ac5863b101d3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "234b5b24_a4223e6f",
         "filename": "scripts/centos8-stream.cfg",
         "patchSetId": 1
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "I checked this locally, and with this chroot have \"user_agent\u003d\" set and on checking repo serve logs blank is reported:- HTTP/1.1\" 200 362292 \"-\" \"-\", if we set some string there that\u0027s get set like \"-\" \"teststring\".\n\nno strong opinion on that but if we want to log something specific to identify the source of request for the mock configs we can set it here.",
       "parentUuid": "d00e099b_82976b0f",
+      "range": {
+        "startLine": 39,
+        "startChar": 11,
+        "endLine": 39,
+        "endChar": 27
+      },
+      "revId": "ef7c5cbb4d76ed5d15ea5d1d7d75ac5863b101d3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ed1993b_da0f3531",
+        "filename": "scripts/centos8-stream.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-12-15T10:21:17Z",
+      "side": 1,
+      "message": "Ok, I\u0027ll set a default value so we can use it.",
+      "parentUuid": "dabfab87_c222bf69",
       "range": {
         "startLine": 39,
         "startChar": 11,
