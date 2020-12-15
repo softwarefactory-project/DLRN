@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "05fcdf60_62b9e1f1",
+        "filename": "scripts/centos8-stream.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 267
+      },
+      "writtenOn": "2020-12-15T10:09:54Z",
+      "side": 1,
+      "message": "In centos8 we have best\u003d0. I think this was needed because of modules.",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 6
+      },
+      "revId": "ef7c5cbb4d76ed5d15ea5d1d7d75ac5863b101d3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "234b5b24_a4223e6f",
         "filename": "scripts/centos8-stream.cfg",
         "patchSetId": 1
