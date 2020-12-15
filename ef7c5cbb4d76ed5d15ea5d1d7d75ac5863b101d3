@@ -46,6 +46,30 @@
       "revId": "ef7c5cbb4d76ed5d15ea5d1d7d75ac5863b101d3",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dabfab87_c222bf69",
+        "filename": "scripts/centos8-stream.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 430
+      },
+      "writtenOn": "2020-12-15T08:32:19Z",
+      "side": 1,
+      "message": "I checked this locally, and with this chroot have \"user_agent\u003d\" set and on checking repo serve logs blank is reported:- HTTP/1.1\" 200 362292 \"-\" \"-\", if we set some string there that\u0027s get set like \"-\" \"teststring\".\n\nno strong opinion on that but if we want to log something specific to identify the source of request for the mock configs we can set it here.",
+      "parentUuid": "d00e099b_82976b0f",
+      "range": {
+        "startLine": 39,
+        "startChar": 11,
+        "endLine": 39,
+        "endChar": 27
+      },
+      "revId": "ef7c5cbb4d76ed5d15ea5d1d7d75ac5863b101d3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
