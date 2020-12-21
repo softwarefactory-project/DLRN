@@ -316,6 +316,14 @@ def main():
                 add_commits(project_toprocess)
     closeSession(session)   # Close session, will reopen during post_build
 
+    # Store skip list
+    datadir = os.path.realpath(config_options.datadir)
+    if not os.path.exists(os.path.join(datadir, 'repos')):
+        os.makedirs(os.path.join(datadir, 'repos'))
+    with open(os.path.join(datadir, 'repos', 'skiplist.txt'), 'w') as fp:
+        for pkg in skipped_list:
+            fp.write(pkg + '\n')
+
     # Check if there is any commit at all to process
     if len(toprocess) == 0:
         if not pkg_name:
@@ -493,12 +501,6 @@ def main():
             session.commit()
     genreports(packages, options.head_only, session, [])
     closeSession(session)
-
-    # Store skip list
-    datadir = os.path.realpath(config_options.datadir)
-    with open(os.path.join(datadir, 'repos', 'skiplist.txt'), 'w') as fp:
-        for pkg in skipped_list:
-            fp.write(pkg + '\n')
 
     if options.dev:
         os.remove(tmpdb_path)
