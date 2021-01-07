@@ -3,7 +3,7 @@ Jinja2
 sh>=1.12.6
 six
 SQLAlchemy
-PyMySQL
+PyMySQL!=1.0.0
 PyYAML
 rdopkg>=0.45.0
 distroinfo
