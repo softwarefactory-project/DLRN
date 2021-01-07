@@ -87,6 +87,24 @@
       "revId": "3bccc24d3b76787b4062903739a734447d20c3c6",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c7a35b8a_f7e9c740",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 430
+      },
+      "writtenOn": "2021-01-07T15:17:40Z",
+      "side": 1,
+      "message": "checked without additional entry it will not get installed on python3, so let\u0027s add.",
+      "parentUuid": "9570079e_d0b840dd",
+      "revId": "3bccc24d3b76787b4062903739a734447d20c3c6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
