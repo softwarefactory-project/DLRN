@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "c789e9ce_f7f37143",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 430
+      },
+      "writtenOn": "2021-01-07T15:03:07Z",
+      "side": 1,
+      "message": "we don\u0027t know when there will be new pypi release for it so we have to handle here itself, i requested there but last comment is \"I will do it someday in this year.\" https://github.com/PyMySQL/PyMySQL/pull/936",
+      "parentUuid": "8ff46921_942dfc49",
+      "revId": "3bccc24d3b76787b4062903739a734447d20c3c6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9570079e_d0b840dd",
         "filename": "requirements.txt",
         "patchSetId": 1
