@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "794d8b99_8add7b14",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 430
+      },
+      "writtenOn": "2021-01-07T14:18:28Z",
+      "side": 1,
+      "message": "actually seems some issue with published wheel binary too as they don\u0027t have data-requires-python metadata.",
+      "revId": "3bccc24d3b76787b4062903739a734447d20c3c6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9570079e_d0b840dd",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 430
+      },
+      "writtenOn": "2021-01-07T14:18:28Z",
+      "side": 1,
+      "message": "isn\u0027t additional entry not needed for python3?",
+      "revId": "3bccc24d3b76787b4062903739a734447d20c3c6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
