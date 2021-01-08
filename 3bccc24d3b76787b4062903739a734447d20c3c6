@@ -105,6 +105,24 @@
       "revId": "3bccc24d3b76787b4062903739a734447d20c3c6",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b3c12307_e54c7260",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2021-01-08T07:50:48Z",
+      "side": 1,
+      "message": "I see PyMySQL 1.0.1 still fails to install on Python 2. Let\u0027s do like renderspec below (see line 11) and add another line to support Python 3 like:\n\nPyMySQL;python_version\u003e\u003d\u00273.3\u0027",
+      "parentUuid": "c7a35b8a_f7e9c740",
+      "revId": "3bccc24d3b76787b4062903739a734447d20c3c6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
