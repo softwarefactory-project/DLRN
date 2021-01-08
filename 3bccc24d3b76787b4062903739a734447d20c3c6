@@ -123,6 +123,24 @@
       "revId": "3bccc24d3b76787b4062903739a734447d20c3c6",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7606a59d_84ec3ad8",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 430
+      },
+      "writtenOn": "2021-01-08T08:04:43Z",
+      "side": 1,
+      "message": "1.0.1 have data-requires-python\u003e\u003d3.6, actually issue is 1.0.0 don\u0027t have that metadata so pip will try to use 1.0.0 in py2 and fails, so we can block 1.0.0 and pip will auto pull right version. Ideally 1.0.0 should have been deleted from pypi so pip install work fine on py2 too.\n\nPyMySQL!\u003d1.0.0",
+      "parentUuid": "b3c12307_e54c7260",
+      "revId": "3bccc24d3b76787b4062903739a734447d20c3c6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
