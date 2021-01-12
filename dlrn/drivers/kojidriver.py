@@ -176,6 +176,9 @@ class KojiBuildDriver(BuildRPMDriver):
                 'dlrn.drivers.downstream.DownstreamInfoDriver'):
             git = sh.git.bake(_cwd=ds_source_git, _tty_out=False,
                               _timeout=3600)
+            # In some cases, a patch rebasing script could update the
+            # downstream source git, so we ensure we have the latest code
+            git.pull()
             repoinfo_ds_git = str(git.log("--pretty=format:%H %ct",
                                           "-1", ".")).strip().split(" ")
 
