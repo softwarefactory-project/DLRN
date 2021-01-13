@@ -34,6 +34,7 @@ from dlrn.remote import import_commit
 from dlrn.utils import aggregate_repo_files
 from dlrn.utils import find_in_artifacts
 
+from flask import g as flask_g
 from flask import jsonify
 from flask import render_template
 from flask import request
@@ -48,6 +49,12 @@ import time
 
 pagination_limit = 100
 max_limit = 100
+
+
+def _get_db():
+    if 'db' not in flask_g:
+        flask_g.db = getSession(app.config['DB_PATH'])
+    return flask_g.db
 
 
 def _get_config_options(config_file):
@@ -176,7 +183,7 @@ def repo_status():
         success = bool(strtobool(success))
 
     # Find the commit id for commit_hash/distro_hash
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     commit = _get_commit(session, commit_hash, distro_hash)
 
     if commit is None:
@@ -203,7 +210,6 @@ def repo_status():
              'user': vote.user,
              'component': vote.component}
         data.append(d)
-    closeSession(session)
     return jsonify(data)
 
 
@@ -229,7 +235,7 @@ def agg_status():
         success = bool(strtobool(success))
 
     # Find the aggregates
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     votes = session.query(CIVote_Aggregate)
     votes = votes.filter(CIVote_Aggregate.ref_hash == agg_hash)
     if success is not None:
@@ -247,7 +253,6 @@ def agg_status():
              'notes': vote.notes,
              'user': vote.user}
         data.append(d)
-    closeSession(session)
     return jsonify(data)
 
 
@@ -306,7 +311,7 @@ def last_tested_repo_GET():
         oldest_time = datetime.now() - timedelta(hours=int(max_age))
         timestamp = time.mktime(oldest_time.timetuple())
 
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     try:
         if sequential_mode:
             # CI pipeline case
@@ -331,7 +336,6 @@ def last_tested_repo_GET():
               'in_progress': vote.ci_in_progress,
               'user': vote.user,
               'component': vote.component}
-    closeSession(session)
     return jsonify(result), 200
 
 
@@ -385,7 +389,7 @@ def promotions_GET():
                            status_code=400)
 
     # Find the commit id for commit_hash/distro_hash
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     if commit_hash and distro_hash:
         commit = _get_commit(session, commit_hash, distro_hash)
         if commit is None:
@@ -430,7 +434,6 @@ def promotions_GET():
              'component': promotion.component,
              'user': promotion.user}
         data.append(d)
-    closeSession(session)
     return jsonify(data)
 
 
@@ -466,7 +469,7 @@ def get_metrics():
                            status_code=400)
 
     # Find the commits count for each metric
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     commits = session.query(Commit).filter(
         Commit.status == 'SUCCESS',
         Commit.dt_build >= start_timestamp,
@@ -493,7 +496,6 @@ def get_metrics():
     result = {'succeeded': successful_commits,
               'failed': failed_commits,
               'total': total_commits}
-    closeSession(session)
     return jsonify(result), 200
 
 
@@ -539,8 +541,7 @@ def last_tested_repo_POST():
         oldest_time = datetime.now() - timedelta(hours=int(max_age))
         timestamp = time.mktime(oldest_time.timetuple())
 
-    session = getSession(app.config['DB_PATH'])
-
+    session = _get_db()
     try:
         if sequential_mode:
             # CI pipeline case
@@ -572,7 +573,6 @@ def last_tested_repo_POST():
               'in_progress': newvote.ci_in_progress,
               'user': newvote.user,
               'component': newvote.component}
-    closeSession(session)
     return jsonify(result), 201
 
 
@@ -618,7 +618,7 @@ def report_result():
 
     notes = request.json.get('notes', '')
 
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     # We have two paths here: one for votes on commit/distro hash, another
     # for votes on aggregate_hash
     component = None
@@ -660,7 +660,6 @@ def report_result():
               'notes': notes,
               'user': auth.username(),
               'component': component}
-    closeSession(session)
     return jsonify(result), 201
 
 
@@ -685,7 +684,7 @@ def promote():
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     commit = _get_commit(session, commit_hash, distro_hash)
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash combination not found',
@@ -755,7 +754,6 @@ def promote():
               'timestamp': timestamp,
               'user': auth.username(),
               'aggregate_hash': repo_checksum}
-    closeSession(session)
     return jsonify(result), 201
 
 
@@ -777,7 +775,7 @@ def promote_batch():
         raise InvalidUsage('Missing parameters', status_code=400)
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     # Now we will be running all checks for each combination
     # Check for invalid promote names
     for hash_item in hash_list:
@@ -889,7 +887,6 @@ def promote_batch():
               'timestamp': timestamp,
               'user': auth.username(),
               'aggregate_hash': repo_checksum}
-    closeSession(session)
     return jsonify(result), 201
 
 
@@ -922,7 +919,7 @@ def strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
 
 @app.route('/api/civotes.html', methods=['GET'])
 def get_civotes():
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     offset = request.args.get('offset', 0)
 
     votes = session.query(CIVote)
@@ -958,8 +955,6 @@ def get_civotes():
 
     repolist = sorted(repolist, key=lambda repo: repo.timestamp, reverse=True)
 
-    closeSession(session)
-
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     return render_template('votes_general.j2',
@@ -978,7 +973,7 @@ def get_civotes_detail():
     success = request.args.get('success', None)
     offset = request.args.get('offset', 0)
 
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     votes = session.query(CIVote)
     votes = votes.filter(CIVote.ci_name != 'consistent')
 
@@ -1009,7 +1004,6 @@ def get_civotes_detail():
         votelist[i].distro_hash = commit.distro_hash
         votelist[i].distro_hash_short = commit.distro_hash[:8]
 
-    closeSession(session)
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     return render_template('votes.j2',
@@ -1021,7 +1015,7 @@ def get_civotes_detail():
 
 @app.route('/api/civotes_agg.html', methods=['GET'])
 def get_civotes_agg():
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     offset = request.args.get('offset', 0)
 
     votes = session.query(CIVote_Aggregate)
@@ -1053,8 +1047,6 @@ def get_civotes_agg():
 
     agglist = sorted(agglist, key=lambda repo: repo.timestamp, reverse=True)
 
-    closeSession(session)
-
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     return render_template('votes_general_agg.j2',
@@ -1071,7 +1063,7 @@ def get_civotes_agg_detail():
     success = request.args.get('success', None)
     offset = request.args.get('offset', 0)
 
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     votes = session.query(CIVote_Aggregate)
 
     if ref_hash:
@@ -1091,7 +1083,6 @@ def get_civotes_agg_detail():
     votelist = votes.all()
     count = votes.count()
 
-    closeSession(session)
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     return render_template('votes_agg.j2',
@@ -1116,7 +1107,7 @@ def get_report():
     else:
         with_status = None
 
-    session = getSession(app.config['DB_PATH'])
+    session = _get_db()
     commits = getCommits(session, without_status="RETRY",
                          project=package_name, with_status=with_status,
                          limit=pagination_limit, offset=offset,
@@ -1125,7 +1116,6 @@ def get_report():
     count = commits.count()
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
-    closeSession(session)
 
     commits_build_dir = {}
     for commit in commits:
@@ -1159,3 +1149,10 @@ def get_report():
                            count=count,
                            limit=pagination_limit,
                            commits_build_dir=commits_build_dir)
+
+
+@app.teardown_appcontext
+def teardown_db(exception=None):
+    session = flask_g.pop('db', None)
+    if session is not None:
+        closeSession(session)
