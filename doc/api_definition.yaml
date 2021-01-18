@@ -506,6 +506,12 @@ paths:
                 description: |
                   distro_hash of the repo to be promoted.
                 type: string
+              extended_hash:
+                description: |
+                  extended_hash of the repo to be promoted. If not specified,
+                  the API will take the last commit built with the commit and
+                  distro hash.
+                type: string
               promote_name:
                 description: |
                   Name to be used for the promotion. In the current
@@ -542,10 +548,10 @@ paths:
           description: The JSON params to post
           required: true
           schema:
-            title: ArrayOfVotes
+            title: ArrayOfPromotionParams
             type: array
             items:
-              $ref: '#/definitions/CIVote'
+              $ref: '#/definitions/PromotionParam'
       responses:
         201:
           description: Successful response
@@ -577,6 +583,11 @@ paths:
               distro_hash:
                 description: |
                   If set, distro_hash of the repo to use as filter key. Requires commit_hash.
+                type: string
+              extended_hash:
+                description: |
+                  If set, extended_hash of the repo to use as filter key. Requires commit_hash
+                  and distro_hash.
                 type: string
               aggregate_hash:
                 description: |
@@ -716,6 +727,9 @@ definitions:
       distro_hash:
         type: string
         description: distro_hash of promoted repo
+      extended_hash:
+        type: string
+        description: extended_hash of promoted repo
       aggregate_hash:
         type: string
         description: hash of the aggregated repo, when using components
@@ -746,6 +760,9 @@ definitions:
       distro_hash:
         type: string
         description: distro_hash of promoted repo
+      extended_hash:
+        type: string
+        description: extended_hash of promoted repo
       aggregate_hash:
         type: string
         description: hash of the aggregated repo, when using components
@@ -770,6 +787,9 @@ definitions:
       distro_hash:
         type: string
         description: distro_hash of promoted repo
+      extended_hash:
+        type: string
+        description: extended_hash of promoted repo
       promote_name:
         type: string
         description: name used for the promotion

@@ -67,7 +67,7 @@ class TestCommitsQuery(DLRNAPIGraphQLTestCase):
         response = self.app.get('/api/graphql?query={ commits { id } }')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data['data']['commits']), 4)
+        self.assertEqual(len(data['data']['commits']), 5)
 
     def test_filtered_query(self, db_mock):
         query = """
@@ -95,7 +95,7 @@ class TestCommitsQuery(DLRNAPIGraphQLTestCase):
         response = self.app.get('/api/graphql?query=%s' % query)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data['data']['commits']), 2)
+        self.assertEqual(len(data['data']['commits']), 3)
 
     def test_badfiltered_query(self, db_mock):
         query = """
@@ -137,7 +137,7 @@ class TestCommitsQuery(DLRNAPIGraphQLTestCase):
         response = self.app.get('/api/graphql?query=%s' % query)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data['data']['commits']), 1)
+        self.assertEqual(len(data['data']['commits']), 2)
         self.assertEqual(data['data']['commits'][0]['status'],
                          'SUCCESS')
         self.assertEqual(data['data']['commits'][0]['component'],
@@ -173,7 +173,7 @@ class TestCommitsQuery(DLRNAPIGraphQLTestCase):
         response = self.app.get('/api/graphql?query=%s' % query)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data['data']['commits']), 2)
+        self.assertEqual(len(data['data']['commits']), 3)
 
 
 @mock.patch('dlrn.api.graphql.getSession', side_effect=mocked_session)

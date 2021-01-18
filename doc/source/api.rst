@@ -183,6 +183,8 @@ commit_hash          string      If set, commit_hash of the repo to use as filte
                      (optional)  Requires distro_hash.
 distro_hash          string      If set, commit_hash of the repo to use as filter key.
                      (optional)  Requires commit_hash.
+extended_hash        string      If set, extended_hash of the repo to use as filter key. 
+                     (optional)  Requires commit_hash and distro_hash.
 aggregate_hash       string      If set, use the generated aggregate_hash as filter key.
                      (optional)  Only makes sense when components are enabled.
 promote_name         string      If set to a value, filter results by the specified promotion
@@ -202,6 +204,7 @@ Parameter          Type                             Description
 ===============  ==========  ==============================================================
 commit_hash      string      commit_hash of the promoted repo
 distro_hash      string      distro_hash of the promoted repo
+extended_hash    string      extended_hash of the promoted repo
 agggregate_hash  string      Hash of the aggregated repo file, when using components
 repo_hash        string      Repository hash, composed of the commit_hash and short
                              distro_hash
@@ -398,6 +401,9 @@ Request:
 ==============  ==========  ==============================================================
 commit_hash     string      commit_hash of the repo to be promoted
 distro_hash     string      distro_hash of the repo to be promoted
+extended_hash   string      extended_hash of the repo to be promoted (optional). If not
+                            specified, the API will take the last commit built with the
+                            commit and distro hash.
 promote_name    string      name to be used for the promotion. In the current
                             implementation, this is the name of the symlink to be created
 ==============  ==========  ==============================================================
@@ -409,6 +415,7 @@ Parameter         Type                             Description
 ===============  ==========  ==============================================================
 commit_hash      string      commit_hash of the promoted repo
 distro_hash      string      distro_hash of the promoted repo
+extended_hash    string      extended_hash of the promoted repo
 repo_hash        string      Repository hash, composed of the commit_hash and short
                              distro_hash
 repo_url         string      Full URL of the promoted repository
@@ -445,6 +452,9 @@ The JSON input will contain an array where each item contains:
 ==============  ==========  ==============================================================
 commit_hash     string      commit_hash of the repo to be promoted
 distro_hash     string      distro_hash of the repo to be promoted
+extended_hash   string      extended_hash of the repo to be promoted (optional). If not
+                            specified, the API will take the last commit built with the
+                            commit and distro hash.
 promote_name    string      name to be used for the promotion. In the current
                             implementation, this is the name of the symlink to be created
 ==============  ==========  ==============================================================
@@ -456,6 +466,7 @@ Parameter          Type                             Description
 ===============  ==========  ==============================================================
 commit_hash      string      commit_hash of the promoted repo
 distro_hash      string      distro_hash of the promoted repo
+extended_hash    string      extended_hash of the promoted repo
 repo_hash        string      Repository hash, composed of the commit_hash and short
                              distro_hash
 repo_url         string      Full URL of the promoted repository

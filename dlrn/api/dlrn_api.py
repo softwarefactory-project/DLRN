@@ -77,11 +77,17 @@ def _json_media_type(f):
     return decorated_function
 
 
-def _get_commit(session, commit_hash, distro_hash):
+def _get_commit(session, commit_hash, distro_hash, extended_hash=None):
     commit = session.query(Commit).filter(
         Commit.status == 'SUCCESS',
         Commit.commit_hash == commit_hash,
-        Commit.distro_hash == distro_hash).order_by(desc(Commit.id)).first()
+        Commit.distro_hash == distro_hash)
+    # If an extended hash is specified, also filter for it. Since it
+    # could be None, we are falling back to the previous behavior for
+    # compatibility
+    if extended_hash:
+        commit = commit.filter(Commit.extended_hash == extended_hash)
+    commit = commit.order_by(desc(Commit.id)).first()
     return commit
 
 
@@ -343,6 +349,7 @@ def last_tested_repo_GET():
 def promotions_GET():
     # commit_hash(optional): commit hash
     # distro_hash(optional): distro hash
+    # extended_hash(optional): extended hash
     # aggregate_hash(optional): aggregate hash
     # promote_name(optional): only report promotions for promote_name
     # offset(optional): skip the first X promotions (only 100 are shown
@@ -351,6 +358,7 @@ def promotions_GET():
     # component(optional): only report promotions for this component
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
+    extended_hash = request.args.get('extended_hash', None)
     agg_hash = request.args.get('aggregate_hash', None)
     promote_name = request.args.get('promote_name', None)
     offset = int(request.args.get('offset', 0))
@@ -364,6 +372,8 @@ def promotions_GET():
             commit_hash = request.json.get('commit_hash', None)
         if distro_hash is None:
             distro_hash = request.json.get('distro_hash', None)
+        if extended_hash is None:
+            extended_hash = request.json.get('extended_hash', None)
         if agg_hash is None:
             agg_hash = request.json.get('aggregate_hash', None)
         if promote_name is None:
@@ -391,10 +401,10 @@ def promotions_GET():
     # Find the commit id for commit_hash/distro_hash
     session = _get_db()
     if commit_hash and distro_hash:
-        commit = _get_commit(session, commit_hash, distro_hash)
+        commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
         if commit is None:
-            raise InvalidUsage('commit_hash+distro_hash combination not found',
-                               status_code=404)
+            raise InvalidUsage('commit_hash+distro_hash+extended_hash '
+                               'combination not found', status_code=404)
         commit_id = commit.id
     else:
         commit_id = None
@@ -427,6 +437,7 @@ def promotions_GET():
         d = {'timestamp': promotion.timestamp,
              'commit_hash': commit.commit_hash,
              'distro_hash': commit.distro_hash,
+             'extended_hash': commit.extended_hash,
              'aggregate_hash': promotion.aggregate_hash,
              'repo_hash': repo_hash,
              'repo_url': repo_url,
@@ -669,6 +680,7 @@ def report_result():
 def promote():
     # commit_hash: commit hash
     # distro_hash: distro hash
+    # extended_hash (optional): extended hash
     # promote_name: symlink name
     try:
         commit_hash = request.json['commit_hash']
@@ -676,6 +688,8 @@ def promote():
         promote_name = request.json['promote_name']
     except KeyError:
         raise InvalidUsage('Missing parameters', status_code=400)
+
+    extended_hash = request.json.get('extended_hash', None)
 
     # Check for invalid promote names
     if (promote_name == 'consistent' or promote_name == 'current'):
@@ -685,15 +699,15 @@ def promote():
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     session = _get_db()
-    commit = _get_commit(session, commit_hash, distro_hash)
+    commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
     if commit is None:
-        raise InvalidUsage('commit_hash+distro_hash combination not found',
-                           status_code=404)
+        raise InvalidUsage('commit_hash+distro_hash+extended_hash combination'
+                           ' not found', status_code=404)
 
     # If the commit has been purged, do not move on
     if commit.flags & FLAG_PURGED:
-        raise InvalidUsage('commit_hash+distro_hash has been purged, cannot '
-                           'promote it', status_code=410)
+        raise InvalidUsage('commit_hash+distro_hash+extended_hash has been '
+                           'purged, cannot promote it', status_code=410)
 
     if config_options.use_components:
         base_directory = os.path.join(app.config['REPO_PATH'], "component/%s" %
@@ -747,6 +761,7 @@ def promote():
 
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
+              'extended_hash': commit.extended_hash,
               'repo_hash': repo_hash,
               'repo_url': repo_url,
               'promote_name': promote_name,
@@ -769,7 +784,8 @@ def promote_batch():
             commit_hash = pair['commit_hash']
             distro_hash = pair['distro_hash']
             promote_name = pair['promote_name']
-            hash_item = [commit_hash, distro_hash, promote_name]
+            extended_hash = pair.get('extended_hash', None)
+            hash_item = [commit_hash, distro_hash, extended_hash, promote_name]
             hash_list.append(hash_item)
     except KeyError:
         raise InvalidUsage('Missing parameters', status_code=400)
@@ -781,22 +797,24 @@ def promote_batch():
     for hash_item in hash_list:
         commit_hash = hash_item[0]
         distro_hash = hash_item[1]
-        promote_name = hash_item[2]
+        extended_hash = hash_item[2]
+        promote_name = hash_item[3]
         if (promote_name == 'consistent' or promote_name == 'current'):
             raise InvalidUsage('Invalid promote_name %s for hash %s_%s' % (
                                promote_name, commit_hash, distro_hash),
                                status_code=403)
-        commit = _get_commit(session, commit_hash, distro_hash)
+        commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
         if commit is None:
-            raise InvalidUsage('commit_hash+distro_hash combination not found'
-                               ' for %s_%s' % (commit_hash, distro_hash),
+            raise InvalidUsage('commit_hash+distro_hash+extended_hash '
+                               'combination not found for %s_%s_%s' % (
+                                commit_hash, distro_hash, extended_hash),
                                status_code=404)
 
         # If the commit has been purged, do not move on
         if commit.flags & FLAG_PURGED:
-            raise InvalidUsage('commit_hash+distro_hash %s_%s has been purged,'
-                               ' cannot promote it' % (commit_hash,
-                                                       distro_hash),
+            raise InvalidUsage('commit_hash+distro_hash+extended_hash %s_%s_%s'
+                               ' has been purged, cannot promote it' % (
+                                commit_hash, distro_hash, extended_hash),
                                status_code=410)
 
         if config_options.use_components:
@@ -818,8 +836,9 @@ def promote_batch():
         rollback_item = {}
         commit_hash = hash_item[0]
         distro_hash = hash_item[1]
-        promote_name = hash_item[2]
-        commit = _get_commit(session, commit_hash, distro_hash)
+        extended_hash = hash_item[2]
+        promote_name = hash_item[3]
+        commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
         # We should create a relative symlink
         yumrepodir = commit.getshardedcommitdir()
         if config_options.use_components:
@@ -880,6 +899,7 @@ def promote_batch():
     repo_url = "%s/%s" % (config_options.baseurl, commit.getshardedcommitdir())
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
+              'extended_hash': commit.extended_hash,
               'repo_hash': repo_hash,
               'repo_url': repo_url,
               'promote_name': promote_name,

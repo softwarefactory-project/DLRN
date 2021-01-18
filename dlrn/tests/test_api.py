@@ -474,7 +474,8 @@ class TestPromote(DLRNAPITestCase):
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 410)
-        self.assertEqual(data['message'], 'commit_hash+distro_hash has been'
+        self.assertEqual(data['message'], 'commit_hash+distro_hash+'
+                                          'extended_hash has been'
                                           ' purged, cannot promote it')
 
     @mock.patch('os.symlink')
@@ -494,6 +495,25 @@ class TestPromote(DLRNAPITestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(sl_mock.call_args_list, expected)
+        data = json.loads(response.data)
+        self.assertEqual(data['extended_hash'], None)
+
+    @mock.patch('os.symlink')
+    def test_promote_successful_exthash(self, sl_mock, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='93eee77657978547f5fad1cb'
+                                               '8cd30b570da83e68',
+                                   distro_hash='008678d7b0e20fbae185f2bb'
+                                               '1bd0d9d167586211',
+                                   extended_hash='1234567890_1234567890',
+                                   promote_name='my-ci'))
+        response = self.app.post('/api/promote',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+
+        self.assertEqual(response.status_code, 201)
+        data = json.loads(response.data)
+        self.assertEqual(data['extended_hash'], '1234567890_1234567890')
 
     def test_promote_invalid_name(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='1c67b1ab8c6fe273d4e'
@@ -596,6 +616,34 @@ class TestPromoteBatch(DLRNAPITestCase):
                               '14f0df5d3cbbd0edc_8170b868', '/tmp/foo-ci'),
                     mock.call('component/tripleo/17/23/17234e9ab9dfab4cf56'
                               '00f67f1d24db5064f1025_024e24f0', '/tmp/foo-ci')]
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(sl_mock.call_args_list, expected)
+
+    @mock.patch('os.symlink')
+    def test_promote_batch_successful_exthash(self, sl_mock, db2_mock,
+                                              db_mock):
+        req_data = json.dumps([dict(commit_hash='1c67b1ab8c6fe273d4e'
+                                                '175a14f0df5d3cbbd0edc',
+                                    distro_hash='8170b8686c38bafb6021'
+                                                'd998e2fb268ab26ccf65',
+                                    promote_name='test-ci'),
+                               dict(commit_hash='93eee77657978547f5fad'
+                                                '1cb8cd30b570da83e68',
+                                    distro_hash='008678d7b0e20fbae185f'
+                                                '2bb1bd0d9d167586211',
+                                    extended_hash='1234567890_1234567890',
+                                    promote_name='test-ci'),
+                               ])
+        response = self.app.post('/api/promote-batch',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+
+        expected = [mock.call('1c/67/1c67b1ab8c6fe273d4e175a'
+                              '14f0df5d3cbbd0edc_8170b868', '/tmp/test-ci'),
+                    mock.call('component/tripleo/93/ee/93eee77657978547f5fad'
+                              '1cb8cd30b570da83e68_008678d7_12345678',
+                              '/tmp/test-ci')]
         self.assertEqual(response.status_code, 201)
         self.assertEqual(sl_mock.call_args_list, expected)
 
@@ -894,13 +942,13 @@ class TestGetPromotions(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 3)
+        self.assertEqual(len(data), 4)
 
     def test_get_promotions_multiple_votes_url_params(self, db2_mock, db_mock):
         response = self.app.get('/api/promotions')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 3)
+        self.assertEqual(len(data), 4)
 
     def test_get_promotions_with_promote_name(self, db2_mock, db_mock):
         req_data = json.dumps(dict(promote_name='another-ci'))
@@ -930,6 +978,20 @@ class TestGetPromotions(DLRNAPITestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
 
+    def test_get_promotions_with_ext_hash(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='93eee77657978547f5fad1cb8c'
+                                               'd30b570da83e68',
+                                   distro_hash='008678d7b0e20fbae185f2bb1b'
+                                               'd0d9d167586211',
+                                   extended_hash='1234567890_1234567890'))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['extended_hash'], '1234567890_1234567890')
+
     def test_get_promotions_with_offset(self, db2_mock, db_mock):
         req_data = json.dumps(dict(offset=1))
         response = self.app.get('/api/promotions',
@@ -937,13 +999,13 @@ class TestGetPromotions(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data), 3)
 
     def test_get_promotions_with_offset_url_params(self, db2_mock, db_mock):
         response = self.app.get('/api/promotions?offset=1')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data), 3)
 
     def test_get_promotions_with_limit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(limit=1))
@@ -1016,8 +1078,8 @@ class TestMetrics(DLRNAPITestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(data['total'], 4)
-        self.assertEqual(data['succeeded'], 4)
+        self.assertEqual(data['total'], 5)
+        self.assertEqual(data['succeeded'], 5)
         self.assertEqual(data['failed'], 0)
 
     def test_metrics_success_url_param(self, db2_mock, db_mock):
@@ -1025,8 +1087,8 @@ class TestMetrics(DLRNAPITestCase):
                                 '&end_date=2015-09-09')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(data['total'], 4)
-        self.assertEqual(data['succeeded'], 4)
+        self.assertEqual(data['total'], 5)
+        self.assertEqual(data['succeeded'], 5)
         self.assertEqual(data['failed'], 0)
 
     def test_metrics_filtered(self, db2_mock, db_mock):
