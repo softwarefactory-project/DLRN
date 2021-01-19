@@ -74,7 +74,7 @@ branch=""
 
 if [ ${target} = "centos" ]; then
     baseurl_release="centos7"
-elif [ ${target} = "centos8" ]; then
+elif [[ ${target} =~ "centos8" ]]; then
     baseurl_release="centos8"
 fi
 
