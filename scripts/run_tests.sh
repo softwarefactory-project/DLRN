@@ -74,8 +74,10 @@ branch=""
 
 if [ ${target} = "centos" ]; then
     baseurl_release="centos7"
-elif [ ${target} = "centos8" ]; then
+    log_dir="centos"
+elif [[ ${target} =~ "centos8" ]]; then
     baseurl_release="centos8"
+    log_dir="centos8"
 fi
 
 # If we're testing a commit on a specific branch, make sure we're using it
@@ -108,10 +110,10 @@ mkdir -p data/repos
 # If the commands below throws an error we still want the logs
 function copy_logs() {
     mkdir -p logs
-    rsync -avzr data/repos logs/$target
+    rsync -avzr data/repos logs/$log_dir
     # Only copy the current symlink if it exists
     if [ -h data/repos/current ]; then
-      rsync -avzrL data/repos/current logs/$target
+      rsync -avzrL data/repos/current logs/$log_dir
     fi
 }
 trap copy_logs ERR EXIT
