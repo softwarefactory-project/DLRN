@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4c08916b_a36f7c2c",
+        "filename": "dlrn/api/dlrn_api.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2021-01-19T08:12:18Z",
+      "side": 1,
+      "message": "its not necessary, but in previous condition is same, so its ok",
+      "range": {
+        "startLine": 376,
+        "startChar": 62,
+        "endLine": 376,
+        "endChar": 66
+      },
+      "revId": "74dcc54ff591bf473b5c3818823f2b48043eebcc",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
