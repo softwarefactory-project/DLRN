@@ -50,6 +50,14 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
         mkdir ${MOCKDIR}/var/tmp/pkgsrc
         cp -pr . ${MOCKDIR}/var/tmp/pkgsrc
 
+        # Remove any private tags, they could interfere with setuptools
+        # There is a known issue with setuptools_scm, used in Gnocchi
+        pushd ${MOCKDIR}/var/tmp/pkgsrc
+        set +o pipefail
+        git tag -l "private-*" | xargs -n 1 git tag -d
+        set -o pipefail
+        popd
+
         # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
         # so only look at the last line for version
         setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && rm -rf *.egg-info && (([ -x /usr/bin/python3 ] && python3 setup.py --version 2> /dev/null) || python setup.py --version 2> /dev/null)"| tail -n 1) \
