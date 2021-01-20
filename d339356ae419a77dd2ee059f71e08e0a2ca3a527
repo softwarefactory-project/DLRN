@@ -22,6 +22,30 @@
       "revId": "d339356ae419a77dd2ee059f71e08e0a2ca3a527",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "609e3cb5_f2333d9d",
+        "filename": "scripts/build_srpm.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2021-01-20T13:58:22Z",
+      "side": 1,
+      "message": "Hm nice trick! I\u0027ll change that.",
+      "parentUuid": "efc0a26a_2eee9e9e",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 57,
+        "endChar": 56
+      },
+      "revId": "d339356ae419a77dd2ee059f71e08e0a2ca3a527",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
