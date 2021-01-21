@@ -100,6 +100,15 @@ civotes:
   timestamp: '1441635095'
   notes: ''
   component: 'foo-component'
+- id: '5'
+  commit_id: '5623'
+  ci_name: 'extended-ci'
+  ci_url: 'http://dummyci.example.com/extended-ci'
+  ci_vote: true
+  ci_in_progress: false
+  timestamp: '1441635099'
+  notes: ''
+  component: 'tripleo'
 civotes_agg:
 - id: '1'
   ref_hash: '12345678'

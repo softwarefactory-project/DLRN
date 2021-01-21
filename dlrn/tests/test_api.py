@@ -125,53 +125,11 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
                                 content_type='application/json')
         data = json.loads(response.data)
         self.assertEqual(data['commit_hash'],
-                         '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc')
+                         '93eee77657978547f5fad1cb8cd30b570da83e68')
         self.assertEqual(data['distro_hash'],
-                         '8170b8686c38bafb6021d998e2fb268ab26ccf65')
-        self.assertEqual(data['job_id'], 'another-ci')
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_last_tested_repo_non_existing_ci(self, db_mock, dt_mock):
-        req_data = json.dumps(dict(max_age='0', job_id='foo'))
-        dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
-        response = self.app.get('/api/last_tested_repo',
-                                data=req_data,
-                                content_type='application/json')
-        data = json.loads(response.data)
-        self.assertEqual(data['commit_hash'],
-                         '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc')
-        self.assertEqual(data['distro_hash'],
-                         '8170b8686c38bafb6021d998e2fb268ab26ccf65')
-        self.assertEqual(data['job_id'], 'consistent')
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_last_tested_repo_existing_ci(self, db_mock, dt_mock):
-        req_data = json.dumps(dict(max_age='0',
-                                   job_id='current-passed-ci'))
-        dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
-        response = self.app.get('/api/last_tested_repo',
-                                data=req_data,
-                                content_type='application/json')
-        data = json.loads(response.data)
-        self.assertEqual(data['commit_hash'],
-                         '17234e9ab9dfab4cf5600f67f1d24db5064f1025')
-        self.assertEqual(data['distro_hash'],
-                         '024e24f0cf4366c2290c22f24e42de714d1addd1')
-        self.assertEqual(data['job_id'], 'current-passed-ci')
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_last_tested_repo_failed(self, db_mock, dt_mock):
-        req_data = json.dumps(dict(max_age='0', success='0'))
-        dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
-        response = self.app.get('/api/last_tested_repo',
-                                data=req_data,
-                                content_type='application/json')
-        data = json.loads(response.data)
-        self.assertEqual(data['commit_hash'],
-                         '17234e9ab9dfab4cf5600f67f1d24db5064f1025')
-        self.assertEqual(data['distro_hash'],
-                         '024e24f0cf4366c2290c22f24e42de714d1addd1')
-        self.assertEqual(data['job_id'], 'current-passed-ci')
+                         '008678d7b0e20fbae185f2bb1bd0d9d167586211')
+        self.assertEqual(data['extended_hash'],
+                         '1234567890_1234567890')
         self.assertEqual(response.status_code, 200)
 
     def test_get_last_tested_repo_failed_url_params(self, db_mock, dt_mock):
@@ -274,9 +232,11 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(data['commit_hash'],
-                         '1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc')
+                         '93eee77657978547f5fad1cb8cd30b570da83e68')
         self.assertEqual(data['distro_hash'],
-                         '8170b8686c38bafb6021d998e2fb268ab26ccf65')
+                         '008678d7b0e20fbae185f2bb1bd0d9d167586211')
+        self.assertEqual(data['extended_hash'],
+                         '1234567890_1234567890')
         self.assertEqual(data['job_id'], 'foo-ci')
         self.assertEqual(data['in_progress'], True)
 
@@ -442,6 +402,25 @@ class TestReportResult(DLRNAPITestCase):
                                  headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
+
+    def test_report_result_ext_hash(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='93eee77657978547f5fad'
+                                               '1cb8cd30b570da83e68',
+                                   job_id='foo-ci', url='',
+                                   timestamp='1941635095', success='true',
+                                   distro_hash='008678d7b0e20fbae185f2'
+                                               'bb1bd0d9d167586211',
+                                   extended_hash='1234567890_1234567890'))
+
+        response = self.app.post('/api/report_result',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(data['in_progress'], False)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['extended_hash'], '1234567890_1234567890')
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
@@ -748,6 +727,17 @@ class TestRepoStatus(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
+
+    def test_repo_status_extended_hash(self, db2_mock, db_mock):
+        response = self.app.get('/api/repo_status?commit_hash='
+                                '93eee77657978547f5fad1cb8cd30b570da83e68&'
+                                'distro_hash=008678d7b0e20fbae185f2bb1bd0d'
+                                '9d167586211&extended_hash='
+                                '1234567890_1234567890')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['extended_hash'], '1234567890_1234567890')
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)

@@ -166,10 +166,12 @@ def getVote(session, timestamp, success=None, job_id=None, component=None,
 def repo_status():
     # commit_hash: commit hash
     # distro_hash: distro hash
+    # extended_hash(optional): extended hash
     # success(optional): only report successful/unsuccessful votes
 
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
+    extended_hash = request.args.get('extended_hash', None)
     success = request.args.get('success', None)
 
     if request.headers.get('Content-Type') == 'application/json':
@@ -179,6 +181,8 @@ def repo_status():
             commit_hash = request.json.get('commit_hash', None)
         if distro_hash is None:
             distro_hash = request.json.get('distro_hash', None)
+        if extended_hash is None:
+            extended_hash = request.json.get('extended_hash', None)
         if success is None:
             success = request.json.get('success', None)
 
@@ -190,11 +194,11 @@ def repo_status():
 
     # Find the commit id for commit_hash/distro_hash
     session = _get_db()
-    commit = _get_commit(session, commit_hash, distro_hash)
+    commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
 
     if commit is None:
-        raise InvalidUsage('commit_hash+distro_hash combination not found',
-                           status_code=404)
+        raise InvalidUsage('commit_hash+distro_hash+extended_hash combination'
+                           ' not found', status_code=404)
     commit_id = commit.id
 
     # Now find every vote for this commit_hash/distro_hash combination
@@ -208,6 +212,7 @@ def repo_status():
         d = {'timestamp': vote.timestamp,
              'commit_hash': commit_hash,
              'distro_hash': distro_hash,
+             'extended_hash': extended_hash,
              'job_id': vote.ci_name,
              'success': bool(vote.ci_vote),
              'in_progress': vote.ci_in_progress,
@@ -336,6 +341,7 @@ def last_tested_repo_GET():
 
     result = {'commit_hash': commit.commit_hash,
               'distro_hash': commit.distro_hash,
+              'extended_hash': commit.extended_hash,
               'timestamp': vote.timestamp,
               'job_id': vote.ci_name,
               'success': vote.ci_vote,
@@ -578,6 +584,7 @@ def last_tested_repo_POST():
 
     result = {'commit_hash': commit.commit_hash,
               'distro_hash': commit.distro_hash,
+              'extended_hash': commit.extended_hash,
               'timestamp': newvote.timestamp,
               'job_id': newvote.ci_name,
               'success': newvote.ci_vote,
@@ -594,6 +601,7 @@ def report_result():
     # job_id: name of CI
     # commit_hash: commit hash
     # distro_hash: distro hash
+    # extended_hash(optional): extended hash
     # aggregate_hash: hash of aggregate.
     # url: URL where more information can be found
     # timestamp: CI execution timestamp
@@ -610,6 +618,7 @@ def report_result():
 
     commit_hash = request.json.get('commit_hash', None)
     distro_hash = request.json.get('distro_hash', None)
+    extended_hash = request.json.get('extended_hash', None)
     aggregate_hash = request.json.get('aggregate_hash', None)
 
     if not commit_hash and not distro_hash and not aggregate_hash:
@@ -630,14 +639,14 @@ def report_result():
     notes = request.json.get('notes', '')
 
     session = _get_db()
-    # We have two paths here: one for votes on commit/distro hash, another
-    # for votes on aggregate_hash
+    # We have two paths here: one for votes on commit/distro/extended hash,
+    # another for votes on aggregate_hash
     component = None
     if commit_hash:
-        commit = _get_commit(session, commit_hash, distro_hash)
+        commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
         if commit is None:
-            raise InvalidUsage('commit_hash+distro_hash combination not found',
-                               status_code=404)
+            raise InvalidUsage('commit_hash+distro_hash+extended_hash '
+                               'combination not found', status_code=404)
 
         commit_id = commit.id
         component = commit.component
@@ -662,6 +671,7 @@ def report_result():
 
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
+              'extended_hash': extended_hash,
               'aggregate_hash': aggregate_hash,
               'timestamp': timestamp,
               'job_id': job_id,
