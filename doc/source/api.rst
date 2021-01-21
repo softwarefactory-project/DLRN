@@ -77,6 +77,7 @@ Response:
 ===================  ==========  ==============================================================
 commit_hash          string      commit_hash of tested repo
 distro_hash          string      distro_hash of tested repo
+extended_hash        string      extended_hash of tested repo
 success              boolean     whether the test was successful or not
 job_id               string      name of the CI sending the vote
 in_progress          boolean     is this CI job still in-progress?
@@ -103,6 +104,9 @@ Request:
 ===================  ==========  ==============================================================
 commit_hash          string      commit_hash of the repo to fetch information for
 distro_hash          string      distro_hash of the repo to fetch information for
+extended_hash        string      If set, extended_hash of the repo to fetch information for.
+                     (optional)  If not set, the latest commit with the commit/distro hash
+                                 combination will be reported.
 success              boolean     If set to a value, only return the CI reports with the
                      (optional)  specified vote. If not set, return all CI reports.
 ===================  ==========  ==============================================================
@@ -117,6 +121,7 @@ The JSON output will contain an array where each item contains:
 job_id               string      name of the CI sending the vote
 commit_hash          string      commit_hash of tested repo
 distro_hash          string      distro_hash of tested repo
+extended_hash        string      extended_hash of tested repo
 url                  string      URL where to find additional information from the CI execution
 timestamp            integer     Timestamp (in seconds since the epoch)
 in_progress          boolean     False -> is this CI job still in-progress?
@@ -317,6 +322,7 @@ Response:
 ===================  ==========  ==============================================================
 commit_hash          string      commit_hash of tested repo
 distro_hash          string      distro_hash of tested repo
+extended_hash        string      extended_hash of tested repo
 success              boolean     whether the test was successful or not
 job_id               string      name of the CI sending the vote
 in_progress          boolean     True -> is this CI job still in-progress?
@@ -351,6 +357,9 @@ Request:
 job_id          string      name of the CI sending the vote
 commit_hash     string      commit_hash of tested repo
 distro_hash     string      distro_hash of tested repo
+extended_hash   string      extended_hash of the tested repo. If not set, the latest
+                (optional)  commit with the commit_hash/distro_hash combination will be
+                            used
 aggregate_hash  string      hash of the aggregated repo that was tested
 url             string      URL where to find additional information from the CI execution
 timestamp       integer     Timestamp (in seconds since the epoch)
@@ -366,6 +375,7 @@ Parameter         Type                             Description
 job_id          string      name of the CI sending the vote
 commit_hash     string      commit_hash of tested repo
 distro_hash     string      distro_hash of tested repo
+extended_hash   string      extended_hash of tested repo
 url             string      URL where to find additional information from the CI execution
 timestamp       integer     Timestamp (in seconds since the epoch)
 in_progress     boolean     False -> is this CI job still in-progress?

@@ -182,7 +182,7 @@ class TestcivoteQuery(DLRNAPIGraphQLTestCase):
         response = self.app.get('/api/graphql?query={ civote { id } }')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data['data']['civote']), 4)
+        self.assertEqual(len(data['data']['civote']), 5)
 
     def test_filtered_query(self, db_mock):
         query = """
