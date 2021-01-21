@@ -195,6 +195,12 @@ paths:
                 description: |
                   distro_hash of the repo to fetch information for.
                 type: string
+              extended_hash:
+                description: |
+                  extended_hash of the repo to fetch information for. If not
+                  specified, the latest commit with the commit and distro hash
+                  will be used.
+                type: string
               success:
                 description: |
                   If set to a value, only return the CI reports with the
@@ -447,6 +453,11 @@ paths:
                 description: |
                   distro_hash of tested repo.
                 type: string
+              extended_hash:
+                description: |
+                  extended_hash of the tested repo. If not specified, the latest
+                  commit with the commit and distro hash will be used.
+                type: string
               aggregate_hash:
                 decription: |
                   hash of the aggregated repo that was tested. Either this parameter
@@ -649,6 +660,9 @@ definitions:
       distro_hash:
         type: string
         description: distro_hash of tested repo
+      extended_hash:
+        type: string
+        description: extended_hash of tested repo
       aggregate_hash:
         type: string
         description: hash of the aggregated repo
@@ -703,6 +717,9 @@ definitions:
       distro_hash:
         type: string
         description: distro_hash of tested repo
+      extended_hash:
+        type: string
+        description: extended_hash of tested repo
       success:
         type: boolean
         description: whether the test was successful or not
