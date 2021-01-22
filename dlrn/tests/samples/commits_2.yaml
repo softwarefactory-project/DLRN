@@ -109,6 +109,33 @@ civotes:
   timestamp: '1441635099'
   notes: ''
   component: 'tripleo'
+- id: '6'
+  commit_id: '5627'
+  ci_name: 'current-passed-ci-fail'
+  ci_url: 'http://dummyci.example.com/current-passed-ci'
+  ci_vote: false
+  ci_in_progress: true
+  timestamp: '1441635090'
+  notes: ''
+  user: 'foo'
+- id: '7'
+  commit_id: '5654'
+  ci_name: 'another-ci-fail'
+  ci_url: 'http://dummyci.example.com/another-ci'
+  ci_vote: false
+  ci_in_progress: false
+  timestamp: '1441635095'
+  notes: ''
+  component: 'foo-component'
+- id: '8'
+  commit_id: '5623'
+  ci_name: 'extended-ci-fail'
+  ci_url: 'http://dummyci.example.com/extended-ci'
+  ci_vote: false
+  ci_in_progress: false
+  timestamp: '1441635099'
+  notes: ''
+  component: 'tripleo'
 civotes_agg:
 - id: '1'
   ref_hash: '12345678'
