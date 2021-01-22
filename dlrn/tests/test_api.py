@@ -137,10 +137,10 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
         response = self.app.get('/api/last_tested_repo?max_age=0&success=0')
         data = json.loads(response.data)
         self.assertEqual(data['commit_hash'],
-                         '17234e9ab9dfab4cf5600f67f1d24db5064f1025')
+                         '93eee77657978547f5fad1cb8cd30b570da83e68')
         self.assertEqual(data['distro_hash'],
-                         '024e24f0cf4366c2290c22f24e42de714d1addd1')
-        self.assertEqual(data['job_id'], 'current-passed-ci')
+                         '008678d7b0e20fbae185f2bb1bd0d9d167586211')
+        self.assertEqual(data['job_id'], 'extended-ci-fail')
         self.assertEqual(response.status_code, 200)
 
     def test_get_last_tested_repo_sequential(self, db_mock, dt_mock):
@@ -694,7 +694,7 @@ class TestRepoStatus(DLRNAPITestCase):
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data), 3)
 
     def test_repo_status_multiple_votes_url_param(self, db2_mock, db_mock):
         response = self.app.get('/api/repo_status?commit_hash='
@@ -703,7 +703,7 @@ class TestRepoStatus(DLRNAPITestCase):
                                 'e714d1addd1')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data), 3)
 
     def test_repo_status_with_success(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='17234e9ab9dfab4cf5600f'
@@ -728,6 +728,27 @@ class TestRepoStatus(DLRNAPITestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
 
+    def test_repo_status_extended_with_success_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/repo_status?commit_hash='
+                                '93eee77657978547f5fad1cb8cd30b570da83e68&'
+                                'distro_hash=008678d7b0e20fbae185f2bb1bd0d'
+                                '9d167586211&extended_hash='
+                                '1234567890_1234567890&success=true')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
+    def test_neg_repo_status_extended_with_success_url_param(self, db2_mock, db_mock):
+        response = self.app.get('/api/repo_status?commit_hash='
+                                '93eee77657978547f5fad1cb8cd30b570da83e68&'
+                                'distro_hash=008678d7b0e20fbae185f2bb1bd0d'
+                                '9d167586211&extended_hash='
+                                '1234567890_1234567890&success=false')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['success'], False)
+
     def test_repo_status_extended_hash(self, db2_mock, db_mock):
         response = self.app.get('/api/repo_status?commit_hash='
                                 '93eee77657978547f5fad1cb8cd30b570da83e68&'
@@ -736,9 +757,16 @@ class TestRepoStatus(DLRNAPITestCase):
                                 '1234567890_1234567890')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(len(data), 1)
+        self.assertEqual(len(data), 2)
         self.assertEqual(data[0]['extended_hash'], '1234567890_1234567890')
 
+    def test_neg_repo_status_extended_hash(self, db2_mock, db_mock):
+        response = self.app.get('/api/repo_status?commit_hash='
+                                '93eee77657978547f5fad1cb8cd30b570da83e68&'
+                                'distro_hash=008678d7b0e20fbae185f2bb1bd0d'
+                                '9d167586211&extended_hash='
+                                '1234567890_1234567891')
+        self.assertEqual(response.status_code, 404)
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
@@ -948,6 +976,7 @@ class TestGetPromotions(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['promote_name'], 'another-ci')
 
     def test_get_promotions_with_promote_name_url_params(self, db2_mock,
                                                          db_mock):
@@ -955,12 +984,38 @@ class TestGetPromotions(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['promote_name'], 'another-ci')
 
     def test_get_promotions_with_commit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='17234e9ab9dfab4cf5600f67f1'
                                                'd24db5064f1025',
                                    distro_hash='024e24f0cf4366c2290c22f24e'
                                                '42de714d1addd1'))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
+    # hrm.. commit: 93eee should return w/ component tripleo I think??
+    def test_get_promotions_with_commit_component(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(commit_hash='93eee77657978547f5fad1cb8cd30b'
+                                               '570da83e68',
+                                   distro_hash='008678d7b0e20fbae185f2bb1bd0d9'
+                                               'd167586211',
+                                   component='tripleo'))
+        response = self.app.get('/api/promotions',
+                                data=req_data,
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+
+    # hrm.. perhaps the two entries in data with the same commit hash
+    # are messing this up
+    def test_get_promotions_with_component(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(component='tripleo'))
         response = self.app.get('/api/promotions',
                                 data=req_data,
                                 content_type='application/json')
