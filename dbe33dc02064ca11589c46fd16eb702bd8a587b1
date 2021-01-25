@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "24aa17d3_05672839",
+        "filename": "dlrn/tests/test_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1013,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2021-01-25T10:01:55Z",
+      "side": 1,
+      "message": "In this test, we have two commits with the same commit/distro_hash combination: id 5628 and id 5623. Since we are not specifying the extended_hash, the commit with the highest id is found (5628).\n\nThe component field in the promotion associated to this commit (lines 184-188 in commits_2.yaml) is not set, so this is why the API call cannot find it.",
+      "range": {
+        "startLine": 1001,
+        "startChar": 0,
+        "endLine": 1013,
+        "endChar": 38
+      },
+      "revId": "dbe33dc02064ca11589c46fd16eb702bd8a587b1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f5a2244_bf045a60",
+        "filename": "dlrn/tests/test_api.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2021-01-25T10:01:55Z",
+      "side": 1,
+      "message": "Same as above, none of the promotion entries in commits_2.yaml specify a component. We can fix it just by adding \"component: tripleo\" to the promotion entry.",
+      "range": {
+        "startLine": 1015,
+        "startChar": 0,
+        "endLine": 1024,
+        "endChar": 38
+      },
+      "revId": "dbe33dc02064ca11589c46fd16eb702bd8a587b1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
