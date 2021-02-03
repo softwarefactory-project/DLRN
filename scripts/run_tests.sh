@@ -161,16 +161,15 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
         UPSTREAM_URL=$(rdopkg findpkg $PROJECT_TO_BUILD -l /tmp/rdoinfo | grep ^upstream | awk '{print $2}')
         UPSTREAM_URL_REDIRECTED=$(curl -Ls -w %{url_effective} -o /dev/null ${UPSTREAM_URL})
         UPSTREAM_PROJECT_NAME=${UPSTREAM_URL_REDIRECTED/https:\/\/opendev.org\//}
-        rm -rf data/${PROJECT_TO_BUILD_MAPPED}
         # Only build in the check pipeline to avoid merging a change
         # in packaging that is dependent of an non merged upstream
         # change
-        git clone ${UPSTREAM_URL_REDIRECTED} "data/${PROJECT_TO_BUILD_MAPPED}"
         if [ "${ZUUL_PIPELINE}" != "check" ]; then
             NOT_EXTRACTED=1
-        fi
+        else
+            rm -rf data/${PROJECT_TO_BUILD_MAPPED}
+            git clone ${UPSTREAM_URL_REDIRECTED} "data/${PROJECT_TO_BUILD_MAPPED}"
 
-        if [ -z "$NOT_EXTRACTED" ]; then
             # We cannot run git review -d because we don't have an
             # available account. So we do the same using curl, jq and git.
             if [ "$branch" != "" ]; then
