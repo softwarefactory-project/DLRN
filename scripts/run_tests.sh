@@ -164,9 +164,7 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
         # Only build in the check pipeline to avoid merging a change
         # in packaging that is dependent of an non merged upstream
         # change
-        if [ "${ZUUL_PIPELINE}" != "check" ]; then
-            NOT_EXTRACTED=1
-        else
+        if [ "${ZUUL_PIPELINE}" == "check" ]; then
             rm -rf data/${PROJECT_TO_BUILD_MAPPED}
             git clone ${UPSTREAM_URL_REDIRECTED} "data/${PROJECT_TO_BUILD_MAPPED}"
 
