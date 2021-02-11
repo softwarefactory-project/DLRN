@@ -74,7 +74,7 @@
     nodeset:
       nodes:
         - name: centos-7
-          label: rdo-centos-7-vexxhost
+          label: rdo-centos-7
 
 - job:
     name: dlrn-api-functional-centos-8
@@ -82,7 +82,7 @@
     nodeset:
       nodes:
         - name: centos-8
-          label: rdo-centos-8-vexxhost
+          label: rdo-centos-8
 
 - job:
     name: docs-build
@@ -96,7 +96,7 @@
     nodeset:
       nodes:
         - name: container
-          label: pod-python-f32
+          label: zuul-worker-python
 
 - project:
     name: DLRN
