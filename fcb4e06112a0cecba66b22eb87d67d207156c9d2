@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "73c0fe8b_c3a1f151",
+        "filename": "playbooks/prepare.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2021-02-12T09:05:19Z",
+      "side": 1,
+      "message": "I think we should get the latest pip already with the commands in lines 45-46. This won\u0027t hurt though.",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 52
+      },
+      "revId": "fcb4e06112a0cecba66b22eb87d67d207156c9d2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
