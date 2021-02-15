@@ -822,7 +822,7 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
         if commit.commit_branch == getsourcebranch(package):
             # This will return all commits since the last handled commit
             # including the last handled commit, remove it later if needed.
-            since = "--after=%d" % (commit.dt_commit)
+            since = "--after=%d" % (int(commit.dt_commit) + 1)
         else:
             # The last processed commit belongs to a different branch. Just
             # in case, let's check if we built a previous commit from the
@@ -832,7 +832,7 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
             if commit:
                 logger.info("Last commit belongs to another branch, but"
                             " we're ok with that")
-                since = "--after=%d" % (commit.dt_commit)
+                since = "--after=%d" % (int(commit.dt_commit) + 1)
                 # In any case, we just want to build the last commit, if any
                 head_only = True
 
