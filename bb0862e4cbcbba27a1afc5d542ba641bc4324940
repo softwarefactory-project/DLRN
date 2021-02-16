@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d95f56d7_96fcb9cb",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 535
+      },
+      "writtenOn": "2021-02-16T12:02:45Z",
+      "side": 1,
+      "message": "I take it dt_commit is some kind of epoch timestamp and not a date object? This seems like a reasonable solution to me!",
+      "revId": "bb0862e4cbcbba27a1afc5d542ba641bc4324940",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
