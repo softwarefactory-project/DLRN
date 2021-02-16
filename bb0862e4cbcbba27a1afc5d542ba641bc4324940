@@ -34,6 +34,24 @@
       "revId": "bb0862e4cbcbba27a1afc5d542ba641bc4324940",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d26b578_d45e74ed",
+        "filename": "dlrn/shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 535
+      },
+      "writtenOn": "2021-02-16T13:05:40Z",
+      "side": 1,
+      "message": "Perfect!",
+      "parentUuid": "5e4712ec_0e3c8b05",
+      "revId": "bb0862e4cbcbba27a1afc5d542ba641bc4324940",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
