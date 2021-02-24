@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import argparse
 import mock
 import os
 import sh
@@ -429,3 +430,120 @@ class TestGetinfo(base.TestCase):
             project_toprocess, _, skipped = shell.getinfo(package)
             self.assertEqual(len(project_toprocess), 0)
             self.assertEqual(skipped, True)
+
+
+class TestAddCommits(base.TestCase):
+    def setUp(self):
+        super(TestAddCommits, self).setUp()
+        self.db_fd, filepath = tempfile.mkstemp()
+        self.session = mocked_session("sqlite:///%s" % filepath)
+        # Create a simple, empty list of options
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--dev', action="store_true")
+        parser.add_argument('--run', action="store_true")
+        self.options = parser.parse_args([])
+        self.toprocess = []
+
+    def tearDown(self):
+        super(TestAddCommits, self).tearDown()
+        os.close(self.db_fd)
+
+    def test_simple_add_commit(self):
+        commit = db.Commit(dt_commit=123, project_name='foo', type="rpm",
+                           commit_hash='1c67b1ab8c6fe273d4e175a14f0df5'
+                                       'd3cbbd0edf',
+                           repo_dir='/home/dlrn/data/foo',
+                           distro_hash='c31d1b18eb5ab5aed6721fc4fad06c9'
+                                       'bd242490f',
+                           dt_distro=123,
+                           distgit_dir='/home/dlrn/data/foo_distro',
+                           commit_branch='master', dt_build=1441245153)
+        shell._add_commits([commit], self.toprocess, self.options,
+                           self.session)
+        self.assertEqual(len(self.toprocess), 1)
+
+    def test_simple_add_several_commits(self):
+        commit1 = db.Commit(dt_commit=123, project_name='foo', type="rpm",
+                            commit_hash='1c67b1ab8c6fe273d4e175a14f0df5'
+                                        'd3cbbd0edf',
+                            repo_dir='/home/dlrn/data/foo',
+                            distro_hash='c31d1b18eb5ab5aed6721fc4fad06c9'
+                                        'bd242490f',
+                            dt_distro=123,
+                            distgit_dir='/home/dlrn/data/foo_distro',
+                            commit_branch='master', dt_build=1441245153)
+        commit2 = db.Commit(dt_commit=456, project_name='bar', type="rpm",
+                            commit_hash='1c67b1ab8c6fe273465175a14f0df5'
+                                        'd3cbbd0123',
+                            repo_dir='/home/dlrn/data/bar',
+                            distro_hash='c31d1b18eb5ab5aed6721fc4fad06c9'
+                                        'bd2424e00',
+                            dt_distro=456,
+                            distgit_dir='/home/dlrn/data/bar_distro',
+                            commit_branch='master', dt_build=1441245154)
+        shell._add_commits([commit1, commit2], self.toprocess, self.options,
+                           self.session)
+        self.assertEqual(len(self.toprocess), 2)
+
+    def test_commit_already_processed(self):
+        commit = db.Commit(dt_commit=1441634092, project_name='python-pysaml2',
+                           type="rpm",
+                           commit_hash='17234e9ab9dfab4cf5600f67f1d24db5064f10'
+                                       '25',
+                           repo_dir='/home/dlrn/data/foo',
+                           distro_hash='024e24f0cf4366c2290c22f24e42de714d1add'
+                                       'd1',
+                           dt_distro=1431949433,
+                           distgit_dir='/home/dlrn/data/foo_distro',
+                           commit_branch='master', dt_build=1441635099)
+        shell._add_commits([commit], self.toprocess, self.options,
+                           self.session)
+        self.assertEqual(len(self.toprocess), 0)
+
+    def test_commit_already_processed_dev_mode(self):
+        self.options.dev = True
+        commit = db.Commit(dt_commit=1441634092, project_name='python-pysaml2',
+                           type="rpm",
+                           commit_hash='17234e9ab9dfab4cf5600f67f1d24db5064f10'
+                                       '25',
+                           repo_dir='/home/dlrn/data/foo',
+                           distro_hash='024e24f0cf4366c2290c22f24e42de714d1add'
+                                       'd1',
+                           dt_distro=1431949433,
+                           distgit_dir='/home/dlrn/data/foo_distro',
+                           commit_branch='master', dt_build=1441635099)
+        shell._add_commits([commit], self.toprocess, self.options,
+                           self.session)
+        self.assertEqual(len(self.toprocess), 1)
+
+    def test_commit_already_processed_run_mode(self):
+        self.options.run = True
+        commit = db.Commit(dt_commit=1441634092, project_name='python-pysaml2',
+                           type="rpm",
+                           commit_hash='17234e9ab9dfab4cf5600f67f1d24db5064f10'
+                                       '25',
+                           repo_dir='/home/dlrn/data/foo',
+                           distro_hash='024e24f0cf4366c2290c22f24e42de714d1add'
+                                       'd1',
+                           dt_distro=1431949433,
+                           distgit_dir='/home/dlrn/data/foo_distro',
+                           commit_branch='master', dt_build=1441635099)
+        shell._add_commits([commit], self.toprocess, self.options,
+                           self.session)
+        self.assertEqual(len(self.toprocess), 1)
+
+    def test_commit_retry(self):
+        commit = db.Commit(dt_commit=1444203303,
+                           project_name='python-tripleoclient', type="rpm",
+                           commit_hash='7ac2745f11522d46b8fed8c015922b93f68a64'
+                                       '88',
+                           repo_dir='/home/centos-master/data/tripleoclient',
+                           distro_hash='0b1ce934e5b2e7d45a448f6555d24036f9aeca'
+                                       '51',
+                           dt_distro=1442515488,
+                           distgit_dir='/home/centos-master/data/python-triple'
+                                       'oclient-distgit',
+                           commit_branch='master', dt_build=1444215994)
+        shell._add_commits([commit], self.toprocess, self.options,
+                           self.session)
+        self.assertEqual(len(self.toprocess), 1)
