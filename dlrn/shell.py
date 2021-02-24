@@ -266,12 +266,18 @@ def main():
         for commit_toprocess in project_toprocess:
             if options.dev is True or \
                options.run or \
-               not session.query(Commit).filter(
-                   Commit.commit_hash == commit_toprocess.commit_hash,
-                   Commit.distro_hash == commit_toprocess.distro_hash,
-                   Commit.extended_hash == commit_toprocess.extended_hash,
-                   Commit.type == commit_toprocess.type,
-                   Commit.status != "RETRY").all():
+               (not session.query(Commit).filter(
+                    Commit.commit_hash == commit_toprocess.commit_hash,
+                    Commit.distro_hash == commit_toprocess.distro_hash,
+                    Commit.extended_hash == commit_toprocess.extended_hash,
+                    Commit.type == commit_toprocess.type,
+                    Commit.status != "RETRY").all()
+                 and not session.query(Commit).filter(
+                    Commit.dt_commit == commit_toprocess.dt_commit,
+                    Commit.distro_hash == commit_toprocess.distro_hash,
+                    Commit.extended_hash == commit_toprocess.extended_hash,
+                    Commit.type == commit_toprocess.type,
+                    Commit.status != "RETRY").all()):
                 toprocess.append(commit_toprocess)
 
     if not pkg_name and not pkg_names:
