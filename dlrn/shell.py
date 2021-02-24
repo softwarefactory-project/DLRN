@@ -68,6 +68,24 @@ def deprecation():
     main()
 
 
+def _add_commits(project_toprocess, toprocess, options, session):
+    # The first entry in the list of commits is a commit we have
+    # already processed, we want to process it again only if in dev
+    # mode or distro hash has changed, we can't simply check
+    # against the last commit in the db, as multiple commits can
+    # have the same commit date
+    for commit_toprocess in project_toprocess:
+        if options.dev is True or \
+           options.run or \
+           not session.query(Commit).filter(
+               Commit.commit_hash == commit_toprocess.commit_hash,
+               Commit.distro_hash == commit_toprocess.distro_hash,
+               Commit.extended_hash == commit_toprocess.extended_hash,
+               Commit.type == commit_toprocess.type,
+               Commit.status != "RETRY").all():
+            toprocess.append(commit_toprocess)
+
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -257,23 +275,6 @@ def main():
     toprocess = []
     skipped_list = []
 
-    def add_commits(project_toprocess):
-        # The first entry in the list of commits is a commit we have
-        # already processed, we want to process it again only if in dev
-        # mode or distro hash has changed, we can't simply check
-        # against the last commit in the db, as multiple commits can
-        # have the same commit date
-        for commit_toprocess in project_toprocess:
-            if options.dev is True or \
-               options.run or \
-               not session.query(Commit).filter(
-                   Commit.commit_hash == commit_toprocess.commit_hash,
-                   Commit.distro_hash == commit_toprocess.distro_hash,
-                   Commit.extended_hash == commit_toprocess.extended_hash,
-                   Commit.type == commit_toprocess.type,
-                   Commit.status != "RETRY").all():
-                toprocess.append(commit_toprocess)
-
     if not pkg_name and not pkg_names:
         pool = multiprocessing.Pool()   # This will use all the system cpus
         # Use functools.partial to iterate on the packages to process,
@@ -297,7 +298,7 @@ def main():
                         break
                 if skipped:
                     skipped_list.append(updated_pkg['name'])
-                add_commits(project_toprocess)
+                _add_commits(project_toprocess, toprocess, options, session)
             except StopIteration:
                 break
         pool.close()
@@ -313,7 +314,7 @@ def main():
                     database_connection)
                 if skipped:
                     skipped_list.append(package['name'])
-                add_commits(project_toprocess)
+                _add_commits(project_toprocess, toprocess, options, session)
     closeSession(session)   # Close session, will reopen during post_build
 
     # Store skip list
