@@ -16,6 +16,24 @@
       "revId": "be3b53ce655f269930590a224a67428890602f51",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe446964_ad01e786",
+        "filename": "dlrn/tests/test_shell.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2021-02-25T13:29:25Z",
+      "side": 1,
+      "message": "Good idea! I\u0027ll add that to the next patchset, thanks.",
+      "parentUuid": "14416311_4161f37d",
+      "revId": "be3b53ce655f269930590a224a67428890602f51",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
