@@ -547,3 +547,35 @@ class TestAddCommits(base.TestCase):
         shell._add_commits([commit], self.toprocess, self.options,
                            self.session)
         self.assertEqual(len(self.toprocess), 1)
+
+    def test_commit_different_commit_but_same_timestamp(self):
+        commit = db.Commit(dt_commit=1444033792,
+                           project_name='python-tripleoclient', type="rpm",
+                           commit_hash='1234567890abcdef1234567890abcdef123456'
+                                       '78',
+                           repo_dir='/home/centos-master/data/tripleoclient',
+                           distro_hash='0b1ce934e5b2e7d45a448f6555d24036f9aeca'
+                                       '51',
+                           dt_distro=1442515488,
+                           distgit_dir='/home/centos-master/data/python-triple'
+                                       'oclient-distgit',
+                           commit_branch='master', dt_build=1444215995)
+        shell._add_commits([commit], self.toprocess, self.options,
+                           self.session)
+        self.assertEqual(len(self.toprocess), 0)
+
+    def test_commit_same_timestamp_newer_distgit(self):
+        commit = db.Commit(dt_commit=1444033792,
+                           project_name='python-tripleoclient', type="rpm",
+                           commit_hash='1234567890abcdef1234567890abcdef123456'
+                                       '78',
+                           repo_dir='/home/centos-master/data/tripleoclient',
+                           distro_hash='0b1ce934e5b2e7d45a448f6555d24036f9aeca'
+                                       'ff',
+                           dt_distro=1442515500,
+                           distgit_dir='/home/centos-master/data/python-triple'
+                                       'oclient-distgit',
+                           commit_branch='master', dt_build=1444215995)
+        shell._add_commits([commit], self.toprocess, self.options,
+                           self.session)
+        self.assertEqual(len(self.toprocess), 1)
