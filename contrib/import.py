@@ -12,7 +12,11 @@
 
 from dlrn.db import getSession
 from dlrn.utils import loadYAML
+import os
 
-session = getSession('sqlite:////data/commits.sqlite')
+dbpath = os.getenv('DLRNAPI_DBPATH')
+if not dbpath:
+    dbpath = 'sqlite:////data/commits.sqlite'
+session = getSession(dbpath)
 loadYAML(session, '/DLRN/dlrn/tests/samples/commits_2.yaml')
 session.close()
