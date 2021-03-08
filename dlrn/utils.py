@@ -71,6 +71,13 @@ def loadYAML(session, yamlfile):
     with open(yamlfile) as fp:
         data = yaml.safe_load(fp)
 
+    try:
+        for user in data['users']:
+            my_user = User(**user)
+            session.add(my_user)
+            session.commit()
+    except KeyError:
+        pass   # No users in yaml, just ignore
     for commit in data['commits']:
         c = Commit(**commit)
         # We need a special case for extended_hash, which could be "None"
@@ -102,13 +109,6 @@ def loadYAML(session, yamlfile):
             session.commit()
     except KeyError:
         pass   # No civotes_agg in yaml, just ignore
-    try:
-        for user in data['users']:
-            my_user = User(**user)
-            session.add(my_user)
-            session.commit()
-    except KeyError:
-        pass   # No users in yaml, just ignore
     try:
         for promotion in data['promotions']:
             p = Promotion(**promotion)
