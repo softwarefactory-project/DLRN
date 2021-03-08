@@ -11,6 +11,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+if [ -n "$DLRNAPI_DBPATH" ];
+then
+    sed -i "s#^DB_PATH.*#DB_PATH = \"$DLRNAPI_DBPATH\"#" /DLRN/dlrn/api/config.py
+else
+    # Default to sqlite3
+    sed -i 's#^DB_PATH.*#DB_PATH = "sqlite:////data/commits.sqlite"#' /DLRN/dlrn/api/config.py
+fi
+
 if [ -n "$DLRNAPI_USE_SAMPLE_DATA" ];
 then
     python3 /import.py
