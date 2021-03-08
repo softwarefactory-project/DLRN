@@ -31,6 +31,10 @@ the following environment variables:
   pre-create some basic data (commits, CI votes and a user ``foo``, with
   password ``bar``). This can be useful for tests.
 
+- ``DLRNAPI_DBPATH``: if set to any value, the container will use this
+  connection string to connect to a database supported by SQLAlchemy. If not set,
+  it will default to a local SQLite3 database.
+
 - ``CONFIG_FILE``: if set to any value, the API will read that file to get its
   configuration options. See `https://raw.githubusercontent.com/softwarefactory-project/DLRN/master/dlrn/api/config.py`_
   for a configuration file example.
