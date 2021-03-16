@@ -18,6 +18,37 @@ securityDefinitions:
     description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
 # Describe your paths here
 paths:
+  /api/health:
+    get:
+      description: |
+        Check the API server health. This will trigger a database connection to
+        ensure all components are in working condition.
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              result:
+                type: string
+                description: A simple success string
+    post:
+      security:
+       - basicAuth: []
+      description: |
+        Check the API server health. This will trigger a database connection to
+        ensure all components are in working condition. In addition to this, the
+        POST call will check authentication.
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              result:
+                type: string
+                description: A simple success string
+
   /api/last_tested_repo:
     # This is a HTTP operation
     get:

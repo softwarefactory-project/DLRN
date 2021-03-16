@@ -113,6 +113,18 @@
           nohup scripts/api.py &
         chdir: "{{ working_dir }}/DLRN"
 
+    - name: Check API server health
+      uri:
+        url: http://localhost:5000/api/health
+
+    - name: Check API server health (POST)
+      uri:
+        url: http://localhost:5000/api/health
+        method: POST
+        force_basic_auth: yes
+        user: foo
+        password: bar
+
     - name: Build some packages with DLRN, using --order
       shell:
         cmd: |
