@@ -2,7 +2,8 @@ pbr>=0.5.6
 Jinja2
 sh>=1.12.6
 six
-SQLAlchemy
+SQLAlchemy<1.4.0;python_version=='2.7'
+SQLAlchemy;python_version>='3.3'
 PyMySQL!=1.0.0
 PyYAML
 rdopkg>=0.45.0

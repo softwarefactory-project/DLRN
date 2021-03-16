@@ -75,7 +75,7 @@ class TestDriverDownstream(base.TestCase):
             'project': 'nova',
             'conf': 'rpmfactory-core',
             'upstream': 'git://git.openstack.org/openstack/nova',
-            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'patches': 'http://review.rdoproject.org/r/openstack/nova.git',
             'distgit': 'git://git.example.com/rpms/nova',
             'master-distgit':
                 'git://git.example.com/rpms/nova',
@@ -128,7 +128,7 @@ class TestDriverDownstream(base.TestCase):
             'project': 'nova',
             'conf': 'rpmfactory-core',
             'upstream': 'git://git.openstack.org/openstack/nova',
-            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'patches': 'http://review.rdoproject.org/r/openstack/nova.git',
             'distgit': 'git://git.example.com/rpms/nova',
             'master-distgit':
                 'git://git.example.com/rpms/nova',
@@ -183,7 +183,7 @@ class TestDriverDownstream(base.TestCase):
             'project': 'nova',
             'conf': 'rpmfactory-core',
             'upstream': 'git://git.openstack.org/openstack/nova',
-            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'patches': 'http://review.rdoproject.org/r/openstack/nova.git',
             'distgit': 'git://git.example.com/rpms/nova',
             'master-distgit':
                 'git://git.example.com/rpms/nova',
@@ -238,7 +238,7 @@ class TestDriverDownstream(base.TestCase):
             'project': 'nova',
             'conf': 'rpmfactory-core',
             'upstream': 'git://git.openstack.org/openstack/nova',
-            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'patches': 'http://review.rdoproject.org/r/openstack/nova.git',
             'distgit': 'git://git.example.com/rpms/nova',
             'master-distgit':
                 'git://git.example.com/rpms/nova',
@@ -270,7 +270,7 @@ class TestDriverDownstream(base.TestCase):
             'project': 'nova',
             'conf': 'rpmfactory-core',
             'upstream': 'git://git.openstack.org/openstack/nova',
-            'patches': 'http://review.rdoproject.org/r/p/openstack/nova.git',
+            'patches': 'http://review.rdoproject.org/r/openstack/nova.git',
             'distgit': 'git://git.example.com/rpms/nova',
             'master-distgit':
                 'git://git.example.com/rpms/nova',

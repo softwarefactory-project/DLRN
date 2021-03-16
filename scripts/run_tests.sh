@@ -6,7 +6,7 @@ set -ex
 # ./run_tests.sh <path_to_rdoinfo> <distro (either centos or fedora)> <baseurl to trunk repo> <tag (optional)>
 
 # Simple script to test that DLRN works either locally or in a zuul environment
-GIT_BASE_URL="https://review.rdoproject.org/r/p"
+GIT_BASE_URL="https://review.rdoproject.org/r"
 OPENSTACK_GIT_URL="https://opendev.org"
 ZUUL3_HOME="${ZUUL3_HOME:-/home/zuul}"
 ZUUL_CLONES_DIR="${ZUUL3_HOME}/src/review.rdoproject.org"
