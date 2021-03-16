@@ -1122,3 +1122,31 @@ class TestMetrics(DLRNAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(data['total'], 0)
+
+
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+class TestHealth(DLRNAPITestCase):
+    def test_health_get(self, db2_mock, db_mock):
+        response = self.app.get('/api/health')
+        self.assertEqual(response.status_code, 200)
+
+    def test_health_post_ok(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(test='test'))
+        response = self.app.post('/api/health',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_health_post_nouser(self, db2_mock, db_mock):
+        response = self.app.post('/api/health')
+        self.assertEqual(response.status_code, 401)
+
+    def test_health_post_wrong_user(self, db2_mock, db_mock):
+        headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'blabla:blabla').decode('ascii'))}
+        response = self.app.post('/api/health',
+                                 headers=headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 401)

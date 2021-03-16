@@ -162,6 +162,31 @@ def getVote(session, timestamp, success=None, job_id=None, component=None,
     return vote
 
 
+@app.route('/api/health', methods=['GET'])
+def health():
+    # Check database connection
+    session = _get_db()
+    commit = session.query(Commit).first()
+    if commit:
+        result = {'result': 'ok'}
+    else:
+        result = {'result': 'ok, no commits in DB'}
+    return jsonify(result), 200
+
+
+@app.route('/api/health', methods=['POST'])
+@auth.login_required
+def health_post():
+    # Check database connection
+    session = _get_db()
+    commit = session.query(Commit).first()
+    if commit:
+        result = {'result': 'ok'}
+    else:
+        result = {'result': 'ok, no commits in DB'}
+    return jsonify(result), 200
+
+
 @app.route('/api/repo_status', methods=['GET'])
 def repo_status():
     # commit_hash: commit hash

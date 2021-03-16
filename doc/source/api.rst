@@ -20,6 +20,43 @@ and expected to be removed in a future version.
 API calls
 *********
 
+GET /api/health
+---------------
+
+Check the API server health. This will trigger a database connection to
+ensure all components are in working condition.
+
+Normal response codes: 200
+
+Error response codes: 401
+
+Response:
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+result               string      A simple success string
+===================  ==========  ==============================================================
+
+POST /api/health
+----------------
+
+Check the API server health. This will trigger a database connection to
+ensure all components are in working condition. In addition to this, the
+POST call will check authentication.
+
+Normal response codes: 200
+
+Error response codes: 401
+
+Response:
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+result               string      A simple success string
+===================  ==========  ==============================================================
+
 GET /api/last_tested_repo
 -------------------------
 
