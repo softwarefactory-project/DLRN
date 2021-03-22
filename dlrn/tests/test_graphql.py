@@ -243,10 +243,11 @@ class TestcivoteQuery(DLRNAPIGraphQLTestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data['data']['civote']), 2)
         self.assertEqual(data['data']['civote'][0]['commitId'], 5627)
-        self.assertEqual(data['data']['civote'][0]['ciName'], 'consistent')
-        self.assertEqual(data['data']['civote'][0]['ciVote'], True)
-        self.assertEqual(data['data']['civote'][0]['ciInProgress'], False)
-        self.assertEqual(data['data']['civote'][0]['timestamp'], 1441635089)
+        self.assertEqual(data['data']['civote'][0]['ciName'],
+                         'current-passed-ci')
+        self.assertEqual(data['data']['civote'][0]['ciVote'], False)
+        self.assertEqual(data['data']['civote'][0]['ciInProgress'], True)
+        self.assertEqual(data['data']['civote'][0]['timestamp'], 1441635090)
         self.assertEqual(data['data']['civote'][0]['user'], 'foo')
         assert 'component' not in data['data']['civote'][0]
 
@@ -309,10 +310,10 @@ class TestCIVoteAggregationQuery(DLRNAPIGraphQLTestCase):
         self.assertEqual(data['data']['civoteAgg'][0]['ciName'], 'phase2-ci')
         self.assertEqual(data['data']['civoteAgg'][0]['ciUrl'],
                          'http://dummyci.example.com/phase2-ci')
-        self.assertEqual(data['data']['civoteAgg'][0]['ciVote'], True)
+        self.assertEqual(data['data']['civoteAgg'][0]['ciVote'], False)
         self.assertEqual(data['data']['civoteAgg'][0]['ciInProgress'], False)
         self.assertEqual(data['data']['civoteAgg'][0]['timestamp'],
-                         1441635095)
+                         1441635195)
         self.assertEqual(data['data']['civoteAgg'][0]['notes'], '')
         assert 'user' not in data['data']['civoteAgg'][0]
 

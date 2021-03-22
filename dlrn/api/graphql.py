@@ -26,6 +26,7 @@ except ImportError:
 from datetime import datetime
 from flask import g
 from six.moves import configparser
+from sqlalchemy import desc
 
 from dlrn.api import app
 from dlrn.api.utils import InvalidUsage
@@ -142,7 +143,8 @@ if graphene:
                 query = query.filter(CommitModel.status == status)
 
             # Enforce pagination limit and offset
-            query = query.limit(limit).offset(offset)
+            query = query.order_by(desc(CommitModel.id)).limit(limit).\
+                offset(offset)
             return query.all()
 
         def resolve_civote(self, info, **args):
@@ -180,7 +182,8 @@ if graphene:
             if component:
                 query = query.filter(CIVoteModel.component == component)
 
-            query = query.limit(limit).offset(offset)
+            query = query.order_by(desc(CIVoteModel.id)).limit(limit).\
+                offset(offset)
             return query.all()
 
         def resolve_civoteAgg(self, info, **args):
@@ -216,7 +219,8 @@ if graphene:
             if user:
                 query = query.filter(CIVoteAggModel.user == user)
 
-            query = query.limit(limit).offset(offset)
+            query = query.order_by(desc(CIVoteAggModel.id)).limit(limit).\
+                offset(offset)
             return query.all()
 
         def resolve_packageStatus(self, info, **args):
