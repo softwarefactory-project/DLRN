@@ -60,6 +60,12 @@ def _get_config_options(config_file):
     return ConfigOptions(cp)
 
 
+def _as_bool(value):
+    if value is not None:
+        return True if bool(value) else False
+    return None
+
+
 if graphene:
     class Commit(SQLAlchemyObjectType):
         class Meta:
@@ -114,7 +120,7 @@ if graphene:
         civoteAgg = graphene.List(CIVoteAgg,
                                   refHash=graphene.String(),
                                   ciName=graphene.String(),
-                                  ciVote=graphene.String(),
+                                  ciVote=graphene.Boolean(),
                                   ciInProgress=graphene.Boolean(),
                                   timestamp=graphene.Int(),
                                   user=graphene.String())
@@ -155,8 +161,8 @@ if graphene:
             # civote query params
             commit_id = args.get("commitId", None)
             ci_name = args.get("ciName", None)
-            ci_vote = args.get("ciVote", None)
-            ci_in_progress = args.get("ciInProgress", None)
+            ci_vote = _as_bool(args.get("ciVote", None))
+            ci_in_progress = _as_bool(args.get("ciInProgress", None))
             timestamp = args.get("timestamp", None)
             user = args.get("user", None)
             component = args.get("component", None)
@@ -170,9 +176,9 @@ if graphene:
                 query = query.filter(CIVoteModel.commit_id == commit_id)
             if ci_name:
                 query = query.filter(CIVoteModel.ci_name == ci_name)
-            if ci_vote:
+            if ci_vote is not None:
                 query = query.filter(CIVoteModel.ci_vote == ci_vote)
-            if ci_in_progress:
+            if ci_in_progress is not None:
                 query = query.filter(CIVoteModel.ci_in_progress ==
                                      ci_in_progress)
             if timestamp:
@@ -194,8 +200,8 @@ if graphene:
             # civote query params
             ref_hash = args.get("refHash", None)
             ci_name = args.get("ciName", None)
-            ci_vote = args.get("ciVote", None)
-            ci_in_progress = args.get("ciInProgress", None)
+            ci_vote = _as_bool(args.get("ciVote", None))
+            ci_in_progress = _as_bool(args.get("ciInProgress", None))
             timestamp = args.get("timestamp", None)
             user = args.get("user", None)
 
@@ -209,9 +215,9 @@ if graphene:
                 query = query.filter(CIVoteAggModel.ref_hash == ref_hash)
             if ci_name:
                 query = query.filter(CIVoteAggModel.ci_name == ci_name)
-            if ci_vote:
+            if ci_vote is not None:
                 query = query.filter(CIVoteAggModel.ci_vote == ci_vote)
-            if ci_in_progress:
+            if ci_in_progress is not None:
                 query = query.filter(
                     CIVoteAggModel.ci_in_progress == ci_in_progress)
             if timestamp:

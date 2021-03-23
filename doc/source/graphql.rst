@@ -122,8 +122,8 @@ Available queries:
 
 Arguments:
 
-- projectName: limit the results to the commits beloging to the specified project name.
-- component: limit the results to the commits beloging to the specified component.
+- projectName: limit the results to the commits belonging to the specified project name.
+- component: limit the results to the commits belonging to the specified component.
 - status: limit the results to the commits with the specified status.
 - offset: return the results after the specified entry.
 - limit: return a maximum amount of commits (100 by default, cannot be higher than 100).
@@ -144,14 +144,13 @@ Arguments:
     ): [CIVote]
 
 Arguments:
-
-- commitId: limit the results to the civote beloging to the commit id.
-- ciName: limit the results to the civote beloging to the CI name.
-- ciVote: limit the results to the civote beloging to the voting CI.
-- ciInProgress: limit the results to the civote beloging to "In Progress" state.
-- timestamp: limit the results to the civote beloging to the specified timestamp.
-- user: limit the results to the civote beloging to the specified user.
-- component: limit the results to the civote beloging to the specified component.
+- commitId: limit the results to the civote belonging to the commit id.
+- ciName: limit the results to the civote belonging to the CI name.
+- ciVote: limit the results to the civote belonging to the voting CI.
+- ciInProgress: limit the results to the civote belonging to "In Progress" state.
+- timestamp: limit the results to the civote belonging to the specified timestamp.
+- user: limit the results to the civote belonging to the specified user.
+- component: limit the results to the civote belonging to the specified component.
 
 * civoteAgg
 
@@ -160,19 +159,20 @@ Arguments:
     civoteAgg (
         refHash: String
         ciName: String
-        ciVote: String
+        ciVote: Boolean
         ciInProgress: Boolean
         timestamp: Int
         user: String
     ): [CIVote_Aggregate]
 
 Arguments:
-- refHash: limit the results to the civote_aggregation beloging to the specified reference hash.
-- ciName: limit the results to the civote_aggregation beloging to the specified CI name.
-- ciVote: limit the results to the civote_aggregation beloging to the specified CI vote.
-- ciInProgress: limit the results to the civote_aggregation beloging to the specified CI in progress state.
-- timestamp: limit the results to the civote_aggregation beloging to the specified timestamp.
-- user: limit the results to the civote_aggregation beloging to the specified user.
+- refHash: limit the results to the civote_aggregation belonging to the specified reference hash.
+- ciName: limit the results to the civote_aggregation belonging to the specified CI name.
+- ciVote: limit the results to the civote_aggregation belonging to the specified CI vote.
+- ciInProgress: limit the results to the civote_aggregation belonging to the specified CI in progress state.
+- timestamp: limit the results to the civote_aggregation belonging to the specified timestamp.
+- user: limit the results to the civote_aggregation belonging to the specified user.
+
 
 * packageStatus
 

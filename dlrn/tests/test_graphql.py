@@ -212,6 +212,62 @@ class TestcivoteQuery(DLRNAPIGraphQLTestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data['data']['civote']), 1)
 
+    def test_filtered_query_civote_true(self, db_mock):
+        query = """
+            query {
+                civote(ciVote: true)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 4)
+
+    def test_filtered_query_civote_false(self, db_mock):
+        query = """
+            query {
+                civote(ciVote: false)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 1)
+
+    def test_filtered_query_inprogress_true(self, db_mock):
+        query = """
+            query {
+                civote(ciInProgress: true)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 1)
+
+    def test_filtered_query_inprogress_false(self, db_mock):
+        query = """
+            query {
+                civote(ciInProgress: false)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 4)
+
     def test_badfiltered_query(self, db_mock):
         query = """
             query {
@@ -273,6 +329,62 @@ class TestCIVoteAggregationQuery(DLRNAPIGraphQLTestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data['data']['civoteAgg']), 2)
+
+    def test_filtered_civote_true(self, db_mock):
+        query = """
+            query {
+                civoteAgg(ciVote: true)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 2)
+
+    def test_filtered_civote_false(self, db_mock):
+        query = """
+            query {
+                civoteAgg(ciVote: false)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 1)
+
+    def test_filtered_ciinprogress_false(self, db_mock):
+        query = """
+            query {
+                civoteAgg(ciInProgress: false)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 3)
+
+    def test_filtered_ciinprogress_true(self, db_mock):
+        query = """
+            query {
+                civoteAgg(ciInProgress: true)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 0)
 
     def test_badfiltered_query(self, db_mock):
         query = """
