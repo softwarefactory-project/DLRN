@@ -32,7 +32,6 @@ from dlrn.db import Promotion
 from dlrn.purge import FLAG_PURGED
 from dlrn.remote import import_commit
 from dlrn.utils import aggregate_repo_files
-from dlrn.utils import find_in_artifacts
 
 from flask import g as flask_g
 from flask import jsonify
@@ -41,7 +40,6 @@ from flask import request
 
 import calendar
 import os
-import re
 from six.moves import configparser
 from sqlalchemy import desc
 import time
@@ -1027,47 +1025,23 @@ def get_civotes_detail():
     distro_hash = request.args.get('distro_hash', None)
     component = request.args.get('component', None)
     ci_name = request.args.get('ci_name', None)
-    success = request.args.get('success', None)
-    offset = request.args.get('offset', 0)
 
     session = _get_db()
-    votes = session.query(CIVote)
-    votes = votes.filter(CIVote.ci_name != 'consistent')
 
+    commit_id = -1
     if commit_hash and distro_hash:
         commit = _get_commit(session, commit_hash, distro_hash)
-        votes = votes.from_self().filter(CIVote.commit_id == commit.id)
-    elif ci_name:
-        votes = votes.filter(CIVote.ci_name == ci_name)
-    elif component:
-        votes = votes.filter(CIVote.component == component)
-    else:
-        raise InvalidUsage("Please specify either commit_hash+distro_hash or "
-                           "ci_name as parameters.", status_code=400)
-
-    votes = votes.offset(offset).limit(pagination_limit)
-
-    if success is not None:
-        votes = votes.from_self().filter(
-            CIVote.ci_vote == bool(strtobool(success)))
-
-    votelist = votes.all()
-    count = votes.count()
-
-    for i in range(len(votelist)):
-        commit = getCommits(session, limit=0).filter(
-            Commit.id == votelist[i].commit_id).first()
-        votelist[i].commit_hash = commit.commit_hash
-        votelist[i].distro_hash = commit.distro_hash
-        votelist[i].distro_hash_short = commit.distro_hash[:8]
+        commit_id = commit.id if commit else -1
+    elif not ci_name and not component:
+        raise InvalidUsage("Please specify either commit_hash+distro_hash, "
+                           "component or ci_name as parameters.",
+                           status_code=400)
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     return render_template('votes.j2',
                            target=config_options.target,
-                           votes=votelist,
-                           count=count,
-                           limit=pagination_limit)
+                           commitid=commit_id)
 
 
 @app.route('/api/civotes_agg.html', methods=['GET'])
@@ -1117,95 +1091,28 @@ def get_civotes_agg():
 def get_civotes_agg_detail():
     ref_hash = request.args.get('ref_hash', None)
     ci_name = request.args.get('ci_name', None)
-    success = request.args.get('success', None)
-    offset = request.args.get('offset', 0)
 
-    session = _get_db()
-    votes = session.query(CIVote_Aggregate)
-
-    if ref_hash:
-        votes = votes.from_self().filter(CIVote_Aggregate.ref_hash == ref_hash)
-    elif ci_name:
-        votes = votes.filter(CIVote_Aggregate.ci_name == ci_name)
-    else:
+    if not ref_hash and not ci_name:
         raise InvalidUsage("Please specify either ref_hash or "
                            "ci_name as parameters.", status_code=400)
-
-    votes = votes.offset(offset).limit(pagination_limit)
-
-    if success is not None:
-        votes = votes.from_self().filter(
-            CIVote_Aggregate.ci_vote == bool(strtobool(success)))
-
-    votelist = votes.all()
-    count = votes.count()
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     return render_template('votes_agg.j2',
-                           target=config_options.target,
-                           votes=votelist,
-                           count=count,
-                           limit=pagination_limit)
+                           target=config_options.target)
 
 
 @app.route('/api/report.html', methods=['GET'])
 def get_report():
-    package_name = request.args.get('package', None)
-    success = request.args.get('success', None)
-    component = request.args.get('component', None)
-    offset = request.args.get('offset', 0)
-
-    if success is not None:
-        if bool(strtobool(success)):
-            with_status = "SUCCESS"
-        else:
-            with_status = "FAILED"
-    else:
-        with_status = None
-
-    session = _get_db()
-    commits = getCommits(session, without_status="RETRY",
-                         project=package_name, with_status=with_status,
-                         limit=pagination_limit, offset=offset,
-                         component=component)
-
-    count = commits.count()
-
     config_options = _get_config_options(app.config['CONFIG_FILE'])
-
-    commits_build_dir = {}
-    for commit in commits:
-        version = ''
-        release = ''
-        commit_dir = commit.getshardedcommitdir()
-        src_package = find_in_artifacts(commit.artifacts, r'\w+.src.rpm')
-        if src_package:
-            splitted_name = re.split(r'-\d+\.[0-9]{14}.[0-9a-f]{7}\.',
-                                     src_package.split('/')[-1])
-            # NOTE(dpawlik): Release is predictable, but versioning not.
-            # So better is to take value after the split.
-            version = splitted_name[0].replace(commit.project_name + '-', '')
-            release = re.findall(r'\d+\.[0-9]{14}.[0-9a-f]{7}\.\w+',
-                                 src_package.split('/')[-1])
-
-        key = "%s_%s_%s" % (commit.commit_hash, commit.distro_hash,
-                            commit.extended_hash)
-        commits_build_dir[key] = {
-            'build_dir': "%s/%s" % (config_options.baseurl, commit_dir),
-            'version': version,
-            'release': ''.join(release)
-        }
 
     return render_template('report.j2',
                            reponame='Detailed build report',
                            target=config_options.target,
                            src=config_options.source,
                            project_name=config_options.project_name,
-                           commits=commits,
-                           count=count,
                            limit=pagination_limit,
-                           commits_build_dir=commits_build_dir)
+                           baseurl=config_options.baseurl)
 
 
 @app.teardown_appcontext
