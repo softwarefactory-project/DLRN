@@ -98,8 +98,12 @@ The PackageStatus type is generated directly in Graphene.
 Queries
 -------
 
-All queries should conform to the GraphQL language. Note that you will need to specify
-which fields from the return type you want to get. See `the GraphQL tutorial <https://graphql.org/learn/queries/>`_
+All queries should conform to the GraphQL language. When more than one item is
+returned, they will be sorted by descending id order, which means newer commits
+or CI Votes are displayed first.
+
+Note that you will need to specify which fields from the return type you want
+to get. See `the GraphQL tutorial <https://graphql.org/learn/queries/>`_
 for additional details.
 
 Available queries:
