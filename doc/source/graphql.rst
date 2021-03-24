@@ -141,6 +141,8 @@ Arguments:
         timestamp: Int
         user: String
         component: String
+        offset: Int
+        limit: Int
     ): [CIVote]
 
 Arguments:
@@ -151,6 +153,9 @@ Arguments:
 - timestamp: limit the results to the civote belonging to the specified timestamp.
 - user: limit the results to the civote belonging to the specified user.
 - component: limit the results to the civote belonging to the specified component.
+- offset: return the results after the specified entry.
+- limit: return a maximum amount of commits (100 by default, cannot be higher than 100).
+
 
 * civoteAgg
 
@@ -163,6 +168,8 @@ Arguments:
         ciInProgress: Boolean
         timestamp: Int
         user: String
+        offset: Int
+        limit: Int
     ): [CIVote_Aggregate]
 
 Arguments:
@@ -172,6 +179,8 @@ Arguments:
 - ciInProgress: limit the results to the civote_aggregation belonging to the specified CI in progress state.
 - timestamp: limit the results to the civote_aggregation belonging to the specified timestamp.
 - user: limit the results to the civote_aggregation belonging to the specified user.
+- offset: return the results after the specified entry.
+- limit: return a maximum amount of commits (100 by default, cannot be higher than 100).
 
 
 * packageStatus

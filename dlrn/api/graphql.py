@@ -115,7 +115,9 @@ if graphene:
                                ciInProgress=graphene.Boolean(),
                                timestamp=graphene.Int(),
                                user=graphene.String(),
-                               component=graphene.String())
+                               component=graphene.String(),
+                               offset=graphene.Int(),
+                               limit=graphene.Int())
 
         civoteAgg = graphene.List(CIVoteAgg,
                                   refHash=graphene.String(),
@@ -123,7 +125,9 @@ if graphene:
                                   ciVote=graphene.Boolean(),
                                   ciInProgress=graphene.Boolean(),
                                   timestamp=graphene.Int(),
-                                  user=graphene.String())
+                                  user=graphene.String(),
+                                  offset=graphene.Int(),
+                                  limit=graphene.Int())
 
         packageStatus = graphene.List(PackageStatus,
                                       projectName=graphene.String(),
