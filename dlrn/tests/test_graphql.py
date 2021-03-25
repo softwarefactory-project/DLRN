@@ -184,6 +184,34 @@ class TestcivoteQuery(DLRNAPIGraphQLTestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data['data']['civote']), 5)
 
+    def test_get_offset(self, db_mock):
+        query = """
+            query {
+                civote(offset: 2)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 3)
+
+    def test_get_limit(self, db_mock):
+        query = """
+            query {
+                civote(limit: 2)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 2)
+
     def test_filtered_query(self, db_mock):
         query = """
             query {
@@ -315,6 +343,34 @@ class TestCIVoteAggregationQuery(DLRNAPIGraphQLTestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(len(data['data']['civoteAgg']), 3)
+
+    def test_get_offset(self, db_mock):
+        query = """
+            query {
+                civoteAgg(offset: 2)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 1)
+
+    def test_get_limit(self, db_mock):
+        query = """
+            query {
+                civoteAgg(limit: 2)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 2)
 
     def test_filtered_query(self, db_mock):
         query = """
