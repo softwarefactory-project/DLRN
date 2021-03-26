@@ -6,8 +6,8 @@ source ./scripts/common-functions
 
 # UPSTREAMVERSION EXPECTED_UPSTREAMVERSION EXPECTED_VERSION  EXPECTED_RELEASE
 function test_setvr(){
-    # Set date to return a hardcoded time we can test for
-    function date(){ $(which --skip-functions date) --date='2015/1/2 3:44:55' $@ ; }
+    # Set release date to a hardcoded time we can test for
+    export RELEASE_DATE=20150102034455
     VERSION=
     RELEASE=
     setversionandrelease $1 shortsha

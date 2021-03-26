@@ -18,6 +18,7 @@ import os
 import sh
 import shutil
 
+from datetime import datetime
 from six.moves.urllib.request import urlopen
 
 from dlrn.config import getConfigOptions
@@ -251,7 +252,7 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
             config_options.coprid):
         os.environ['COPR_ID'] = config_options.coprid
 
-    # Set release numbering option
+    # Set release numbering options
     if config_options.release_numbering == '0.1.date.hash':
         os.environ['RELEASE_NUMBERING'] = '0.1.date.hash'
     elif config_options.release_numbering == 'minor.date.hash':
@@ -259,6 +260,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
         os.environ['RELEASE_MINOR'] = config_options.release_minor
     else:
         os.environ['RELEASE_NUMBERING'] = '0.date.hash'
+    release_timestamp = datetime.utcfromtimestamp(commit.dt_build)
+    os.environ['RELEASE_DATE'] = release_timestamp.strftime('%Y%m%d%H%M%S')
 
     # Set env variable for mock configuration
     os.environ['MOCK_CONFIG'] = mock_config
