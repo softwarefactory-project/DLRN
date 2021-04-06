@@ -25,8 +25,15 @@ from dlrn.drivers.gitrepo import GitRepoDriver
 from dlrn.tests import base
 
 
-def _mocked_environ(*args, **kwargs):
-    return 'myuser'
+def _mocked_environ(param, default=None):
+    if param == 'USER':
+        return 'myuser'
+    elif param == 'MOCK_CONFIG':
+        return '/tmp/test.cfg'
+    elif param == 'RELEASE_DATE':
+        return '20150102034455'
+    elif param == 'RELEASE_NUMBERING':
+        return '0.date.hash'
 
 
 def _mocked_exists(path):
@@ -80,7 +87,7 @@ class TestDriverGit(base.TestCase):
         self.assertEqual(packages, [])
 
     @mock.patch('os.path.exists', side_effect=_mocked_exists)
-    @mock.patch('os.environ.get', side_effect=['myuser'])
+    @mock.patch('os.environ.get', side_effect=_mocked_environ)
     @mock.patch('sh.renderspec', create=True)
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir')
@@ -99,7 +106,10 @@ class TestDriverGit(base.TestCase):
              'DLRN_USER=myuser',
              '/bin/true'],
             _cwd=directory,
-            _env={'LANG': 'C'})]
+            _env={'LANG': 'C',
+                  'MOCK_CONFIG': '/tmp/test.cfg',
+                  'RELEASE_DATE': '20150102034455',
+                  'RELEASE_NUMBERING': '0.date.hash'})]
 
         self.assertEqual(env_mock.call_args_list, expected)
         self.assertEqual(env_mock.call_count, 1)
@@ -124,7 +134,10 @@ class TestDriverGit(base.TestCase):
              'DLRN_USER=myuser',
              '/bin/true'],
             _cwd=directory,
-            _env={'LANG': 'C'}),
+            _env={'LANG': 'C',
+                  'MOCK_CONFIG': '/tmp/test.cfg',
+                  'RELEASE_DATE': '20150102034455',
+                  'RELEASE_NUMBERING': '0.date.hash'}),
             mock.call(
             ['DLRN_PACKAGE_NAME=foo',
              'DLRN_DISTGIT=%s' % directory,
@@ -132,7 +145,10 @@ class TestDriverGit(base.TestCase):
              'DLRN_USER=myuser',
              '/bin/false'],
             _cwd=directory,
-            _env={'LANG': 'C'})
+            _env={'LANG': 'C',
+                  'MOCK_CONFIG': '/tmp/test.cfg',
+                  'RELEASE_DATE': '20150102034455',
+                  'RELEASE_NUMBERING': '0.date.hash'})
             ]
 
         self.assertEqual(env_mock.call_args_list, expected)

@@ -38,6 +38,17 @@ def _mocked_git_log(*args, **kwargs):
             '1605774411 896f7544a70028ff5db1d5a2d0f3619b62218dd6']
 
 
+def _mocked_get_environ(param, default=None):
+    if param == 'USER':
+        return 'myuser'
+    elif param == 'MOCK_CONFIG':
+        return '/tmp/test.cfg'
+    elif param == 'RELEASE_DATE':
+        return '20150102034455'
+    elif param == 'RELEASE_NUMBERING':
+        return '0.date.hash'
+
+
 class TestDriverRdoInfo(base.TestCase):
     def setUp(self):
         super(TestDriverRdoInfo, self).setUp()
@@ -91,7 +102,7 @@ class TestDriverRdoInfo(base.TestCase):
 
         self.assertEqual(di_mock.call_args_list, expected)
 
-    @mock.patch('os.environ.get', side_effect=['myuser'])
+    @mock.patch('os.environ.get', side_effect=_mocked_get_environ)
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
     def test_custom_preprocess(self, ld_mock, sh_mock, get_mock):
@@ -105,12 +116,15 @@ class TestDriverRdoInfo(base.TestCase):
                                'DLRN_USER=myuser',
                                '/bin/true'],
                               _cwd='%s/foo_distro/' % self.temp_dir,
-                              _env={'LANG': 'C'})]
+                              _env={'LANG': 'C',
+                                    'MOCK_CONFIG': '/tmp/test.cfg',
+                                    'RELEASE_DATE': '20150102034455',
+                                    'RELEASE_NUMBERING': '0.date.hash'})]
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(sh_mock.call_count, 1)
 
-    @mock.patch('os.environ.get', side_effect=['myuser'])
+    @mock.patch('os.environ.get', side_effect=_mocked_get_environ)
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
     def test_custom_preprocess_source_commit(self, ld_mock, sh_mock,
@@ -126,12 +140,15 @@ class TestDriverRdoInfo(base.TestCase):
                                'DLRN_USER=myuser',
                                '/bin/true'],
                               _cwd='%s/foo_distro/' % self.temp_dir,
-                              _env={'LANG': 'C'})]
+                              _env={'LANG': 'C',
+                                    'MOCK_CONFIG': '/tmp/test.cfg',
+                                    'RELEASE_DATE': '20150102034455',
+                                    'RELEASE_NUMBERING': '0.date.hash'})]
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(sh_mock.call_count, 1)
 
-    @mock.patch('os.environ.get', side_effect=['myuser'])
+    @mock.patch('os.environ.get', side_effect=_mocked_get_environ)
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
     def test_custom_preprocess_rdoinfo_repo(self, ld_mock, sh_mock, get_mock):
@@ -147,7 +164,10 @@ class TestDriverRdoInfo(base.TestCase):
                                'DLRN_USER=myuser',
                                '/bin/true'],
                               _cwd='%s/foo_distro/' % self.temp_dir,
-                              _env={'LANG': 'C'})]
+                              _env={'LANG': 'C',
+                                    'MOCK_CONFIG': '/tmp/test.cfg',
+                                    'RELEASE_DATE': '20150102034455',
+                                    'RELEASE_NUMBERING': '0.date.hash'})]
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(sh_mock.call_count, 1)
