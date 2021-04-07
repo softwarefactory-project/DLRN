@@ -75,14 +75,30 @@ def _add_commits(project_toprocess, toprocess, options, session):
     # against the last commit in the db, as multiple commits can
     # have the same commit date
     for commit_toprocess in project_toprocess:
+        # We are adding an extra check here to cover a rare corner case:
+        # if we have two commits A and B with the exact same dt_commit, in a
+        # first pass we will build either just the last one (if we switched
+        # tags), or both. If we built the last one (A), we do not want to
+        # build the other (B), because B would be a previous commit.
+        # The only way to prevent this is to check that we have not built a
+        # commit with the same dt_commit and same distro and extended hashes.
+        # This could only be an issue if, for some reason, we want to discard
+        # commit A and build commit B in the future, but we can work around
+        # this by adding a change to the distgit.
         if options.dev is True or \
            options.run or \
-           not session.query(Commit).filter(
-               Commit.commit_hash == commit_toprocess.commit_hash,
-               Commit.distro_hash == commit_toprocess.distro_hash,
-               Commit.extended_hash == commit_toprocess.extended_hash,
-               Commit.type == commit_toprocess.type,
-               Commit.status != "RETRY").all():
+           (not session.query(Commit).filter(
+                Commit.commit_hash == commit_toprocess.commit_hash,
+                Commit.distro_hash == commit_toprocess.distro_hash,
+                Commit.extended_hash == commit_toprocess.extended_hash,
+                Commit.type == commit_toprocess.type,
+                Commit.status != "RETRY").all()
+            and not session.query(Commit).filter(
+                Commit.dt_commit == commit_toprocess.dt_commit,
+                Commit.distro_hash == commit_toprocess.distro_hash,
+                Commit.extended_hash == commit_toprocess.extended_hash,
+                Commit.type == commit_toprocess.type,
+                Commit.status != "RETRY").all()):
             toprocess.append(commit_toprocess)
 
 
