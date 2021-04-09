@@ -68,6 +68,7 @@ DLRN_CORE_CONFIG = {
         'keep_changelog': {'type': 'boolean', 'default': False},
         'allow_force_rechecks': {'type': 'boolean', 'default': False},
         'use_components': {'type': 'boolean', 'default': False},
+        'deps_url': {'default': ''},
     }
 }
 

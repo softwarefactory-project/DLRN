@@ -158,6 +158,12 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     newcfg = os.path.join(datadir, mock_config + ".new")
     oldcfg = os.path.join(datadir, mock_config)
     shutil.copyfile(templatecfg, newcfg)
+    deps_url = config_options.deps_url.strip()
+    if deps_url == '' or not deps_url:
+        if not baseurl:
+            raise Exception("No baseurl defined")
+        # Default to baseurl + delorean_deps.repo
+        deps_url = os.path.join(baseurl,  'delorean-deps.repo')
 
     if (config_options.build_driver ==
             'dlrn.drivers.kojidriver.KojiBuildDriver' and
@@ -195,16 +201,14 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     contents = contents[:-1]
 
     try:
-        if not baseurl:
-            raise Exception("No baseurl defined")
-        r = urlopen(baseurl + "/delorean-deps.repo")
+        r = urlopen(deps_url)
         delorean_deps = True
     except Exception:
         logger.warning(
-            "Could not open %s/delorean-deps.repo. If some dependent"
-            " repositories must be included in the mock then check the"
-            " baseurl value in projects.ini, and make sure the file can be"
-            " downloaded." % baseurl)
+            "Could not open %s. If some dependent repositories must be "
+            "included in the mock configuration, then check the baseurl "
+            " and deps_url values in projects.ini, and make sure the file "
+            "can be accesed." % deps_url)
         delorean_deps = False
 
     if delorean_deps:
