@@ -21,111 +21,24 @@ done
 
 cleanup_sdist
 
-MOCKOPTS="-v -r ${DATA_DIR}/${MOCK_CONFIG} --resultdir $OUTPUT_DIRECTORY"
-
-# We want to make it work for both python2 and python3
-if [ -x /usr/bin/python3 ]; then
-    PYTHON=python3
-else
-    # Python 3 not available
-    PYTHON=python2
-fi
-
-echo "Using $PYTHON as python interpreter"
-
-# Cleanup mock directory and copy sources there, so we can run python setup.py
-# inside the buildroot
-/usr/bin/mock $MOCKOPTS --clean
-/usr/bin/mock $MOCKOPTS --init
-# A simple mock --copyin should be enough, but it does not handle symlinks properly
-MOCKDIR=$(/usr/bin/mock -r ${DATA_DIR}/${MOCK_CONFIG} -p)
+detect_python
+setup_mock
 
 if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
-    # handle python packages (some puppet modules are carrying a setup.py too)
+    # As a first step, calculate version and release
+    detect_version_and_release
+
+    # As a second step, generate tarball
     if [ -r setup.py -a ! -r metadata.json ]; then
         SOURCETYPE='tarball'
-        # Reset the git repository to the right commit
-        git checkout -f ${DLRN_SOURCE_COMMIT}
-
-        mkdir ${MOCKDIR}/var/tmp/pkgsrc
-        cp -pr . ${MOCKDIR}/var/tmp/pkgsrc
-
-        # Remove any private tags, they could interfere with setuptools
-        # There is a known issue with setuptools_scm, used in Gnocchi
-        pushd ${MOCKDIR}/var/tmp/pkgsrc
-        set +o pipefail
-        git tag -l "private-*" | xargs -n 1 git tag -d
-        set -o pipefail
-        popd
-
-        # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
-        # so only look at the last line for version
-        setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && rm -rf *.egg-info && (([ -x /usr/bin/python3 ] && python3 setup.py --version 2> /dev/null) || python setup.py --version 2> /dev/null)"| tail -n 1) \
-                             $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && git log --abbrev=7 -n1 --format=format:%h")
-
         /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && (([ -x /usr/bin/python3 ] && python3 setup.py sdist) || python setup.py sdist)"
         /usr/bin/mock $MOCKOPTS --copyout /var/tmp/pkgsrc/dist ./dist
     elif [ -r *.gemspec ]; then
         SOURCETYPE='gem'
-        # Reset the git repository to the right commit
-        git checkout -f ${DLRN_SOURCE_COMMIT}
-
-        GEMSPEC=$(ls -l | grep gemspec | awk '{print $9}')
-        PROJECT=$(basename $GEMSPEC .gemspec)
-        VERSION=$(ruby -e "require 'rubygems'; spec = Gem::Specification::load('$GEMSPEC'); puts spec.version")
-        mkdir ${MOCKDIR}/var/tmp/pkgsrc
-        cp -pr . ${MOCKDIR}/var/tmp/pkgsrc
         /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && gem build $GEMSPEC"
         /usr/bin/mock $MOCKOPTS --copyout /var/tmp/pkgsrc/$PROJECT-$VERSION.gem ./$PROJECT-$VERSION.gem
-        setversionandrelease "$VERSION" $(git log --abbrev=7 -n1 --format=format:%h)
     else
         SOURCETYPE='tarball'
-        # For Puppet modules, check the version in metadata.json (preferred) or Modulefile
-        if [ -r metadata.json ]; then
-            version=$($PYTHON -c "import json; print(json.loads(open('metadata.json').read(-1))['version'])")
-        elif [ -r Modulefile ]; then
-            version=$(grep version Modulefile | sed "s@version *'\(.*\)'@\1@")
-        else
-            version=""
-        fi
-
-        # Not able to discover version, use git tags
-        if [ -z "$version" ]; then
-            version="$(git describe --abbrev=0 --tags 2> /dev/null|sed 's/^[vVrR]//' || :)"
-        fi
-
-        # One final attempt for openstack/rpm-packaging
-        if [ -z "$version" ]; then
-            pushd ${DISTGIT_DIR}
-            if git remote -v | grep openstack/rpm-packaging; then
-                version=$(grep Version *.spec | awk '{print $2}' | head -n 1)
-            fi
-            popd
-        fi
-
-        # We got a version. Check if we need to increase a .Z release due to post-tag commits
-        if [ -n "$version" ]; then
-            post_version=$(git describe --tags|sed 's/^[vVrR]//' || :)
-            current_tag=$(git describe --abbrev=0 --tags|sed 's/^[vVrR]//' || :)
-            if [ "$post_version" != "$current_tag" ]; then
-                # We have a potential post-version. Only applies if
-                # version == current_tag without -rc inside
-                if [[ "$version" = "$current_tag" && ! "$version" =~ "-rc" ]]; then
-                    # Now increase the .Z release
-                    version=$(awk -F. '{ for (i=1;i<NF;i++) printf $i"."; print $NF+1 }' <<< $version)
-                fi
-            fi
-        fi
-
-        # fallback to an arbitrary version
-        if [ -z "$version" ]; then
-            version=0.0.1
-        fi
-
-        # Reset the git repository to the right commit
-        git checkout -f ${DLRN_SOURCE_COMMIT}
-
-        setversionandrelease "$version" $(git log --abbrev=7 -n1 --format=format:%h)
         if [ -r metadata.json ]; then
             # Detect if this is an OpenStack puppet module
             # We know OpenStack puppet modules have a common style for metadata.json
@@ -176,9 +89,7 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
         sed -i -e "s/^%global dlrn_nvr .*/%global dlrn_nvr $(basename $SOURCEWITHREL $SOURCEEXT)/" *.spec || \
         sed -i -e "1i%global dlrn_nvr $(basename $SOURCEWITHREL $SOURCEEXT)\\" *.spec
     sed -i -e "s/UPSTREAMVERSION/$UPSTREAMVERSION/g" *.spec
-    VERSION=${VERSION/-/.}
-    sed -i -e "s/Version:.*/Version: $VERSION/g" *.spec
-    sed -i -e "s/Release:.*/Release: $RELEASE%{?dist}/g" *.spec
+    set_nvr_in_spec
     if [ "$DLRN_KEEP_TARBALL" != "1" ]; then
         sed -i -e "s/^\(Source\|Source0\):.*/\1: $SOURCEWITHREL/" *.spec
     fi
