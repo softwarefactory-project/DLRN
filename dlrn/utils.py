@@ -308,6 +308,7 @@ def run_external_preprocess(**kwargs):
     srcdir = kwargs.get('source_dir')
     commit_hash = kwargs.get('commit_hash')
     username = os.environ.get('USER', None)
+    datadir = kwargs.get('datadir')
 
     run_cmd = []
     # Append environment variables
@@ -325,6 +326,8 @@ def run_external_preprocess(**kwargs):
         run_cmd.append("DLRN_SOURCE_COMMIT=%s" % commit_hash)
     if username:
         run_cmd.append("DLRN_USER=%s" % username)
+    if datadir:
+        run_cmd.append("DLRN_DATADIR=%s" % datadir)
     run_cmd.extend([cmdline])
 
     logger.info('Running custom pre-process: %s' % ' '.join(run_cmd))
@@ -332,7 +335,13 @@ def run_external_preprocess(**kwargs):
         # We are forcing LANG to be C here, because env decides to use
         # non-ascii characters when the command is not found in UTF-8
         # environments
-        sh.env(run_cmd, _cwd=distgit, _env={'LANG': 'C'})
+        sh.env(run_cmd, _cwd=distgit,
+               _env={'LANG': 'C',
+                     'MOCK_CONFIG': os.environ.get('MOCK_CONFIG', None),
+                     'RELEASE_DATE': os.environ.get('RELEASE_DATE', None),
+                     'RELEASE_NUMBERING': os.environ.get('RELEASE_NUMBERING',
+                                                         None)})
+
     except Exception as e:
         msg = getattr(e, 'stderr', None)
         if msg:
