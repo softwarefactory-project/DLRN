@@ -1,149 +1,38 @@
-{% macro commit_key(commit) -%}{{ commit.commit_hash}}_{{ commit.distro_hash }}_{{ commit.extended_hash }}{%- endmacro %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <title>{{ project_name }} Packaging By DLRN</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
   <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js" integrity="sha384-qPGCkCPOuGBUt/edB/0Dab3wE62dCo5HskKmbabea0YxTq2fhWoKXO8ItrP6qZu+" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='utils.js') }}"></script>
     <h1>
       <i class='fa fa-chevron-circle-right pull-left'></i>
       {{ reponame | capitalize }} - {{ target | capitalize }} ({{ src }})
     </h1>
-    <table id="navigation1">
-    <tr>
-    {% if request.args.get('offset') | int != 0  %}
-    <td>
-        <form action="report.html" method="get">
-           {% if request.args.get('success') != None %}
-             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
-           {% endif %}
-           {% if request.args.get('package') != None %}
-           <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
-           {% endif %}
-           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
-          <button type="submit" class="button"><h4>Previous</h4></button>
-        </form>
-    </td>
-    {% endif %}
-    {% if count == limit %}
-    <td>
-    <form action="report.html" method="get">
-       {% if request.args.get('success') != None %}
-         <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
-       {% endif %}
-       {% if request.args.get('package') != None %}
-       <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
-       {% endif %}
-       <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
-      <button type="submit" class="button"><h4>Next</h4></button>
-    </form>
-    </td>
-    {% endif %}
-    </tr></table>
-    <table id="dlrn">
-      <tr>
-        <th>Build Date Time</th>
-        <th>Commit Date Time</th>
-        <th>Project Name</th>
-        <th>Version</th>
-        <th>Release</th>
-        <th>Commit Hash</th>
-        <th>Component</th>
-        <th>Status</th>
-        <th>Repository</th>
-        <th>Build Log</th>
-      </tr>
-      {% for commit in commits %}
-        <tr {% if commit.status == "SUCCESS" %}class="success"{% endif %}>
-          <td>{{ commit.dt_build | strftime }}</td>
-          <td>{{ commit.dt_commit | strftime }}</td>
-          <td>
-            <i class="fa fa-link pull-left"></i>
-            <form action="report.html" method="get">
-               <input type="hidden" name="package" value="{{ commit.project_name }}" />
-               {% if request.args.get('success') != None %}
-                 <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
-               {% endif %}
-              <button type="submit" class="button">{{ commit.project_name }}</button>
-            </form>
-          </td>
-          <td>
-            {{ commits_build_dir[commit_key(commit)]['version'] }}
-          </td>
-          <td>
-            {{ commits_build_dir[commit_key(commit)]['release'] }}
-          </td>
-          <td class="commit">
-            <i class="fa fa-git pull-left"></i>
-            <i>
-                {{ commit.commit_hash }}
-          </td>
-          <td>
-            <form action="report.html" method="get">
-               <input type="hidden" name="component" value="{{ commit.component }}" />
-               <button type="submit" class="button"><i class="fa fa-link pull-left"></i>{{ commit.component }}</button>
-            </form>
-          </td>
-          <td>
-            {% if commit.status == "SUCCESS"  %}
-              <i class="fa fa-link pull-left" style="color:#004153"></i>
-                <form action="report.html" method="get">
-                   {% if request.args.get('package') != None %}
-                   <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
-                   {% endif %}
-                   <input type="hidden" name="success" value=1 />
-                  <button type="submit" class="button">SUCCESS</button>
-                </form>
-            {% else %}
-              <i class="fa fa-link pull-left" style="color:red"></i>
-                <form action="report.html" method="get">
-                   <input type="hidden" name="package" value="{{ commit.project_name }}" />
-                   <input type="hidden" name="success" value=0 />
-                  <button type="submit" class="button">FAILED</button>
-                </form>
-            {% endif %}
-          </td>
-          <td>
-            <i class="fa fa-link pull-left" style='color:#004153'></i>
-            <a href="{{ commits_build_dir[commit_key(commit)]['build_dir'] }}">repo</a>
-          </td>
-          <td>
-            <a href="{{ commits_build_dir[commit_key(commit)]['build_dir'] }}/rpmbuild.log">build log</a>
-          </td>
-        </tr>
-      {% endfor %}
+    <div id="navigation1"></div>
+    <br>
+    <table id="dlrn" class="pf-m-compact pf-m-grid-md cell-border hover" role="grid" aria-label="dlrntable">
+        <thead>
+            <tr>
+                <th>Build Date Time</th>
+                <th>Commit Date Time</th>
+                <th>Project Name</th>
+                <th>Version</th>
+                <th>Release</th>
+                <th>Commit Hash</th>
+                <th>Component</th>
+                <th>Status</th>
+                <th>Repository</th>
+                <th>Build Log</th>
+            </tr>
+        </thead>
     </table>
-    <table id="navigation2">
-    <tr>
-    {% if request.args.get('offset') | int != 0  %}
-    <td>
-        <form action="report.html" method="get">
-           {% if request.args.get('success') != None %}
-             <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
-           {% endif %}
-           {% if request.args.get('package') != None %}
-           <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
-           {% endif %}
-           <input type="hidden" name="offset" value="{{ request.args.get('offset') | int - limit }}"/>
-          <button type="submit" class="button"><h4>Previous</h4></button>
-        </form>
-    </td>
-    {% endif %}
-    {% if count == limit %}
-    <td>
-    <form action="report.html" method="get">
-       {% if request.args.get('success') != None %}
-         <input type="hidden" name="success" value="{{ request.args.get('success') }}"/>
-       {% endif %}
-       {% if request.args.get('package') != None %}
-       <input type="hidden" name="package" value="{{ request.args.get('package') }}" />
-       {% endif %}
-       <input type="hidden" name="offset" value="{{ request.args.get('offset') | int + limit }}"/>
-      <button type="submit" class="button"><h4>Next</h4></button>
-    </form>
-    </td>
-    {% endif %}
-    </tr></table>
+    <script>
+        var baseurl = "{{ baseurl }}";
+        $(document).ready( reportHtml );
+    </script>
   </body>
 </html>
