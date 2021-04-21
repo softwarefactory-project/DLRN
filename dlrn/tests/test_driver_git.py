@@ -34,6 +34,9 @@ def _mocked_environ(param, default=None):
         return '20150102034455'
     elif param == 'RELEASE_NUMBERING':
         return '0.date.hash'
+    elif param == 'RELEASE_MINOR':
+        # We are simulating an option where RELEASE_MINOR is not in the env
+        return default
 
 
 def _mocked_exists(path):
@@ -109,6 +112,7 @@ class TestDriverGit(base.TestCase):
             _env={'LANG': 'C',
                   'MOCK_CONFIG': '/tmp/test.cfg',
                   'RELEASE_DATE': '20150102034455',
+                  'RELEASE_MINOR': '0',
                   'RELEASE_NUMBERING': '0.date.hash'})]
 
         self.assertEqual(env_mock.call_args_list, expected)
@@ -137,6 +141,7 @@ class TestDriverGit(base.TestCase):
             _env={'LANG': 'C',
                   'MOCK_CONFIG': '/tmp/test.cfg',
                   'RELEASE_DATE': '20150102034455',
+                  'RELEASE_MINOR': '0',
                   'RELEASE_NUMBERING': '0.date.hash'}),
             mock.call(
             ['DLRN_PACKAGE_NAME=foo',
@@ -148,6 +153,7 @@ class TestDriverGit(base.TestCase):
             _env={'LANG': 'C',
                   'MOCK_CONFIG': '/tmp/test.cfg',
                   'RELEASE_DATE': '20150102034455',
+                  'RELEASE_MINOR': '0',
                   'RELEASE_NUMBERING': '0.date.hash'})
             ]
 

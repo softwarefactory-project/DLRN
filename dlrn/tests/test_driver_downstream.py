@@ -45,6 +45,8 @@ def _mocked_get_environ(param, default=None):
         return '20150102034455'
     elif param == 'RELEASE_NUMBERING':
         return '0.date.hash'
+    elif param == 'RELEASE_MINOR':
+        return '0'
 
 
 @mock.patch('dlrn.drivers.downstream.urlopen', side_effect=_mocked_versions)
@@ -350,6 +352,7 @@ class TestDriverDownstream(base.TestCase):
             _env={'LANG': 'C',
                   'MOCK_CONFIG': '/tmp/test.cfg',
                   'RELEASE_DATE': '20150102034455',
+                  'RELEASE_MINOR': '0',
                   'RELEASE_NUMBERING': '0.date.hash'})]
 
         self.assertEqual(sh_mock.call_args_list, expected)
@@ -378,6 +381,7 @@ class TestDriverDownstream(base.TestCase):
             _env={'LANG': 'C',
                   'MOCK_CONFIG': '/tmp/test.cfg',
                   'RELEASE_DATE': '20150102034455',
+                  'RELEASE_MINOR': '0',
                   'RELEASE_NUMBERING': '0.date.hash'})]
 
         self.assertEqual(sh_mock.call_args_list, expected)
@@ -406,6 +410,7 @@ class TestDriverDownstream(base.TestCase):
             _env={'LANG': 'C',
                   'MOCK_CONFIG': '/tmp/test.cfg',
                   'RELEASE_DATE': '20150102034455',
+                  'RELEASE_MINOR': '0',
                   'RELEASE_NUMBERING': '0.date.hash'})]
 
         self.assertEqual(sh_mock.call_args_list, expected)
@@ -440,6 +445,7 @@ class TestDriverDownstream(base.TestCase):
             _env={'LANG': 'C',
                   'MOCK_CONFIG': '/tmp/test.cfg',
                   'RELEASE_DATE': '20150102034455',
+                  'RELEASE_MINOR': '0',
                   'RELEASE_NUMBERING': '0.date.hash'})]
 
         self.assertEqual(sh_mock.call_args_list, expected)

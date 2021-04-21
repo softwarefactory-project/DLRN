@@ -339,6 +339,7 @@ def run_external_preprocess(**kwargs):
                _env={'LANG': 'C',
                      'MOCK_CONFIG': os.environ.get('MOCK_CONFIG', None),
                      'RELEASE_DATE': os.environ.get('RELEASE_DATE', None),
+                     'RELEASE_MINOR': os.environ.get('RELEASE_MINOR', '0'),
                      'RELEASE_NUMBERING': os.environ.get('RELEASE_NUMBERING',
                                                          None)})
 
