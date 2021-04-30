@@ -32,7 +32,7 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
     if [ -r setup.py -a ! -r metadata.json ]; then
         SOURCETYPE='tarball'
         /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && (([ -x /usr/bin/python3 ] && python3 setup.py sdist) || python setup.py sdist)"
-        /usr/bin/mock $MOCKOPTS --copyout /var/tmp/pkgsrc/dist ./dist
+        /usr/bin/mock $MOCKOPTS --copyout /var/tmp/pkgsrc/dist ${TOP_DIR}/dist
     elif [ -r *.gemspec ]; then
         SOURCETYPE='gem'
         /usr/bin/mock $MOCKOPTS --chroot "cd /var/tmp/pkgsrc && gem build $GEMSPEC"
@@ -55,9 +55,9 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
         else
             TARNAME=${PROJECT_NAME}
         fi
-        tar zcvf ${TOP_DIR}/$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${TARNAME}-${version}@" --show-transformed-names $PWD
-        mkdir -p dist
-        mv ${TOP_DIR}/$VERSION.tar.gz dist/
+        tar zcvf ${TOP_DIR}/${VERSION}.tar.gz --exclude=.git --transform="s@${PWD#/}@${TARNAME}-${version}@" --show-transformed-names $PWD
+        mkdir -p ${TOP_DIR}/dist
+        mv ${TOP_DIR}/${VERSION}.tar.gz ${TOP_DIR}/dist/
     fi
 
     if [ "$SOURCETYPE" == 'gem' ]; then
@@ -65,9 +65,9 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
         SOURCEEXT='.gem'
         SOURCEPATH=$SOURCE
     else
-        SOURCE=$(ls dist | grep '.tar.gz')
+        SOURCE=$(ls ${TOP_DIR}/dist | grep '.tar.gz')
         SOURCEEXT='.tar.gz'
-        SOURCEPATH="dist/$SOURCE"
+        SOURCEPATH="${TOP_DIR}/dist/$SOURCE"
     fi
     SOURCEWITHREL=$(basename $SOURCE $SOURCEEXT)-$RELEASE$SOURCEEXT
     mv $SOURCEPATH ${TOP_DIR}/SOURCES/$SOURCEWITHREL
