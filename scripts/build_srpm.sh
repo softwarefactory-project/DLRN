@@ -55,9 +55,9 @@ if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
         else
             TARNAME=${PROJECT_NAME}
         fi
-        tar zcvf ../$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${TARNAME}-${version}@" --show-transformed-names $PWD
+        tar zcvf ${TOP_DIR}/$VERSION.tar.gz --exclude=.git --transform="s@${PWD#/}@${TARNAME}-${version}@" --show-transformed-names $PWD
         mkdir -p dist
-        mv ../$VERSION.tar.gz dist/
+        mv ${TOP_DIR}/$VERSION.tar.gz dist/
     fi
 
     if [ "$SOURCETYPE" == 'gem' ]; then
