@@ -109,6 +109,7 @@ mkdir -p data/repos
 
 # If the commands below throws an error we still want the logs
 function copy_logs() {
+    find data/repos -regex '.*\.log' -exec gzip {} \;
     mkdir -p logs
     rsync -avzr data/repos logs/$log_dir
     # Only copy the current symlink if it exists
