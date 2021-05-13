@@ -128,6 +128,11 @@ function detect_version_and_release() {
         fi
         # Not able to discover version, use git tags
         if [ -z "$version" ]; then
+            # Make sure no "private-" tags are present, since they would lead
+            # to the package version being "private"
+            set +o pipefail
+            git tag -l "private-*" | xargs -n 1 git tag -d
+            set -o pipefail
             version="$(git describe --abbrev=0 --tags 2> /dev/null|sed 's/^[vVrR]//' || :)"
         fi
 
