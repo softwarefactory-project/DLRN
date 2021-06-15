@@ -132,7 +132,7 @@ def getVote(session, timestamp, success=None, job_id=None, component=None,
     if vote is None and not fallback:
         # This is the sequential use case. We do not want to find any vote
         # for a different CI
-        raise InvalidUsage('No vote found', status_code=404)
+        raise InvalidUsage('No vote found', status_code=400)
 
     if vote is None and job_id is not None:
         # Second chance: no votes found for job_id. Let's find any real CI
@@ -155,7 +155,7 @@ def getVote(session, timestamp, success=None, job_id=None, component=None,
 
     if vote is None:
         # No Votes found at all
-        raise InvalidUsage('No vote found', status_code=404)
+        raise InvalidUsage('No vote found', status_code=400)
 
     return vote
 
@@ -221,7 +221,7 @@ def repo_status():
 
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash+extended_hash combination'
-                           ' not found', status_code=404)
+                           ' not found', status_code=400)
     commit_id = commit.id
 
     # Now find every vote for this commit_hash/distro_hash combination
@@ -433,7 +433,7 @@ def promotions_GET():
         commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
         if commit is None:
             raise InvalidUsage('commit_hash+distro_hash+extended_hash '
-                               'combination not found', status_code=404)
+                               'combination not found', status_code=400)
         commit_id = commit.id
     else:
         commit_id = None
@@ -669,7 +669,7 @@ def report_result():
         commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
         if commit is None:
             raise InvalidUsage('commit_hash+distro_hash+extended_hash '
-                               'combination not found', status_code=404)
+                               'combination not found', status_code=400)
 
         commit_id = commit.id
         out_ext_hash = commit.extended_hash
@@ -737,7 +737,7 @@ def promote():
     commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash+extended_hash combination'
-                           ' not found', status_code=404)
+                           ' not found', status_code=400)
 
     # If the commit has been purged, do not move on
     if commit.flags & FLAG_PURGED:
@@ -843,7 +843,7 @@ def promote_batch():
             raise InvalidUsage('commit_hash+distro_hash+extended_hash '
                                'combination not found for %s_%s_%s' % (
                                 commit_hash, distro_hash, extended_hash),
-                               status_code=404)
+                               status_code=400)
 
         # If the commit has been purged, do not move on
         if commit.flags & FLAG_PURGED:

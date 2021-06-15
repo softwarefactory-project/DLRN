@@ -81,13 +81,13 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
         response = self.app.get('/api/last_tested_repo',
                                 data=req_data,
                                 content_type='application/json')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_get_last_tested_repo_no_results_url_params(self, db_mock,
                                                         dt_mock):
         dt_mock.now.return_value = datetime.fromtimestamp(1441901490)
         response = self.app.get('/api/last_tested_repo?max_age=48')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_get_last_tested_repo_with_age(self, db_mock, dt_mock):
         req_data = json.dumps(dict(max_age='72'))
@@ -181,7 +181,7 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
         response = self.app.get('/api/last_tested_repo',
                                 data=req_data,
                                 content_type='application/json')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_get_last_tested_repo_component(self, db_mock, dt_mock):
         req_data = json.dumps(dict(max_age='0', success='1',
@@ -288,7 +288,7 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_post_last_tested_repo_component(self, db2_mock, db_mock,
                                              dt_mock):
@@ -338,7 +338,7 @@ class TestReportResult(DLRNAPITestCase):
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_report_result_no_commit_hash(self, db2_mock, db_mock):
         req_data = json.dumps(dict(distro_hash='0', job_id='foo-ci', url='',
@@ -438,7 +438,7 @@ class TestPromote(DLRNAPITestCase):
                                  headers=self.headers,
                                  content_type='application/json')
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_promote_purged_commit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='1c67b1ab8c6fe273d4e17'
@@ -553,7 +553,7 @@ class TestPromoteBatch(DLRNAPITestCase):
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     @mock.patch('os.symlink')
     def test_promote_batch_successful_1(self, sl_mock, db2_mock, db_mock):
@@ -676,12 +676,12 @@ class TestRepoStatus(DLRNAPITestCase):
                                 data=req_data,
                                 content_type='application/json')
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_repo_status_missing_commit_url_param(self, db2_mock, db_mock):
         response = self.app.get('/api/repo_status?commit_hash=abc123'
                                 '&distro_hash=abc123')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_repo_status_multiple_votes(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='17234e9ab9dfab4cf5600f'
@@ -878,13 +878,13 @@ class TestGetPromotions(DLRNAPITestCase):
         response = self.app.get('/api/promotions',
                                 data=req_data,
                                 content_type='application/json')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_get_promotions_no_such_commit_url_params(self, db2_mock,
                                                       db_mock):
         response = self.app.get('/api/promotions?commit_hash=abc123&'
                                 'distro_hash=abc123')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_get_promotions_multiple_votes(self, db2_mock, db_mock):
         req_data = '{}'

@@ -82,7 +82,7 @@ to use the same repo tested by CI (n-1).
 
 Normal response codes: 200
 
-Error response codes: 400, 404
+Error response codes: 400
 
 
 Request:
@@ -131,7 +131,7 @@ Get all the CI reports for a specific repository.
 
 Normal response codes: 200
 
-Error response codes: 400, 404
+Error response codes: 400
 
 
 Request:
@@ -175,7 +175,7 @@ Get all the CI reports for a specific aggregated repository.
 
 Normal response codes: 200
 
-Error response codes: 400, 404
+Error response codes: 400
 
 
 Request:
@@ -214,7 +214,7 @@ per query.
 
 Normal response codes: 200
 
-Error response codes: 400, 404
+Error response codes: 400
 
 Request:
 
@@ -325,7 +325,7 @@ to use the same repo tested by CI (n-1).
 
 Normal response codes: 201
 
-Error response codes: 404, 415
+Error response codes: 400, 415
 
 
 Request:
@@ -384,7 +384,7 @@ return an error.
 
 Normal response codes: 201
 
-Error response codes: 400, 404, 415, 500
+Error response codes: 400, 415, 500
 
 Request:
 
@@ -439,7 +439,7 @@ If the option is set to ``false``, a null value will be returned.
 
 Normal response codes: 201
 
-Error response codes: 400, 403, 404, 410, 415, 500
+Error response codes: 400, 403, 410, 415, 500
 
 Request:
 
@@ -488,7 +488,7 @@ database cannot be promoted.
 
 Normal response codes: 201
 
-Error response codes: 400, 403, 404, 410, 415, 500
+Error response codes: 400, 403, 410, 415, 500
 
 Request:
 
