@@ -118,6 +118,9 @@ Available queries:
         status: String
         offset: Int
         limit: Int
+        commitHash: String
+        distroHash: String
+        extendedHash: String
     ): [Commit]
 
 Arguments:
@@ -127,6 +130,11 @@ Arguments:
 - status: limit the results to the commits with the specified status.
 - offset: return the results after the specified entry.
 - limit: return a maximum amount of commits (100 by default, cannot be higher than 100).
+- commitHash: limit the results to the commits containing the specified commit hash.
+- distroHash: limit the results to the commits containing the specified distro hash.
+- extendedHash: limit the results to the commits containing the specified extended hash.
+  In this case, extendedHash can contain wildcards in SQL format, so setting extendedHash
+  to "foo%" in the query will return all commits with an extended hash that starts by "foo".
 
 
 * civote

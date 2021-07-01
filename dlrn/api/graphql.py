@@ -107,7 +107,10 @@ if graphene:
                                 component=graphene.String(),
                                 status=graphene.String(),
                                 offset=graphene.Int(),
-                                limit=graphene.Int())
+                                limit=graphene.Int(),
+                                commitHash=graphene.String(),
+                                distroHash=graphene.String(),
+                                extendedHash=graphene.String())
         civote = graphene.List(CIVote,
                                commitId=graphene.Int(),
                                ciName=graphene.String(),
@@ -139,6 +142,9 @@ if graphene:
             status = args.get("status", None)
             offset = args.get("offset", 0)
             limit = args.get("limit", pagination_limit)
+            commit_hash = args.get("commitHash", None)
+            distro_hash = args.get("distroHash", None)
+            extended_hash = args.get("extendedHash", None)
 
             # Make sure we do not exceed the pagination limit
             if limit > max_limit:
@@ -151,6 +157,13 @@ if graphene:
                 query = query.filter(CommitModel.component == component)
             if status:
                 query = query.filter(CommitModel.status == status)
+            if commit_hash:
+                query = query.filter(CommitModel.commit_hash == commit_hash)
+            if distro_hash:
+                query = query.filter(CommitModel.distro_hash == distro_hash)
+            if extended_hash:
+                query = query.filter(
+                    CommitModel.extended_hash.like(extended_hash))
 
             # Enforce pagination limit and offset
             query = query.order_by(desc(CommitModel.id)).limit(limit).\

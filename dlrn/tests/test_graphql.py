@@ -83,6 +83,76 @@ class TestCommitsQuery(DLRNAPIGraphQLTestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data['data']['commits']), 2)
 
+    def test_filtered_query_commitHash(self, db_mock):
+        query = """
+            query {
+                commits(commitHash: "1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edc")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['commits']), 1)
+
+    def test_filtered_query_distroHash(self, db_mock):
+        query = """
+            query {
+                commits(distroHash: "008678d7b0e20fbae185f2bb1bd0d9d167586211")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['commits']), 2)
+
+    def test_filtered_query_extendedHash_full(self, db_mock):
+        query = """
+            query {
+                commits(extendedHash: "1234567890_1234567890")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['commits']), 1)
+
+    def test_filtered_query_extendedHash_wildcard(self, db_mock):
+        query = """
+            query {
+                commits(extendedHash: "1234567890_%")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['commits']), 1)
+
+    def test_filtered_query_extendedHash_wildcard_noresult(self, db_mock):
+        query = """
+            query {
+                commits(extendedHash: "abcdef%")
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['commits']), 0)
+
     def test_filtered_query_component(self, db_mock):
         query = """
             query {
