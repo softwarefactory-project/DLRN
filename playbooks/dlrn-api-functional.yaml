@@ -136,7 +136,7 @@
       shell:
         cmd: |
           . ../.venv/bin/activate
-          dlrn --config-file projects.ini --package-name python-glanceclient --package-name python-cliff --use-public
+          dlrn --config-file projects.ini --package-name python-glanceclient --package-name python-requestsexceptions --use-public
         chdir: "{{ working_dir }}/DLRN"
 
     - name: Import a package

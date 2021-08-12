@@ -7,7 +7,6 @@ system_packages:
   - openssl-devel
   - policycoreutils
   - python-setuptools
-  - python-virtualenv
   - python2-devel
   - redhat-rpm-config
   - rpmdevtools
