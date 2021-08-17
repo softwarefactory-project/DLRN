@@ -71,6 +71,13 @@ class TestGetLastProcessedCommit(TestsWithData):
         commit = db.getLastProcessedCommit(self.session, 'python-newproject')
         self.assertEqual(commit, None)
 
+    def test_oldercommit_with_newer_id(self):
+        # The latest puppet-stdlib commit is older than the previous one,
+        # but has a newer id, so it has to be returned
+        commit = db.getLastProcessedCommit(self.session, 'puppet-stdlib')
+        self.assertEqual(commit.dt_commit, 1242426906)
+        self.assertEqual(commit.id, 7875)
+
 
 class TestGetLastBuiltCommit(TestsWithData):
     def test_noretry(self):
@@ -95,7 +102,7 @@ class TestGetCommits(TestsWithData):
     def test_defaults(self):
         commits = db.getCommits(self.session)
         self.assertEqual(commits.count(), 1)
-        self.assertEqual(commits.first().id, 7873)
+        self.assertEqual(commits.first().id, 7875)
 
     def test_no_results(self):
         commits = db.getCommits(self.session, project="dummy")

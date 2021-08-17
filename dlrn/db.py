@@ -230,7 +230,6 @@ def getLastProcessedCommit(
     commit = session.query(Commit).filter(Commit.project_name == project_name,
                                           Commit.type == type,
                                           Commit.status != not_status).\
-        order_by(desc(Commit.dt_commit)).\
         order_by(desc(Commit.id)).first()
     return commit
 
