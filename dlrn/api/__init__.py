@@ -23,6 +23,7 @@ except KeyError:
 
 from dlrn.api import dlrn_api  # noqa
 from dlrn.api import graphql # noqa
+from dlrn.api import prom_metrics # noqa
 from dlrn.config import setup_logging  # noqa
 
 

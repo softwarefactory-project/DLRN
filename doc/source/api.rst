@@ -292,6 +292,35 @@ failed               integer     Number of commits that failed to build in the p
 total                integer     Total number of commits processed in the period
 ===================  ==========  ==============================================================
 
+GET /metrics
+------------
+
+Retrieve statistics on the absolute number of builds for the builder, in Prometheus format.
+
+Normal response codes: 200
+
+Error response codes: 400
+
+No parameters.
+
+Response:
+
+In text/plain format:
+::
+
+    # HELP dlrn_builds_succeeded_total Total number of successful builds
+    # TYPE dlrn_builds_succeeded_total counter
+    dlrn_builds_succeeded_total{baseurl="http://trunk.rdoproject.org/centos8/"} 9296.0
+    # HELP dlrn_builds_failed_total Total number of failed builds
+    # TYPE dlrn_builds_failed_total counter
+    dlrn_builds_failed_total{baseurl="http://trunk.rdoproject.org/centos8/"} 244.0
+    # HELP dlrn_builds_retry_total Total number of builds in retry state
+    # TYPE dlrn_builds_retry_total counter
+    dlrn_builds_retry_total{baseurl="http://trunk.rdoproject.org/centos8/"} 119.0
+    # HELP dlrn_builds_total Total number of builds
+    # TYPE dlrn_builds_total counter
+    dlrn_builds_total{baseurl="http://trunk.rdoproject.org/centos8/"} 9659.0
+
 GET /api/graphql
 ----------------
 

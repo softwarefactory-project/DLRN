@@ -255,3 +255,23 @@
       fail:
         msg: Did not get 5 successfully built packages
       when: (build_metrics.stdout | from_json).succeeded != 5
+
+    - name: Get metrics from the Prometheus endpoint (CentOS 8)
+      uri:
+        url: http://localhost:5000/metrics
+        return_content: yes
+      register: response
+      failed_when: "'dlrn_builds_succeeded_total{baseurl=\"https://trunk.rdoproject.org/centos8-master/\"} 5.0' not in response.content"
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version | int == 8
+
+    - name: Get metrics from the Prometheus endpoint (CentOS 7)
+      uri:
+        url: http://localhost:5000/metrics
+        return_content: yes
+      register: response
+      failed_when: "'dlrn_builds_succeeded_total{baseurl=\"https://trunk.rdoproject.org/centos7-train/\"} 5.0' not in response.content"
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version | int == 7
