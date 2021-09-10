@@ -14,12 +14,10 @@
 import argparse
 import logging
 import os
+import requests
 import sys
 
-from contextlib import closing
 from six.moves import configparser
-from six.moves import urllib
-from six.moves.urllib.request import urlopen
 from tempfile import mkstemp
 
 from dlrn.config import ConfigOptions
@@ -49,12 +47,12 @@ def import_commit(repo_url, config_file, db_connection=None,
                                    dev_mode=False)
 
     remote_yaml = repo_url + '/' + 'commit.yaml'
-    with closing(urlopen(remote_yaml)) as r:
-        contents = map(lambda x: x.decode('utf8'), r.readlines())
-
+    contents = requests.get(remote_yaml, timeout=10)
+    # If we have an error code, this will raise an exception
+    contents.raise_for_status()
     osfd, tmpfilename = mkstemp()
     with os.fdopen(osfd, 'w') as fp:
-        fp.writelines(contents)
+        fp.write(contents.text)
 
     commits = loadYAML_list(tmpfilename)
     os.remove(tmpfilename)
@@ -96,25 +94,27 @@ def import_commit(repo_url, config_file, db_connection=None,
         for logfile in ['build.log', 'installed', 'mock.log', 'root.log',
                         'rpmbuild.log', 'state.log']:
             logfile_url = repo_url + '/' + logfile
+            contents = None
             try:
-                with closing(urlopen(logfile_url)) as r:
-                    contents = map(lambda x: x.decode('utf8'), r.readlines())
-                with open(os.path.join(yumrepodir, logfile), "w") as fp:
-                    fp.writelines(contents)
-            except urllib.error.HTTPError:
+                contents = requests.get(logfile_url, timeout=10)
+            except requests.exceptions.RequestException:
                 # Ignore errors, if the remote build failed there may be
                 # some missing files
                 pass
+            if contents and contents.status_code == 200:
+                with open(os.path.join(yumrepodir, logfile), "w") as fp:
+                    fp.writelines(contents.text)
 
         if commit.artifacts:
             for rpm in commit.artifacts.split(","):
                 rpm_url = repo_url + '/' + rpm.split('/')[-1]
                 try:
-                    with closing(urlopen(rpm_url)) as r:
-                        contents = r.read()
+                    r = requests.get(rpm_url, timeout=45)
+                    # Raise an exception in case of a failure
+                    r.raise_for_status()
                     with open(os.path.join(datadir, rpm), "wb") as fp:
-                        fp.write(contents)
-                except urllib.error.HTTPError:
+                        fp.write(r.content)
+                except requests.exceptions.RequestException:
                     if rpm != 'None':
                         logger.warning("Failed to download rpm file %s"
                                        % rpm_url)

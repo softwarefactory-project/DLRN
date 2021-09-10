@@ -25,7 +25,6 @@ from dlrn.tests import base
 from dlrn import utils
 from flask import json
 from six.moves import configparser
-from six.moves.urllib.request import urlopen
 
 
 def mocked_session(url):
@@ -35,12 +34,13 @@ def mocked_session(url):
     return session
 
 
-def mocked_urlopen(url):
-    if url.startswith('http://example.com'):
-        fp = open('./dlrn/tests/samples/commits_remote.yaml', 'rb')
-        return fp
-    else:
-        return urlopen(url)
+def mocked_get(url, timeout=None):
+    mock_resp = mock.Mock()
+    with open('./dlrn/tests/samples/commits_remote.yaml', 'rb') as fp:
+        mock_resp.status_code = 200
+        mock_resp.content = fp.read()
+        mock_resp.text = mock_resp.content.decode('utf-8')
+    return mock_resp
 
 
 def mock_opt(config_file):
@@ -779,8 +779,8 @@ class TestRemoteImport(DLRNAPITestCase):
     @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver.getpackages')
     @mock.patch.object(sh.Command, '__call__', autospec=True)
     @mock.patch('dlrn.remote.post_build')
-    @mock.patch('dlrn.remote.urlopen', side_effect=mocked_urlopen)
-    def test_post_remote_import_success(self, url_mock, build_mock, sh_mock,
+    @mock.patch('dlrn.remote.requests.get', side_effect=mocked_get)
+    def test_post_remote_import_success(self, get_mock, build_mock, sh_mock,
                                         db2_mock, db_mock, gp_mock, sl_mock,
                                         rn_mock):
 

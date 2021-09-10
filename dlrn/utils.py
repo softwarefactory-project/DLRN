@@ -14,6 +14,7 @@ import hashlib
 import logging
 import os
 import re
+import requests
 import sh
 import sys
 import yaml
@@ -437,6 +438,31 @@ def find_in_artifacts(artifacts, word):
     for artifact in artifacts.split(','):
         if re.findall(word, artifact):
             return artifact
+
+
+def fetch_remote_file(url):
+    '''Fetch a remote file and return a list of lines.
+
+    Extended to support file:/// URL encoding without the need to add
+    an extra dependency, like requests-file.
+    '''
+    result = []
+
+    if url.startswith('file://'):
+        with open(url.replace('file://', ''), 'r') as fp:
+            result.extend(fp.readlines())
+    else:
+        try:
+            r = requests.get(url, timeout=10)
+            # Raise an exception in case of a failure
+            r.raise_for_status()
+            for line in r.iter_lines():
+                result.extend([line.decode('utf-8') + '\n'])
+        except requests.exceptions.RequestException as e:
+            logger.warning('Failed to fetch remote file: %s' % e)
+            raise
+
+    return result
 
 
 if __name__ == '__main__':

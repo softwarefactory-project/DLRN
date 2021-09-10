@@ -19,9 +19,9 @@ import sh
 import shutil
 
 from datetime import datetime
-from six.moves.urllib.request import urlopen
 
 from dlrn.config import getConfigOptions
+from dlrn.utils import fetch_remote_file
 from dlrn.utils import import_object
 from time import time
 
@@ -201,21 +201,16 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     contents = contents[:-1]
 
     try:
-        r = urlopen(deps_url)
-        delorean_deps = True
+        contents.extend(fetch_remote_file(deps_url))
+        contents.extend(["\n\"\"\""])
+        with open(newcfg, "w") as fp:
+            fp.writelines(contents)
     except Exception:
         logger.warning(
             "Could not open %s. If some dependent repositories must be "
             "included in the mock configuration, then check the baseurl "
             " and deps_url values in projects.ini, and make sure the file "
             "can be accesed." % deps_url)
-        delorean_deps = False
-
-    if delorean_deps:
-        contents.extend(map(lambda x: x.decode('utf8'), r.readlines()))
-        contents = contents + ["\n\"\"\""]
-        with open(newcfg, "w") as fp:
-            fp.writelines(contents)
 
     if dev_mode or use_public:
         with open(newcfg, "r") as fp:
@@ -224,18 +219,16 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
         # delete the last line which must be """
         contents = contents[:-1]
         try:
-            r = urlopen(baseurl + "/current/delorean.repo")
+            contents.extend(
+                fetch_remote_file(baseurl + "/current/delorean.repo"))
+            contents.extend(["\n\"\"\""])
+            with open(newcfg, "w") as fp:
+                fp.writelines(contents)
         except Exception as e:
             logger.error("Could not open %s/current/delorean.repo. Check the "
                          "baseurl value in projects.ini, and make sure the "
                          "file can be downloaded." % baseurl)
             raise e
-
-        contents.extend(map(lambda x: x.decode('utf8'), r.readlines()))
-        contents.extend(["\n\"\"\""])
-
-        with open(newcfg, "w") as fp:
-            fp.writelines(contents)
 
     # don't change dlrn.cfg if the content hasn't changed to prevent
     # mock from rebuilding its cache.

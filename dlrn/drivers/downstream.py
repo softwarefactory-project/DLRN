@@ -16,6 +16,7 @@ from dlrn.drivers.pkginfo import PkgInfoDriver
 from dlrn.repositories import getdistrobranch
 from dlrn.repositories import getsourcebranch
 from dlrn.repositories import refreshrepo
+from dlrn.utils import fetch_remote_file
 from dlrn.utils import run_external_preprocess
 
 import csv
@@ -25,10 +26,8 @@ import re
 import sh
 import shutil
 
-from contextlib import closing
 from distroinfo import info
 from distroinfo import query
-from six.moves.urllib.request import urlopen
 
 
 logger = logging.getLogger("dlrn-downstream-driver")
@@ -139,8 +138,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
 
         # return versions.csv as a dict with package name as a key
         vers = {}
-        with closing(urlopen(versions_url)) as r:
-            content = [x.decode('utf-8') for x in r.readlines()]
+        content = fetch_remote_file(versions_url)
         # first line is headers
         for row in csv.reader(content[1:]):
             vers[row[0]] = row[1:]
@@ -153,8 +151,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
         versions_url = self.config_options.versions_url
         commit_url = re.sub('/versions.csv$', '/commit.yaml', versions_url)
         try:
-            with closing(urlopen(commit_url)) as r:
-                content = [x.decode('utf-8') for x in r.readlines()]
+            content = fetch_remote_file(commit_url)
             return content
         except Exception:
             # We do not want to fail on this

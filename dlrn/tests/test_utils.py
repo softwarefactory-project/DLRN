@@ -11,11 +11,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from mock import call
-from mock import MagicMock
 
 import hashlib
 import os
+import requests_mock
 import shutil
 import tempfile
 
@@ -23,6 +22,8 @@ from dlrn import db
 from dlrn.tests import base
 from dlrn.tests.test_db import TestsWithData
 from dlrn import utils
+from mock import call
+from mock import MagicMock
 
 
 class Testdumpshas2file(TestsWithData):
@@ -124,3 +125,28 @@ class TestAggregateRepo(base.TestCase):
         with open(expected_file, 'r') as fp:
             contents = fp.read()
         assert contents == 'TESTING ONE TWO THREE\n'
+
+
+class TestFetchRemoteFile(base.TestCase):
+    def setUp(self):
+        super(base.TestCase, self).setUp()
+        self.file_fd, self.filepath = tempfile.mkstemp()
+        with open(self.filepath, 'w') as fp:
+            fp.write("Test line 1\n")
+            fp.write("Test line 2\n")
+
+    def tearDown(self):
+        super(base.TestCase, self).tearDown()
+        os.close(self.file_fd)
+
+    def test_fetch_file(self):
+        expected_results = ["Test line 1\n", "Test line 2\n"]
+        results = utils.fetch_remote_file('file://' + self.filepath)
+        assert results == expected_results
+
+    @requests_mock.Mocker()
+    def test_fetch_url(self, url):
+        expected_results = ["Line1\n", "Line2\n"]
+        url.get('http://example.com', text='Line1\nLine2\n')
+        results = utils.fetch_remote_file('http://example.com')
+        assert results == expected_results

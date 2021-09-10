@@ -14,7 +14,6 @@
 
 import mock
 import sh
-from six.moves.urllib.request import urlopen
 import sys
 import tempfile
 
@@ -32,12 +31,13 @@ def mocked_session(url):
     return session
 
 
-def mocked_urlopen(url):
-    if url.startswith('http://example.com'):
-        fp = open('./dlrn/tests/samples/commits_remote.yaml', 'rb')
-        return fp
-    else:
-        return urlopen(url)
+def mocked_get(url, timeout=None):
+    mock_resp = mock.Mock()
+    with open('./dlrn/tests/samples/commits_remote.yaml', 'rb') as fp:
+        mock_resp.status_code = 200
+        mock_resp.content = fp.read()
+        mock_resp.text = mock_resp.content.decode('utf-8')
+    return mock_resp
 
 
 @mock.patch('os.rename')
@@ -46,9 +46,9 @@ def mocked_urlopen(url):
 @mock.patch.object(sh.Command, '__call__', autospec=True)
 @mock.patch('dlrn.remote.post_build')
 @mock.patch('dlrn.remote.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.remote.urlopen', side_effect=mocked_urlopen)
+@mock.patch('dlrn.remote.requests.get', side_effect=mocked_get)
 class TestRemote(base.TestCase):
-    def test_remote(self, url_mock, db_mock, build_mock, sh_mock, gp_mock,
+    def test_remote(self, req_mock, db_mock, build_mock, sh_mock, gp_mock,
                     sl_mock, rn_mock):
         testargs = ["dlrn-remote", "--config-file", "projects.ini",
                     "--repo-url", "http://example.com/1/"]

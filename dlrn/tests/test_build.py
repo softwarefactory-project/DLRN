@@ -91,9 +91,9 @@ class TestBuild(base.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.config.datadir,
                                                     "dlrn-1.cfg")))
 
-    @mock.patch('dlrn.build.urlopen')
+    @mock.patch('dlrn.build.fetch_remote_file')
     @mock.patch('os.listdir', side_effect=mocked_listdir)
-    def test_build_rpm_wrapper_custom_deps_url(self, ld_mock, url_mock,
+    def test_build_rpm_wrapper_custom_deps_url(self, ld_mock, get_mock,
                                                sh_mock, env_mock, rc_mock):
         self.configfile.set('DEFAULT', 'build_driver',
                             'dlrn.drivers.mockdriver.MockBuildDriver')
@@ -105,9 +105,9 @@ class TestBuild(base.TestCase):
         build_rpm_wrapper(commit, False, False, False, None, True)
         expected = [mock.call('file://%s/custom-deps.repo' %
                               self.configfile.get('DEFAULT', 'datadir'))]
-        self.assertEqual(expected, url_mock.call_args_list)
+        self.assertEqual(expected, get_mock.call_args_list)
 
-    @mock.patch('dlrn.build.urlopen')
+    @mock.patch('dlrn.build.fetch_remote_file')
     @mock.patch('os.listdir', side_effect=mocked_listdir)
     def test_build_rpm_wrapper_default_deps_url(self, ld_mock, url_mock,
                                                 sh_mock, env_mock, rc_mock):

@@ -23,6 +23,7 @@
 import logging
 import os
 import re
+import requests
 import sh
 
 from dlrn.db import Commit
@@ -33,8 +34,6 @@ from dlrn.utils import run_external_preprocess
 from pymod2pkg import module2package
 from pymod2pkg import module2upstream
 from rdopkg.utils import specfile
-from six.moves import urllib
-from six.moves.urllib.request import urlopen
 
 logger = logging.getLogger("dlrn-gitrepo-driver")
 
@@ -49,10 +48,12 @@ base_urls = ['https://opendev.org/openstack',
 def check_url(url):
     logger.info("Checking url %s" % url)
     try:
-        urlopen(url)
+        r = requests.get(url, timeout=10)
+        # If we have an error code, this will raise an exception
+        r.raise_for_status()
         # URL found
         return True
-    except (urllib.error.HTTPError, urllib.error.URLError):
+    except requests.exceptions.RequestException:
         # Trouble finding URL
         return False
 

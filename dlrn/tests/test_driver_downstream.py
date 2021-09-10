@@ -24,8 +24,9 @@ from six.moves import configparser
 
 
 def _mocked_versions(*args, **kwargs):
-    fn = './dlrn/tests/samples/versions.csv'
-    return open(fn, 'rb')
+    with open('./dlrn/tests/samples/versions.csv', 'r') as fp:
+        output = fp.readlines()
+    return output
 
 
 def _mocked_refreshrepo(*args, **kwargs):
@@ -49,7 +50,8 @@ def _mocked_get_environ(param, default=None):
         return '0'
 
 
-@mock.patch('dlrn.drivers.downstream.urlopen', side_effect=_mocked_versions)
+@mock.patch('dlrn.drivers.downstream.fetch_remote_file',
+            side_effect=_mocked_versions)
 class TestDriverDownstream(base.TestCase):
     def setUp(self):
         super(TestDriverDownstream, self).setUp()
