@@ -397,12 +397,11 @@ class TestGetinfo(base.TestCase):
             ]
         }
 
-        with mock.patch.object(shell, 'pkginfo', driver, create=True):
-            project_toprocess, _, skipped = shell.getinfo(package)
-            # There is no commit in the database, so only 1 commit will be
-            # returned
-            self.assertEqual(len(project_toprocess), 1)
-            self.assertEqual(skipped, False)
+        project_toprocess, _, skipped = shell.getinfo(package, pkginfo=driver)
+        # There is no commit in the database, so only 1 commit will be
+        # returned
+        self.assertEqual(len(project_toprocess), 1)
+        self.assertEqual(skipped, False)
 
     @mock.patch('dlrn.drivers.rdoinfo.refreshrepo',
                 side_effect=Exception('Failed to clone git repository'))
@@ -426,10 +425,9 @@ class TestGetinfo(base.TestCase):
             ]
         }
 
-        with mock.patch.object(shell, 'pkginfo', driver, create=True):
-            project_toprocess, _, skipped = shell.getinfo(package)
-            self.assertEqual(len(project_toprocess), 0)
-            self.assertEqual(skipped, True)
+        project_toprocess, _, skipped = shell.getinfo(package, pkginfo=driver)
+        self.assertEqual(len(project_toprocess), 0)
+        self.assertEqual(skipped, True)
 
 
 class TestAddCommits(base.TestCase):

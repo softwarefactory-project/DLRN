@@ -172,6 +172,7 @@ class GitRepoDriver(PkgInfoDriver):
         local = kwargs.get('local')
         dev_mode = kwargs.get('dev_mode')
         datadir = self.config_options.datadir
+        source = self.config_options.source
 
         for url in base_urls:
             if check_url("%s/%s" % (url, module2upstream(package['name']))):
@@ -186,7 +187,8 @@ class GitRepoDriver(PkgInfoDriver):
         repo = package['upstream']
 
         distro_dir = self.distgit_dir(package['name'])
-        source_branch = getsourcebranch(package)
+        source_branch = getsourcebranch(package,
+                                        default_branch=source)
 
         if dev_mode is True:
             distro_hash = "dev"

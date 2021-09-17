@@ -15,8 +15,8 @@
 # build_package(). This method will perform the actual package build using
 #                  the driver-specific approach.
 
+from dlrn.config import setup_logging
 from dlrn.drivers.buildrpm import BuildRPMDriver
-import dlrn.shell
 
 import io
 import logging
@@ -53,14 +53,16 @@ class KojiBuildDriver(BuildRPMDriver):
 
     def __init__(self, *args, **kwargs):
         super(KojiBuildDriver, self).__init__(*args, **kwargs)
+        self.verbose_build = False
         self.exe_name = self.config_options.koji_exe
         # Check for empty additional_koji_tags value
         if self.config_options.koji_add_tags == ['']:
             self.config_options.koji_add_tags = []
+        setup_logging()
 
     # We are using this method to "tee" koji output to a log file and stdout
     def _process_koji_output(self, line):
-        if dlrn.shell.verbose_build:
+        if self.verbose_build:
             logger.info(line[:-1])
         self.koji_fp.write(line)
 
@@ -259,6 +261,7 @@ class KojiBuildDriver(BuildRPMDriver):
         output_dir = kwargs.get('output_directory')
         package_name = kwargs.get('package_name')
         commit = kwargs.get('commit')
+        self.verbose_build = kwargs.get('verbose')
         scratch = self.config_options.koji_scratch_build
         build_exception = None
 

@@ -35,6 +35,10 @@ def _default_templatedir():
         os.path.dirname(os.path.abspath(__file__)), "templates")
 
 
+# NOTE(jpena): the verbose_build option is not exposed in projects.ini
+#              because we want to control that option in the command-line,
+#              but it is a good idea to have it here so it always gets
+#              initialized.
 DLRN_CORE_CONFIG = {
     'DEFAULT': {
         'tags': {},
@@ -68,6 +72,7 @@ DLRN_CORE_CONFIG = {
         'keep_changelog': {'type': 'boolean', 'default': False},
         'allow_force_rechecks': {'type': 'boolean', 'default': False},
         'use_components': {'type': 'boolean', 'default': False},
+        'verbose_build': {'type': 'boolean', 'default': False},
         'deps_url': {'default': ''},
     }
 }

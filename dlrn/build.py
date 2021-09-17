@@ -10,7 +10,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import dlrn.shell
 import filecmp
 import logging
 import multiprocessing
@@ -20,12 +19,13 @@ import shutil
 
 from datetime import datetime
 
-from dlrn.config import getConfigOptions
+from dlrn.config import setup_logging
 from dlrn.utils import fetch_remote_file
 from dlrn.utils import import_object
 from time import time
 
 logger = logging.getLogger("dlrn-build")
+setup_logging()
 
 
 def _get_yumrepodir(commit):
@@ -34,13 +34,11 @@ def _get_yumrepodir(commit):
 
 def build_worker(packages, commit, run_cmd=False, build_env=None,
                  dev_mode=False, use_public=False, order=False,
-                 sequential=False):
-    config_options = getConfigOptions()
-
+                 sequential=False, config_options=None, pkginfo=None):
     if run_cmd:
         try:
             run(run_cmd, commit, build_env, dev_mode, use_public, order,
-                do_build=False)
+                do_build=False, config_options=config_options)
             return [commit, '', '', None]
         except Exception as e:
             return [commit, '', '', e]
@@ -56,7 +54,8 @@ def build_worker(packages, commit, run_cmd=False, build_env=None,
     notes = ""
     try:
         built_rpms, notes = build(packages, commit, build_env, dev_mode,
-                                  use_public, order, sequential)
+                                  use_public, order, sequential,
+                                  config_options, pkginfo)
         return [commit, built_rpms, notes, None]
     except Exception as e:
         return [commit, '', '', e]
@@ -70,27 +69,26 @@ def get_version_from(packages, project_name):
 
 
 def build(packages, commit, env_vars, dev_mode, use_public,
-          bootstrap, sequential):
+          bootstrap, sequential, config_options, pkginfo):
     if commit.type == "rpm":
         return build_rpm(
             packages, commit, env_vars, dev_mode, use_public,
-            bootstrap, sequential)
+            bootstrap, sequential, config_options, pkginfo)
     elif commit.type == "container":
         return build_container(
             packages, commit, env_vars, dev_mode, use_public,
-            bootstrap, sequential)
+            bootstrap, sequential, config_options, pkginfo)
     else:
         raise Exception("Unknown type %s" % commit.type)
 
 
 def build_container(packages, commit, env_vars, dev_mode, use_public,
-                    bootstrap, sequential):
+                    bootstrap, sequential, config_options, pkginfo):
     raise NotImplementedError()
 
 
 def build_rpm(packages, commit, env_vars, dev_mode, use_public,
-              bootstrap, sequential):
-    config_options = getConfigOptions()
+              bootstrap, sequential, config_options, pkginfo):
     # Set the build timestamp to now
     commit.dt_build = int(time())
 
@@ -101,7 +99,7 @@ def build_rpm(packages, commit, env_vars, dev_mode, use_public,
 
     try:
         build_rpm_wrapper(commit, dev_mode, use_public, bootstrap,
-                          env_vars, sequential,
+                          env_vars, sequential, config_options, pkginfo,
                           version_from=version_from)
     except Exception as e:
         logger.error('Build failed. See logs at: %s/%s/' % (datadir,
@@ -136,8 +134,7 @@ def build_rpm(packages, commit, env_vars, dev_mode, use_public,
 
 
 def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
-                      sequential, version_from=None):
-    config_options = getConfigOptions()
+                      sequential, config_options, pkginfo, version_from=None):
     # Get the worker id
     if sequential is True:
         worker_id = 1
@@ -269,8 +266,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     else:
         additional_mock_options = None
 
-    dlrn.shell.pkginfo.preprocess(package_name=commit.project_name,
-                                  commit_hash=commit.commit_hash)
+    pkginfo.preprocess(package_name=commit.project_name,
+                       commit_hash=commit.commit_hash)
 
     if (config_options.pkginfo_driver ==
             'dlrn.drivers.gitrepo.GitRepoDriver' and
@@ -294,7 +291,8 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     os.environ['DLRN_SOURCE_COMMIT'] = commit.commit_hash
 
     run(os.path.join(scriptsdir, "build_srpm.sh"), commit, env_vars,
-        dev_mode, use_public, bootstrap, version_from=version_from)
+        dev_mode, use_public, bootstrap, version_from=version_from,
+        config_options=config_options)
 
     # SRPM is built, now build the RPM using the driver
     datadir = os.path.realpath(config_options.datadir)
@@ -304,17 +302,16 @@ def build_rpm_wrapper(commit, dev_mode, use_public, bootstrap, env_vars,
     # If we are using the downstream driver, write the reference commit
     if (config_options.pkginfo_driver ==
             'dlrn.drivers.downstream.DownstreamInfoDriver'):
-        dlrn.shell.pkginfo._write_reference_commit(yumrepodir_abs)
-
+        pkginfo._write_reference_commit(yumrepodir_abs)
     buildrpm.build_package(output_directory=yumrepodir_abs,
                            additional_mock_opts=additional_mock_options,
                            package_name=commit.project_name,
-                           commit=commit)
+                           commit=commit,
+                           verbose=config_options.verbose_build)
 
 
 def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
-        do_build=True, version_from=None):
-    config_options = getConfigOptions()
+        do_build=True, version_from=None, config_options=None):
     datadir = os.path.realpath(config_options.datadir)
     yumrepodir = _get_yumrepodir(commit)
     yumrepodir_abs = os.path.join(datadir, yumrepodir)
@@ -346,7 +343,8 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         logger.info('Running %s' % ' '.join(run_cmd))
 
     try:
-        sh.env(run_cmd, _err=process_mock_output, _out=process_mock_output)
+        process_output = mk_process_mock_output(config_options.verbose_build)
+        sh.env(run_cmd, _err=process_output, _out=process_output)
     except Exception as e:
         # This *could* have changed during the build, see kojidriver.py
         datadir = os.path.realpath(config_options.datadir)
@@ -356,6 +354,8 @@ def run(program, commit, env_vars, dev_mode, use_public, bootstrap,
         raise e
 
 
-def process_mock_output(line):
-    if dlrn.shell.verbose_build:
-        logger.info(line[:-1])
+def mk_process_mock_output(verbose):
+    def process_mock_output(line):
+        if verbose:
+            logger.info(line[:-1])
+    return process_mock_output

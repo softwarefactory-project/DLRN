@@ -127,8 +127,8 @@ class RdoInfoDriver(PkgInfoDriver):
 
         distro_dir = self._distgit_clone_dir(package['name'])
         distro_dir_full = self.distgit_dir(package['name'])
-        distro_branch = getdistrobranch(package)
-        source_branch = getsourcebranch(package)
+        distro_branch = getdistrobranch(package, default_branch=self.config_options.distro)
+        source_branch = getsourcebranch(package, default_branch=self.config_options.source)
 
         if dev_mode is False:
             try:

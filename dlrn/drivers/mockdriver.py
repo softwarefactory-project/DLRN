@@ -15,8 +15,8 @@
 # build_package(). This method will perform the actual package build using
 #                  the driver-specific approach.
 
+from dlrn.config import setup_logging
 from dlrn.drivers.buildrpm import BuildRPMDriver
-import dlrn.shell
 
 import io
 import logging
@@ -36,12 +36,14 @@ class MockBuildDriver(BuildRPMDriver):
 
     # We are using this method to "tee" mock output to mock.log and stdout
     def _process_mock_output(self, line):
-        if dlrn.shell.verbose_build:
+        if self.verbose_build:
             logger.info(line[:-1])
         self.mock_fp.write(line)
 
     def __init__(self, *args, **kwargs):
         super(MockBuildDriver, self).__init__(*args, **kwargs)
+        self.verbose_build = False
+        setup_logging()
 
     def build_package(self, **kwargs):
         """Valid parameters:
@@ -56,6 +58,7 @@ class MockBuildDriver(BuildRPMDriver):
         datadir = os.path.realpath(self.config_options.datadir)
         mock_config = os.environ.get('MOCK_CONFIG')
         install_after_build = self.config_options.install_after_build
+        self.verbose_build = kwargs.get('verbose')
 
         # Find src.rpm
         for rpm in os.listdir(output_dir):
