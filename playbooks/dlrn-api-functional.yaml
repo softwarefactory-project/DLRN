@@ -110,6 +110,7 @@
       shell:
         cmd: |
           . ../.venv/bin/activate
+          export REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
           nohup scripts/api.py &
         chdir: "{{ working_dir }}/DLRN"
 
@@ -129,6 +130,7 @@
       shell:
         cmd: |
           . ../.venv/bin/activate
+          export REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
           dlrn --config-file projects.ini --package-name openstack-packstack --package-name openstack-macros --use-public --order
         chdir: "{{ working_dir }}/DLRN"
 
@@ -136,6 +138,7 @@
       shell:
         cmd: |
           . ../.venv/bin/activate
+          export REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
           dlrn --config-file projects.ini --package-name python-glanceclient --package-name python-requestsexceptions --use-public
         chdir: "{{ working_dir }}/DLRN"
 

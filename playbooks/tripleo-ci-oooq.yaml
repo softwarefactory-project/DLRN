@@ -52,12 +52,14 @@
     - name: Install tripleo-quickstart in venv
       shell:
         cmd: |
+          export REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
           {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin/pip install . -c {{ constraints_file }}
         chdir: '{{ ansible_user_dir }}/tripleo-quickstart'
 
     - name: Install tripleo-quickstart-extras in venv
       shell:
         cmd: |
+          export REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
           {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin/pip install . -c {{ constraints_file }}
         chdir: '{{ ansible_user_dir }}/tripleo-quickstart-extras'
 
