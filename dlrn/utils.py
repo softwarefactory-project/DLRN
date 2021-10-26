@@ -19,8 +19,6 @@ import sh
 import sys
 import yaml
 
-import sqlalchemy
-
 from contextlib import contextmanager
 from dlrn.db import CIVote
 from dlrn.db import CIVote_Aggregate
@@ -146,10 +144,8 @@ def saveYAML(session, yamlfile):
     data = {}
 
     attrs = []
-    for a in dir(Commit):
-        if type(getattr(Commit, a)) == \
-                sqlalchemy.orm.attributes.InstrumentedAttribute:
-            attrs.append(a)
+    for a in Commit.__table__.columns.keys():
+        attrs.append(a)
     data['commits'] = []
     for commit in session.query(Commit).all():
         d = {}
@@ -158,10 +154,8 @@ def saveYAML(session, yamlfile):
         data['commits'].append(d)
 
     attrs = []
-    for a in dir(Project):
-        if type(getattr(Project, a)) == \
-                sqlalchemy.orm.attributes.InstrumentedAttribute:
-            attrs.append(a)
+    for a in Project.__table__.columns.keys():
+        attrs.append(a)
     data['projects'] = []
     for project in session.query(Project).all():
         d = {}
@@ -170,10 +164,8 @@ def saveYAML(session, yamlfile):
         data['projects'].append(d)
 
     attrs = []
-    for a in dir(CIVote):
-        if type(getattr(CIVote, a)) == \
-                sqlalchemy.orm.attributes.InstrumentedAttribute:
-            attrs.append(a)
+    for a in CIVote.__table__.columns.keys():
+        attrs.append(a)
     data['civotes'] = []
     for vote in session.query(CIVote).all():
         d = {}
@@ -182,10 +174,8 @@ def saveYAML(session, yamlfile):
         data['civotes'].append(d)
 
     attrs = []
-    for a in dir(CIVote_Aggregate):
-        if type(getattr(CIVote_Aggregate, a)) == \
-                sqlalchemy.orm.attributes.InstrumentedAttribute:
-            attrs.append(a)
+    for a in CIVote_Aggregate.__table__.columns.keys():
+        attrs.append(a)
     data['civotes_agg'] = []
     for vote in session.query(CIVote_Aggregate).all():
         d = {}
@@ -194,10 +184,8 @@ def saveYAML(session, yamlfile):
         data['civotes_agg'].append(d)
 
     attrs = []
-    for a in dir(User):
-        if type(getattr(User, a)) == \
-                sqlalchemy.orm.attributes.InstrumentedAttribute:
-            attrs.append(a)
+    for a in User.__table__.columns.keys():
+        attrs.append(a)
     data['users'] = []
     for user in session.query(User).all():
         d = {}
@@ -206,10 +194,8 @@ def saveYAML(session, yamlfile):
         data['users'].append(d)
 
     attrs = []
-    for a in dir(Promotion):
-        if type(getattr(Promotion, a)) == \
-                sqlalchemy.orm.attributes.InstrumentedAttribute:
-            attrs.append(a)
+    for a in Promotion.__table__.columns.keys():
+        attrs.append(a)
     data['promotions'] = []
     for promotion in session.query(Promotion).all():
         d = {}
@@ -225,10 +211,8 @@ def saveYAML(session, yamlfile):
 def saveYAML_commit(commit, yamlfile):
     data = {}
     attrs = []
-    for a in dir(Commit):
-        if type(getattr(Commit, a)) == \
-                sqlalchemy.orm.attributes.InstrumentedAttribute:
-            attrs.append(a)
+    for a in Commit.__table__.columns.keys():
+        attrs.append(a)
     data['commits'] = []
     # Add commit
     d = {}
