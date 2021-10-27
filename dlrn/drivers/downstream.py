@@ -210,13 +210,15 @@ class DownstreamInfoDriver(PkgInfoDriver):
         distro_branch = self.config_options.downstream_distro_branch
         if not distro_branch:
             fail_req_config_missing('downstream_distro_branch')
-        source_branch = getsourcebranch(package)
+        source_branch = getsourcebranch(
+            package, default_branch=self.config_options.source)
         versions = self._getversions()
 
         ups_distro = package['master-distgit']
         ups_distro_dir = self._upstream_distgit_clone_dir(package['name'])
         ups_distro_dir_full = self.upstream_distgit_dir(package['name'])
-        ups_distro_branch = getdistrobranch(package)
+        ups_distro_branch = getdistrobranch(
+            package, default_branch=self.config_options.distro)
 
         # Downstream source git
         dsgit_attr = self.config_options.downstream_source_git_key

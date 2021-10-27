@@ -15,8 +15,8 @@
 # build_package(). This method will perform the actual package build using
 #                  the driver-specific approach.
 
+from dlrn.config import setup_logging
 from dlrn.drivers.buildrpm import BuildRPMDriver
-import dlrn.shell
 
 import io
 import logging
@@ -37,11 +37,13 @@ class CoprBuildDriver(BuildRPMDriver):
 
     def __init__(self, *args, **kwargs):
         super(CoprBuildDriver, self).__init__(*args, **kwargs)
+        self.verbose_build = False
         self.exe_name = 'copr'
+        setup_logging()
 
     # We are using this method to "tee" copr output to a log file and stdout
     def _process_copr_output(self, line):
-        if dlrn.shell.verbose_build:
+        if self.verbose_build:
             logger.info(line[:-1])
         self.copr_fp.write(line)
 
@@ -52,6 +54,7 @@ class CoprBuildDriver(BuildRPMDriver):
                                  and the built packages will be.
         """
         output_dir = kwargs.get('output_directory')
+        self.verbose_build = kwargs.get('verbose')
         coprid = self.config_options.coprid
 
         # Find src.rpm

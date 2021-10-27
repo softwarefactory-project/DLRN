@@ -115,17 +115,15 @@ def refreshrepo(url, path, branch="master", local=False, full_path=None):
     return repoinfo
 
 
-def getdistrobranch(package):
+def getdistrobranch(package, default_branch=None):
     if 'distro-branch' in package:
         return package['distro-branch']
     else:
-        config_options = getConfigOptions()
-        return config_options.distro
+        return default_branch
 
 
-def getsourcebranch(package):
+def getsourcebranch(package, default_branch=None):
     if 'source-branch' in package:
         return package['source-branch']
     else:
-        config_options = getConfigOptions()
-        return config_options.source
+        return default_branch

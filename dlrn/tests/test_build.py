@@ -20,8 +20,6 @@ import tempfile
 
 from six.moves import configparser
 
-import dlrn.shell
-
 from dlrn.build import build
 from dlrn.build import build_rpm_wrapper
 from dlrn.config import ConfigOptions
@@ -33,9 +31,6 @@ from dlrn import utils
 class FakePkgInfo(object):
     def preprocess(self, **argv):
         return
-
-
-dlrn.shell.pkginfo = FakePkgInfo()
 
 
 def mocked_listdir(directory):
@@ -81,7 +76,8 @@ class TestBuild(base.TestCase):
                             'dlrn.drivers.mockdriver.MockBuildDriver')
         self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
-        build_rpm_wrapper(commit, False, False, False, None, True)
+        build_rpm_wrapper(commit, False, False, False, None, True,
+                          self.config, FakePkgInfo())
         # 3 sh calls:
         # 1- build_srpm.sh
         # 2- mock (handled by env_mock)
@@ -102,7 +98,8 @@ class TestBuild(base.TestCase):
                             self.configfile.get('DEFAULT', 'datadir'))
         self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
-        build_rpm_wrapper(commit, False, False, False, None, True)
+        build_rpm_wrapper(commit, False, False, False, None, True,
+                          self.config, FakePkgInfo())
         expected = [mock.call('file://%s/custom-deps.repo' %
                               self.configfile.get('DEFAULT', 'datadir'))]
         self.assertEqual(expected, get_mock.call_args_list)
@@ -115,7 +112,8 @@ class TestBuild(base.TestCase):
                             'dlrn.drivers.mockdriver.MockBuildDriver')
         self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
-        build_rpm_wrapper(commit, False, False, False, None, True)
+        build_rpm_wrapper(commit, False, False, False, None, True,
+                          self.config, FakePkgInfo())
         expected = [mock.call('file://%s/delorean-deps.repo' %
                               self.configfile.get('DEFAULT', 'datadir'))]
         self.assertEqual(expected, url_mock.call_args_list)
@@ -131,7 +129,8 @@ class TestBuild(base.TestCase):
                             '2')
         self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
-        build_rpm_wrapper(commit, False, False, False, None, True)
+        build_rpm_wrapper(commit, False, False, False, None, True,
+                          self.config, FakePkgInfo())
         self.assertEqual(os.environ['RELEASE_NUMBERING'], 'minor.date.hash')
         self.assertEqual(os.environ['RELEASE_MINOR'], '2')
 
@@ -142,7 +141,8 @@ class TestBuild(base.TestCase):
         self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
         try:
-            build([], commit, None, False, False, False, True)
+            build([], commit, None, False, False, False, True,
+                  self.config, FakePkgInfo())
         except Exception as e:
             self.assertIn("No rpms built for", str(e))
 
@@ -164,7 +164,8 @@ class TestBuild(base.TestCase):
 
         with mock.patch('shutil.copyfile',
                         side_effect=shutil.copyfile) as cp_mock:
-            build_rpm_wrapper(commit, False, False, False, None, True)
+            build_rpm_wrapper(commit, False, False, False, None, True,
+                              self.config, FakePkgInfo())
             self.assertEqual(expected, cp_mock.call_args_list)
 
     @mock.patch('dlrn.drivers.kojidriver.KojiBuildDriver.build_package')
@@ -178,5 +179,6 @@ class TestBuild(base.TestCase):
                             'dlrn.drivers.kojidriver.KojiBuildDriver')
         self.config = ConfigOptions(self.configfile)
         commit = db.getCommits(self.session)[-1]
-        build_rpm_wrapper(commit, False, False, False, None, True)
+        build_rpm_wrapper(commit, False, False, False, None, True,
+                          self.config, FakePkgInfo())
         self.assertEqual(wm_mock.call_count, 1)

@@ -103,6 +103,13 @@ def _add_commits(project_toprocess, toprocess, options, session):
 
 
 def main():
+    # As a first step, make sure we use the right multiprocessing start method
+    # The default fork method used in Linux can lead to issues when mixing
+    # multiprocessing and multithreading
+    if sys.version_info >= (3, 6):
+        if not multiprocessing.get_start_method(allow_none=True):
+            multiprocessing.set_start_method('spawn')
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--config-file',
@@ -187,8 +194,6 @@ def main():
         logger.warning('The --verbose-mock command-line option is deprecated.'
                        ' Please use --verbose-build instead.')
         options.verbose_build = options.verbose_mock
-    global verbose_build
-    verbose_build = options.verbose_build
 
     cp = configparser.RawConfigParser()
     cp.read(options.config_file)
@@ -203,6 +208,7 @@ def main():
         _, tmpdb_path = tempfile.mkstemp()
         logger.info("Using file %s for temporary db" % tmpdb_path)
         config_options.database_connection = "sqlite:///%s" % tmpdb_path
+    config_options.verbose_build = options.verbose_build
 
     session = getSession(config_options.database_connection)
     pkginfo_driver = config_options.pkginfo_driver
@@ -299,7 +305,9 @@ def main():
                                   dev_mode=options.dev,
                                   head_only=options.head_only,
                                   db_connection=config_options.
-                                  database_connection)
+                                  database_connection,
+                                  branch=config_options.source,
+                                  pkginfo=pkginfo)
         iterator = pool.imap(getinfo_wrapper, packages)
         while True:
             try:
@@ -326,8 +334,9 @@ def main():
                     package, local=options.local,
                     dev_mode=options.dev,
                     head_only=options.head_only,
-                    db_connection=config_options.
-                    database_connection)
+                    db_connection=config_options.database_connection,
+                    branch=config_options.source,
+                    pkginfo=pkginfo)
                 if skipped:
                     skipped_list.append(package['name'])
                 _add_commits(project_toprocess, toprocess, options, session)
@@ -427,7 +436,9 @@ def main():
                                   build_env=options.build_env,
                                   dev_mode=options.dev,
                                   use_public=options.use_public,
-                                  order=options.order, sequential=True)
+                                  order=options.order, sequential=True,
+                                  config_options=config_options,
+                                  pkginfo=pkginfo)
             exception = status[3]
             consistent = False
             datadir = os.path.realpath(config_options.datadir)
@@ -466,7 +477,9 @@ def main():
                                        build_env=options.build_env,
                                        dev_mode=options.dev,
                                        use_public=options.use_public,
-                                       order=options.order, sequential=False)
+                                       order=options.order, sequential=False,
+                                       config_options=config_options,
+                                       pkginfo=pkginfo)
         iterator = pool.imap(build_worker_wrapper, toprocess)
 
         while True:
@@ -827,7 +840,7 @@ def post_build_rpm(status, packages, session, build_repo=True):
 
 
 def getinfo(package, local=False, dev_mode=False, head_only=False,
-            db_connection=None, type="rpm"):
+            db_connection=None, branch=None, pkginfo=None, type="rpm"):
     project = package["name"]
     since = "-1"
     session = getSession(db_connection)
@@ -836,7 +849,8 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
         # If we have switched source branches, we want to behave
         # as if no previous commits had been built, and only build
         # the last one
-        if commit.commit_branch == getsourcebranch(package):
+        if commit.commit_branch == getsourcebranch(package,
+                                                   default_branch=branch):
             # This will return all commits since the last handled commit
             # including the last handled commit, remove it later if needed.
             since = "--after=%d" % (commit.dt_commit)
@@ -845,7 +859,9 @@ def getinfo(package, local=False, dev_mode=False, head_only=False,
             # in case, let's check if we built a previous commit from the
             # current branch
             commit = getLastBuiltCommit(session, project,
-                                        getsourcebranch(package), type=type)
+                                        getsourcebranch(package,
+                                                        default_branch=branch),
+                                        type=type)
             if commit:
                 logger.info("Last commit belongs to another branch, but"
                             " we're ok with that")
