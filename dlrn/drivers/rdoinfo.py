@@ -133,8 +133,8 @@ class RdoInfoDriver(PkgInfoDriver):
         if dev_mode is False:
             try:
                 distro_branch, distro_hash, dt_distro = refreshrepo(
-                    distro, distro_dir, distro_branch, local=local,
-                    full_path=distro_dir_full)
+                    distro, distro_dir, self.config_options, distro_branch,
+                    local=local, full_path=distro_dir_full)
             except Exception:
                 # The error was already logged by refreshrepo, and we want
                 # to avoid halting the whole run because this distgit repo
@@ -146,8 +146,8 @@ class RdoInfoDriver(PkgInfoDriver):
             if not os.path.isdir(distro_dir):
                 # We should fail in this case, since we are running
                 # in dev mode, so no try/except
-                refreshrepo(distro, distro_dir, distro_branch, local=local,
-                            full_path=distro_dir_full)
+                refreshrepo(distro, distro_dir, self.config_options, distro_branch,
+                            local=local, full_path=distro_dir_full)
 
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory
@@ -160,7 +160,9 @@ class RdoInfoDriver(PkgInfoDriver):
             if len(repos) > 1:
                 repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
             try:
-                source_branch, _, _ = refreshrepo(repo, repo_dir, source_branch,
+                source_branch, _, _ = refreshrepo(repo, repo_dir,
+                                                  self.config_options,
+                                                  source_branch,
                                                   local=local)
             except Exception:
                 # The error was already logged by refreshrepo, and the only

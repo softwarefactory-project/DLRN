@@ -240,12 +240,12 @@ class DownstreamInfoDriver(PkgInfoDriver):
         if dev_mode is False:
             try:
                 distro_branch, extended_hash_dsdist, dt_extended = refreshrepo(
-                    distro, distro_dir, distro_branch, local=local,
-                    full_path=distro_dir_full)
+                    distro, distro_dir, self.config_options, distro_branch,
+                    local=local, full_path=distro_dir_full)
 
                 _, extended_hash_dssource, _ = refreshrepo(
-                    ds_source, dsgit_dir, dsgit_branch, local=local,
-                    full_path=dsgit_dir)
+                    ds_source, dsgit_dir, self.config_options, dsgit_branch,
+                    local=local, full_path=dsgit_dir)
 
                 extended_hash = '%s_%s' % (extended_hash_dsdist,
                                            extended_hash_dssource)
@@ -254,8 +254,9 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 distro_hash = version[3]
                 # Also download upstream distgit
                 _, _, _ = refreshrepo(
-                    ups_distro, ups_distro_dir, distro_hash,
-                    local=local, full_path=ups_distro_dir_full)
+                    ups_distro, ups_distro_dir, self.config_options,
+                    distro_hash, local=local,
+                    full_path=ups_distro_dir_full)
 
             except Exception:
                 # The error was already logged by refreshrepo, and we want
@@ -269,11 +270,13 @@ class DownstreamInfoDriver(PkgInfoDriver):
             if not os.path.isdir(distro_dir):
                 # We should fail in this case, since we are running
                 # in dev mode, so no try/except
-                refreshrepo(distro, distro_dir, distro_branch, local=local,
+                refreshrepo(distro, distro_dir, self.config_options,
+                            distro_branch, local=local,
                             full_path=distro_dir_full)
             if not os.path.isdir(ups_distro_dir):
-                refreshrepo(ups_distro, ups_distro_dir, ups_distro_branch,
-                            local=local, full_path=ups_distro_dir_full)
+                refreshrepo(ups_distro, ups_distro_dir, self.config_options,
+                            ups_distro_branch, local=local,
+                            full_path=ups_distro_dir_full)
 
         # repo is usually a string, but if it contains more then one entry we
         # git clone into a project subdirectory
@@ -287,6 +290,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
             try:
                 source_branch, _, _ = refreshrepo(repo, repo_dir,
+                                                  self.config_options,
                                                   source_branch,
                                                   local=local)
             except Exception:

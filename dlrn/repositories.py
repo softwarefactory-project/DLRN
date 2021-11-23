@@ -16,13 +16,14 @@ import re
 import sh
 import shutil
 
-from dlrn.config import getConfigOptions
+from dlrn.config import setup_logging
 
 logger = logging.getLogger("dlrn-repositories")
+setup_logging()
 
 
-def refreshrepo(url, path, branch="master", local=False, full_path=None):
-    config_options = getConfigOptions()
+def refreshrepo(url, path, config_options, branch="master", local=False,
+                full_path=None):
     logger.info("Getting %s to %s (%s)" % (url, path, branch))
     checkout_not_present = not os.path.exists(path)
     if checkout_not_present is True:

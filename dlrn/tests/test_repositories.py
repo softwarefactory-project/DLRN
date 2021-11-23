@@ -31,9 +31,16 @@ def _aux_sh(*args):
 
 @mock.patch.object(sh.Command, '__call__', autospec=True)
 class TestRefreshRepo(base.TestCase):
+    def setUp(self):
+        super(TestRefreshRepo, self).setUp()
+        config = configparser.RawConfigParser()
+        config.read("projects.ini")
+        config.set("DEFAULT", "build_driver",
+                   "dlrn.drivers.mockdriver.MockBuildDriver")
+        self.config = ConfigOptions(config)
 
     def test_clone_if_not_cloned(self, sh_mock):
-        repositories.refreshrepo('url', 'path', branch='branch')
+        repositories.refreshrepo('url', 'path', self.config, branch='branch')
         expected = [mock.call(sh.git.clone, 'url', 'path'),
                     mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, '-f', 'branch'),
@@ -44,7 +51,7 @@ class TestRefreshRepo(base.TestCase):
     @mock.patch('os.path.exists', return_value=True)
     @mock.patch('shutil.rmtree', return_value=True)
     def test_dont_clone_if_cloned(self, path_mock, shutil_mock, sh_mock):
-        repositories.refreshrepo('url', 'path', branch='branch')
+        repositories.refreshrepo('url', 'path', self.config, branch='branch')
         expected = [mock.call(sh.git, 'remote', '-v'),
                     mock.call(sh.git.clone, 'url', 'path'),
                     mock.call(sh.git.fetch, 'origin'),
@@ -55,12 +62,14 @@ class TestRefreshRepo(base.TestCase):
 
     @mock.patch('os.path.exists', return_value=True)
     def test_dont_fetch_if_local_repo_exists(self, path_mock, sh_mock):
-        repositories.refreshrepo('url', 'path', branch='branch', local=True)
+        repositories.refreshrepo('url', 'path', self.config, branch='branch',
+                                 local=True)
         expected = [mock.call(sh.git.log, '--pretty=format:%H %ct', '-1', '.')]
         self.assertEqual(sh_mock.call_args_list, expected)
 
     def test_clone_fetch_if_local_repo_missing(self, sh_mock):
-        repositories.refreshrepo('url', 'path', branch='branch', local=True)
+        repositories.refreshrepo('url', 'path', self.config, branch='branch',
+                                 local=True)
         expected = [mock.call(sh.git.clone, 'url', 'path'),
                     mock.call(sh.git.fetch, 'origin'),
                     mock.call(sh.git.checkout, '-f', 'branch'),
@@ -79,7 +88,7 @@ class TestRefreshRepo(base.TestCase):
         with mock.patch.object(sh.Command, '__call__') as new_mock:
             new_mock.side_effect = _aux_sh
             self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
-                              'url', 'path', branch='branch')
+                              'url', 'path', self.config, branch='branch')
             expected = [mock.call('url', 'path'),
                         mock.call('origin'),
                         mock.call('-f', 'branch')]
@@ -93,7 +102,7 @@ class TestRefreshRepo(base.TestCase):
         with mock.patch.object(sh.Command, '__call__') as new_mock:
             new_mock.side_effect = _aux_sh
             self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
-                              'url', 'path', branch='rpm-master')
+                              'url', 'path', self.config, branch='rpm-master')
             expected = [mock.call('url', 'path'),
                         mock.call('origin'),
                         mock.call('-f', 'rpm-master')]
@@ -108,7 +117,7 @@ class TestRefreshRepo(base.TestCase):
         with mock.patch.object(sh.Command, '__call__') as new_mock:
             new_mock.side_effect = _aux_sh
             self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
-                              'url', 'path', branch='foo-bar')
+                              'url', 'path', self.config, branch='foo-bar')
             expected = [mock.call('url', 'path'),
                         mock.call('origin'),
                         mock.call('-f', 'foo-bar')]
@@ -122,7 +131,8 @@ class TestRefreshRepo(base.TestCase):
         self.config = ConfigOptions(config)
         with mock.patch.object(sh.Command, '__call__') as new_mock:
             new_mock.side_effect = _aux_sh
-            result = repositories.refreshrepo('url', 'path', branch='bar')
+            result = repositories.refreshrepo('url', 'path', self.config,
+                                              branch='bar')
             self.assertEqual(result, ['master', 'None'])
             expected = [mock.call('url', 'path'),
                         mock.call('origin'),

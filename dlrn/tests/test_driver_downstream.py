@@ -110,19 +110,20 @@ class TestDriverDownstream(base.TestCase):
 
         expected = [mock.call('git://git.example.com/rpms/nova',
                               self.temp_dir + '/openstack-nova_distro',
-                              'testbranch',
+                              self.config, 'testbranch',
                               full_path=self.temp_dir + '/openstack-nova_'
                                                         'distro/',
                               local=None),
                     mock.call('git://git.example.com/rpms/nova',
                               self.temp_dir + '/openstack-nova_distro_'
                                               'upstream',
-                              'rpm-master',
+                              self.config, 'rpm-master',
                               full_path=self.temp_dir + '/openstack-nova'
                                                         '_distro_upstream/',
                               local=None),
                     mock.call('git://git.openstack.org/openstack/nova',
-                              self.temp_dir + '/nova', 'master', local=None)]
+                              self.temp_dir + '/nova', self.config, 'master',
+                              local=None)]
         if len(rr_mock.call_args_list) == 2:
             # first refreshrepo call is skipped in dev_mode when
             # distro_dir already exists
@@ -218,25 +219,27 @@ class TestDriverDownstream(base.TestCase):
 
         expected = [mock.call('git://git.example.com/rpms/nova',
                               self.temp_dir + '/openstack-nova_distro',
-                              'testbranch',
+                              self.config, 'testbranch',
                               full_path=self.temp_dir + '/openstack-nova_'
                                                         'distro/',
                               local=None),
                     mock.call('git://git.example.com/downstream/nova',
                               self.temp_dir + '/openstack-nova_downstream',
-                              'dsbranch',
+                              self.config, 'dsbranch',
                               full_path=self.temp_dir + '/openstack-nova'
                                                         '_downstream',
                               local=None),
                     mock.call('git://git.example.com/rpms/nova',
                               self.temp_dir + '/openstack-nova_distro_'
                                               'upstream',
+                              self.config,
                               '8fce438abdd12cba33bd9fa4f7d16c098e10094f',
                               full_path=self.temp_dir + '/openstack-nova'
                                                         '_distro_upstream/',
                               local=None),
                     mock.call('git://git.openstack.org/openstack/nova',
-                              self.temp_dir + '/nova', 'master', local=None)]
+                              self.temp_dir + '/nova', self.config, 'master',
+                              local=None)]
         self.assertEqual(rr_mock.call_args_list, expected)
 
         pi = pkginfo[0]

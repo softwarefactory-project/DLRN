@@ -213,6 +213,7 @@ class GitRepoDriver(PkgInfoDriver):
                 repo_dir = os.path.join(repo_dir, os.path.split(repo)[1])
             try:
                 source_branch, _, _ = refreshrepo(repo, repo_dir,
+                                                  self.config_options,
                                                   source_branch, local=local)
             except Exception:
                 # The error was already logged by refreshrepo, and the only

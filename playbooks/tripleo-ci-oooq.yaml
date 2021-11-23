@@ -63,6 +63,28 @@
           {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin/pip install . -c {{ constraints_file }}
         chdir: '{{ ansible_user_dir }}/tripleo-quickstart-extras'
 
+    - name: Install ansible collections in venv
+      shell:
+        cmd: |
+          echo "Installing Ansible Collections dependencies"
+          # Check if we have collections cloned in CI job
+          if [[ -e "~/src/github.com/ansible-collections/ansible.utils" ]]; then
+              {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin/ansible-galaxy collection install --force \
+                  ~/src/github.com/ansible-collections/ansible.utils \
+                  ~/src/github.com/ansible-collections/ansible.netcommon \
+                  ~/src/github.com/ansible-collections/community.general \
+                  ~/src/github.com/ansible-collections/community.libvirt \
+                  ~/src/github.com/ansible-collections/openvswitch.openvswitch
+          else
+              {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin/ansible-galaxy collection install --force \
+                  ansible.posix:=1.3.0 \
+                  openvswitch.openvswitch:=2.0.2 \
+                  community.general:=4.0.2 \
+                  community.libvirt:=1.0.2 \
+                  -p {{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/share/ansible/collections
+          fi
+        chdir: '{{ ansible_user_dir }}/tripleo-quickstart-extras'
+
     - name: Copy ansible configuration file
       copy:
         src: '{{ ansible_user_dir }}/tripleo-quickstart/ansible.cfg'
