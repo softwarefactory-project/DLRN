@@ -32,8 +32,8 @@
       centos_version: 'centos8'
     nodeset:
       nodes:
-        - name: rdo-centos-8
-          label: rdo-centos-8
+        - name: upstream-centos-8-stream
+          label: upstream-centos-8-stream
 
 - job:
     name: dlrn-rpmbuild-tripleo-ci-oooq
@@ -48,13 +48,8 @@
     parent: dlrn-rpmbuild-tripleo-ci-oooq
     nodeset:
       nodes:
-        - name: rdo-centos-8
-          label: rdo-centos-8
-    host-vars:
-      localhost:
-        ansible_python_interpreter: /usr/bin/python3
-      rdo-centos-8:
-        ansible_python_interpreter: /usr/bin/python3
+        - name: cloud-centos-8-stream
+          label: cloud-centos-8-stream
     description: Run DLRN to build a package using Tripleo-Quickstart playbooks on CentOS 8
 
 - job:
@@ -81,8 +76,8 @@
     parent: dlrn-api-functional
     nodeset:
       nodes:
-        - name: centos-8
-          label: rdo-centos-8
+        - name: cloud-centos-8-stream
+          label: cloud-centos-8-stream
 
 - job:
     name: docs-build

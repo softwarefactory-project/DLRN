@@ -17,7 +17,7 @@
     - name: Assure EPEL is enabled (CentOS 8)
       become: true
       shell: |
-        yum-config-manager --enable epel || dnf install epel-release
+        yum-config-manager --enable epel || dnf install epel-release -y
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version | int == 8

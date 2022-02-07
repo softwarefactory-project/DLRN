@@ -21,7 +21,7 @@
             path: "{{ working_dir }}/DLRN/projects.ini"
             section: DEFAULT
             option: target
-            value: centos8
+            value: centos8-stream
         - name: Set baseurl for CentOS 8
           ini_file:
             path: "{{ working_dir }}/DLRN/projects.ini"

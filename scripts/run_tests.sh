@@ -78,6 +78,7 @@ if [ ${target} = "centos" ]; then
 elif [[ ${target} =~ "centos8" ]]; then
     baseurl_release="centos8"
     log_dir="centos8"
+    target="centos8-stream"
 elif [[ ${target} =~ "centos9" ]]; then
     baseurl_release="centos9"
     log_dir="centos9"
