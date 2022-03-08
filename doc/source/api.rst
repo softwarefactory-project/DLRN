@@ -658,6 +658,22 @@ by ErrorLog and CustomLog in the apache conf file.
 read-only endpoints. Default value is False, so the authentication by default is
 only set in those endpoints with write capabilities.
 
+``AUTHENTICATION_DRIVERS`` specifies the drivers used to authenticate/authorize
+users to access the protected API endpoints in an array. Available drivers are:
+
+* DBAuthentication:
+       Uses Basic auth and checks the user and password in the DB. This is
+       the default driver if none is specified. It's necessary to specify the DB with ``DB_PATH``
+       in the app configuration.
+
+* KrbAuthentication:
+       Decrypt Kerberos token to get the user, then check the membership
+       for the given user in a group specified by ``ALLOWED_GROUP`` in the configuration file.
+       The group is an IPA group so it's necessary to have IPA client configured and also
+       specify the kerberos keytab file and principal to log in IPA server with
+       the vars: ``KEYTAB_PATH`` and ``KEYTAB_PRINC`` in the app configuration. ``HTTP_KEYTAB_PATH``
+       is used to decrypt the received token.
+
 Those variables are also applied within the ``CONFIG_FILE`` with
 higher precedence.
 
@@ -675,11 +691,25 @@ in the above example, with the following syntax:
     REPO_PATH = '/home/centos-master/DLRN/data/repos'
     CONFIG_FILE = 'projects.ini'
     PROTECT_READ_ENDPOINTS = False
+    DLRN_DEBUG = False
+    DLRN_LOG_FILE = '/var/log/dlrn-logs/api/api.log'
+    API_AUTH_DEBUG = False
+    API_AUTH_LOG_FILE = '/var/log/dlrn-logs/api_login/api_login.log'
+
+    KEYTAB_PATH = '/tmp/.keytab'
+    KEYTAB_PRINC = 'example@PRINC.COM'
+    HTTP_KEYTAB_PATH = '/tmp/.http-keytab'
+
+    AUTHENTICATION_DRIVERS = ("KrbAuthentication","DBAuthentication")
 
 Where ``DB_PATH`` is the path to the SQLite database for your environment,
 ``REPO_PATH`` will point to the base directory for the generated repositories,
 and ``CONFIG_FILE`` will point to the projects.ini file used when running
 DLRN.
+
+Where ``DLRN_DEBUG``, ``DLRN_LOG_FILE``, ``API_AUTH_DEBUG``, ``API_AUTH_LOG_FILE``,
+``AUTHENTICATION_DRIVERS``, ``KEYTAB_PATH``, ``KEYTAB_PRINC`` and ``HTTP_KEYTAB_PATH``
+are defined at section "WSGI file and httpd configuration"
 
 ***************
 User management

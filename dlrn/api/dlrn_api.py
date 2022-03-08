@@ -17,8 +17,8 @@ from functools import wraps
 import logging
 
 from dlrn.api import app
+from dlrn.api.drivers.auth import Auth
 from dlrn.api.utils import AggDetail
-from dlrn.api.utils import auth
 from dlrn.api.utils import InvalidUsage
 from dlrn.api.utils import RepoDetail
 
@@ -49,6 +49,7 @@ import time
 
 pagination_limit = 100
 max_limit = 100
+auth_multi = Auth(app.config).auth_multi
 
 if 'PROTECT_READ_ENDPOINTS' not in app.config.keys():
     bypass_read_endpoints = True
@@ -172,7 +173,7 @@ def getVote(session, timestamp, success=None, job_id=None, component=None,
 
 
 @app.route('/api/health', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def health():
     # Check database connection
     session = _get_db()
@@ -185,7 +186,7 @@ def health():
 
 
 @app.route('/api/health', methods=['POST'])
-@auth.login_required(optional=False)
+@auth_multi.login_required(optional=False)
 def health_post():
     # Check database connection
     session = _get_db()
@@ -198,7 +199,7 @@ def health_post():
 
 
 @app.route('/api/repo_status', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def repo_status():
     # commit_hash: commit hash
     # distro_hash: distro hash
@@ -261,7 +262,7 @@ def repo_status():
 
 
 @app.route('/api/agg_status', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def agg_status():
     # aggregate_hash: aggregate hash
     # success(optional): only report successful/unsuccessful votes
@@ -305,7 +306,7 @@ def agg_status():
 
 
 @app.route('/api/last_tested_repo', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def last_tested_repo_GET():
     # max_age: Maximum age in hours, used as base for the search
     # success(optional): find repos with a successful/unsuccessful vote
@@ -390,7 +391,7 @@ def last_tested_repo_GET():
 
 
 @app.route('/api/promotions', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def promotions_GET():
     # commit_hash(optional): commit hash
     # distro_hash(optional): distro hash
@@ -494,7 +495,7 @@ def promotions_GET():
 
 
 @app.route('/api/metrics/builds', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def get_metrics():
     # start_date: start date for period, in YYYY-mm-dd format (UTC)
     # end_date: end date for period, in YYYY-mm-dd format (UTC)
@@ -557,7 +558,7 @@ def get_metrics():
 
 
 @app.route('/api/last_tested_repo', methods=['POST'])
-@auth.login_required(optional=False)
+@auth_multi.login_required(optional=False)
 @_json_media_type
 def last_tested_repo_POST():
     # max_age: Maximum age in hours, used as base for the search
@@ -615,7 +616,7 @@ def last_tested_repo_POST():
     newvote = CIVote(commit_id=vote.commit_id, ci_name=my_job_id,
                      ci_url='', ci_vote=False, ci_in_progress=True,
                      timestamp=int(time.time()), notes='',
-                     user=auth.username(), component=vote.component)
+                     user=auth_multi.current_user(), component=vote.component)
     session.add(newvote)
     session.commit()
 
@@ -624,7 +625,7 @@ def last_tested_repo_POST():
         Commit.id == vote.commit_id).first()
 
     logger.info("Added new vote to commit %s for component %s by user %s",
-                commit.commit_hash, vote.component, auth.username())
+                commit.commit_hash, vote.component, auth_multi.current_user())
 
     result = {'commit_hash': commit.commit_hash,
               'distro_hash': commit.distro_hash,
@@ -639,7 +640,7 @@ def last_tested_repo_POST():
 
 
 @app.route('/api/report_result', methods=['POST'])
-@auth.login_required(optional=False)
+@auth_multi.login_required(optional=False)
 @_json_media_type
 def report_result():
     # job_id: name of CI
@@ -699,11 +700,11 @@ def report_result():
         vote = CIVote(commit_id=commit_id, ci_name=job_id, ci_url=url,
                       ci_vote=bool(strtobool(success)), ci_in_progress=False,
                       timestamp=int(timestamp), notes=notes,
-                      user=auth.username(), component=component)
+                      user=auth_multi.current_user(), component=component)
         log_message = 'Added new vote to commit {commit} for component \
                       {component} by user {name}'.format(
                       commit=commit_hash, component=component,
-                      name=auth.username())
+                      name=auth_multi.current_user())
 
     else:
         out_ext_hash = None
@@ -716,10 +717,10 @@ def report_result():
         vote = CIVote_Aggregate(ref_hash=aggregate_hash, ci_name=job_id,
                                 ci_url=url, ci_vote=bool(strtobool(success)),
                                 ci_in_progress=False, timestamp=int(timestamp),
-                                notes=notes, user=auth.username())
+                                notes=notes, user=auth_multi.current_user())
         log_message = 'Added new vote to aggregate hash {aggregate_hash} by \
                       user {name}'.format(aggregate_hash=aggregate_hash,
-                                          name=auth.username())
+                                          name=auth_multi.current_user())
 
     session.add(vote)
     session.commit()
@@ -735,13 +736,13 @@ def report_result():
               'in_progress': False,
               'url': url,
               'notes': notes,
-              'user': auth.username(),
+              'user': auth_multi.current_user(),
               'component': component}
     return jsonify(result), 201
 
 
 @app.route('/api/promote', methods=['POST'])
-@auth.login_required(optional=False)
+@auth_multi.login_required(optional=False)
 @_json_media_type
 def promote():
     # commit_hash: commit hash
@@ -818,7 +819,7 @@ def promote():
 
     timestamp = time.mktime(datetime.now().timetuple())
     promotion = Promotion(commit_id=commit.id, promotion_name=promote_name,
-                          timestamp=timestamp, user=auth.username(),
+                          timestamp=timestamp, user=auth_multi.current_user(),
                           component=commit.component,
                           aggregate_hash=repo_checksum)
 
@@ -826,7 +827,7 @@ def promote():
     session.commit()
     logger.info('Added new promotion named %s to commit %s for component %s \
                 by user %s', promote_name, commit_hash,
-                commit.component, auth.username())
+                commit.component, auth_multi.current_user())
     repo_hash = _repo_hash(commit)
     repo_url = "%s/%s" % (config_options.baseurl, commit.getshardedcommitdir())
 
@@ -838,13 +839,13 @@ def promote():
               'promote_name': promote_name,
               'component': commit.component,
               'timestamp': timestamp,
-              'user': auth.username(),
+              'user': auth_multi.current_user(),
               'aggregate_hash': repo_checksum}
     return jsonify(result), 201
 
 
 @app.route('/api/promote-batch', methods=['POST'])
-@auth.login_required(optional=False)
+@auth_multi.login_required(optional=False)
 @_json_media_type
 def promote_batch():
     # hash_pairs: list of commit/distro hash pairs
@@ -949,7 +950,8 @@ def promote_batch():
         timestamp = time.mktime(datetime.now().timetuple())
         promotion = Promotion(commit_id=commit.id,
                               promotion_name=promote_name,
-                              timestamp=timestamp, user=auth.username(),
+                              timestamp=timestamp,
+                              user=auth_multi.current_user(),
                               component=commit.component,
                               aggregate_hash=None)
         session.add(promotion)
@@ -957,7 +959,7 @@ def promote_batch():
                             commit {commit} for component {component} by \
                             user {name}".format(promote_name=promote_name,
                             commit=commit_hash, component=commit.component,
-                            name=auth.username()))
+                            name=auth_multi.current_user()))
 
     # And finally, if we are using components, update the top-level
     # repo file
@@ -988,13 +990,13 @@ def promote_batch():
               'promote_name': promote_name,
               'component': commit.component,
               'timestamp': timestamp,
-              'user': auth.username(),
+              'user': auth_multi.current_user(),
               'aggregate_hash': repo_checksum}
     return jsonify(result), 201
 
 
 @app.route('/api/remote/import', methods=['POST'])
-@auth.login_required(optional=False)
+@auth_multi.login_required(optional=False)
 @_json_media_type
 def remote_import():
     # repo_url: repository URL to import from
@@ -1021,7 +1023,7 @@ def strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
 
 
 @app.route('/api/civotes.html', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def get_civotes():
     session = _get_db()
     offset = request.args.get('offset', 0)
@@ -1069,7 +1071,7 @@ def get_civotes():
 
 
 @app.route('/api/civotes_detail.html', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def get_civotes_detail():
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
@@ -1095,7 +1097,7 @@ def get_civotes_detail():
 
 
 @app.route('/api/civotes_agg.html', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def get_civotes_agg():
     session = _get_db()
     offset = request.args.get('offset', 0)
@@ -1139,7 +1141,7 @@ def get_civotes_agg():
 
 
 @app.route('/api/civotes_agg_detail.html', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def get_civotes_agg_detail():
     ref_hash = request.args.get('ref_hash', None)
     ci_name = request.args.get('ci_name', None)
@@ -1155,7 +1157,7 @@ def get_civotes_agg_detail():
 
 
 @app.route('/api/report.html', methods=['GET'])
-@auth.login_required(optional=bypass_read_endpoints)
+@auth_multi.login_required(optional=bypass_read_endpoints)
 def get_report():
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 

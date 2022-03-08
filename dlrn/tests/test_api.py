@@ -16,6 +16,7 @@ import os
 import sh
 import shutil
 import tempfile
+import unittest
 from unittest.mock import patch
 
 from datetime import datetime
@@ -24,11 +25,25 @@ from dlrn.api.api_logging import create_rotating_file_handler_dict
 from dlrn.api.api_logging import get_config
 from dlrn.api.api_logging import setup_dict_config
 from dlrn.api import app
+from dlrn.api import dlrn_api
+from dlrn.api.drivers.auth import Auth
 from dlrn.config import ConfigOptions
 from dlrn import db
 from dlrn.tests import base
 from dlrn import utils
 from flask import json
+# Skipping Kerberos tests if DLRN was installed without Kerberos option.
+try:
+    import ipalib
+    from ipalib.errors import PublicError
+except ModuleNotFoundError:
+    ipalib = None
+    PublicError = Exception
+
+try:
+    import gssapi
+except ModuleNotFoundError:
+    gssapi = None
 from six.moves import configparser
 
 
@@ -80,6 +95,7 @@ class DLRNAPITestCase(base.TestCase):
         self.db_fd, self.filepath = tempfile.mkstemp()
         app.config['DB_PATH'] = "sqlite:///%s" % self.filepath
         app.config['REPO_PATH'] = '/tmp'
+        self.setup_default_auth()
         self.app = app.test_client()
         self.app.testing = True
         self.headers = {'Authorization': 'Basic %s' % (
@@ -89,6 +105,39 @@ class DLRNAPITestCase(base.TestCase):
         os.close(self.db_fd)
         os.unlink(self.filepath)
         super(DLRNAPITestCase, self).tearDown()
+
+    def setup_default_auth(self):
+        default_driver = "dlrn.api.drivers.dbauthentication.DBAuthentication"
+        db_auth = utils.import_class(default_driver)()
+        dlrn_api.auth_multi.main_auth = db_auth
+        dlrn_api.auth_multi.additional_auth = []
+
+
+class DLRNAPITestCaseKrb(DLRNAPITestCase):
+    from dlrn.api.drivers.krbauthentication import IPAAuthorization
+    from dlrn.api.drivers.krbauthentication import KrbAuthentication
+
+    def setUp(self):
+        super(DLRNAPITestCaseKrb, self).setUp()
+        self.KrbAuthentication.gssapi = gssapi
+        self.IPAAuthorization.api = ipalib.api
+        self.headers = {'Authorization': 'Negotiate VE9LRU4='}
+        app.config['ALLOWED_GROUP'] = "Test_group"
+        app.config['KEYTAB_PATH'] = ".keytab"
+        app.config['KEYTAB_PRINC'] = "keytab_principal"
+        app.config['HTTP_KEYTAB_PATH'] = "http_keytab_principal"
+        self.setup_kerberos_auth()
+
+    def tearDown(self):
+        super(DLRNAPITestCaseKrb, self).tearDown()
+        # Returning to the default global state.
+        self.setup_default_auth()
+
+    def setup_kerberos_auth(self):
+        krb_driver = "dlrn.api.drivers.krbauthentication.KrbAuthentication"
+        krb_auth = utils.import_class(krb_driver)()
+        dlrn_api.auth_multi.main_auth = krb_auth
+        dlrn_api.auth_multi.additional_auth = []
 
 
 @mock.patch('dlrn.api.dlrn_api.datetime')
@@ -220,7 +269,8 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
 
 @mock.patch('dlrn.api.dlrn_api.datetime')
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestPostLastTestedRepo(DLRNAPITestCase):
     def test_post_last_tested_repo_needs_auth(self, db2_mock, db_mock,
                                               dt_mock):
@@ -332,7 +382,8 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestReportResult(DLRNAPITestCase):
     def test_report_result_needs_auth(self, db2_mock, db_mock):
         response = self.app.post('/api/report_result')
@@ -352,7 +403,6 @@ class TestReportResult(DLRNAPITestCase):
                                    timestamp='1941635095', success='true',
                                    distro_hash='8170b8686c38bafb6021d998e2fb26'
                                                '8ab26ccf65'))
-
         response = self.app.post('/api/report_result',
                                  data=req_data,
                                  headers=self.headers,
@@ -443,7 +493,8 @@ class TestReportResult(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestPromote(DLRNAPITestCase):
     def test_promote_needs_auth(self, db2_mock, db_mock):
         response = self.app.post('/api/promote')
@@ -541,7 +592,8 @@ class TestPromote(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestPromoteBatch(DLRNAPITestCase):
     def setUp(self):
         super(TestPromoteBatch, self).setUp()
@@ -687,7 +739,8 @@ class TestPromoteBatch(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestRepoStatus(DLRNAPITestCase):
     def test_repo_status_missing_commit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='abc123', distro_hash='abc123'))
@@ -760,7 +813,8 @@ class TestRepoStatus(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestAggStatus(DLRNAPITestCase):
     def test_agg_status_missing_hash(self, db2_mock, db_mock):
         response = self.app.get('/api/agg_status?success=true')
@@ -787,7 +841,8 @@ class TestAggStatus(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.remote.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestRemoteImport(DLRNAPITestCase):
     def test_post_remote_import_needs_auth(self, db2_mock, db_mock):
         response = self.app.post('/api/remote/import')
@@ -820,7 +875,8 @@ class TestRemoteImport(DLRNAPITestCase):
 
 @mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestGetCIVotes(DLRNAPITestCase):
     def test_get_civotes(self, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/civotes.html')
@@ -848,7 +904,8 @@ class TestGetCIVotes(DLRNAPITestCase):
 
 @mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestGetCIAggVotes(DLRNAPITestCase):
     def test_get_ciaggvotes(self, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/civotes_agg.html')
@@ -874,7 +931,8 @@ class TestGetCIAggVotes(DLRNAPITestCase):
 
 @mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestGetReport(DLRNAPITestCase):
     def test_get_report(self, commit_mock, db2_mock, db_mock):
         response = self.app.get('/api/report.html')
@@ -882,7 +940,8 @@ class TestGetReport(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestGetPromotions(DLRNAPITestCase):
     def test_get_promotions_missing_commit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(distro_hash='abc123'))
@@ -1004,7 +1063,8 @@ class TestGetPromotions(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestMetrics(DLRNAPITestCase):
     def test_metrics_missing_start_date(self, db2_mock, db_mock):
         req_data = json.dumps(dict(end_date='0'))
@@ -1104,8 +1164,10 @@ class TestMetrics(DLRNAPITestCase):
         self.assertEqual(data['total'], 0)
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
-@mock.patch('dlrn.api.utils.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession',
+            side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
 class TestHealth(DLRNAPITestCase):
     def test_health_get(self, db2_mock, db_mock):
         response = self.app.get('/api/health')
@@ -1137,6 +1199,280 @@ class TestHealth(DLRNAPITestCase):
                                 content_type='application/json')
         # Error 405 is "method not allowed"
         self.assertEqual(response.status_code, 405)
+
+
+class TestAuthConfiguration(base.TestCase):
+    from dlrn.api.drivers.dbauthentication import DBAuthentication
+    from dlrn.api.drivers.krbauthentication import KrbAuthentication
+
+    def test_default_auth_conf(self):
+        config = {'AUTHENTICATION_DRIVERS': []}
+        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+            auth = Auth(config).auth_multi
+            self.assertEqual(cm.output, ['INFO:logger_dlrn:Trying to load '
+                                         'default auth driver: dlrn.api.'
+                                         'drivers.dbauthentication.'
+                                         'DBAuthentication', 'INFO:logger_dlrn'
+                                         ':Default auth driver loaded.'])
+
+        self.assertIsInstance(auth.main_auth, self.DBAuthentication)
+
+    def test_non_existing_driver_conf(self):
+        config = {'AUTHENTICATION_DRIVERS': ["non_existing_driver"]}
+        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+            auth = Auth(config).auth_multi
+            self.assertEqual(cm.output, ["ERROR:logger_dlrn:Driver not found:"
+                                         " 'non_existing_driver'"])
+        self.assertIsInstance(auth.main_auth, self.DBAuthentication)
+
+    def test_db_driver_conf(self):
+        config = {'AUTHENTICATION_DRIVERS': ["DBAuthentication"]}
+        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+            auth = Auth(config).auth_multi
+            self.assertEqual(cm.output, ['INFO:logger_dlrn:Added auth driver:'
+                                         ' DBAuthentication'])
+        self.assertIsInstance(auth.main_auth, self.DBAuthentication)
+
+    def test_krb_driver_conf(self):
+        config = {'AUTHENTICATION_DRIVERS': ["KrbAuthentication"]}
+        app.config['KEYTAB_PATH'] = ".keytab"
+        app.config['KEYTAB_PRINC'] = "keytab_principal"
+        app.config['HTTP_KEYTAB_PATH'] = "http_keytab_principal"
+
+        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+            auth = Auth(config).auth_multi
+            self.assertEqual(cm.output, ['INFO:logger_dlrn:Added auth driver:'
+                                         ' KrbAuthentication'])
+        self.assertIsInstance(auth.main_auth, self.KrbAuthentication)
+
+    def test_multiple_driver_conf(self):
+        config = {'AUTHENTICATION_DRIVERS': ["KrbAuthentication",
+                                             "DBAuthentication"]}
+        app.config['KEYTAB_PATH'] = ".keytab"
+        app.config['KEYTAB_PRINC'] = "keytab_principal"
+        app.config['HTTP_KEYTAB_PATH'] = "http_keytab_principal"
+
+        auth = Auth(config).auth_multi
+        self.assertIsInstance(auth.main_auth, self.KrbAuthentication)
+        self.assertIsInstance(auth.additional_auth[0], self.DBAuthentication)
+
+
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session)
+class TestDBAuthDriver(DLRNAPITestCase):
+
+    def test_basic_auth_no_headers(self, db2_mock, db_mock):
+        self.headers = {}
+        req_data = json.dumps(dict(test='test'))
+        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+            response = self.app.post('/api/health',
+                                     data=req_data,
+                                     headers=self.headers,
+                                     content_type='application/json')
+            self.assertEqual(cm.output, ['ERROR:logger_dlrn:No user or'
+                                         ' password in the request headers.'])
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_basic_auth_success(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(test='test'))
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:bar').decode('ascii'))}
+        response = self.app.post('/api/health',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(db2_mock.call_count, 1)
+
+    def test_basic_auth_wrong_credentials(self, db2_mock, db_mock):
+        req_data = json.dumps(dict(test='test'))
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:wrong_password').decode('ascii'))}
+        response = self.app.post('/api/health',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(db2_mock.call_count, 1)
+
+
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+class TestKrbAuthDriver(DLRNAPITestCaseKrb):
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".__init__", return_value=None)
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".is_user_in_allowed_group", return_value=True)
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
+                '.get_user')
+    def test_kerberos_auth_success(self, gtuser_mock,
+                                   ipaallowed_mock, ipaauth_mock, db_mock):
+        req_data = json.dumps(dict(test='test'))
+        response = self.app.post('/api/health',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(gtuser_mock.call_count, 1)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".__init__", return_value=None)
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".is_user_in_allowed_group", return_value=False)
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication.'
+                'get_user')
+    def test_kerberos_auth_wrong_credentials(self, gtuser_mock,
+                                             ipaallowed_mock, ipaauth_mock,
+                                             db_mock):
+        req_data = json.dumps(dict(test='test'))
+        response = self.app.post('/api/health',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(gtuser_mock.call_count, 1)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".__init__", return_value=None)
+    def test_kerberos_auth_wrong_token(self, ipaauth_mock, db_mock):
+        req_data = json.dumps(dict(test='test'))
+        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+            response = self.app.post('/api/health',
+                                     data=req_data,
+                                     headers=self.headers,
+                                     content_type='application/json')
+            self.assertEqual(cm.output, ['ERROR:logger_dlrn:Invalid token'
+                                         ' while accessing "path": /api/health'
+                                         ', "method": POST'])
+        self.assertEqual(response.status_code, 401)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".__init__", return_value=None)
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                "._return_allowed_ipa_users", return_value=["foo"])
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".disconnect_from_ipa")
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
+                '.get_user', return_value="foo")
+    def test_ipa_authorization_success(self, gtuser_mock, closeipa_mock,
+                                       ipaallowed_mock, ipaauth_mock,
+                                       db_mock):
+        req_data = json.dumps(dict(test='test'))
+        self.headers = {'Authorization': 'Negotiate VE9LRU4='}
+        response = self.app.post('/api/health',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(gtuser_mock.call_count, 1)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".__init__", return_value=None)
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                "._return_allowed_ipa_users", return_value=["bar"])
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".disconnect_from_ipa")
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
+                '.get_user', return_value="foo")
+    def test_ipa_authorization_failure(self, gtuser_mock, closeipa_mock,
+                                       ipaallowed_mock, ipaauth_mock,
+                                       db_mock):
+        req_data = json.dumps(dict(test='test'))
+        response = self.app.post('/api/health',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(gtuser_mock.call_count, 1)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".__init__", return_value=None)
+    # Mock an error while getting the members of the allowed group.
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                "._return_allowed_ipa_users", side_effect=PublicError(""))
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".disconnect_from_ipa")
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
+                '.get_user', return_value="foo")
+    def test_ipa_authorization_group_show_error(self, gtuser_mock,
+                                                closeipa_mock, ipaallowed_mock,
+                                                ipaauth_mock, db_mock):
+        req_data = json.dumps(dict(test='test'))
+        response = self.app.post('/api/health',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(gtuser_mock.call_count, 1)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
+                '.get_user', return_value="foo")
+    def test_ipa_authorization_missing_keytab_vars(self, gtuser_mock,
+                                                   db_mock):
+        req_data = json.dumps(dict(test='test'))
+        app.config.pop('KEYTAB_PATH')
+        self.setup_kerberos_auth()
+        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+            response = self.app.post('/api/health',
+                                     data=req_data,
+                                     headers=self.headers,
+                                     content_type='application/json')
+            self.assertRegex(cm.output[0],
+                             'No keytab_path in the app configuration')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(gtuser_mock.call_count, 1)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".is_user_in_allowed_group", return_value=True)
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
+                '.get_user')
+    def test_kerb_auth_no_ipalib_module(self, gtuser_mock,
+                                        ipaallowed_mock, db_mock):
+        self.IPAAuthorization.api = None
+        req_data = json.dumps(dict(test='test'))
+        self.headers = {'Authorization': 'Negotiate VE9LRU4='}
+        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+            response = self.app.post('/api/health',
+                                     data=req_data,
+                                     headers=self.headers,
+                                     content_type='application/json')
+            self.assertRegex(cm.output[0],
+                             'Kerberos auth not enabled due to missing ipalib'
+                             ' dependency')
+        self.assertEqual(response.status_code, 500)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    def test_kerb_auth_no_gssapi_module(self, db_mock):
+        self.KrbAuthentication.gssapi = None
+        req_data = json.dumps(dict(test='test'))
+        self.headers = {'Authorization': 'Negotiate VE9LRU4='}
+        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+            response = self.app.post('/api/health',
+                                     data=req_data,
+                                     headers=self.headers,
+                                     content_type='application/json')
+            self.assertRegex(cm.output[0],
+                             'Kerberos auth not enabled due to missing gssapi'
+                             ' dependency')
+        self.assertEqual(response.status_code, 500)
 
 
 class TestGetLogger(DLRNAPITestCase):

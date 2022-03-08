@@ -7,14 +7,14 @@ Installing prerequisites (CentOS 7):
 .. code-block:: bash
 
     $ sudo yum install git createrepo python-virtualenv mock gcc redhat-rpm-config rpmdevtools httpd \
-      libffi-devel openssl-devel
+      libffi-devel openssl-devel openldap-devel krb5-devel
 
 Installing prerequisites (CentOS 8 or Fedora):
 
 .. code-block:: bash
 
     $ sudo yum install git createrepo python3-virtualenv mock gcc redhat-rpm-config rpmdevtools httpd \
-      libffi-devel openssl-devel
+      libffi-devel openssl-devel openldap-devel krb5-devel
 
 Add the user you intend to run as to the mock group:
 

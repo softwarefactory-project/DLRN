@@ -15,6 +15,7 @@
     name: dlrn-rpmbuild-centos-7
     parent: dlrn-base
     description: Run DLRN to build a package
+    pre-run: playbooks/python-devel-install.yaml
     run: playbooks/rpmbuild.yaml
     vars:
       python_version: py36
