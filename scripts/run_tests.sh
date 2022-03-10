@@ -182,6 +182,10 @@ for PROJECT_TO_BUILD in ${PROJECTS_TO_BUILD}; do
             fi
 
             JSON=$(curl -s -L https://review.opendev.org/changes/${UPSTREAM_PROJECT_NAME/\//%2F}~$REVIEW_BRANCH~$UPSTREAM_ID/revisions/current/review|sed 1d)
+            # If it fails to get info for the review we may be in a branchless project, fallback to try to fetch without branch
+            if [ -z $JSON ]; then
+            JSON=$(curl -s -L https://review.opendev.org/changes/$UPSTREAM_ID/revisions/current/review|sed 1d)
+            fi
             COMMIT=$($PYTHON -c 'import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s["current_revision"])' <<< $JSON)
             REF=$($PYTHON -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s['revisions']['$COMMIT']['ref'])" <<< $JSON)
             GERRIT_URL=$($PYTHON -c "import json;import sys; s = json.loads(sys.stdin.read(-1)); print(s['revisions']['$COMMIT']['fetch']['anonymous http']['url'])" <<< $JSON)

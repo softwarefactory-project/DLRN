@@ -108,7 +108,10 @@
                 - name:  pod-centos-7-epel
                   label:  pod-centos-7-epel
         - tox-py36:
-            nodeset: centos-latest-pod
+            nodeset:
+              nodes:
+                - name: testrunner
+                  label: zuul-worker-ubi7
             vars:
                 tox_install_bindep: false
         - dlrn-rpmbuild
@@ -128,7 +131,10 @@
                 - name:  pod-centos-7-epel
                   label:  pod-centos-7-epel
         - tox-py36:
-            nodeset: centos-latest-pod
+            nodeset:
+              nodes:
+                - name: testrunner
+                  label: zuul-worker-ubi7
             vars:
                 tox_install_bindep: false
         - dlrn-rpmbuild
