@@ -21,3 +21,4 @@ graphene-sqlalchemy>=2.0
 flask-sqlalchemy
 flask-graphql
 prometheus-client
+pyOpenSSL<22.0.0;python_version=='2.7'
