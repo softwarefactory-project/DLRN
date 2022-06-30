@@ -102,16 +102,11 @@
       jobs:
         - tox-pep8:
             nodeset: fedora-latest-pod
-        - tox-py27:
-            nodeset:
-              nodes:
-                - name:  pod-centos-7-epel
-                  label:  pod-centos-7-epel
         - tox-py36:
             nodeset:
               nodes:
-                - name: testrunner
-                  label: zuul-worker-ubi7
+                - name: upstream-centos-8-stream
+                  label: upstream-centos-8-stream
             vars:
                 tox_install_bindep: false
         - dlrn-rpmbuild
@@ -125,16 +120,11 @@
       jobs:
         - tox-pep8:
             nodeset: fedora-latest-pod
-        - tox-py27:
-            nodeset:
-              nodes:
-                - name:  pod-centos-7-epel
-                  label:  pod-centos-7-epel
         - tox-py36:
             nodeset:
               nodes:
-                - name: testrunner
-                  label: zuul-worker-ubi7
+                - name: upstream-centos-8-stream
+                  label: upstream-centos-8-stream
             vars:
                 tox_install_bindep: false
         - dlrn-rpmbuild

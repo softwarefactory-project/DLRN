@@ -29,10 +29,10 @@
 
     - name: Set constraints fact for CentOS/RHEL 8
       set_fact:
-        constraints_file: https://opendev.org/openstack/requirements/raw/branch/master/upper-constraints.txt
+        constraints_file: https://opendev.org/openstack/requirements/raw/branch/stable/wallaby/upper-constraints.txt
       when:
         - ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
-        - ansible_distribution_major_version | int > 7
+        - ansible_distribution_major_version | int == 8
 
     - name: Install updated pip
       shell:
@@ -108,13 +108,13 @@
             vars:
               artg_change_list:
                - project: openstack/tripleo-heat-templates
-                 branch: master
-                 refspec: master
+                 branch: stable/wallaby
+                 refspec: stable/wallaby
                  host: https://review.opendev.org
               artg_compressed_gating_repo: '/tmp/gating_repo.tar.gz'
               build_repo_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/..'
               dlrn_pre_installed: true
-              release: 'master'
+              release: 'stable/wallaby'
         dest: '{{ ansible_user_dir }}/build-packages.yaml'
       when: (ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and ansible_distribution_major_version | int == 8
 

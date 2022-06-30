@@ -14,7 +14,8 @@ renderspec;python_version>='3.3'
 pymod2pkg>=0.5.5
 requests
 Flask
-Flask-HTTPAuth
+Flask-HTTPAuth<4.4.0;python_version=='2.7'
+Flask-HTTPAuth;python_version>='3.3'
 passlib>=1.6.5
 graphene<3.0
 graphene-sqlalchemy>=2.0
