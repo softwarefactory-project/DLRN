@@ -22,6 +22,20 @@
       centos_version: 'centos7'
 
 - job:
+    name: dlrn-rpmbuild-cs9
+    parent: dlrn-base
+    description: Run DLRN to build a package using Python 3 on Centos9
+    run: playbooks/rpmbuild.yaml
+    vars:
+      python_version: py39
+      tag: ''
+      centos_version: 'centos9'
+    nodeset:
+      nodes:
+        - name: cloud-centos-9-stream
+          label: cloud-centos-9-stream
+
+- job:
     name: dlrn-rpmbuild-python3
     parent: dlrn-base
     description: Run DLRN to build a package using Python 3
@@ -115,6 +129,7 @@
             vars:
                 tox_install_bindep: false
         - dlrn-rpmbuild
+        - dlrn-rpmbuild-cs9
         - dlrn-rpmbuild-python3
         - dlrn-rpmbuild-tripleo-ci-oooq
         - dlrn-rpmbuild-tripleo-ci-oooq-centos8
@@ -138,6 +153,7 @@
             vars:
                 tox_install_bindep: false
         - dlrn-rpmbuild
+        - dlrn-rpmbuild-cs9
         - dlrn-rpmbuild-python3
     post:
       jobs:

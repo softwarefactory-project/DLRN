@@ -20,7 +20,8 @@
         yum-config-manager --enable epel || dnf install epel-release -y
       when:
         - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version | int == 8
+        - ansible_distribution_major_version | int == 8 or
+          ansible_distribution_major_version | int == 9
 
     # NOTE(jpena) The Fedora image contains an exclude for python-virtualenv
     # in dnf.conf, because it installs it from PyPi. We do not need it in DLRN
