@@ -11,6 +11,8 @@
           export REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
           if [ ${CENTOS_VERS} = "centos8" ]; then
               export TARGET="centos8"
+          elif [ ${CENTOS_VERS} = "centos9" ]; then
+              export TARGET="centos9"
           else
               export TARGET="centos"
           fi
