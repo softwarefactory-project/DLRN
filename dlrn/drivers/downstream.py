@@ -328,6 +328,8 @@ class DownstreamInfoDriver(PkgInfoDriver):
                             distgit_dir=self.distgit_dir(package['name']),
                             commit_branch=source_branch, component=component)
             project_toprocess.append(commit)
+            # Prepare if needed spec file from jinja file.
+            self._distgit_setup(project)
 
         return PkgInfoDriver.Info(project_toprocess, False)
 
@@ -336,9 +338,26 @@ class DownstreamInfoDriver(PkgInfoDriver):
         commit_hash = kwargs.get('commit_hash')
         distgit_dir = self.distgit_dir(package_name)
         ups_distro_dir_full = self.upstream_distgit_dir(package_name)
-        distro_dir_full = self.distgit_dir(package_name)
         datadir = os.path.realpath(self.config_options.datadir)
         source_dir = "%s/%s" % (self.config_options.datadir, package_name)
+
+        for custom_preprocess in self.config_options.custom_preprocess:
+            if custom_preprocess != '':
+                run_external_preprocess(
+                    cmdline=custom_preprocess,
+                    pkgname=package_name,
+                    distgit=distgit_dir,
+                    upstream_distgit=ups_distro_dir_full,
+                    distroinfo=self.distroinfo_path,
+                    source_dir=source_dir,
+                    commit_hash=commit_hash,
+                    datadir=datadir)
+        return
+
+    def _distgit_setup(self, package_name):
+        distro_dir_full = self.distgit_dir(package_name)
+        ups_distro_dir_full = self.upstream_distgit_dir(package_name)
+        distgit_dir = self.distgit_dir(package_name)
 
         # In this case, we will copy the upstream distgit into downstream
         # distgit, then transform spec
@@ -373,18 +392,6 @@ class DownstreamInfoDriver(PkgInfoDriver):
                                             _tty_out=False, _timeout=3600)
             renderspec('--spec-style', 'fedora', '--epoch',
                        '../../epoch/fedora.yaml')
-
-        for custom_preprocess in self.config_options.custom_preprocess:
-            if custom_preprocess != '':
-                run_external_preprocess(
-                    cmdline=custom_preprocess,
-                    pkgname=package_name,
-                    distgit=distgit_dir,
-                    upstream_distgit=ups_distro_dir_full,
-                    distroinfo=self.distroinfo_path,
-                    source_dir=source_dir,
-                    commit_hash=commit_hash,
-                    datadir=datadir)
         return
 
     def distgit_dir(self, package_name):

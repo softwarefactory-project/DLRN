@@ -238,6 +238,8 @@ class GitRepoDriver(PkgInfoDriver):
                                 dt_extended=0, extended_hash=None,
                                 component=None)
                 project_toprocess.append(commit)
+            # Prepare if needed spec file from jinja file.
+            self._distgit_setup(project)
 
         return PkgInfoDriver.Info(project_toprocess, False)
 
@@ -245,8 +247,23 @@ class GitRepoDriver(PkgInfoDriver):
         package_name = kwargs.get('package_name')
         commit_hash = kwargs.get('commit_hash')
         distgit_dir = self.distgit_dir(package_name)
-        output_filename = "%s.spec" % module2package(package_name, 'fedora')
         source_dir = "%s/%s" % (self.config_options.datadir, package_name)
+
+        for custom_preprocess in self.config_options.custom_preprocess:
+            if custom_preprocess != '':
+                run_external_preprocess(
+                    cmdline=custom_preprocess,
+                    pkgname=package_name,
+                    distgit=distgit_dir,
+                    source_dir=source_dir,
+                    commit_hash=commit_hash)
+        return
+
+    def _distgit_setup(self, package_name):
+        output_filename = "%s.spec" % module2package(package_name, 'fedora')
+        distgit_dir = self.distgit_dir(package_name)
+
+        # Always needed in this driver
         preprocess = sh.renderspec.bake(_cwd=distgit_dir,
                                         _tty_out=False, _timeout=3600)
         preprocess('--spec-style', 'fedora', '--epoch',
@@ -261,15 +278,7 @@ class GitRepoDriver(PkgInfoDriver):
                     spec = re.sub(r'-%{version}', '-%{upstream_version}', spec)
                     fp.seek(0)
                     fp.write(spec)
-
-        for custom_preprocess in self.config_options.custom_preprocess:
-            if custom_preprocess != '':
-                run_external_preprocess(
-                    cmdline=custom_preprocess,
-                    pkgname=package_name,
-                    distgit=distgit_dir,
-                    source_dir=source_dir,
-                    commit_hash=commit_hash)
+        return
 
     def distgit_dir(self, package_name):
         datadir = self.config_options.datadir

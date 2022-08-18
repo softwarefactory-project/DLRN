@@ -13,7 +13,6 @@
 # under the License.
 
 import mock
-import os
 import sh
 import shutil
 import tempfile
@@ -37,6 +36,8 @@ def _mocked_environ(param, default=None):
     elif param == 'RELEASE_MINOR':
         # We are simulating an option where RELEASE_MINOR is not in the env
         return default
+    elif param == 'PATH':
+        return '/tmp/fake/path'
 
 
 def _mocked_exists(path):
@@ -162,10 +163,23 @@ class TestDriverGit(base.TestCase):
 
     @mock.patch('sh.renderspec', create=True)
     @mock.patch('os.listdir')
-    def test_custom_preprocess_fail(self, ld_mock, rs_mock):
+    def test_custom_preprocess_fail_env_var(self, ld_mock, rs_mock):
+        self.config.custom_preprocess = ['/bin/true']
+        driver = GitRepoDriver(cfg_options=self.config)
+        self.assertRaises(RuntimeError, driver.preprocess, package_name='foo')
+
+    @mock.patch('os.environ.get', side_effect=_mocked_environ)
+    @mock.patch('sh.renderspec', create=True)
+    @mock.patch('os.listdir')
+    def test_custom_preprocess_fail_command(self, ld_mock, rs_mock, get_mock):
         self.config.custom_preprocess = ['/bin/nonexistingcommand']
         driver = GitRepoDriver(cfg_options=self.config)
-        os.makedirs(os.path.join(self.config.datadir,
-                                 'package_info/openstack/foo'))
+        self.assertRaisesRegex(RuntimeError, 'env',
+                               driver.preprocess,
+                               package_name='foo')
 
-        self.assertRaises(RuntimeError, driver.preprocess, package_name='foo')
+    @mock.patch('sh.renderspec', create=True, side_effect=True)
+    def test_distgit_setup_needed(self, sh_render):
+        driver = GitRepoDriver(cfg_options=self.config)
+        driver._distgit_setup(package_name='foo')
+        self.assertEqual(sh_render.bake.call_count, 1)

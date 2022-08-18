@@ -204,7 +204,8 @@ class RdoInfoDriver(PkgInfoDriver):
                                 dt_extended=0, extended_hash=None,
                                 component=component)
                 project_toprocess.append(commit)
-
+        # Prepare if needed spec file from jinja file.
+        self._distgit_setup(project)
         return PkgInfoDriver.Info(project_toprocess, False)
 
     def preprocess(self, **kwargs):
@@ -213,7 +214,21 @@ class RdoInfoDriver(PkgInfoDriver):
         commit_hash = kwargs.get('commit_hash')
         distgit_dir = self.distgit_dir(package_name)
         source_dir = "%s/%s" % (self.config_options.datadir, package_name)
-        # Now, try to check if we need to run a pre-processing job
+
+        for custom_preprocess in self.config_options.custom_preprocess:
+            if custom_preprocess != '':
+                run_external_preprocess(
+                    cmdline=custom_preprocess,
+                    pkgname=package_name,
+                    distgit=distgit_dir,
+                    distroinfo=self.distroinfo_path,
+                    source_dir=source_dir,
+                    commit_hash=commit_hash)
+        return
+
+    def _distgit_setup(self, package_name):
+        distgit_dir = self.distgit_dir(package_name)
+        # Now, try to check if we need to run a render job
         preprocess_needed = False
         for f in os.listdir(distgit_dir):
             if f.endswith('.spec.j2'):
@@ -226,16 +241,6 @@ class RdoInfoDriver(PkgInfoDriver):
                                             _tty_out=False, _timeout=3600)
             renderspec('--spec-style', 'fedora', '--epoch',
                        '../../epoch/fedora.yaml')
-
-        for custom_preprocess in self.config_options.custom_preprocess:
-            if custom_preprocess != '':
-                run_external_preprocess(
-                    cmdline=custom_preprocess,
-                    pkgname=package_name,
-                    distgit=distgit_dir,
-                    distroinfo=self.distroinfo_path,
-                    source_dir=source_dir,
-                    commit_hash=commit_hash)
         return
 
     def distgit_dir(self, package_name):
