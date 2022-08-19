@@ -1,6 +1,6 @@
 pbr>=0.5.6
 Jinja2
-sh>=1.12.6
+sh==1.14.2
 six
 SQLAlchemy<1.4.0;python_version=='2.7'
 SQLAlchemy;python_version>='3.3'
