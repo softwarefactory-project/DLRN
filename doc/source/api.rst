@@ -643,7 +643,19 @@ Set ``CONFIG_FILE`` to the path of the DLRN configuration file, and make sure
 you specify the right user and group for the ``WSGIDaemonProcess`` line.
 
 Set ``DLRN_DEBUG`` to enable debug logs and set ``DLRN_LOG_FILE`` to the path
-of a logfile.
+of a logfile (default false). If ``DLRN_LOG_FILE`` is not set, then the logs
+are redirected to logs set by ErrorLog and CustomLog in the apache conf file.
+
+Set ``API_AUTH_DEBUG`` to enable debug logs for API authentication (default
+false) and set ``API_AUTH_LOG_FILE`` to the path of an API authentication
+logfile. If ``API_AUTH_LOG_FILE`` is not set, then the logs are redirected to
+logs set by ErrorLog and CustomLog in the apache conf file.
+
+``DLRN_DEBUG`` also specifies if debug when logs are redirected to logs set
+by ErrorLog and CustomLog in the apache conf file.
+
+Those variables are also applied within the ``CONFIG_FILE`` with
+higher precedence.
 
 DLRN API configuration
 ----------------------
