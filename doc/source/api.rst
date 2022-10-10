@@ -645,7 +645,6 @@ you specify the right user and group for the ``WSGIDaemonProcess`` line.
 Set ``DLRN_DEBUG`` to enable debug logs and set ``DLRN_LOG_FILE`` to the path
 of a logfile.
 
-
 DLRN API configuration
 ----------------------
 

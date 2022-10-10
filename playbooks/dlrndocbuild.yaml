@@ -1,7 +1,7 @@
 ---
 - hosts: all
   vars:
-    working_dir: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}'
+    working_dir: '/workspace/{{ zuul.project.src_dir }}'
   tasks:
     - name: Install test-requirements for building Spinx doc
       pip:
