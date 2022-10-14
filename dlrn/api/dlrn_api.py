@@ -14,6 +14,7 @@ from datetime import datetime
 from datetime import timedelta
 from distutils.util import strtobool
 from functools import wraps
+import logging
 
 from dlrn.api import app
 from dlrn.api.utils import AggDetail
@@ -106,6 +107,10 @@ def _rollback_batch_promotion(rollback_list):
                 os.symlink(previous_link, target_link)
             except Exception:
                 pass    # yes, ignore errors
+
+
+def _get_logger():
+    return logging.getLogger("logger_dlrn")
 
 
 @app.errorhandler(InvalidUsage)
@@ -560,6 +565,7 @@ def last_tested_repo_POST():
     sequential_mode = request.json.get('sequential_mode', None)
     previous_job_id = request.json.get('previous_job_id', None)
     component = request.json.get('component', None)
+    logger = _get_logger()
 
     if success is not None:
         success = bool(strtobool(success))
@@ -605,6 +611,9 @@ def last_tested_repo_POST():
         Commit.status == 'SUCCESS',
         Commit.id == vote.commit_id).first()
 
+    logger.info("Added new vote to commit %s for component %s by user %s",
+                commit.commit_hash, vote.component, auth.username())
+
     result = {'commit_hash': commit.commit_hash,
               'distro_hash': commit.distro_hash,
               'extended_hash': commit.extended_hash,
@@ -643,6 +652,7 @@ def report_result():
     distro_hash = request.json.get('distro_hash', None)
     extended_hash = request.json.get('extended_hash', None)
     aggregate_hash = request.json.get('aggregate_hash', None)
+    logger = _get_logger()
 
     if not commit_hash and not distro_hash and not aggregate_hash:
         raise InvalidUsage('Missing parameters', status_code=400)
@@ -678,6 +688,11 @@ def report_result():
                       ci_vote=bool(strtobool(success)), ci_in_progress=False,
                       timestamp=int(timestamp), notes=notes,
                       user=auth.username(), component=component)
+        log_message = 'Added new vote to commit {commit} for component \
+                      {component} by user {name}'.format(
+                      commit=commit_hash, component=component,
+                      name=auth.username())
+
     else:
         out_ext_hash = None
         prom = session.query(Promotion).filter(
@@ -690,9 +705,13 @@ def report_result():
                                 ci_url=url, ci_vote=bool(strtobool(success)),
                                 ci_in_progress=False, timestamp=int(timestamp),
                                 notes=notes, user=auth.username())
+        log_message = 'Added new vote to aggregate hash {aggregate_hash} by \
+                      user {name}'.format(aggregate_hash=aggregate_hash,
+                                          name=auth.username())
 
     session.add(vote)
     session.commit()
+    logger.info(log_message)
 
     result = {'commit_hash': commit_hash,
               'distro_hash': distro_hash,
@@ -730,9 +749,9 @@ def promote():
     if (promote_name == 'consistent' or promote_name == 'current'):
         raise InvalidUsage('Invalid promote_name %s' % promote_name,
                            status_code=403)
-
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
+    logger = _get_logger()
     session = _get_db()
     commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
     if commit is None:
@@ -790,7 +809,9 @@ def promote():
 
     session.add(promotion)
     session.commit()
-
+    logger.info('Added new promotion named %s to commit %s for component %s by \
+                user %s', promote_name, commit_hash,
+                commit.component, auth.username())
     repo_hash = _repo_hash(commit)
     repo_url = "%s/%s" % (config_options.baseurl, commit.getshardedcommitdir())
 
@@ -827,6 +848,7 @@ def promote_batch():
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
     session = _get_db()
+    logger = _get_logger()
     # Now we will be running all checks for each combination
     # Check for invalid promote names
     for hash_item in hash_list:
@@ -866,6 +888,7 @@ def promote_batch():
                                status_code=403)
 
     # After all checks have been performed, do all promotions
+    log_messages = []
     rollback_list = []
     for hash_item in hash_list:
         rollback_item = {}
@@ -915,6 +938,11 @@ def promote_batch():
                               component=commit.component,
                               aggregate_hash=None)
         session.add(promotion)
+        log_messages.append("Added new promotion named {promote_name} to \
+                            commit {commit} for component {component} by \
+                            user {name}".format(promote_name=promote_name,
+                            commit=commit_hash, component=commit.component,
+                            name=auth.username()))
 
     # And finally, if we are using components, update the top-level
     # repo file
@@ -930,6 +958,8 @@ def promote_batch():
     # Close session and return the last promotion we did (which includes the
     # repo checksum)
     session.commit()
+    for log_message in log_messages:
+        logger.info(log_message)
     repo_hash = _repo_hash(commit)
     repo_url = "%s/%s" % (config_options.baseurl, commit.getshardedcommitdir())
     result = {'commit_hash': commit_hash,
