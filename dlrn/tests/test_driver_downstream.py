@@ -48,6 +48,8 @@ def _mocked_get_environ(param, default=None):
         return '0.date.hash'
     elif param == 'RELEASE_MINOR':
         return '0'
+    elif param == 'PATH':
+        return '/tmp/fake/path'
 
 
 @mock.patch('dlrn.drivers.downstream.fetch_remote_file',
@@ -81,9 +83,11 @@ class TestDriverDownstream(base.TestCase):
         assert nv[1] == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', nv[1]
         assert nv[3] == '8fce438abdd12cba33bd9fa4f7d16c098e10094f', nv[3]
 
+    @mock.patch('dlrn.drivers.downstream.DownstreamInfoDriver._distgit_setup',
+                return_value=True)
     @mock.patch('dlrn.drivers.downstream.refreshrepo',
                 side_effect=_mocked_refreshrepo)
-    def test_getinfo(self, rr_mock, uo_mock):
+    def test_getinfo(self, rr_mock, ds_mock, uo_mock):
         driver = DownstreamInfoDriver(cfg_options=self.config)
         package = {
             'name': 'openstack-nova',
@@ -190,9 +194,11 @@ class TestDriverDownstream(base.TestCase):
         self.assertEqual(pkginfo, [])
         self.assertEqual(skipped, True)
 
+    @mock.patch('dlrn.drivers.downstream.DownstreamInfoDriver._distgit_setup',
+                return_value=True)
     @mock.patch('dlrn.drivers.downstream.refreshrepo',
                 side_effect=_mocked_refreshrepo)
-    def test_getinfo_nodevmode(self, rr_mock, uo_mock):
+    def test_getinfo_nodevmode(self, rr_mock, ds_mock, uo_mock):
         driver = DownstreamInfoDriver(cfg_options=self.config)
         package = {
             'name': 'openstack-nova',
@@ -246,9 +252,11 @@ class TestDriverDownstream(base.TestCase):
         assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
             pi.commit_hash
 
+    @mock.patch('dlrn.drivers.downstream.DownstreamInfoDriver._distgit_setup',
+                return_value=True)
     @mock.patch('dlrn.drivers.downstream.refreshrepo',
                 side_effect=_mocked_refreshrepo)
-    def test_getinfo_component(self, rr_mock, uo_mock):
+    def test_getinfo_component(self, rr_mock, ds_mock, uo_mock):
         self.config.use_components = True
         driver = DownstreamInfoDriver(cfg_options=self.config)
         package = {
@@ -278,9 +286,11 @@ class TestDriverDownstream(base.TestCase):
         pi = pkginfo[0]
         assert pi.component == 'compute'
 
+    @mock.patch('dlrn.drivers.downstream.DownstreamInfoDriver._distgit_setup',
+                return_value=True)
     @mock.patch('dlrn.drivers.downstream.refreshrepo',
                 side_effect=_mocked_refreshrepo)
-    def test_getinfo_component_disabled(self, rr_mock, uo_mock):
+    def test_getinfo_component_disabled(self, rr_mock, ds_mock, uo_mock):
         self.config.use_components = False
         driver = DownstreamInfoDriver(cfg_options=self.config)
         package = {
@@ -311,7 +321,7 @@ class TestDriverDownstream(base.TestCase):
         assert pi.component is None
 
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
-    def test_preprocess_use_upstream_spec(self, ld_mock, uo_mock):
+    def test_use_upstream_spec(self, ld_mock, uo_mock):
         self.config.use_upstream_spec = True
         self.config.downstream_spec_replace_list =\
             ['^%global with_doc.*/%global with_doc 0']
@@ -327,7 +337,7 @@ class TestDriverDownstream(base.TestCase):
             fp.write("foo")
 
         driver = DownstreamInfoDriver(cfg_options=self.config)
-        driver.preprocess(package_name='openstack-nova')
+        driver._distgit_setup(package_name='openstack-nova')
 
         # This checks that the spec file got copied over, and modified with
         # downstream_spec_replace_list
@@ -421,17 +431,13 @@ class TestDriverDownstream(base.TestCase):
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(sh_mock.call_count, 1)
 
-    @mock.patch('dlrn.drivers.downstream.DownstreamInfoDriver.'
-                '_restore_changelog')
-    @mock.patch('dlrn.drivers.downstream.DownstreamInfoDriver._save_changelog')
     @mock.patch('os.environ.get', side_effect=_mocked_get_environ)
     @mock.patch('sh.env', create=True)
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
     @mock.patch('shutil.copy')
     def test_custom_preprocess_upstream_spec_keep_changelog(self, cp_mock,
                                                             ld_mock, sh_mock,
-                                                            get_mock, sc_mock,
-                                                            rc_mock, uo_mock):
+                                                            get_mock, uo_mock):
         self.config.custom_preprocess = ['/bin/true']
         self.config.use_upstream_spec = True
         self.config.keep_changelog = True
@@ -455,13 +461,50 @@ class TestDriverDownstream(base.TestCase):
 
         self.assertEqual(sh_mock.call_args_list, expected)
         self.assertEqual(sh_mock.call_count, 1)
-        self.assertEqual(sc_mock.call_count, 1)
-        self.assertEqual(rc_mock.call_count, 1)
 
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
-    def test_custom_preprocess_fail(self, ld_mock, uo_mock):
+    def test_custom_preprocess_fail_env_var(self, ld_mock, uo_mock):
+        self.config.custom_preprocess = ['/bin/true']
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        self.assertRaises(RuntimeError, driver.preprocess, package_name='foo')
+
+    @mock.patch('os.environ.get', side_effect=_mocked_get_environ)
+    @mock.patch('os.listdir', side_effect=_mocked_listdir)
+    def test_custom_preprocess_fail_command(self, ld_mock, uo_mock, get_mock):
         self.config.custom_preprocess = ['/bin/nonexistingcommand']
         driver = DownstreamInfoDriver(cfg_options=self.config)
-        os.mkdir(os.path.join(self.temp_dir, 'foo_distro'))
+        self.assertRaisesRegex(RuntimeError, 'env',
+                               driver.preprocess,
+                               package_name='foo')
 
-        self.assertRaises(RuntimeError, driver.preprocess, package_name='foo')
+    def test_distgit_setup_not_needed_use_upstream(self, uo_mock):
+        self.config.use_upstream_spec = True
+        upstream = '%s/foo_distro_upstream/' % self.temp_dir
+        downstream = '%s/foo_distro/' % self.temp_dir
+        os.mkdir(upstream)
+        os.mkdir(downstream)
+        with open(upstream + "specfile", "w") as fp:
+            fp.write("upstream")
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        driver._distgit_setup(package_name='foo')
+        self.assertEqual(os.listdir(upstream),
+                         os.listdir(downstream))
+
+    def test_distgit_setup_not_needed_not_use_upstream(self, uo_mock):
+        self.config.use_upstream_spec = False
+        downstream = '%s/foo_distro/' % self.temp_dir
+        os.mkdir(downstream)
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        driver._distgit_setup(package_name='foo')
+        self.assertFalse(os.listdir(downstream))
+
+    @mock.patch('sh.renderspec', create=True, side_effect=True)
+    def test_distgit_setup_needed(self, sh_render, uo_mock):
+        self.config.use_upstream_spec = False
+        downstream_folder = '%s/foo_distro/' % self.temp_dir
+        os.mkdir(downstream_folder)
+        with open(downstream_folder + "specfile.spec.j2", "w") as fp:
+            fp.writelines("downstream")
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        driver._distgit_setup(package_name='foo')
+        self.assertEqual(sh_render.bake.call_count, 1)

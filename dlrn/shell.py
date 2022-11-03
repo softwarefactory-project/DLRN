@@ -372,9 +372,6 @@ def main():
         speclist = []
         bootstraplist = []
         for project_name in projects:
-            # Preprocess spec if needed
-            pkginfo.preprocess(package_name=project_name)
-
             filename = None
             for f in os.listdir(pkginfo.distgit_dir(project_name)):
                 if f.endswith('.spec'):

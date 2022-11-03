@@ -49,6 +49,8 @@ def _mocked_get_environ(param, default=None):
         return '0.date.hash'
     elif param == 'RELEASE_MINOR':
         return '1'
+    elif param == 'PATH':
+        return '/tmp/fake/path'
 
 
 class TestDriverRdoInfo(base.TestCase):
@@ -187,18 +189,27 @@ class TestDriverRdoInfo(base.TestCase):
         self.assertEqual(sh_mock.call_count, 3)
 
     @mock.patch('os.listdir', side_effect=_mocked_listdir)
-    def test_custom_preprocess_fail(self, ld_mock):
-        self.config.custom_preprocess = ['/bin/nonexistingcommand']
+    def test_custom_preprocess_fail_env_var(self, ld_mock):
+        self.config.custom_preprocess = ['/bin/true']
         driver = RdoInfoDriver(cfg_options=self.config)
-        os.mkdir(os.path.join(self.temp_dir, 'foo_distro'))
-
         self.assertRaises(RuntimeError, driver.preprocess, package_name='foo')
 
+    @mock.patch('os.environ.get', side_effect=_mocked_get_environ)
+    @mock.patch('os.listdir', side_effect=_mocked_listdir)
+    def test_custom_preprocess_fail_command(self, ld_mock, get_mock):
+        self.config.custom_preprocess = ['/bin/nonexistingcommand']
+        driver = RdoInfoDriver(cfg_options=self.config)
+        self.assertRaisesRegex(RuntimeError, 'env',
+                               driver.preprocess,
+                               package_name='foo')
+
+    @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver._distgit_setup',
+                return_value=True)
     @mock.patch.object(sh.Command, '__call__', autospec=True,
                        side_effect=_mocked_git_log)
     @mock.patch('dlrn.drivers.rdoinfo.refreshrepo',
                 side_effect=_mocked_refreshrepo_ok)
-    def test_getinfo_basic(self, rr_mock, git_mock):
+    def test_getinfo_basic(self, rr_mock, git_mock, ds_mock):
         driver = RdoInfoDriver(cfg_options=self.config)
         package = {
             'name': 'openstack-nova',
@@ -260,3 +271,13 @@ class TestDriverRdoInfo(base.TestCase):
 
         self.assertEqual(skipped, True)
         self.assertEqual(pkginfo, [])
+
+    @mock.patch('sh.renderspec', create=True, side_effect=True)
+    def test_distgit_setup_needed(self, sh_render):
+        os.mkdir(os.path.join(self.config.datadir, 'foo_distro'))
+        with open(self.config.datadir+"/foo_distro/"+"specfile.spec.j2",
+                  "w") as fp:
+            fp.writelines("specfile")
+        driver = RdoInfoDriver(cfg_options=self.config)
+        driver._distgit_setup(package_name='foo')
+        self.assertEqual(sh_render.bake.call_count, 1)
