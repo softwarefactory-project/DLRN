@@ -127,10 +127,12 @@ function detect_version_and_release() {
             version=""
         fi
 
-        # Make sure no "private-" tags are present, since they would lead
-        # to the package version being "private"
+        # Make sure no "private-", "-em" or "-eol" tags are present, since they would lead
+        # to the package version being "private", "<version>-em" or "<version-eol>"
         set +o pipefail
         git tag -l "private-*" | xargs -n 1 git tag -d
+        git tag -l "*-em" | xargs -n 1 git tag -d
+        git tag -l "*-eol" | xargs -n 1 git tag -d
         set -o pipefail
 
         # Not able to discover version, use git tags
