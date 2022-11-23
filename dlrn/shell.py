@@ -18,6 +18,7 @@ import multiprocessing
 import os
 import sys
 import tempfile
+import time
 
 from copy import deepcopy
 from functools import cmp_to_key
@@ -636,6 +637,21 @@ def process_build_result_rpm(
                                 'for %s' % project)
             commit.status = "FAILED"
             commit.notes = str(exception)
+        notes_logfile = os.path.join(yumrepodir, "notes.log")
+        note_read = getattr(commit, "notes")
+        with open(notes_logfile, "w+") as fp:
+            fp.write(note_read)
+
+        # appending notes.log to rpmbuild.log to make debugging easier
+        if "Custom pre-process failed" in str(exception):
+            output_file = open(logfile, "a")
+            timestamp = time.strftime('%d-%m-%Y %H:%M:%S %Z %z')
+            output_file.write("\n ~~~ %s: This is a copy of notes.log file "
+                              "(extracted from commit.notes), to store "
+                              "all logs in rpmbuild.log. ~~~\n\n" % timestamp)
+            output_file.write(note_read)
+            output_file.close()
+
         if stop:
             return exit_code
     # Add commit to the session
