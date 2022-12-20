@@ -74,6 +74,7 @@ function setup_mock() {
     # inside the buildroot
     /usr/bin/mock $MOCKOPTS --clean
     /usr/bin/mock $MOCKOPTS --init
+    /usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "git config --global --add safe.directory /var/tmp/pkgsrc"
     MOCKDIR=$(/usr/bin/mock -r ${DATA_DIR}/${MOCK_CONFIG} -p)
 }
 
