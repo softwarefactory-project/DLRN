@@ -6,7 +6,8 @@ SQLAlchemy<1.4.0;python_version=='2.7'
 SQLAlchemy;python_version>='3.3'
 PyMySQL!=1.0.0
 PyYAML
-rdopkg>=0.45.0
+rdopkg>=0.45.0,<1.5.0;python_version<'3.3'
+rdopkg>=0.45.0;python_version>'3.3'
 distroinfo
 alembic>=0.7.0,!=1.4.2
 renderspec<2.0.0;python_version=='2.7'
