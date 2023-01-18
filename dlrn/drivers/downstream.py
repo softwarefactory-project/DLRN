@@ -144,36 +144,6 @@ class DownstreamInfoDriver(PkgInfoDriver):
             vers[row[0]] = row[1:]
         return vers
 
-    def _fetch_reference_commit(self):
-        """Fetch the commit.yaml file used for this run
-
-        """
-        versions_url = self.config_options.versions_url
-        commit_url = re.sub('/versions.csv$', '/commit.yaml', versions_url)
-        try:
-            content = fetch_remote_file(commit_url)
-            return content
-        except Exception:
-            # We do not want to fail on this
-            return None
-
-    def _write_reference_commit(self, directory):
-        """Write the commit.yaml file
-
-        Used for this run in directory as reference_commit.yaml
-
-        :param: directory where the file will be stored
-        """
-
-        ref_commit_yaml = self._fetch_reference_commit()
-
-        if ref_commit_yaml is None:
-            return
-        path = os.path.join(directory, 'reference_commit.yaml')
-        with open(path, 'w') as fp:
-            for line in ref_commit_yaml:
-                fp.write(line)
-
     def _transform_spec(self, directory):
         """Transform based on rules, basically a crude sed implementation
 
