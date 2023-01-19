@@ -444,6 +444,7 @@ following configuration options are included:
 
   Also note that setting ``rhpkg`` only makes sense when using ``dlrn.drivers.downstream.DownstreamInfoDriver``
   as the pkginfo driver.
+* ``koji_rhpkg_timeout``, indicates the timeout for rhpkg commands. Default 3600.
 * ``fetch_mock_config``, if set to ``true``, will instruct DLRN to download the
   mock configuration for the build target from Koji, and use it when building
   the source RPM. If set to ``false``, DLRN will use its internally defined mock

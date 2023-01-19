@@ -42,6 +42,20 @@ def _mocked_call(*args, **kwargs):
     return True
 
 
+def _mocked_call_and_timeout(*args, **kwargs):
+    if args[0] == '/usr/bin/git log':
+        return '1 2'
+    if args[1] == 'build':
+        raise sh.TimeoutException("Timeout", "")
+    return True
+
+
+def _mocked_list_tasks(*args, **kwargs):
+    return ["45133830 20   osp-build-staging    OPEN     noarch\
+                build (rhos-17.0-rhel-9-trunk-candidate, \
+                python-pysaml2-3.0-1a.el7.centos.src.rpm)"]
+
+
 @mock.patch('sh.restorecon', create=True)
 @mock.patch('sh.env', create=True)
 @mock.patch('os.listdir', side_effect=_mocked_listdir)
@@ -499,3 +513,52 @@ class TestDriverKoji(base.TestCase):
         self.assertEqual(env_mock.call_count, 4)
         self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(env_mock.call_args_list, expected)
+
+    def test_get_own_task_id(self, ld_mock, env_mock, rc_mock):
+        driver = KojiBuildDriver(cfg_options=self.config)
+        env_mock.side_effect = _mocked_list_tasks
+        driver.exe_name = 'brew'
+        driver.config_options.koji_build_target = "rhos-17.0-rhel-9-"\
+                                                  "trunk-candidate"
+        task_id = driver.get_own_task_id("python-pysaml2-3.0-1a.el7."
+                                         "centos.src.rpm")
+        self.assertEqual(task_id, "45133830")
+
+    def test_cancel_brew_task(self, ld_mock, env_mock, rc_mock):
+        driver = KojiBuildDriver(cfg_options=self.config)
+        driver.exe_name = 'brew'
+        driver.cancel_brew_task("45133830")
+        driver.cancel_brew_task(45133830)
+        driver.cancel_brew_task(None)
+        self.assertRaises(ValueError, driver.cancel_brew_task, "")
+        self.assertRaises(ValueError, driver.cancel_brew_task, "foo")
+        # cancel_brew_tasks accepts number
+        # in integer or string Built-in types.
+        self.assertEqual(env_mock.call_count, 2)
+
+    @mock.patch('dlrn.drivers.kojidriver.KojiBuildDriver.get_own_task_id')
+    @mock.patch('dlrn.drivers.kojidriver.KojiBuildDriver.cancel_brew_task')
+    @mock.patch('os.rename')
+    @mock.patch.object(sh.Command, '__call__', autospec=True,
+                       side_effect=_mocked_call_and_timeout)
+    @mock.patch('dlrn.drivers.kojidriver.time', side_effect=_mocked_time)
+    @mock.patch('sh.kinit', create=True)
+    def test_build_package_rhpkg_timeout(self, ki_mock, tm_mock, rh_mock,
+                                         rn_mock, cl_mock, gt_mock, ld_mock,
+                                         env_mock, rc_mock):
+        self.config.koji_use_rhpkg = True
+        self.config.koji_rhpkg_timeout = -1
+        commit = db.Commit(dt_commit=123, project_name='python-pysaml2',
+                           commit_hash='1234567890abcdef',
+                           distro_hash='1234567890abcdef',
+                           extended_hash='1234567890abcdef',
+                           dt_distro=123,
+                           dt_extended=123)
+
+        driver = KojiBuildDriver(cfg_options=self.config)
+
+        self.assertRaises(sh.TimeoutException, driver.build_package,
+                          output_directory=self.temp_dir,
+                          package_name='python-pysaml2', commit=commit)
+        self.assertEqual(gt_mock.call_count, 1)
+        self.assertEqual(cl_mock.call_count, 1)

@@ -42,6 +42,8 @@ class KojiBuildDriver(BuildRPMDriver):
             'koji_build_target': {'name': 'build_target'},
             'koji_arch': {'name': 'arch', 'default': 'x86_64'},
             'koji_use_rhpkg': {'name': 'use_rhpkg', 'type': 'boolean'},
+            'koji_rhpkg_timeout': {'name': 'rhpkg_timeout', 'default': 3600,
+                                   'type': 'int'},
             'koji_exe': {'default': 'koji'},
             'fetch_mock_config': {'type': 'boolean'},
             'mock_base_packages': {'default': ''},
@@ -131,7 +133,7 @@ class KojiBuildDriver(BuildRPMDriver):
             sh.kinit('-k', '-t', keytab_file, krb_principal)
 
         rhpkg = sh.rhpkg.bake(_cwd=distgit_dir, _tty_out=False,
-                              _timeout=3600,
+                              _timeout=self.config_options.koji_rhpkg_timeout,
                               _err=self._process_koji_output,
                               _out=self._process_koji_output,
                               _env={'PATH': '/usr/bin/'})
@@ -210,6 +212,19 @@ class KojiBuildDriver(BuildRPMDriver):
                      encoding='utf-8', errors='replace') as self.koji_fp:
             try:
                 rhpkg('build', '--skip-nvr-check', scratch=scratch)
+            except sh.TimeoutException as e:
+                logger.error("Timeout for building the package %s"
+                             % package_name)
+                task_id = self.get_own_task_id(os.path.basename(src_rpm))
+                build_exception = e
+                if task_id:
+                    self.cancel_brew_task(task_id)
+                    logger.info("Canceled Brew task: %s", task_id)
+                else:
+                    logger.info("The task id could not be found after"
+                                " it timed out. Pkg %s build status in"
+                                " DLRN dashboard might not match with"
+                                " the actual status" % package_name)
             except Exception as e:
                 build_exception = e
 
@@ -283,6 +298,8 @@ class KojiBuildDriver(BuildRPMDriver):
                 output_dir = os.path.join(datadir, "repos",
                                           commit.getshardedcommitdir())
 
+            if type(build_exception) == sh.TimeoutException:
+                raise Exception("Brew building timeout excedeed.")
             # Find task id to download logs
             with open(logfile, 'r') as fp:
                 log_content = fp.readlines()
@@ -352,3 +369,26 @@ class KojiBuildDriver(BuildRPMDriver):
             # downloading all relevant artifacts
             if build_exception:
                 raise build_exception
+
+    def get_own_task_id(self, src_rpm):
+        run_cmd = [self.exe_name]
+        run_cmd.extend(['list-tasks', '--mine', '--quiet'])
+        brew_output = sh.env(run_cmd, _env={'PATH': '/usr/bin/'})
+        task_id = None
+        for row in brew_output:
+            # src_rpm identified the pkg to build
+            # for example: python-pysaml2-3.0-1a.el7.centos.src.rpm
+            if (self.config_options.koji_build_target in row and
+                    src_rpm in row):
+                task_id = row.split()[0]
+        return task_id
+
+    def cancel_brew_task(self, task_id):
+        if type(task_id) in [int, str]:
+            try:
+                task_id = int(task_id)
+            except (ValueError, TypeError):
+                raise ValueError("Task id %s is not a number" % task_id)
+            run_cmd = [self.exe_name]
+            run_cmd.extend(['cancel', '--force', int(task_id)])
+            sh.env(run_cmd, _env={'PATH': '/usr/bin/'})
