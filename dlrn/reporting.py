@@ -105,6 +105,7 @@ def genreports(packages, head_only, session, all_commits):
                                     src=src,
                                     project_name=project_name,
                                     target=target,
+                                    config_options=config_options,
                                     commits=commits)
     shutil.copy2(css_file, os.path.join(repodir, "styles.css"))
     report_file = os.path.join(repodir, "report.html")

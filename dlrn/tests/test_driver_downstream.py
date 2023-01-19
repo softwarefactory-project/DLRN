@@ -80,8 +80,8 @@ class TestDriverDownstream(base.TestCase):
         driver = DownstreamInfoDriver(cfg_options=self.config)
         versions = driver._getversions()
         nv = versions['openstack-nova']
-        assert nv[1] == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', nv[1]
-        assert nv[3] == '8fce438abdd12cba33bd9fa4f7d16c098e10094f', nv[3]
+        assert nv[1] == 'c9de185ea1ac1e8d4435c5863b2ad7cefdb28c76', nv[1]
+        assert nv[3] == '118992921c733bc0079e34dbde59cc8b3c1312dc', nv[3]
 
     @mock.patch('dlrn.drivers.downstream.DownstreamInfoDriver._distgit_setup',
                 return_value=True)
@@ -136,7 +136,7 @@ class TestDriverDownstream(base.TestCase):
         self.assertEqual(skipped, False)
 
         pi = pkginfo[0]
-        assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
+        assert pi.commit_hash == 'c9de185ea1ac1e8d4435c5863b2ad7cefdb28c76', \
             pi.commit_hash
 
     @mock.patch('dlrn.drivers.downstream.refreshrepo',
@@ -239,7 +239,7 @@ class TestDriverDownstream(base.TestCase):
                               self.temp_dir + '/openstack-nova_distro_'
                                               'upstream',
                               self.config,
-                              '8fce438abdd12cba33bd9fa4f7d16c098e10094f',
+                              '118992921c733bc0079e34dbde59cc8b3c1312dc',
                               full_path=self.temp_dir + '/openstack-nova'
                                                         '_distro_upstream/',
                               local=None),
@@ -249,7 +249,7 @@ class TestDriverDownstream(base.TestCase):
         self.assertEqual(rr_mock.call_args_list, expected)
 
         pi = pkginfo[0]
-        assert pi.commit_hash == 'ef6b4f43f467dfad2fd0fe99d9dec3fc93a9ffed', \
+        assert pi.commit_hash == 'c9de185ea1ac1e8d4435c5863b2ad7cefdb28c76', \
             pi.commit_hash
 
     @mock.patch('dlrn.drivers.downstream.DownstreamInfoDriver._distgit_setup',
