@@ -12,6 +12,7 @@
 
 import argparse
 from getpass import getpass
+import logging
 import passlib.hash
 from six.moves import configparser
 from six.moves import input
@@ -25,6 +26,7 @@ from dlrn.db import User
 
 
 def create_user(options, db_connection):
+    log = logging.getLogger(__name__)
     try:
         session = getSession(db_connection)
         olduser = session.query(User).filter(
@@ -43,23 +45,24 @@ def create_user(options, db_connection):
             session.add(newuser)
             session.commit()
             closeSession(session)
-            print("User %s successfully created" % options.username)
+            log.info("User %s successfully created" % options.username)
         else:
-            print("User %s already exists" % options.username)
+            log.error("User %s already exists" % options.username)
             return -1
     except Exception as e:
-        print("Failed to create user %s, %s" % (options.username, e))
+        log.error("Failed to create user %s, %s" % (options.username, e))
         return -1
     return 0
 
 
 def delete_user(options, db_connection):
+    log = logging.getLogger(__name__)
     session = getSession(db_connection)
     user = session.query(User).filter(
         User.username == options.username).first()
 
     if user is None:
-        print("ERROR: User %s does not exist" % options.username)
+        log.error("ERROR: User %s does not exist" % options.username)
         return -1
     else:
         if not options.force:
@@ -71,24 +74,26 @@ def delete_user(options, db_connection):
                 return -1
         session.delete(user)
         session.commit()
-        print("User %s deleted" % options.username)
+        log.info("User %s deleted" % options.username)
     closeSession(session)
     return 0
 
 
 def update_user(options, db_connection):
+    log = logging.getLogger(__name__)
     session = getSession(db_connection)
     password = passlib.hash.sha512_crypt.encrypt(options.password)
     user = session.query(User).filter(
         User.username == options.username).first()
 
     if user is None:
-        print("ERROR: User %s does not exist" % options.username)
+        log.error("ERROR: User %s does not exist" % options.username)
         return -1
     else:
         user.password = password
         session.add(user)
         session.commit()
+        log.info("User %s updated" % options.username)
     closeSession(session)
     return 0
 
