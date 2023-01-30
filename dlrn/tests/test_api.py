@@ -16,8 +16,13 @@ import os
 import sh
 import shutil
 import tempfile
+from unittest.mock import patch
 
 from datetime import datetime
+from dlrn.api.api_logging import create_logger_dict
+from dlrn.api.api_logging import create_rotating_file_handler_dict
+from dlrn.api.api_logging import get_config
+from dlrn.api.api_logging import setup_dict_config
 from dlrn.api import app
 from dlrn.config import ConfigOptions
 from dlrn import db
@@ -53,6 +58,20 @@ def mock_opt(config_file):
 
 def mock_ag(dirname, datadir, session, reponame, hashed_dir=False):
     return 'abc123'
+
+
+def mock_logger_dict(logger_name, handler_name, log_level):
+    return {logger_name: {'level': log_level,
+                          'handlers': [handler_name],
+                          'propagate': False}}
+
+
+def mock_handler_dict(handler_name, file_path):
+    return {handler_name: {'class': 'logging.handlers.RotatingFileHandler',
+                           'filename': file_path,
+                           'backupCount': 3,
+                           'maxBytes': 15728640,
+                           'formatter': 'default'}}
 
 
 class DLRNAPITestCase(base.TestCase):
@@ -1118,3 +1137,95 @@ class TestHealth(DLRNAPITestCase):
                                 content_type='application/json')
         # Error 405 is "method not allowed"
         self.assertEqual(response.status_code, 405)
+
+
+class TestGetLogger(DLRNAPITestCase):
+    log_debug_var = "LOG_LEVEL"
+    log_path_var = "Path1"
+    config = {}
+    dlrn_logger_name = "logger_dlrn"
+    auth_logger_name = "logger_auth"
+    dlrn_handler_name = "file_dlrn"
+    auth_handler_name = "file_auth"
+    file_path = "Path1"
+    log_level = "DEBUG"
+    debug_bool = True
+
+    def test_get_config_debug(self):
+        self.assertEqual(get_config(self.config,
+                                    self.log_debug_var), False)
+        with patch.object(os.environ, 'get') as os_environ_get:
+            os_environ_get.return_value = True
+            self.assertEqual(get_config(self.config,
+                                        self.log_debug_var), True)
+            self.config[self.log_debug_var] = False
+            self.assertEqual(get_config(self.config,
+                                        self.log_debug_var), False)
+
+    def test_get_config_path(self):
+        self.assertEqual(get_config(self.config,
+                                    self.log_path_var), False)
+        with patch.object(os.environ, 'get') as os_environ_get:
+            os_environ_get.return_value = "Path1"
+            self.assertEqual(get_config(self.config,
+                                        self.log_path_var), "Path1")
+            self.config[self.log_path_var] = "Path2"
+            self.assertEqual(get_config(self.config,
+                                        self.log_path_var), "Path2")
+
+    def test_create_rotating_file_handler_dict(self):
+        handler_dict = create_rotating_file_handler_dict(
+            self.dlrn_handler_name, self.file_path)
+        result_handler_dict = mock_handler_dict(
+            self.dlrn_handler_name, self.file_path)
+        self.assertEqual(handler_dict, result_handler_dict)
+
+    def test_create_logger_dict(self):
+        logger_dict = create_logger_dict(self.dlrn_logger_name,
+                                         self.dlrn_handler_name,
+                                         self.log_level)
+        result_logger_dict = mock_logger_dict(self.dlrn_logger_name,
+                                              self.dlrn_handler_name,
+                                              self.log_level)
+        self.assertEqual(logger_dict, result_logger_dict)
+
+    def test_setup_basic_dict_config(self):
+        basic_dict_config = setup_dict_config(self.config)
+        self.assertEqual(len(basic_dict_config["handlers"]), 0)
+        self.assertEqual(len(basic_dict_config["loggers"]), 1)
+        self.assertEqual(len(basic_dict_config["loggers"]["root"]), 1)
+        # Without configuration, we want the minimum login configuration
+        self.assertEqual(basic_dict_config["loggers"]["root"]['level'], 'INFO')
+
+    @mock.patch('dlrn.api.api_logging.get_config')
+    @mock.patch('dlrn.api.api_logging.get_config')
+    @mock.patch('dlrn.api.api_logging.create_rotating_file_handler_dict',
+                side_effect=mock_handler_dict)
+    @mock.patch('dlrn.api.api_logging.create_logger_dict',
+                side_effect=mock_logger_dict)
+    def test_setup_complex_dict_config(self, mocked_logged_dict,
+                                       mocked_handler_dict, mocked_retr_debug,
+                                       mocked_retr_path):
+        mocked_retr_debug.return_value = self.debug_bool
+        mocked_retr_path.return_value = self.log_path_var
+        result_dlrn_handler_dict = mock_handler_dict(self.dlrn_handler_name,
+                                                     self.file_path)
+        result_dlrn_logger_dict = mock_logger_dict(self.dlrn_logger_name,
+                                                   self.dlrn_handler_name,
+                                                   self.log_level,)
+        result_auth_handler_dict = mock_handler_dict(self.auth_handler_name,
+                                                     self.file_path)
+        result_auth_logger_dict = mock_logger_dict(self.auth_logger_name,
+                                                   self.auth_handler_name,
+                                                   self.log_level,)
+        return_dict = (setup_dict_config({}))
+        return_loggers = return_dict["loggers"]
+        return_handlers = return_dict["handlers"]
+        self.assertDictEqual(return_loggers[self.dlrn_logger_name],
+                             result_dlrn_logger_dict[self.dlrn_logger_name])
+        self.assertDictEqual(return_handlers[self.dlrn_handler_name],
+                             result_dlrn_handler_dict[self.dlrn_handler_name])
+        self.assertDictEqual(return_loggers[self.auth_logger_name],
+                             result_auth_logger_dict[self.auth_logger_name])
+        self.assertDictEqual(return_handlers[self.auth_handler_name],
+                             result_auth_handler_dict[self.auth_handler_name])

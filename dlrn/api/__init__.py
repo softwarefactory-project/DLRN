@@ -9,10 +9,12 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+import logging.config as logging_config
 import os
 
 from flask import Flask
+
+from dlrn.api.api_logging import setup_dict_config
 
 app = Flask(__name__)
 app.config.from_object('dlrn.api.config')
@@ -21,10 +23,15 @@ try:
 except KeyError:
     pass
 
+
 from dlrn.api import dlrn_api  # noqa
-from dlrn.api import graphql # noqa
-from dlrn.api import prom_metrics # noqa
-from dlrn.config import setup_logging  # noqa
+from dlrn.api import graphql  # noqa
+from dlrn.api import prom_metrics  # noqa
 
 
-setup_logging(os.environ.get("DLRN_DEBUG"), os.environ.get("DLRN_LOG_FILE"))
+def setup_api_logging(config):
+    log_dictConfig = setup_dict_config(app.config)
+    logging_config.dictConfig(log_dictConfig)
+
+
+setup_api_logging(app.config)
