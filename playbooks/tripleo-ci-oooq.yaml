@@ -128,7 +128,7 @@
               - build-test-packages
             vars:
               artg_change_list:
-               - project: openstack/tripleo-heat-templates
+               - project: openstack/stevedore
                  branch: stable/train
                  refspec: stable/train
                  host: https://review.opendev.org
