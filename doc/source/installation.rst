@@ -161,12 +161,15 @@ The configuration file looks like this:
 * ``fallback_to_master`` defines the fallback behavior when cloning Git
   repositories.
 
-  * With the default value of 1, DLRN will fall back to the ``master`` branch
-    for source repositories if the configured branch cannot be found, and
-    ``rpm-master`` for distgit repositories.
-  * If the value is 0, there will be no fallback, so if the configured branch
-    does not exist an error message will be displayed, and the project will be
-    ignored when deciding which packages need to be built.
+  * if dlrn fails to clone the branch defined in source dlrn parameter, it tries
+    to clone tag <release>-eol if it exists. If it does not, it checks the
+    fallback_to_master parameter. With the default value of 1, DLRN will fall
+    back to the ``master`` or ``main`` branch.
+  * if dlrn fails to clone a branch named ``<name>-rdo``, it assumes it is a
+    distgit and will try to fallback to ``rpm-master`` if parameter
+    fallback_to_master is set to 1.
+  * If dlrn fails to checkout a branch different to the one defined in source
+    parameter and the name does not ends with ``-rdo``, it will fail to build.
 
 * ``nonfallback_branches`` defines a list of regular expressions of branches for
   source and distgit repositories that should never fall back to other branches,

@@ -88,22 +88,49 @@ def refreshrepo(url, path, config_options, branch="master", local=False,
                     # Do not try fallback on selected branches
                     raise
             else:
-                if config_options.fallback_to_master:
-                    # Fallback to master
-                    if branch.startswith("rpm-"):
-                        branch = "rpm-master"
-                    elif branch.endswith("-rdo"):
-                        # Distgit branches can start with rpm- or end with -rdo
+                if branch == config_options.source:
+                    # It failed to clone the branch for upstream repo defined
+                    # in source parameter in project.ini . In this case
+                    # dlrn first checks if there is a <release>-eol tag. If it
+                    # does not exist, dlrn falls back to master if it is
+                    # allowed by config.
+                    eol_tag = branch.replace('stable/', '') + '-eol'
+                    list_eol = git.tag('-l', eol_tag)
+                    if list_eol:
+                        branch = eol_tag
+                    elif config_options.fallback_to_master:
+                        if git.branch('--list', 'master'):
+                            branch = "master"
+                        elif git.branch('--list', 'main'):
+                            branch = "main"
+                        else:
+                            logger.error("Branch %s for %s does not exist and "
+                                         "fallback branches master or main "
+                                         "are not found." % (branch, url))
+                            raise
+                    else:
+                        logger.error("Branch %s for %s does not exist, "
+                                     "and the configuration does not allow "
+                                     "to fallback to master." % (branch, url))
+                        raise
+                elif branch.endswith("-rdo"):
+                    # For distgits, there are no EOL tags, so dlrn falls back
+                    # to rpm-master if allowed by config.
+                    if config_options.fallback_to_master:
                         branch = "rpm-master"
                     else:
-                        branch = "master"
-                    logger.info("Falling back to %s" % branch)
-                    git.checkout(branch)
+                        logger.error("Branch %s for %s does not exist, "
+                                     "and the configuration does not allow "
+                                     "to fallback to master." % (branch, url))
+                        raise
                 else:
-                    logger.error("Branch %s for %s does not exist, and the "
-                                 "configuration does not allow a fallback to "
-                                 "master." % (branch, url))
+                    logger.error("Git ref %s for %s does not exist and it "
+                                 "is not the default source in dlrn config. "
+                                 "Check your package configuration."
+                                 % (branch, url))
                     raise
+                logger.info("Falling back %s to %s" % (url, branch))
+                git.checkout(branch)
         try:
             git.reset("--hard", "origin/%s" % branch)
         except Exception:
