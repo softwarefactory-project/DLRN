@@ -23,6 +23,9 @@
           <th>Status</th>
           <th>Repository</th>
           <th>Build Log</th>
+	  {% if config_options.pkginfo_driver == "dlrn.drivers.downstream.DownstreamInfoDriver"  %}
+          <th>Import Source</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -52,6 +55,13 @@
           <td>
             <a href="{{ commit.getshardedcommitdir() }}/rpmbuild.log">build log</a>
           </td>
+          {% if config_options.pkginfo_driver == "dlrn.drivers.downstream.DownstreamInfoDriver"  %}
+            {% if commit.versions_csv != None  %}
+              <td>{{ commit.versions_csv.replace("/versions.csv","") }}</td>
+            {% else %}
+              <td></td>
+            {% endif %}
+          {% endif %}
         </tr>
       {% endfor %}
       </tbody>

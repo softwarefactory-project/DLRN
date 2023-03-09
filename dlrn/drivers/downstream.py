@@ -136,12 +136,19 @@ class DownstreamInfoDriver(PkgInfoDriver):
         if not versions_url:
             fail_req_config_missing('versions_url')
 
+        # versions_url can be a comma separated list of urls
+        # where latest overrides previous ones
+        versions_url_list = versions_url.split(',')
+
         # return versions.csv as a dict with package name as a key
         vers = {}
-        content = fetch_remote_file(versions_url)
-        # first line is headers
-        for row in csv.reader(content[1:]):
-            vers[row[0]] = row[1:]
+
+        for versions_url_file in versions_url_list:
+            content = fetch_remote_file(versions_url_file)
+            # first line is headers
+            for row in csv.reader(content[1:]):
+                row.append(versions_url_file)
+                vers[row[0]] = row[1:]
         return vers
 
     def _transform_spec(self, directory):
@@ -295,6 +302,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                             distro_hash=distro_hash, dt_distro=dt_distro,
                             extended_hash=extended_hash,
                             dt_extended=dt_extended,
+                            versions_csv=version[9],
                             distgit_dir=self.distgit_dir(package['name']),
                             commit_branch=source_branch, component=component)
             project_toprocess.append(commit)

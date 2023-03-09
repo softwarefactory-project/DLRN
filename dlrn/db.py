@@ -70,6 +70,9 @@ class Commit(Base):
     artifacts = Column(Text, doc="Path to generated artifacts")
     notes = Column(Text, doc="Notes, free-form")
     flags = Column(Integer, default=0, doc="Internal flags")
+    versions_csv = Column(String(256),
+                          doc="URL of the source versions.csv in downstream "
+                              "driver")
     civotes = relationship("CIVote", back_populates="commit")
     promotions = relationship("Promotion", back_populates="commit")
 
