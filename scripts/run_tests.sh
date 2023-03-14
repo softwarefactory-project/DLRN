@@ -97,7 +97,14 @@ if [[ "${ZUUL_BRANCH}" =~ rpm- && "${ZUUL_BRANCH}" != "rpm-master" ]]; then
 elif [[ "${ZUUL_BRANCH}" =~ -rdo ]]; then
     branch=$(sed "s/-rdo//" <<< "${ZUUL_BRANCH}")
     baseurl="http://trunk.rdoproject.org/${branch}/${baseurl_release}/"
-    src="stable/${branch}"
+    #TODO(jcapitao): the condition below needs to be handled
+    # dynamically. Right now, we don't have the metadata in rdoinfo, so
+    # I'm adding it manually in order to unblock CI.
+    if [ "$branch" == 'antelope' ]; then
+        src="stable/2023.1"
+    else
+        src="stable/${branch}"
+    fi
     PROJECT_DISTRO_BRANCH=$ZUUL_BRANCH
 fi
 
