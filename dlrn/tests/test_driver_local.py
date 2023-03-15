@@ -14,7 +14,6 @@
 
 import mock
 import os
-import sh
 import shutil
 import tempfile
 
@@ -41,7 +40,7 @@ class TestDriverLocal(base.TestCase):
         shutil.rmtree(self.config.datadir)
         shutil.rmtree(self.base_dir)
 
-    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('sh.git', create=True)
     def test_getinfo(self, sh_mock):
         driver = LocalDriver(cfg_options=self.config)
         package = {

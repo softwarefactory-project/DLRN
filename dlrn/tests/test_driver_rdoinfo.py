@@ -14,7 +14,6 @@
 
 import mock
 import os
-import sh
 import shutil
 import tempfile
 
@@ -205,11 +204,11 @@ class TestDriverRdoInfo(base.TestCase):
 
     @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver._distgit_setup',
                 return_value=True)
-    @mock.patch.object(sh.Command, '__call__', autospec=True,
-                       side_effect=_mocked_git_log)
+    @mock.patch('sh.git', create=True)
     @mock.patch('dlrn.drivers.rdoinfo.refreshrepo',
                 side_effect=_mocked_refreshrepo_ok)
     def test_getinfo_basic(self, rr_mock, git_mock, ds_mock):
+        git_mock.bake().log.side_effect = _mocked_git_log
         driver = RdoInfoDriver(cfg_options=self.config)
         package = {
             'name': 'openstack-nova',
@@ -240,11 +239,11 @@ class TestDriverRdoInfo(base.TestCase):
         self.assertEqual(pi.commit_hash,
                          'd2ddfd9c5d7bfea3055ec5d51b4cb11ad12a02f3')
 
-    @mock.patch.object(sh.Command, '__call__', autospec=True,
-                       side_effect=_mocked_git_log)
+    @mock.patch('sh.git', create=True)
     @mock.patch('dlrn.drivers.rdoinfo.refreshrepo',
                 side_effect=Exception('Failed to clone git repository'))
     def test_getinfo_git_failure(self, rr_mock, git_mock):
+        git_mock.bake().log.side_effect = _mocked_git_log
         driver = RdoInfoDriver(cfg_options=self.config)
         package = {
             'name': 'openstack-nova',
