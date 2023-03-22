@@ -251,25 +251,33 @@ def main():
         if commit.status == 'SUCCESS':
             if not force:
                 logger.error(
-                    "Trying to recheck an already successful commit,"
+                    "Trying to recheck an already successful commit in %s,"
                     " ignoring. If you want to force it, use --force-recheck"
-                    " and set allow_force_rechecks=True in projects.ini")
-                sys.exit(1)
+                    " and set allow_force_rechecks=True in projects.ini."
+                    % commit.project_name)
+                return False
             else:
                 logger.info("Forcefully rechecking a successfully built "
-                            "commit for %s" % commit.project_name)
+                            "commit for %s." % commit.project_name)
         elif commit.status == 'RETRY':
             # In this case, we are going to retry anyway, so
             # do nothing and exit
             logger.warning("Trying to recheck a commit in RETRY state,"
-                           " ignoring.")
-            sys.exit(0)
+                           "in project %s, ignoring." % commit.project_name)
+            return True
         # We could set the status to RETRY here, but if we have gone
         # beyond max_retries it wouldn't work as expected. Thus, our
         # only chance is to remove the commit
         session.delete(commit)
-        session.commit()
-        sys.exit(0)
+        try:
+            session.commit()
+        except Exception as e:
+            logger.error("Error occured during commiting changes "
+                         "to database: %s" % e)
+            session.rollback()
+            return False
+        logger.info("Successful recheck for %s." % commit.project_name)
+        return True
 
     if options.recheck is True:
         if not pkg_name:
@@ -281,15 +289,24 @@ def main():
             force_recheck = True
         else:
             force_recheck = False
-        package = [p for p in packages if p['name'] == pkg_name][0]
-        for build_type in package.get('types', ['rpm']):
-            commit = getLastProcessedCommit(session, pkg_name, type=build_type)
-            if commit:
-                recheck_commit(commit, force_recheck)
-            else:
-                logger.error("There are no existing commits for package %s",
-                             pkg_name)
-                sys.exit(1)
+        exit_recheck = 0
+
+        for pkg_name in pkg_names:
+            package = [p for p in packages if p['name'] == pkg_name][0]
+            for build_type in package.get('types', ['rpm']):
+                commit = getLastProcessedCommit(session, pkg_name,
+                                                type=build_type)
+                if commit:
+                    if recheck_commit(commit, force_recheck) is False:
+                        logger.error("Recheck for package %s failed."
+                                     % pkg_name)
+                        exit_recheck = 1
+                else:
+                    logger.error("There are no existing commits "
+                                 "for package %s." % pkg_name)
+                    exit_recheck = 1
+        sys.exit(exit_recheck)
+
     # when we run a program instead of building we don't care about
     # the commits, we just want to run once per package
     if options.run:
