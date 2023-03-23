@@ -12,6 +12,7 @@ ZUUL3_HOME="${ZUUL3_HOME:-/home/zuul}"
 ZUUL_CLONES_DIR="${ZUUL3_HOME}/src/review.rdoproject.org"
 RDOINFO="${1:-$GIT_BASE_URL/rdoinfo}"
 PYTHON_VERSION="${PYTHON_VERSION:-py27}"
+USE_COMPONENTS="${USE_COMPONENTS:-False}"
 # We want to make it work for both python2 and python3
 if [ -x /usr/bin/python3 ]; then
     PYTHON=python3
@@ -114,6 +115,7 @@ sed -i "s%target=.*%target=${target}%" projects.ini
 sed -i "s%source=.*%source=${src}%" projects.ini
 sed -i "s%baseurl=.*%baseurl=${baseurl}%" projects.ini
 sed -i "s%tags=.*%tags=${tag}%" projects.ini
+sed -i "s%use_components=.*%use_components=${USE_COMPONENTS}%" projects.ini
 
 # Prepare directories for distro repo
 mkdir -p data/repos

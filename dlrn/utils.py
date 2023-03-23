@@ -351,9 +351,11 @@ def get_component_list(session):
 
 # Aggregate all .repo files from a given symlink into a top-level repo file
 # Also, aggregate the versions.csv file, this is useful for additional tooling
-def aggregate_repo_files(dirname, datadir, session, reponame,
+def aggregate_repo_files(dirname, datadir, session, reponame, packages,
                          hashed_dir=False):
-    component_list = get_component_list(session)
+    component_list_db = set(get_component_list(session))
+    component_list_pkgs = set([pkg.get('component') for pkg in packages])
+    component_list = component_list_db.intersection(component_list_pkgs)
 
     repo_content = ''
     csv_content = []

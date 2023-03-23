@@ -33,6 +33,7 @@ from dlrn.db import Promotion
 from dlrn.purge import FLAG_PURGED
 from dlrn.remote import import_commit
 from dlrn.utils import aggregate_repo_files
+from dlrn.utils import import_object
 
 from flask import g as flask_g
 from flask import jsonify
@@ -797,8 +798,11 @@ def promote():
     repo_checksum = None
     if config_options.use_components:
         datadir = os.path.realpath(config_options.datadir)
+        pkginfo_driver = config_options.pkginfo_driver
+        pkginfo = import_object(pkginfo_driver, cfg_options=config_options)
+        packages = pkginfo.getpackages(tags=config_options.tags)
         repo_checksum = aggregate_repo_files(promote_name, datadir, session,
-                                             config_options.reponame,
+                                             config_options.reponame, packages,
                                              hashed_dir=True)
 
     timestamp = time.mktime(datetime.now().timetuple())
@@ -949,8 +953,11 @@ def promote_batch():
     repo_checksum = None
     if config_options.use_components:
         datadir = os.path.realpath(config_options.datadir)
+        pkginfo_driver = config_options.pkginfo_driver
+        pkginfo = import_object(pkginfo_driver, cfg_options=config_options)
+        packages = pkginfo.getpackages(tags=config_options.tags)
         repo_checksum = aggregate_repo_files(promote_name, datadir, session,
-                                             config_options.reponame,
+                                             config_options.reponame, packages,
                                              hashed_dir=True)
         promotion.aggregate_hash = repo_checksum
         session.add(promotion)
