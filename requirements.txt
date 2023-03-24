@@ -17,7 +17,7 @@ requests
 Flask
 Flask-HTTPAuth<4.4.0;python_version=='2.7'
 Flask-HTTPAuth;python_version>='3.3'
-passlib>=1.6.5
+passlib>=1.7.0
 graphene<3.0
 graphene-sqlalchemy>=2.0
 flask-sqlalchemy

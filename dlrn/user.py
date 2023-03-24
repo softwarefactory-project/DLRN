@@ -13,7 +13,7 @@
 import argparse
 from getpass import getpass
 import logging
-import passlib.hash
+from passlib.hash import sha512_crypt
 from six.moves import configparser
 from six.moves import input
 import sys
@@ -39,7 +39,7 @@ def create_user(options, db_connection):
             else:
                 newpass = options.password
 
-            password = passlib.hash.sha512_crypt.encrypt(newpass)
+            password = sha512_crypt.hash(newpass)
             newuser = User(username=options.username,
                            password=password)
             session.add(newuser)
@@ -82,7 +82,7 @@ def delete_user(options, db_connection):
 def update_user(options, db_connection):
     log = logging.getLogger(__name__)
     session = getSession(db_connection)
-    password = passlib.hash.sha512_crypt.encrypt(options.password)
+    password = sha512_crypt.hash(options.password)
     user = session.query(User).filter(
         User.username == options.username).first()
 
