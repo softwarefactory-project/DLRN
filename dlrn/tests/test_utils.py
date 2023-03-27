@@ -17,6 +17,7 @@ import os
 import requests_mock
 import shutil
 import tempfile
+import yaml
 
 from dlrn import db
 from dlrn.tests import base
@@ -24,6 +25,7 @@ from dlrn.tests.test_db import TestsWithData
 from dlrn import utils
 from mock import call
 from mock import MagicMock
+from yaml.loader import SafeLoader
 
 
 class Testdumpshas2file(TestsWithData):
@@ -105,8 +107,11 @@ class TestAggregateRepo(base.TestCase):
         os.close(self.db_fd)
 
     def test_aggregate_repo_files(self):
+        with open('./dlrn/tests/samples/rdo.yml') as f:
+            packages = yaml.load(f, Loader=SafeLoader)['packages']
         result = utils.aggregate_repo_files('test1', self.datadir,
-                                            self.session, 'delorean')
+                                            self.session, 'delorean',
+                                            packages)
         expected_file = os.path.join(self.datadir, 'repos', 'test1',
                                      'delorean.repo')
         assert os.path.exists(expected_file)
@@ -116,8 +121,10 @@ class TestAggregateRepo(base.TestCase):
         assert result == hashlib.md5(b'TESTING ONE TWO THREE\n').hexdigest()
 
     def test_aggregate_repo_files_hashed_dir(self):
+        with open('./dlrn/tests/samples/rdo.yml') as f:
+            packages = yaml.load(f, Loader=SafeLoader)['packages']
         utils.aggregate_repo_files('test1', self.datadir, self.session,
-                                   'delorean', hashed_dir=True)
+                                   'delorean', packages, hashed_dir=True)
         expected_file = os.path.join(self.datadir, 'repos', 'test1',
                                      'delorean.repo')
         assert os.path.exists(expected_file)

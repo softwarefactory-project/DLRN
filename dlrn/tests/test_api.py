@@ -56,7 +56,7 @@ def mock_opt(config_file):
     return co
 
 
-def mock_ag(dirname, datadir, session, reponame, hashed_dir=False):
+def mock_ag(dirname, datadir, session, reponame, packages, hashed_dir=False):
     return 'abc123'
 
 

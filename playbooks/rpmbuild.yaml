@@ -13,6 +13,7 @@
               export TARGET="centos8"
           elif [ ${CENTOS_VERS} = "centos9" ]; then
               export TARGET="centos9"
+              export USE_COMPONENTS="True"
           else
               export TARGET="centos"
           fi
