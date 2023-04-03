@@ -13,7 +13,6 @@
 import argparse
 import mock
 import os
-import sh
 import shutil
 import sys
 import tempfile
@@ -375,11 +374,11 @@ class TestGetinfo(base.TestCase):
 
     @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver._distgit_setup',
                 return_value=True)
-    @mock.patch.object(sh.Command, '__call__', autospec=True,
-                       side_effect=_mocked_git_log)
+    @mock.patch('sh.git', create=True)
     @mock.patch('dlrn.drivers.rdoinfo.refreshrepo',
                 side_effect=_mocked_refreshrepo)
     def test_getinfo_basic(self, rr_mock, git_mock, db_mock, ds_mock):
+        git_mock.bake().log.side_effect = _mocked_git_log
         driver = RdoInfoDriver(cfg_options=self.config)
         package = {
             'name': 'openstack-nova',

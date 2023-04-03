@@ -68,13 +68,13 @@ class TestDriverCopr(base.TestCase):
                               _err=driver._process_copr_output,
                               _out=driver._process_copr_output,
                               _cwd=self.temp_dir,
-                              _env={'PATH': '/usr/bin/'}),
+                              _env=mock.ANY),
                     mock.call(['copr', 'download-build', '-d',
                                '%s/1234' % self.temp_dir, '1234'],
                               _err=driver._process_copr_output,
                               _out=driver._process_copr_output,
                               _cwd=self.temp_dir,
-                              _env={'PATH': '/usr/bin/'})]
+                              _env=mock.ANY)]
         # 1- copr build (handled by env_mock)
         # 2- copr download-build (handled by env_mock)
         # 3- restorecon (handled by rc_mock)

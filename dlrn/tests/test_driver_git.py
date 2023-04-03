@@ -13,7 +13,6 @@
 # under the License.
 
 import mock
-import sh
 import shutil
 import tempfile
 
@@ -59,9 +58,10 @@ class TestDriverGit(base.TestCase):
         super(TestDriverGit, self).tearDown()
         shutil.rmtree(self.config.datadir)
 
-    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('sh.renderspec', create=True)
+    @mock.patch('sh.git', create=True)
     @mock.patch('dlrn.drivers.gitrepo.refreshrepo')
-    def test_getinfo(self, refresh_mock, sh_mock):
+    def test_getinfo(self, refresh_mock, sh_mock, sh_renderspec):
         refresh_mock.return_value = [None, None, None]
         driver = GitRepoDriver(cfg_options=self.config)
         package = {'upstream': 'test', 'name': 'test'}
@@ -70,10 +70,11 @@ class TestDriverGit(base.TestCase):
         self.assertEqual(info, [])
         self.assertEqual(skipped, False)
 
-    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('sh.renderspec', create=True)
+    @mock.patch('sh.git', create=True)
     @mock.patch('dlrn.drivers.gitrepo.refreshrepo',
                 side_effect=Exception('Failed to clone git repository'))
-    def test_getinfo_failure(self, refresh_mock, sh_mock):
+    def test_getinfo_failure(self, refresh_mock, sh_mock, sh_renderspec):
         refresh_mock.return_value = [None, None, None]
         driver = GitRepoDriver(cfg_options=self.config)
         package = {'upstream': 'test', 'name': 'test'}
@@ -82,7 +83,7 @@ class TestDriverGit(base.TestCase):
         self.assertEqual(info, [])
         self.assertEqual(skipped, True)
 
-    @mock.patch.object(sh.Command, '__call__', autospec=True)
+    @mock.patch('sh.git', create=True)
     @mock.patch('os.listdir')
     def test_getpackages(self, listdir_mock, sh_mock):
         listdir_mock.return_value = []

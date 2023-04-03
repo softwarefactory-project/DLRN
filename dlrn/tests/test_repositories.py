@@ -21,35 +21,38 @@ from dlrn.tests import base
 from six.moves import configparser
 
 
-def _aux_sh(*args):
-    call = args[0]
-    if call == '-f':
+def _aux_git_checkout(*args):
+    # Accessed when call git checkout
+    if args[0] == '-f':
         raise sh.ErrorReturnCode_1('blabla'.encode(), ''.encode(),
                                    ''.encode())
-    if call == '-l' and args[1] == 'branchless-eol':
+
+
+def _aux_git_tag(*args):
+    # Accessed when call git tag
+    if args[0] == '-l' and args[1] == 'branchless-eol':
         return None
-    if call == '-l' and args[1] == 'eoled-eol':
+    if args[0] == '-l' and args[1] == 'eoled-eol':
         return 'eoled-eol'
-    if call == '--list' and args[1] == 'master':
+
+
+def _aux_git_branch(*args):
+    # Accessed when call git branch
+    if args[0] == '--list' and args[1] == 'master':
         return 'master'
-    return
-
-
-def _aux_sh_main(*args):
-    call = args[0]
-    if call == '-f':
-        raise sh.ErrorReturnCode_1('blabla'.encode(), ''.encode(),
-                                   ''.encode())
-    if call == '-l' and args[1] == 'branchless-eol':
-        return None
-    if call == '--list' and args[1] == 'master':
-        return None
-    if call == '--list' and args[1] == 'main':
+    if args[0] == '--list' and args[1] == 'main':
         return 'main'
-    return
 
 
-@mock.patch.object(sh.Command, '__call__', autospec=True)
+def _aux_git_branch_main(*args):
+    # Accessed when call git branch
+    if args[0] == '--list' and args[1] == 'master':
+        return None
+    if args[0] == '--list' and args[1] == 'main':
+        return 'main'
+
+
+@mock.patch('sh.git', create=True)
 class TestRefreshRepo(base.TestCase):
     def setUp(self):
         super(TestRefreshRepo, self).setUp()
@@ -59,186 +62,300 @@ class TestRefreshRepo(base.TestCase):
                    "dlrn.drivers.mockdriver.MockBuildDriver")
         self.config = ConfigOptions(config)
 
-    def test_clone_if_not_cloned(self, sh_mock):
+    @mock.patch('os.path.exists', return_value=False)
+    def test_clone_if_not_cloned(self, path_mock, git_mock):
         repositories.refreshrepo('url', 'path', self.config, branch='branch')
-        expected = [mock.call(sh.git.clone, 'url', 'path'),
-                    mock.call(sh.git.fetch, 'origin'),
-                    mock.call(sh.git.checkout, '-f', 'branch'),
-                    mock.call(sh.git.reset, '--hard', 'origin/branch'),
-                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1', '.')]
-        self.assertEqual(sh_mock.call_args_list, expected)
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake().checkout('-f', 'branch')]
+        expected_git_reset = [mock.call.bake().reset('--hard',
+                                                     'origin/branch')]
+        expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
+                                                 '-1', '.')]
+
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
+        self.assertEqual(git_mock.bake().reset.call_args_list,
+                         expected_git_reset)
+        self.assertEqual(git_mock.bake().log.call_args_list, expected_git_log)
 
     @mock.patch('os.path.exists', return_value=True)
     @mock.patch('shutil.rmtree', return_value=True)
-    def test_dont_clone_if_cloned(self, path_mock, shutil_mock, sh_mock):
+    def test_dont_clone_if_cloned(self, path_mock, shutil_mock, git_mock):
         repositories.refreshrepo('url', 'path', self.config, branch='branch')
-        expected = [mock.call(sh.git, 'remote', '-v'),
-                    mock.call(sh.git.clone, 'url', 'path'),
-                    mock.call(sh.git.fetch, 'origin'),
-                    mock.call(sh.git.checkout, '-f', 'branch'),
-                    mock.call(sh.git.reset, '--hard', 'origin/branch'),
-                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1', '.')]
-        self.assertEqual(sh_mock.call_args_list, expected)
+        expected_git_remote = [mock.call.bake()('remote', '-v')]
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.bake().fetch('origin')]
+        expected_git_checkout = [mock.call.bake().checkout('-f', 'branch')]
+        expected_git_reset = [mock.call.bake().reset('--hard',
+                                                     'origin/branch')]
+        expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
+                                                 '-1', '.')]
+
+        self.assertEqual(git_mock.bake().call_args_list, expected_git_remote)
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
+        self.assertEqual(git_mock.bake().reset.call_args_list,
+                         expected_git_reset)
+        self.assertEqual(git_mock.bake().log.call_args_list, expected_git_log)
 
     @mock.patch('os.path.exists', return_value=True)
-    def test_dont_fetch_if_local_repo_exists(self, path_mock, sh_mock):
+    def test_dont_fetch_if_local_repo_exists(self, path_mock, git_mock):
         repositories.refreshrepo('url', 'path', self.config, branch='branch',
                                  local=True)
-        expected = [mock.call(sh.git.log, '--pretty=format:%H %ct', '-1', '.')]
-        self.assertEqual(sh_mock.call_args_list, expected)
+        expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
+                                                 '-1', '.')]
+        self.assertEqual(git_mock.bake().log.call_args_list, expected_git_log)
 
-    def test_clone_fetch_if_local_repo_missing(self, sh_mock):
+    def test_clone_fetch_if_local_repo_missing(self, git_mock):
         repositories.refreshrepo('url', 'path', self.config, branch='branch',
                                  local=True)
-        expected = [mock.call(sh.git.clone, 'url', 'path'),
-                    mock.call(sh.git.fetch, 'origin'),
-                    mock.call(sh.git.checkout, '-f', 'branch'),
-                    mock.call(sh.git.reset, '--hard', 'origin/branch'),
-                    mock.call(sh.git.log, '--pretty=format:%H %ct', '-1', '.')]
-        self.assertEqual(sh_mock.call_args_list, expected)
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake().checkout('-f', 'branch')]
+        expected_git_reset = [mock.call.bake().reset('--hard',
+                                                     'origin/branch')]
+        expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
+                                                 '-1', '.')]
 
-    def test_clone_no_fallback(self, sh_mock):
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
+        self.assertEqual(git_mock.bake().reset.call_args_list,
+                         expected_git_reset)
+        self.assertEqual(git_mock.bake().log.call_args_list, expected_git_log)
+
+    def test_clone_no_fallback(self, git_mock):
         config = configparser.RawConfigParser()
         config.read("projects.ini")
         config.set('DEFAULT', 'fallback_to_master', '0')
         self.config = ConfigOptions(config)
-        # We need to redefine the mock object again, to use a side effect
-        # that will fail in the git checkout call. A bit convoluted, but
-        # it works
-        with mock.patch.object(sh.Command, '__call__') as new_mock:
-            new_mock.side_effect = _aux_sh
-            self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
-                              'url', 'path', self.config, branch='branch')
-            expected = [mock.call('url', 'path'),
-                        mock.call('origin'),
-                        mock.call('-f', 'branch')]
-            self.assertEqual(new_mock.call_args_list, expected)
+        git_mock.bake().branch.side_effect = _aux_git_branch
+        git_mock.bake().tag.side_effect = _aux_git_tag
+        git_mock.bake().checkout.side_effect = _aux_git_checkout
+        self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
+                          'url', 'path', self.config, branch='branch')
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake().checkout('-f', 'branch')]
 
-    def test_clone_no_fallback_default(self, sh_mock):
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
+
+    def test_clone_no_fallback_default(self, git_mock):
         config = configparser.RawConfigParser()
         config.read("projects.ini")
         config.set('DEFAULT', 'fallback_to_master', '1')
         self.config = ConfigOptions(config)
-        with mock.patch.object(sh.Command, '__call__') as new_mock:
-            new_mock.side_effect = _aux_sh
-            self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
-                              'url', 'path', self.config, branch='rpm-master')
-            expected = [mock.call('url', 'path'),
-                        mock.call('origin'),
-                        mock.call('-f', 'rpm-master')]
-            self.assertEqual(new_mock.call_args_list, expected)
+        git_mock.bake().branch.side_effect = _aux_git_branch
+        git_mock.bake().tag.side_effect = _aux_git_tag
+        git_mock.bake().checkout.side_effect = _aux_git_checkout
+        self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
+                          'url', 'path', self.config, branch='rpm-master')
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake().checkout('-f',
+                                                           'rpm-master')]
 
-    def test_clone_no_fallback_var(self, sh_mock):
-        config = configparser.RawConfigParser()
-        config.read("projects.ini")
-        config.set('DEFAULT', 'fallback_to_master', '1')
-        config.set('DEFAULT', 'nonfallback_branches', '^foo-')
-        self.config = ConfigOptions(config)
-        with mock.patch.object(sh.Command, '__call__') as new_mock:
-            new_mock.side_effect = _aux_sh
-            self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
-                              'url', 'path', self.config, branch='foo-bar')
-            expected = [mock.call('url', 'path'),
-                        mock.call('origin'),
-                        mock.call('-f', 'foo-bar')]
-            self.assertEqual(new_mock.call_args_list, expected)
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
 
-    def test_clone_fallback_var(self, sh_mock):
+    def test_clone_no_fallback_var(self, git_mock):
         config = configparser.RawConfigParser()
         config.read("projects.ini")
         config.set('DEFAULT', 'fallback_to_master', '1')
         config.set('DEFAULT', 'nonfallback_branches', '^foo-')
         self.config = ConfigOptions(config)
-        with mock.patch.object(sh.Command, '__call__') as new_mock:
-            new_mock.side_effect = _aux_sh
-            result = repositories.refreshrepo('url', 'path', self.config,
-                                              branch='zed-rdo')
-            self.assertEqual(result, ['rpm-master', 'None'])
-            expected = [mock.call('url', 'path'),
-                        mock.call('origin'),
-                        mock.call('-f', 'zed-rdo'),
-                        mock.call('rpm-master'),
-                        mock.call('--hard', 'origin/rpm-master'),
-                        mock.call('--pretty=format:%H %ct', '-1', '.')]
-            self.assertEqual(new_mock.call_args_list, expected)
+        git_mock.bake().branch.side_effect = _aux_git_branch
+        git_mock.bake().tag.side_effect = _aux_git_tag
+        git_mock.bake().checkout.side_effect = _aux_git_checkout
+        self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
+                          'url', 'path', self.config, branch='foo-bar')
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake().checkout('-f', 'foo-bar')]
 
-    def test_clone_fallback_eol(self, sh_mock):
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
+
+    def test_clone_fallback_var(self, git_mock):
+        config = configparser.RawConfigParser()
+        config.read("projects.ini")
+        config.set('DEFAULT', 'fallback_to_master', '1')
+        config.set('DEFAULT', 'nonfallback_branches', '^foo-')
+        self.config = ConfigOptions(config)
+        git_mock.bake().branch.side_effect = _aux_git_branch
+        git_mock.bake().tag.side_effect = _aux_git_tag
+        git_mock.bake().checkout.side_effect = _aux_git_checkout
+        git_mock.bake().log.return_value = None
+        result = repositories.refreshrepo('url', 'path', self.config,
+                                          branch='zed-rdo')
+        self.assertEqual(result, ['rpm-master', 'None'])
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake().checkout('-f', 'zed-rdo'),
+                                 mock.call.bake().checkout('rpm-master')]
+        expected_git_reset = [mock.call.bake().reset('--hard',
+                                                     'origin/rpm-master')]
+        expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
+                                                 '-1', '.')]
+
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
+        self.assertEqual(git_mock.bake().reset.call_args_list,
+                         expected_git_reset)
+        self.assertEqual(git_mock.bake().log.call_args_list, expected_git_log)
+
+    def test_clone_fallback_eol(self, git_mock):
         config = configparser.RawConfigParser()
         config.read("projects.ini")
         config.set('DEFAULT', 'source', 'stable/eoled')
         config.set('DEFAULT', 'fallback_to_master', '1')
         config.set('DEFAULT', 'nonfallback_branches', '^foo-')
         self.config = ConfigOptions(config)
-        with mock.patch.object(sh.Command, '__call__') as new_mock:
-            new_mock.side_effect = _aux_sh
-            result = repositories.refreshrepo('url', 'path', self.config,
-                                              branch='stable/eoled')
-            self.assertEqual(result, ['eoled-eol', 'None'])
-            expected = [mock.call('url', 'path'),
-                        mock.call('origin'),
-                        mock.call('-f', 'stable/eoled'),
-                        mock.call('-l', 'eoled-eol'),
-                        mock.call('eoled-eol'),
-                        mock.call('--hard', 'origin/eoled-eol'),
-                        mock.call('--pretty=format:%H %ct', '-1', '.')]
-            self.assertEqual(new_mock.call_args_list, expected)
+        git_mock.bake().branch.side_effect = _aux_git_branch
+        git_mock.bake().tag.side_effect = _aux_git_tag
+        git_mock.bake().checkout.side_effect = _aux_git_checkout
+        git_mock.bake().log.return_value = None
+        result = repositories.refreshrepo('url', 'path', self.config,
+                                          branch='stable/eoled')
+        self.assertEqual(result, ['eoled-eol', 'None'])
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake().checkout('-f',
+                                                           'stable/eoled'),
+                                 mock.call.bake().checkout('eoled-eol')]
+        expected_git_tag = [mock.call.tag('-l', 'eoled-eol')]
+        expected_git_reset = [mock.call.bake().reset('--hard',
+                                                     'origin/eoled-eol')]
+        expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
+                                                 '-1', '.')]
 
-    def test_clone_fallback_branchless(self, sh_mock):
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
+        self.assertEqual(git_mock.bake().tag.call_args_list, expected_git_tag)
+        self.assertEqual(git_mock.bake().reset.call_args_list,
+                         expected_git_reset)
+        self.assertEqual(git_mock.bake().log.call_args_list, expected_git_log)
+
+    def test_clone_fallback_branchless(self, git_mock):
         config = configparser.RawConfigParser()
         config.read("projects.ini")
         config.set('DEFAULT', 'source', 'stable/branchless')
         config.set('DEFAULT', 'fallback_to_master', '1')
         config.set('DEFAULT', 'nonfallback_branches', '^foo-')
         self.config = ConfigOptions(config)
-        with mock.patch.object(sh.Command, '__call__') as new_mock:
-            new_mock.side_effect = _aux_sh
-            result = repositories.refreshrepo('url', 'path', self.config,
-                                              branch='stable/branchless')
-            self.assertEqual(result, ['master', 'None'])
-            expected = [mock.call('url', 'path'),
-                        mock.call('origin'),
-                        mock.call('-f', 'stable/branchless'),
-                        mock.call('-l', 'branchless-eol'),
-                        mock.call('--list', 'master'),
-                        mock.call('master'),
-                        mock.call('--hard', 'origin/master'),
-                        mock.call('--pretty=format:%H %ct', '-1', '.')]
-            self.assertEqual(new_mock.call_args_list, expected)
+        git_mock.bake().branch.side_effect = _aux_git_branch
+        git_mock.bake().tag.side_effect = _aux_git_tag
+        git_mock.bake().checkout.side_effect = _aux_git_checkout
+        git_mock.bake().log.return_value = None
+        result = repositories.refreshrepo('url', 'path', self.config,
+                                          branch='stable/branchless')
+        self.assertEqual(result, ['master', 'None'])
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake()
+                                 .checkout('-f', 'stable/branchless'),
+                                 mock.call.bake().checkout('master')]
+        expected_git_tag = [mock.call.tag('-l', 'branchless-eol')]
+        expected_git_branch = [mock.call.branch('--list', 'master')]
+        expected_git_reset = [mock.call.bake().reset('--hard',
+                                                     'origin/master')]
+        expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
+                                                 '-1', '.')]
 
-    def test_clone_fallback_main(self, sh_mock):
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
+        self.assertEqual(git_mock.bake().tag.call_args_list, expected_git_tag)
+        self.assertEqual(git_mock.bake().branch.call_args_list,
+                         expected_git_branch)
+        self.assertEqual(git_mock.bake().reset.call_args_list,
+                         expected_git_reset)
+        self.assertEqual(git_mock.bake().log.call_args_list, expected_git_log)
+
+    def test_clone_fallback_main(self, git_mock):
         config = configparser.RawConfigParser()
         config.read("projects.ini")
         config.set('DEFAULT', 'source', 'stable/branchless')
         config.set('DEFAULT', 'fallback_to_master', '1')
         config.set('DEFAULT', 'nonfallback_branches', '^foo-')
         self.config = ConfigOptions(config)
-        with mock.patch.object(sh.Command, '__call__') as new_mock:
-            new_mock.side_effect = _aux_sh_main
-            result = repositories.refreshrepo('url', 'path', self.config,
-                                              branch='stable/branchless')
-            expected = [mock.call('url', 'path'),
-                        mock.call('origin'),
-                        mock.call('-f', 'stable/branchless'),
-                        mock.call('-l', 'branchless-eol'),
-                        mock.call('--list', 'master'),
-                        mock.call('--list', 'main'),
-                        mock.call('main'),
-                        mock.call('--hard', 'origin/main'),
-                        mock.call('--pretty=format:%H %ct', '-1', '.')]
-            self.assertEqual(new_mock.call_args_list, expected)
-            self.assertEqual(result, ['main', 'None'])
+        git_mock.bake().branch.side_effect = _aux_git_branch_main
+        git_mock.bake().tag.side_effect = _aux_git_tag
+        git_mock.bake().checkout.side_effect = _aux_git_checkout
+        git_mock.bake().log.return_value = None
+        result = repositories.refreshrepo('url', 'path', self.config,
+                                          branch='stable/branchless')
+        self.assertEqual(result, ['main', 'None'])
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake()
+                                 .checkout('-f', 'stable/branchless'),
+                                 mock.call.bake().checkout('main')]
+        expected_git_tag = [mock.call.tag('-l', 'branchless-eol')]
+        expected_git_branch = [mock.call.branch('--list', 'master'),
+                               mock.call.branch('--list', 'main')]
+        expected_git_reset = [mock.call.bake().reset('--hard',
+                                                     'origin/main')]
+        expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
+                                                 '-1', '.')]
 
-    def test_clone_no_fallback_nosource(self, sh_mock):
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
+        self.assertEqual(git_mock.bake().tag.call_args_list, expected_git_tag)
+        self.assertEqual(git_mock.bake().branch.call_args_list,
+                         expected_git_branch)
+        self.assertEqual(git_mock.bake().reset.call_args_list,
+                         expected_git_reset)
+        self.assertEqual(git_mock.bake().log.call_args_list, expected_git_log)
+
+    def test_clone_no_fallback_nosource(self, git_mock):
         config = configparser.RawConfigParser()
         config.read("projects.ini")
         config.set('DEFAULT', 'source', 'stable/release')
         config.set('DEFAULT', 'fallback_to_master', '1')
         self.config = ConfigOptions(config)
-        with mock.patch.object(sh.Command, '__call__') as new_mock:
-            new_mock.side_effect = _aux_sh
-            self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
-                              'url', 'path', self.config, branch='1.0.0')
-            expected = [mock.call('url', 'path'),
-                        mock.call('origin'),
-                        mock.call('-f', '1.0.0')]
-            self.assertEqual(new_mock.call_args_list, expected)
+        git_mock.bake().branch.side_effect = _aux_git_branch
+        git_mock.bake().tag.side_effect = _aux_git_tag
+        git_mock.bake().checkout.side_effect = _aux_git_checkout
+        git_mock.bake().log.return_value = None
+        self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
+                          'url', 'path', self.config, branch='1.0.0')
+        expected_git_clone = [mock.call.clone('url', 'path')]
+        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_checkout = [mock.call.bake().checkout('-f', '1.0.0')]
+
+        self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
+        self.assertEqual(git_mock.bake().fetch.call_args_list,
+                         expected_git_fetch)
+        self.assertEqual(git_mock.bake().checkout.call_args_list,
+                         expected_git_checkout)
