@@ -7,7 +7,7 @@
           export TAG="{{  tag | default('') }}"
           export CENTOS_VERS="{{  centos_version | default('centos7') }}"
           export REPO_SERVER="https://trunk.rdoproject.org"
-          export PYTHON_VERSION="{{ python_version | default('py27') }}"
+          export PYTHON_VERSION="{{ python_version | default('py36') }}"
           export REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
           if [ ${CENTOS_VERS} = "centos8" ]; then
               export TARGET="centos8"
