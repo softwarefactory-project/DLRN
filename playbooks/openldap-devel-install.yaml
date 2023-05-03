@@ -1,0 +1,9 @@
+---
+- hosts: centos-7
+  tasks:
+    - name: Install openldap-devel
+      package:
+        name:
+          - openldap-devel
+        state: present
+      become: true

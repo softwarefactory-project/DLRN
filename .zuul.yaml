@@ -75,6 +75,7 @@
 - job:
     name: dlrn-api-functional-centos-7
     parent: dlrn-api-functional
+    pre-run: playbooks/openldap-devel-install.yaml
     nodeset:
       nodes:
         - name: centos-7
@@ -102,6 +103,12 @@
         - name: container
           label: zuul-worker-python
 
+- job:
+    name: tox-py36-ci-config
+    parent: tox-py36
+    pre-run: playbooks/krb5-devel-install.yaml
+    run: playbooks/tox_run.yaml
+
 - project:
     name: DLRN
     vars:
@@ -111,7 +118,7 @@
       jobs:
         - tox-pep8:
             nodeset: fedora-latest-pod
-        - tox-py36:
+        - tox-py36-ci-config:
             nodeset:
               nodes:
                 - name: upstream-centos-8-stream
