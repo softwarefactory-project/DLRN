@@ -813,8 +813,8 @@ def promote():
 
     session.add(promotion)
     session.commit()
-    logger.info('Added new promotion named %s to commit %s for component %s by \
-                user %s', promote_name, commit_hash,
+    logger.info('Added new promotion named %s to commit %s for component %s \
+                by user %s', promote_name, commit_hash,
                 commit.component, auth.username())
     repo_hash = _repo_hash(commit)
     repo_url = "%s/%s" % (config_options.baseurl, commit.getshardedcommitdir())
