@@ -12,7 +12,7 @@
           label: cloud-centos-7
 
 - job:
-    name: dlrn-rpmbuild
+    name: dlrn-rpmbuild-centos-7
     parent: dlrn-base
     description: Run DLRN to build a package
     run: playbooks/rpmbuild.yaml
@@ -22,7 +22,7 @@
       centos_version: 'centos7'
 
 - job:
-    name: dlrn-rpmbuild-cs9
+    name: dlrn-rpmbuild-centos-9
     parent: dlrn-base
     description: Run DLRN to build a package using Python 3 on Centos9
     run: playbooks/rpmbuild.yaml
@@ -36,7 +36,7 @@
           label: cloud-centos-9-stream
 
 - job:
-    name: dlrn-rpmbuild-python3
+    name: dlrn-rpmbuild-centos-8
     parent: dlrn-base
     description: Run DLRN to build a package using Python 3
     run: playbooks/rpmbuild.yaml
@@ -50,21 +50,16 @@
           label: upstream-centos-8-stream
 
 - job:
-    name: dlrn-rpmbuild-tripleo-ci-oooq
+    name: dlrn-rpmbuild-tripleo-ci-oooq-centos8
     parent: dlrn-base
     voting: false
-    description: Run DLRN to build a package using Tripleo-Quickstart playbooks
+    description: Run DLRN to build a package using Tripleo-Quickstart playbooks on CentOS 8
     run: playbooks/tripleo-ci-oooq.yaml
     post-run: playbooks/tripleo-ci-oooq-getlogs.yaml
-
-- job:
-    name: dlrn-rpmbuild-tripleo-ci-oooq-centos8
-    parent: dlrn-rpmbuild-tripleo-ci-oooq
     nodeset:
       nodes:
         - name: cloud-centos-8-stream
           label: cloud-centos-8-stream
-    description: Run DLRN to build a package using Tripleo-Quickstart playbooks on CentOS 8
 
 - job:
     name: dlrn-api-functional
@@ -123,10 +118,9 @@
                   label: upstream-centos-8-stream
             vars:
                 tox_install_bindep: false
-        - dlrn-rpmbuild
-        - dlrn-rpmbuild-cs9
-        - dlrn-rpmbuild-python3
-        - dlrn-rpmbuild-tripleo-ci-oooq
+        - dlrn-rpmbuild-centos-7
+        - dlrn-rpmbuild-centos-9
+        - dlrn-rpmbuild-centos-8
         - dlrn-rpmbuild-tripleo-ci-oooq-centos8
         - dlrn-api-functional-centos-7
         - dlrn-api-functional-centos-8
@@ -142,9 +136,9 @@
                   label: upstream-centos-8-stream
             vars:
                 tox_install_bindep: false
-        - dlrn-rpmbuild
-        - dlrn-rpmbuild-cs9
-        - dlrn-rpmbuild-python3
+        - dlrn-rpmbuild-centos-7
+        - dlrn-rpmbuild-centos-9
+        - dlrn-rpmbuild-centos-8
     post:
       jobs:
         - publish-readthedocs
