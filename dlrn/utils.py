@@ -360,7 +360,7 @@ def aggregate_repo_files(dirname, datadir, session, reponame, packages,
     repo_content = ''
     csv_content = []
 
-    for component in component_list:
+    for component in sorted(component_list):
         repo_file = os.path.join(datadir, "repos/component", component,
                                  dirname, "%s.repo" % reponame)
         csv_file = os.path.join(datadir, "repos/component", component,
