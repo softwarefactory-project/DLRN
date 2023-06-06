@@ -654,6 +654,10 @@ logs set by ErrorLog and CustomLog in the apache conf file.
 ``DLRN_DEBUG`` also specifies if debug when logs are redirected to logs set
 by ErrorLog and CustomLog in the apache conf file.
 
+``PROTECT_READ_ENDPOINTS`` is used to make optional or not the authentication in
+read-only endpoints. Default value is False, so the authentication by default is
+only set in those endpoints with write capabilities.
+
 Those variables are also applied within the ``CONFIG_FILE`` with
 higher precedence.
 
@@ -670,6 +674,7 @@ in the above example, with the following syntax:
     DB_PATH = 'sqlite:////home/centos-master/DLRN/commits.sqlite'
     REPO_PATH = '/home/centos-master/DLRN/data/repos'
     CONFIG_FILE = 'projects.ini'
+    PROTECT_READ_ENDPOINTS = False
 
 Where ``DB_PATH`` is the path to the SQLite database for your environment,
 ``REPO_PATH`` will point to the base directory for the generated repositories,

@@ -50,6 +50,11 @@ import time
 pagination_limit = 100
 max_limit = 100
 
+if 'PROTECT_READ_ENDPOINTS' not in app.config.keys():
+    bypass_read_endpoints = True
+else:
+    bypass_read_endpoints = not app.config['PROTECT_READ_ENDPOINTS']
+
 
 def _get_db():
     if 'db' not in flask_g:
@@ -167,6 +172,7 @@ def getVote(session, timestamp, success=None, job_id=None, component=None,
 
 
 @app.route('/api/health', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def health():
     # Check database connection
     session = _get_db()
@@ -179,7 +185,7 @@ def health():
 
 
 @app.route('/api/health', methods=['POST'])
-@auth.login_required
+@auth.login_required(optional=False)
 def health_post():
     # Check database connection
     session = _get_db()
@@ -192,6 +198,7 @@ def health_post():
 
 
 @app.route('/api/repo_status', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def repo_status():
     # commit_hash: commit hash
     # distro_hash: distro hash
@@ -254,6 +261,7 @@ def repo_status():
 
 
 @app.route('/api/agg_status', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def agg_status():
     # aggregate_hash: aggregate hash
     # success(optional): only report successful/unsuccessful votes
@@ -297,6 +305,7 @@ def agg_status():
 
 
 @app.route('/api/last_tested_repo', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def last_tested_repo_GET():
     # max_age: Maximum age in hours, used as base for the search
     # success(optional): find repos with a successful/unsuccessful vote
@@ -381,6 +390,7 @@ def last_tested_repo_GET():
 
 
 @app.route('/api/promotions', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def promotions_GET():
     # commit_hash(optional): commit hash
     # distro_hash(optional): distro hash
@@ -484,6 +494,7 @@ def promotions_GET():
 
 
 @app.route('/api/metrics/builds', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def get_metrics():
     # start_date: start date for period, in YYYY-mm-dd format (UTC)
     # end_date: end date for period, in YYYY-mm-dd format (UTC)
@@ -546,7 +557,7 @@ def get_metrics():
 
 
 @app.route('/api/last_tested_repo', methods=['POST'])
-@auth.login_required
+@auth.login_required(optional=False)
 @_json_media_type
 def last_tested_repo_POST():
     # max_age: Maximum age in hours, used as base for the search
@@ -628,7 +639,7 @@ def last_tested_repo_POST():
 
 
 @app.route('/api/report_result', methods=['POST'])
-@auth.login_required
+@auth.login_required(optional=False)
 @_json_media_type
 def report_result():
     # job_id: name of CI
@@ -730,7 +741,7 @@ def report_result():
 
 
 @app.route('/api/promote', methods=['POST'])
-@auth.login_required
+@auth.login_required(optional=False)
 @_json_media_type
 def promote():
     # commit_hash: commit hash
@@ -833,7 +844,7 @@ def promote():
 
 
 @app.route('/api/promote-batch', methods=['POST'])
-@auth.login_required
+@auth.login_required(optional=False)
 @_json_media_type
 def promote_batch():
     # hash_pairs: list of commit/distro hash pairs
@@ -983,7 +994,7 @@ def promote_batch():
 
 
 @app.route('/api/remote/import', methods=['POST'])
-@auth.login_required
+@auth.login_required(optional=False)
 @_json_media_type
 def remote_import():
     # repo_url: repository URL to import from
@@ -1010,6 +1021,7 @@ def strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
 
 
 @app.route('/api/civotes.html', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def get_civotes():
     session = _get_db()
     offset = request.args.get('offset', 0)
@@ -1057,6 +1069,7 @@ def get_civotes():
 
 
 @app.route('/api/civotes_detail.html', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def get_civotes_detail():
     commit_hash = request.args.get('commit_hash', None)
     distro_hash = request.args.get('distro_hash', None)
@@ -1082,6 +1095,7 @@ def get_civotes_detail():
 
 
 @app.route('/api/civotes_agg.html', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def get_civotes_agg():
     session = _get_db()
     offset = request.args.get('offset', 0)
@@ -1125,6 +1139,7 @@ def get_civotes_agg():
 
 
 @app.route('/api/civotes_agg_detail.html', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def get_civotes_agg_detail():
     ref_hash = request.args.get('ref_hash', None)
     ci_name = request.args.get('ci_name', None)
@@ -1140,6 +1155,7 @@ def get_civotes_agg_detail():
 
 
 @app.route('/api/report.html', methods=['GET'])
+@auth.login_required(optional=bypass_read_endpoints)
 def get_report():
     config_options = _get_config_options(app.config['CONFIG_FILE'])
 
