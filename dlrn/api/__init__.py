@@ -24,14 +24,14 @@ except KeyError:
     pass
 
 
-from dlrn.api import dlrn_api  # noqa
-from dlrn.api import graphql  # noqa
-from dlrn.api import prom_metrics  # noqa
-
-
 def setup_api_logging(config):
     log_dictConfig = setup_dict_config(app.config)
     logging_config.dictConfig(log_dictConfig)
 
 
 setup_api_logging(app.config)
+
+# TODO(evallesp): Change how we initialize the API to move imports to the top.
+from dlrn.api import dlrn_api  # noqa
+from dlrn.api import graphql  # noqa
+from dlrn.api import prom_metrics  # noqa

@@ -19,3 +19,5 @@ graphene-sqlalchemy>=2.0
 flask-sqlalchemy
 flask-graphql
 prometheus-client
+cryptography<=37.0.2
+stevedore
