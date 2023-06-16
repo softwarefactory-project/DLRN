@@ -111,3 +111,10 @@
             groups=mock
             append=yes
       become: true
+
+    - name: Install krb5-devel
+      package:
+        name:
+          - krb5-devel
+        state: present
+      become: true
