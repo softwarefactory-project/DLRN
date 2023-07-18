@@ -27,6 +27,7 @@ from dlrn.api.api_logging import setup_dict_config
 from dlrn.api import app
 from dlrn.api import dlrn_api
 from dlrn.api.drivers.auth import Auth
+from dlrn.api.utils import ConfigError
 from dlrn.config import ConfigOptions
 from dlrn import db
 from dlrn.tests import base
@@ -1473,6 +1474,36 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                              'Kerberos auth not enabled due to missing gssapi'
                              ' dependency')
         self.assertEqual(response.status_code, 500)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    def test_ipa_authorization_retrieve_kerberos_ConfigError(self, db_mock):
+        from dlrn.api.drivers.krbauthentication import IPAAuthorization
+        app.config.pop('KEYTAB_PATH')
+        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+            try:
+                IPAAuthorization()
+            except ConfigError as e:
+                self.assertEqual(cm.output[0], 'INFO:logger_dlrn:[0],'
+                                 ' Retrieving valid kerberos token...')
+                self.assertIsInstance(e, ConfigError)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".retrieve_kerb_ticket")
+    def test_ipa_authorization_retrieve_kerberos_kinit_Error(self, rtrv_token,
+                                                             db_mock):
+        from dlrn.api.drivers.krbauthentication import IPAAuthorization
+        rtrv_token.side_effect = Exception
+        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+            try:
+                IPAAuthorization()
+            except Exception as e:
+                self.assertRegex(cm.output[-1], 'ERROR:logger_dlrn:Maximum'
+                                 ' retries for retrieving valid kerberos'
+                                 ' token executed')
+                self.assertIsInstance(e, Exception)
 
 
 class TestGetLogger(DLRNAPITestCase):

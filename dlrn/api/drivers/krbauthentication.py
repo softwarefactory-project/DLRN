@@ -28,11 +28,13 @@ import sh
 from werkzeug.datastructures import Authorization
 
 from dlrn.api import app
+from dlrn.api.utils import ConfigError
 
 log_auth = logging.getLogger("logger_auth")
 log_api = logging.getLogger("logger_dlrn")
 
 IPALIB_CONTEXT = 'dlrn-api'
+MAX_KINIT_RETRY = 3
 
 
 class IPAAuthorization:
@@ -40,14 +42,36 @@ class IPAAuthorization:
     api = api
 
     def __init__(self):
+        if self.api is None:
+            raise ModuleNotFoundError("Kerberos auth not enabled due"
+                                      " to missing ipalib dependency")
+        kinit_success = False
+        retry_index = 0
+        while not kinit_success and retry_index < MAX_KINIT_RETRY:
+            log_api.info("[%s], Retrieving valid kerberos token..." %
+                         retry_index)
+            try:
+                kinit_success = self.retrieve_kerb_ticket()
+            except ConfigError as e:
+                log_api.exception(e)
+                raise ConfigError
+            except Exception as e:
+                log_api.exception("Exception occurred while retrieving"
+                                  " a valid kerberos token: %s" % e)
+                retry_index += 1
+
+        if retry_index == MAX_KINIT_RETRY:
+            log_api.exception("Maximum retries for retrieving valid"
+                              " kerberos token executed")
+        if not kinit_success:
+            raise Exception
+
+        log_api.info("Valid kerberos token retrieved")
+
         try:
-            if self.api is None:
-                raise ModuleNotFoundError("Kerberos auth not enabled due"
-                                          " to missing ipalib dependency")
             # Avoid to initialize twice.
             if "context" not in self.api.env or \
                self.api.env.context != IPALIB_CONTEXT:
-                self.retrieve_kerb_ticket()
                 self.api.bootstrap(context=IPALIB_CONTEXT)
                 self.api.finalize()
             if not api.Backend.rpcclient.isconnected():
@@ -84,14 +108,15 @@ class IPAAuthorization:
 
     def retrieve_kerb_ticket(self):
         if 'KEYTAB_PATH' not in app.config.keys():
-            raise Exception("No keytab_path in the app configuration")
+            raise ConfigError("No keytab_path in the app configuration")
         if 'KEYTAB_PRINC' not in app.config.keys():
-            raise Exception("No keytab_princ in the app configuration")
+            raise ConfigError("No keytab_princ in the app configuration")
         keytab_path = app.config['KEYTAB_PATH']
         keytab_princ = app.config['KEYTAB_PRINC']
         try:
             kinit = sh.kinit.bake()
             kinit('-kt', keytab_path, keytab_princ)
+            return True
         except Exception as e:
             raise (Exception("Exception while retrieving valid "
                              "kerberos ticket: %s" % e))
@@ -106,7 +131,7 @@ class KrbAuthentication(HTTPAuth):
                                                 header=header)
         self.verify_token_callback = self.verify_user
         if 'HTTP_KEYTAB_PATH' not in app.config.keys():
-            raise Exception("No http_keytab_path in the app configuration")
+            raise ConfigError("No http_keytab_path in the app configuration")
         # HTTP keytab for decrypting the token.
         os.environ["KRB5_KTNAME"] = "FILE:" + app.config['HTTP_KEYTAB_PATH']
 
