@@ -27,6 +27,10 @@ class InvalidUsage(Exception):
         return rv
 
 
+class ConfigError(Exception):
+    pass
+
+
 class RepoDetail(object):
     def __init__(self):
         self.commit_hash = None
