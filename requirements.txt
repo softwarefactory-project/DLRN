@@ -12,7 +12,7 @@ renderspec
 pymod2pkg>=0.5.5
 requests
 Flask
-Flask-HTTPAuth
+Flask-HTTPAuth>=4.5.0
 passlib>=1.7.0
 graphene<3.0
 graphene-sqlalchemy>=2.0
