@@ -43,7 +43,7 @@
     run: playbooks/rpmbuild.yaml
     vars:
       python_version: py36
-      tag: ''
+      tag: 'wallaby'
       centos_version: 'centos8'
     nodeset:
       nodes:

@@ -87,24 +87,12 @@ class IPAAuthorization:
         except Exception as e:
             log_api.exception("Error while disconnecting from IPA: %s" % e)
 
-    def _return_allowed_ipa_users(self, group):
+    def return_user_roles(self, username):
         try:
-            result = self.api.Command.group_show(group)
-            return result['result']['member_user']
+            result = self.api.Command.user_show(username)
+            return result['result']['memberof_group']
         except PublicError as e:
             raise PublicError(e)
-
-    def is_user_in_allowed_group(self, username, allowed_group):
-        allowed = False
-        try:
-            allowed_users = self._return_allowed_ipa_users(allowed_group)
-        except PublicError as e:
-            allowed_users = []
-            log_api.error("Error while checking allowed users: %s" % e)
-        self.disconnect_from_ipa()
-        if username in allowed_users:
-            allowed = True
-        return allowed
 
     def retrieve_kerb_ticket(self):
         if 'KEYTAB_PATH' not in app.config.keys():
@@ -130,6 +118,7 @@ class KrbAuthentication(HTTPAuth):
         super(KrbAuthentication, self).__init__(scheme=scheme, realm=realm,
                                                 header=header)
         self.verify_token_callback = self.verify_user
+        self.get_user_roles_callback = self.get_user_roles
         if 'HTTP_KEYTAB_PATH' not in app.config.keys():
             raise ConfigError("No http_keytab_path in the app configuration")
         # HTTP keytab for decrypting the token.
@@ -157,33 +146,38 @@ class KrbAuthentication(HTTPAuth):
             user = str(sc.initiator_name).split("@")[0]
         return user
 
+    def get_user_roles(self, username):
+        try:
+            ipa = IPAAuthorization()
+            groups = ipa.return_user_roles(username)
+        except Exception as e:
+            log_api.error("Error while retrieving user's roles: %s" % e)
+            raise
+        return groups
+
     def verify_user(self, token):
-        allowed = False
-        allowed_group = None
-        if 'ALLOWED_GROUP' not in app.config.keys():
-            log_api.error("No allowed_group in the app configuration.")
-        else:
-            allowed_group = app.config['ALLOWED_GROUP']
-        if token and allowed_group:
+        username = None
+        if token:
             try:
                 username = self.get_user(base64.b64decode(token))
-                ipa = IPAAuthorization()
-                if username and ipa.is_user_in_allowed_group(username,
-                                                             allowed_group):
-                    log_auth.info('"User": %s, "event": login, "success": '
-                                  'true, "path": %s, "method": %s', username,
-                                  request.path, request.method)
-                    allowed = True
-                else:
-                    log_auth.info('"User": %s, "event": login, "success": '
-                                  'false, "path": %s, "method": %s',
-                                  username, request.path, request.method)
             except ModuleNotFoundError as e:
                 log_api.exception(e)
                 raise
             except Exception:
                 pass
-        return allowed
+        return username
+
+    def authorize(self, role, user, auth):
+        success = super().authorize(role, user, auth)
+        if success:
+            log_auth.info('"User": %s, "event": login, "success": '
+                          'true, "path": %s, "method": %s', user,
+                          request.path, request.method)
+        else:
+            log_auth.info('"User": %s, "event": login, "success": '
+                          'false, "path": %s, "method": %s',
+                          user, request.path, request.method)
+        return success
 
     def authenticate(self, auth, password):
         # This overrides authenticate from flask_httpauth method.

@@ -47,6 +47,9 @@ except ModuleNotFoundError:
     gssapi = None
 from six.moves import configparser
 
+TEST_SUCCESS_ROLE = "test_success_role"
+TEST_WRONG_ROLE = "test_wrong_role"
+
 
 def mocked_session(url):
     db_fd, filepath = tempfile.mkstemp()
@@ -90,6 +93,13 @@ def mock_handler_dict(handler_name, file_path):
                            'formatter': 'default'}}
 
 
+@dlrn_api.app.route('/api/test_auth', methods=['POST'])
+@dlrn_api.auth_multi.login_required(optional=False, role=TEST_SUCCESS_ROLE)
+def test_health():
+    from flask import jsonify
+    return jsonify({'result': 'ok'}), 200
+
+
 class DLRNAPITestCase(base.TestCase):
     def setUp(self):
         super(DLRNAPITestCase, self).setUp()
@@ -123,7 +133,6 @@ class DLRNAPITestCaseKrb(DLRNAPITestCase):
         self.KrbAuthentication.gssapi = gssapi
         self.IPAAuthorization.api = ipalib.api
         self.headers = {'Authorization': 'Negotiate VE9LRU4='}
-        app.config['ALLOWED_GROUP'] = "Test_group"
         app.config['KEYTAB_PATH'] = ".keytab"
         app.config['KEYTAB_PRINC'] = "keytab_principal"
         app.config['HTTP_KEYTAB_PATH'] = "http_keytab_principal"
@@ -1305,12 +1314,10 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                      "gssapi or ipalib modules not installed")
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".__init__", return_value=None)
-    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".is_user_in_allowed_group", return_value=True)
     @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
                 '.get_user')
     def test_kerberos_auth_success(self, gtuser_mock,
-                                   ipaallowed_mock, ipaauth_mock, db_mock):
+                                   ipaauth_mock, db_mock):
         req_data = json.dumps(dict(test='test'))
         response = self.app.post('/api/health',
                                  data=req_data,
@@ -1323,19 +1330,20 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                      "gssapi or ipalib modules not installed")
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".__init__", return_value=None)
-    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".is_user_in_allowed_group", return_value=False)
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication.'
+                'authorize', return_value=False)
     @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication.'
                 'get_user')
-    def test_kerberos_auth_wrong_credentials(self, gtuser_mock,
-                                             ipaallowed_mock, ipaauth_mock,
-                                             db_mock):
+    def test_kerberos_auth_not_allowed(self, gtuser_mock,
+                                       krbauth_authorize, ipaauth_mock,
+                                       db_mock):
         req_data = json.dumps(dict(test='test'))
         response = self.app.post('/api/health',
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(krbauth_authorize.call_count, 1)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(gtuser_mock.call_count, 1)
 
     @unittest.skipIf(gssapi is None or ipalib is None,
@@ -1359,64 +1367,65 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".__init__", return_value=None)
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                "._return_allowed_ipa_users", return_value=["foo"])
+                ".return_user_roles", return_value=[TEST_SUCCESS_ROLE])
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".disconnect_from_ipa")
     @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
                 '.get_user', return_value="foo")
     def test_ipa_authorization_success(self, gtuser_mock, closeipa_mock,
-                                       ipaallowed_mock, ipaauth_mock,
+                                       ipa_retr_roles, ipaauth_mock,
                                        db_mock):
         req_data = json.dumps(dict(test='test'))
         self.headers = {'Authorization': 'Negotiate VE9LRU4='}
-        response = self.app.post('/api/health',
+        response = self.app.post('/api/test_auth',
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(gtuser_mock.call_count, 1)
+        self.assertEqual(ipa_retr_roles.call_count, 1)
 
     @unittest.skipIf(gssapi is None or ipalib is None,
                      "gssapi or ipalib modules not installed")
+    @mock.patch('dlrn.api.drivers.krbauthentication.IPAAuthorization'
+                '.return_user_roles', return_value=[TEST_WRONG_ROLE])
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".__init__", return_value=None)
-    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                "._return_allowed_ipa_users", return_value=["bar"])
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".disconnect_from_ipa")
     @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
                 '.get_user', return_value="foo")
     def test_ipa_authorization_failure(self, gtuser_mock, closeipa_mock,
-                                       ipaallowed_mock, ipaauth_mock,
-                                       db_mock):
+                                       ipa_retr_roles, get_roles, db_mock):
         req_data = json.dumps(dict(test='test'))
-        response = self.app.post('/api/health',
+        response = self.app.post('/api/test_auth',
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(gtuser_mock.call_count, 1)
+        self.assertEqual(ipa_retr_roles.call_count, 1)
 
     @unittest.skipIf(gssapi is None or ipalib is None,
                      "gssapi or ipalib modules not installed")
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".__init__", return_value=None)
-    # Mock an error while getting the members of the allowed group.
+    # Mock an error while getting the roles of the given user.
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                "._return_allowed_ipa_users", side_effect=PublicError(""))
+                ".return_user_roles", side_effect=PublicError(""))
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".disconnect_from_ipa")
     @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
                 '.get_user', return_value="foo")
-    def test_ipa_authorization_group_show_error(self, gtuser_mock,
-                                                closeipa_mock, ipaallowed_mock,
-                                                ipaauth_mock, db_mock):
+    def test_ipa_authorization_user_show_error(self, gtuser_mock,
+                                               closeipa_mock, ipaallowed_mock,
+                                               ipaauth_mock, db_mock):
         req_data = json.dumps(dict(test='test'))
-        response = self.app.post('/api/health',
+        response = self.app.post('/api/test_auth',
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 500)
         self.assertEqual(gtuser_mock.call_count, 1)
 
     @unittest.skipIf(gssapi is None or ipalib is None,
@@ -1429,19 +1438,19 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
         app.config.pop('KEYTAB_PATH')
         self.setup_kerberos_auth()
         with self.assertLogs("logger_dlrn", level="ERROR") as cm:
-            response = self.app.post('/api/health',
+            response = self.app.post('/api/test_auth',
                                      data=req_data,
                                      headers=self.headers,
                                      content_type='application/json')
             self.assertRegex(cm.output[0],
                              'No keytab_path in the app configuration')
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 500)
         self.assertEqual(gtuser_mock.call_count, 1)
 
     @unittest.skipIf(gssapi is None or ipalib is None,
                      "gssapi or ipalib modules not installed")
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".is_user_in_allowed_group", return_value=True)
+                ".return_user_roles", return_value=True)
     @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
                 '.get_user')
     def test_kerb_auth_no_ipalib_module(self, gtuser_mock,
@@ -1450,7 +1459,7 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
         req_data = json.dumps(dict(test='test'))
         self.headers = {'Authorization': 'Negotiate VE9LRU4='}
         with self.assertLogs("logger_dlrn", level="ERROR") as cm:
-            response = self.app.post('/api/health',
+            response = self.app.post('/api/test_auth',
                                      data=req_data,
                                      headers=self.headers,
                                      content_type='application/json')
