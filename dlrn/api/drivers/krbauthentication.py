@@ -10,6 +10,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import base64
+from functools import wraps
+
 import logging
 import os
 
@@ -21,10 +23,14 @@ except ModuleNotFoundError:
     gssapi = None
 try:
     from ipalib import api
-    from ipalib.errors import PublicError
+    from ipalib.errors import ACIError
+    from ipalib.errors import CCacheError
+    from ipalib.errors import KerberosError
+    from ipalib.errors import NetworkError
 except ModuleNotFoundError:
     api = None
 import sh
+from sh import ErrorReturnCode
 from werkzeug.datastructures import Authorization
 
 from dlrn.api import app
@@ -34,7 +40,36 @@ log_auth = logging.getLogger("logger_auth")
 log_api = logging.getLogger("logger_dlrn")
 
 IPALIB_CONTEXT = 'dlrn-api'
-MAX_KINIT_RETRY = 3
+MAX_RETRY = 5
+
+
+def retry_on_error(custom_error=None, action_msg="", success_msg=""):
+    def _retry_on_error(f):
+        @wraps(f)
+        def retry_on_error_manager(self):
+            success = False
+            retry_index = 0
+            while not success and retry_index < MAX_RETRY:
+                log_api.info("[%s], %s", retry_index, action_msg)
+                try:
+                    success = f(self)
+                except custom_error as e:
+                    log_api.exception("Exception occurred %s" % e)
+                    retry_index += 1
+                except (Exception, ConfigError) as e:
+                    log_api.exception(e)
+                    raise
+
+            if retry_index == MAX_RETRY:
+                log_api.error("Maximum retries executed")
+            if not success:
+                raise Exception("Failed to complete operation")
+
+            log_api.info(success_msg)
+            return success
+
+        return retry_on_error_manager
+    return _retry_on_error
 
 
 class IPAAuthorization:
@@ -42,58 +77,41 @@ class IPAAuthorization:
     api = api
 
     def __init__(self):
+        log_api.debug("Starting IPAAuthorization")
+        self._username = None
         if self.api is None:
             raise ModuleNotFoundError("Kerberos auth not enabled due"
                                       " to missing ipalib dependency")
-        kinit_success = False
-        retry_index = 0
-        while not kinit_success and retry_index < MAX_KINIT_RETRY:
-            log_api.info("[%s], Retrieving valid kerberos token..." %
-                         retry_index)
-            try:
-                kinit_success = self.retrieve_kerb_ticket()
-            except ConfigError as e:
-                log_api.exception(e)
-                raise ConfigError
-            except Exception as e:
-                log_api.exception("Exception occurred while retrieving"
-                                  " a valid kerberos token: %s" % e)
-                retry_index += 1
+        log_api.debug("IPAAuthorization started")
 
-        if retry_index == MAX_KINIT_RETRY:
-            log_api.exception("Maximum retries for retrieving valid"
-                              " kerberos token executed")
-        if not kinit_success:
-            raise Exception
+    def set_username(self, username):
+        self._username = username
 
-        log_api.info("Valid kerberos token retrieved")
-
-        try:
-            # Avoid to initialize twice.
-            if "context" not in self.api.env or \
-               self.api.env.context != IPALIB_CONTEXT:
-                self.api.bootstrap(context=IPALIB_CONTEXT)
-                self.api.finalize()
-            if not api.Backend.rpcclient.isconnected():
-                self.api.Backend.rpcclient.connect()
-        except Exception as e:
-            log_api.exception("Exception occurred while Initializing"
-                              " connection to IPA: %s" % e)
-            raise
+    def get_username(self):
+        return self._username
 
     def disconnect_from_ipa(self):
         try:
             self.api.Backend.rpcclient.disconnect()
+            log_api.debug("Disconnected from IPA server")
         except Exception as e:
             log_api.exception("Error while disconnecting from IPA: %s" % e)
 
-    def return_user_roles(self, username):
-        try:
-            result = self.api.Command.user_show(username)
-            return result['result']['memberof_group']
-        except PublicError as e:
-            raise PublicError(e)
+    @retry_on_error(custom_error=KerberosError,
+                    action_msg="Connecting to IPA for authorization...",
+                    success_msg="Connected succesfully to IPA server")
+    def connect_to_ipa_server(self):
+        if "context" not in self.api.env or \
+           self.api.env.context != IPALIB_CONTEXT:
+            self.api.bootstrap(context=IPALIB_CONTEXT)
+            self.api.finalize()
+        if not api.Backend.rpcclient.isconnected():
+            self.api.Backend.rpcclient.connect()
+        return True
 
+    @retry_on_error(custom_error=ErrorReturnCode,
+                    action_msg="Retrieving valid kerberos token...",
+                    success_msg="Valid kerberos token retrieved")
     def retrieve_kerb_ticket(self):
         if 'KEYTAB_PATH' not in app.config.keys():
             raise ConfigError("No keytab_path in the app configuration")
@@ -105,9 +123,26 @@ class IPAAuthorization:
             kinit = sh.kinit.bake()
             kinit('-kt', keytab_path, keytab_princ)
             return True
-        except Exception as e:
-            raise (Exception("Exception while retrieving valid "
-                             "kerberos ticket: %s" % e))
+        except ErrorReturnCode:
+            raise
+
+    @retry_on_error(custom_error=(gssapi.raw.misc.GSSError, CCacheError,
+                                  ACIError, KerberosError,
+                                  NetworkError),
+                    action_msg="Returning user roles...",
+                    success_msg="Roles returned successfully")
+    def execute_user_show(self):
+        result = self.api.Command.user_show(self.get_username())
+        return result['result']['memberof_group']
+
+    def return_user_roles(self):
+        try:
+            self.retrieve_kerb_ticket()
+            self.connect_to_ipa_server()
+            roles = self.execute_user_show()
+        except Exception:
+            raise
+        return roles
 
 
 class KrbAuthentication(HTTPAuth):
@@ -117,12 +152,20 @@ class KrbAuthentication(HTTPAuth):
     def __init__(self, scheme='Negotiate', realm=None, header=None):
         super(KrbAuthentication, self).__init__(scheme=scheme, realm=realm,
                                                 header=header)
+        log_api.debug("Starting KrbAuthentication")
         self.verify_token_callback = self.verify_user
         self.get_user_roles_callback = self.get_user_roles
         if 'HTTP_KEYTAB_PATH' not in app.config.keys():
             raise ConfigError("No http_keytab_path in the app configuration")
         # HTTP keytab for decrypting the token.
         os.environ["KRB5_KTNAME"] = "FILE:" + app.config['HTTP_KEYTAB_PATH']
+        log_api.debug("KrbAuthentication started")
+
+    def _start_authorization(self):
+        try:
+            self.ipa = IPAAuthorization()
+        except ModuleNotFoundError:
+            raise
 
     def get_user(self, token):
         if self.gssapi is None:
@@ -148,11 +191,19 @@ class KrbAuthentication(HTTPAuth):
 
     def get_user_roles(self, username):
         try:
-            ipa = IPAAuthorization()
-            groups = ipa.return_user_roles(username)
+            self._start_authorization()
+        except ModuleNotFoundError as e:
+            log_api.exception(e)
+            raise
+        try:
+            self.ipa.set_username(username)
+            groups = self.ipa.return_user_roles()
+        except ConfigError as e:
+            log_api.error(e)
+            raise
         except Exception as e:
             log_api.error("Error while retrieving user's roles: %s" % e)
-            raise
+            groups = None
         return groups
 
     def verify_user(self, token):

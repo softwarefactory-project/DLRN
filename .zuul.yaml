@@ -137,7 +137,7 @@
       jobs:
         - tox-pep8:
             nodeset: fedora-latest-pod
-        - tox-py36:
+        - tox-py36-ci-config:
             nodeset:
               nodes:
                 - name: upstream-centos-8-stream

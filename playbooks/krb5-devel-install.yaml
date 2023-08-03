@@ -7,3 +7,10 @@
           - krb5-devel
         state: present
       become: true
+
+    - name: Install krb5-workstation
+      package:
+        name:
+          - krb5-workstation
+        state: present
+      become: true

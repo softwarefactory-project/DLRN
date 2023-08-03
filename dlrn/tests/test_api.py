@@ -1310,6 +1310,12 @@ class TestDBAuthDriver(DLRNAPITestCase):
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 class TestKrbAuthDriver(DLRNAPITestCaseKrb):
+    class CustomError(Exception):
+        pass
+
+    class CustomError2(Exception):
+        pass
+
     @unittest.skipIf(gssapi is None or ipalib is None,
                      "gssapi or ipalib modules not installed")
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
@@ -1412,20 +1418,48 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                 ".__init__", return_value=None)
     # Mock an error while getting the roles of the given user.
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".return_user_roles", side_effect=PublicError(""))
+                ".execute_user_show", side_effect=ConfigError)
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".disconnect_from_ipa")
+                ".connect_to_ipa_server")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".retrieve_kerb_ticket")
     @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
                 '.get_user', return_value="foo")
-    def test_ipa_authorization_user_show_error(self, gtuser_mock,
-                                               closeipa_mock, ipaallowed_mock,
-                                               ipaauth_mock, db_mock):
+    def test_ipa_authorization_user_show_config_error(self, gtuser_mock,
+                                                      retr_kerb, connect_ipa,
+                                                      ipaallowed_mock,
+                                                      ipaauth_mock, db_mock):
         req_data = json.dumps(dict(test='test'))
         response = self.app.post('/api/test_auth',
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 500)
+        self.assertEqual(gtuser_mock.call_count, 1)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".__init__", return_value=None)
+    # Mock an error while getting the roles of the given user.
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".execute_user_show", side_effect=KeyError)
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".connect_to_ipa_server")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".retrieve_kerb_ticket")
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
+                '.get_user', return_value="foo")
+    def test_ipa_authorization_user_show_key_error(self, gtuser_mock,
+                                                   retr_kerb, connect_ipa,
+                                                   ipaallowed_mock,
+                                                   ipaauth_mock, db_mock):
+        req_data = json.dumps(dict(test='test'))
+        response = self.app.post('/api/test_auth',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(gtuser_mock.call_count, 1)
 
     @unittest.skipIf(gssapi is None or ipalib is None,
@@ -1491,7 +1525,7 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
         app.config.pop('KEYTAB_PATH')
         with self.assertLogs("logger_dlrn", level="INFO") as cm:
             try:
-                IPAAuthorization()
+                IPAAuthorization().retrieve_kerb_ticket()
             except ConfigError as e:
                 self.assertEqual(cm.output[0], 'INFO:logger_dlrn:[0],'
                                  ' Retrieving valid kerberos token...')
@@ -1499,20 +1533,84 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
 
     @unittest.skipIf(gssapi is None or ipalib is None,
                      "gssapi or ipalib modules not installed")
-    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".retrieve_kerb_ticket")
-    def test_ipa_authorization_retrieve_kerberos_kinit_Error(self, rtrv_token,
-                                                             db_mock):
+    def test_ipa_authorization_retrieve_kerberos_kinit_Error(self, db_mock):
         from dlrn.api.drivers.krbauthentication import IPAAuthorization
-        rtrv_token.side_effect = Exception
-        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
             try:
-                IPAAuthorization()
+                IPAAuthorization().return_user_roles()
+                print(cm.output)
             except Exception as e:
-                self.assertRegex(cm.output[-1], 'ERROR:logger_dlrn:Maximum'
-                                 ' retries for retrieving valid kerberos'
-                                 ' token executed')
+                self.assertRegex(cm.output[-1], 'ERROR:logger_dlrn:Maximum '
+                                 'retries executed')
                 self.assertIsInstance(e, Exception)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    def test_ipa_authorization_decorator_success(self, db_mock):
+        from dlrn.api.drivers.krbauthentication import retry_on_error
+        action_msg = "Starting test message"
+        success_msg = "Success test message"
+
+        @retry_on_error(custom_error=self.CustomError,
+                        action_msg=action_msg,
+                        success_msg=success_msg)
+        def to_be_decorated(self):
+            return True
+        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+            to_be_decorated(self)
+            self.assertRegex(cm.output[0], action_msg)
+            self.assertRegex(cm.output[1], success_msg)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    def test_ipa_authorization_decorator_general_error(self, db_mock):
+        from dlrn.api.drivers.krbauthentication import retry_on_error
+        action_msg = "Starting test message"
+        success_msg = "Success test message"
+        error_msg = "Configuration error produced"
+
+        @retry_on_error(custom_error=self.CustomError,
+                        action_msg=action_msg,
+                        success_msg=success_msg)
+        def to_be_decorated(self):
+            raise ConfigError(error_msg)
+        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+            self.assertRaises(ConfigError, to_be_decorated, self)
+            self.assertRegex(cm.output[0], action_msg)
+            self.assertRegex(cm.output[1], error_msg)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    def test_ipa_authorization_decorator_max_retries_error(self, db_mock):
+        from dlrn.api.drivers.krbauthentication import retry_on_error
+        action_msg = "Starting test message"
+        success_msg = "Success test message"
+        error_msg = "Custom error produced"
+
+        @retry_on_error(custom_error=(self.CustomError, self.CustomError2),
+                        action_msg=action_msg,
+                        success_msg=success_msg)
+        def to_be_decorated(self):
+            raise self.CustomError(error_msg)
+
+        @retry_on_error(custom_error=(self.CustomError, self.CustomError2),
+                        action_msg=action_msg,
+                        success_msg=success_msg)
+        def to_be_decorated_2(self):
+            raise self.CustomError2(error_msg)
+
+        # Checking that first error type is risen 3 times
+        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+            self.assertRaises(Exception, to_be_decorated, self)  # noqa: H202
+            self.assertRegex(cm.output[0], action_msg)
+            self.assertRegex(cm.output[1], error_msg)
+            self.assertRegex(cm.output[-1], "Maximum retries executed")
+        # Checking that second error type is risen 3 times
+        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+            self.assertRaises(Exception, to_be_decorated_2, self)  # noqa: H202
+            self.assertRegex(cm.output[0], action_msg)
+            self.assertRegex(cm.output[1], error_msg)
+            self.assertRegex(cm.output[-1], "Maximum retries executed")
 
 
 class TestGetLogger(DLRNAPITestCase):
