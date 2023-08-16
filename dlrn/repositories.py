@@ -94,9 +94,12 @@ def refreshrepo(url, path, config_options, branch="master", local=False,
                     # dlrn first checks if there is a <release>-eol tag. If it
                     # does not exist, dlrn falls back to master if it is
                     # allowed by config.
+                    unm_branch = branch.replace('stable/', 'unmaintained/')
                     eol_tag = branch.replace('stable/', '') + '-eol'
                     list_eol = git.tag('-l', eol_tag)
-                    if list_eol:
+                    if git.branch('--list', unm_branch):
+                        branch = unm_branch
+                    elif list_eol:
                         branch = eol_tag
                     elif config_options.fallback_to_master:
                         if git.branch('--list', 'master'):
