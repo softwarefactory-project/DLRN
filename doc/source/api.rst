@@ -667,12 +667,17 @@ users to access the protected API endpoints in an array. Available drivers are:
        in the app configuration.
 
 * KrbAuthentication:
-       Decrypt Kerberos token to get the user, then check the membership
-       for the given user in a group specified by ``ALLOWED_GROUP`` in the configuration file.
-       The group is an IPA group so it's necessary to have IPA client configured and also
-       specify the kerberos keytab file and principal to log in IPA server with
-       the vars: ``KEYTAB_PATH`` and ``KEYTAB_PRINC`` in the app configuration. ``HTTP_KEYTAB_PATH``
-       is used to decrypt the received token.
+       Decrypt the Kerberos token to get the user, then check the roles assigned to that user.
+       If the user has a role assigned to them that matches ``API_READ_WRITE_ROLES`` or
+       ``API_READ_ONLY_ROLES`` they will be granted permission to access the endpoints matching
+       their allowed level. ``API_READ_ONLY_ROLES`` only have access to GET HTTP endpoints.
+       ``API_READ_WRITE_ROLES`` have access to all GET and POST HTTP endpoints. The roles are
+       IPA groups so it's necessary to have IPA client configured (for retrieving the user's roles)
+       and also specify the kerberos keytab file and principal to log in IPA server with the vars:
+       ``KEYTAB_PATH`` and ``KEYTAB_PRINC`` in the app configuration. ``HTTP_KEYTAB_PATH`` is used
+       to decrypt the received token.
+       ``ALLOWED_GROUP`` has been deprecated, and ``API_READ_WRITE_ROLES`` and ``API_READ_ONLY_ROLES``
+       should be used instead
 
 Those variables are also applied within the ``CONFIG_FILE`` with
 higher precedence.

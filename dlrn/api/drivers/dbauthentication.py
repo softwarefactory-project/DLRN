@@ -31,6 +31,10 @@ class DBAuthentication(HTTPBasicAuth):
         self.verbose_build = False
         self.verify_password_callback = self.verify_pw
 
+    # TODO(evallesp): Implement authorization
+    def authorize(self, role, user, auth):
+        return True
+
     def verify_pw(self, username, password):
         allowed = False
         session = None
