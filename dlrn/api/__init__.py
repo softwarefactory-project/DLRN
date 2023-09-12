@@ -16,7 +16,7 @@ import os
 from flask import Flask
 
 from dlrn.api.api_logging import setup_dict_config
-from dlrn.api.utils import ConfigError
+from dlrn.api.utils import ConfigurationValidator
 
 app = Flask(__name__)
 app.config.from_object('dlrn.api.config')
@@ -33,12 +33,14 @@ def setup_api_logging(config):
 
 setup_api_logging(app.config)
 log_api = logging.getLogger("logger_dlrn")
-
-# TODO(evallesp): Change how we initialize the API to move imports to the top.
-try:
+configuration_validation = ConfigurationValidator(app.config)
+if configuration_validation.is_valid():
+    log_api.debug(configuration_validation)
+    # TODO(evallesp): Change how we initialize the API to move
+    # imports to the top. If the config is valid, then we start
+    # the whole API
     from dlrn.api import dlrn_api  # noqa
-except ConfigError as e:
-    log_api.error(e)
-
-from dlrn.api import graphql  # noqa
-from dlrn.api import prom_metrics  # noqa
+    from dlrn.api import graphql  # noqa
+    from dlrn.api import prom_metrics  # noqa
+else:
+    log_api.error(configuration_validation)

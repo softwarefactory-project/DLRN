@@ -35,7 +35,6 @@ from sh import ErrorReturnCode
 from werkzeug.datastructures import Authorization
 
 from dlrn.api import app
-from dlrn.api.utils import ConfigError
 
 log_auth = logging.getLogger("logger_auth")
 log_api = logging.getLogger("logger_dlrn")
@@ -58,7 +57,7 @@ def retry_on_error(custom_error=None, action_msg="", success_msg=""):
                     log_api.exception("Exception occurred %s" % e)
                     retry_index += 1
                     time.sleep(2)
-                except (Exception, ConfigError) as e:
+                except Exception as e:
                     log_api.exception(e)
                     raise
 
@@ -115,10 +114,6 @@ class IPAAuthorization:
                     action_msg="Retrieving valid kerberos token...",
                     success_msg="Valid kerberos token retrieved")
     def retrieve_kerb_ticket(self):
-        if 'KEYTAB_PATH' not in app.config.keys():
-            raise ConfigError("No keytab_path in the app configuration")
-        if 'KEYTAB_PRINC' not in app.config.keys():
-            raise ConfigError("No keytab_princ in the app configuration")
         keytab_path = app.config['KEYTAB_PATH']
         keytab_princ = app.config['KEYTAB_PRINC']
         try:
@@ -158,8 +153,6 @@ class KrbAuthentication(HTTPAuth):
         log_api.debug("Starting KrbAuthentication")
         self.verify_token_callback = self.verify_user
         self.get_user_roles_callback = self.get_user_roles
-        if 'HTTP_KEYTAB_PATH' not in app.config.keys():
-            raise ConfigError("No http_keytab_path in the app configuration")
         # HTTP keytab for decrypting the token.
         os.environ["KRB5_KTNAME"] = "FILE:" + app.config['HTTP_KEYTAB_PATH']
         log_api.debug("KrbAuthentication started")
@@ -201,9 +194,6 @@ class KrbAuthentication(HTTPAuth):
         try:
             self.ipa.set_username(username)
             groups = self.ipa.return_user_roles()
-        except ConfigError as e:
-            log_api.error(e)
-            raise
         except Exception as e:
             log_api.error("Error while retrieving user's roles: %s" % e)
             groups = None

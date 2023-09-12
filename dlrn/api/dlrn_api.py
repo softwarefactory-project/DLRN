@@ -19,7 +19,6 @@ import logging
 from dlrn.api import app
 from dlrn.api.drivers.auth import Auth
 from dlrn.api.utils import AggDetail
-from dlrn.api.utils import ConfigError
 from dlrn.api.utils import InvalidUsage
 from dlrn.api.utils import RepoDetail
 
@@ -81,11 +80,6 @@ if (not can_read_roles and not can_write_roles) and \
                                              " API_READ_WRITE_ROLES and"
                                              " API_READ_ONLY_ROLES values")
     can_write_roles = can_read_roles = app.config['ALLOWED_GROUP']
-
-if (not can_read_roles and can_write_roles) or \
-    (can_read_roles and not can_write_roles):
-    raise ConfigError("Error in API configuration: Declare both or none from"
-                      " API_READ_WRITE_ROLES and API_READ_ONLY_ROLES")
 
 
 def _get_db():

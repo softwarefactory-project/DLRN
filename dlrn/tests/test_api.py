@@ -27,7 +27,7 @@ from dlrn.api.api_logging import setup_dict_config
 from dlrn.api import app
 from dlrn.api import dlrn_api
 from dlrn.api.drivers.auth import Auth
-from dlrn.api.utils import ConfigError
+from dlrn.api.utils import ConfigurationValidator
 from dlrn.config import ConfigOptions
 from dlrn import db
 from dlrn.tests import base
@@ -1414,34 +1414,6 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                 ".__init__", return_value=None)
     # Mock an error while getting the roles of the given user.
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".execute_user_show", side_effect=ConfigError)
-    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".disconnect_from_ipa")
-    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".connect_to_ipa_server")
-    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".retrieve_kerb_ticket")
-    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
-                '.get_user', return_value="foo")
-    def test_ipa_authorization_user_show_config_error(self, gtuser_mock,
-                                                      retr_kerb, connect_ipa,
-                                                      disconnect_ipa,
-                                                      ipaallowed_mock,
-                                                      ipaauth_mock, db_mock):
-        req_data = json.dumps(dict(test='test'))
-        response = self.app.post('/api/test_auth',
-                                 data=req_data,
-                                 headers=self.headers,
-                                 content_type='application/json')
-        self.assertEqual(response.status_code, 500)
-        self.assertEqual(gtuser_mock.call_count, 1)
-
-    @unittest.skipIf(gssapi is None or ipalib is None,
-                     "gssapi or ipalib modules not installed")
-    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
-                ".__init__", return_value=None)
-    # Mock an error while getting the roles of the given user.
-    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".execute_user_show", side_effect=KeyError)
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".disconnect_from_ipa")
@@ -1462,25 +1434,6 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                                  headers=self.headers,
                                  content_type='application/json')
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(gtuser_mock.call_count, 1)
-
-    @unittest.skipIf(gssapi is None or ipalib is None,
-                     "gssapi or ipalib modules not installed")
-    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
-                '.get_user', return_value="foo")
-    def test_ipa_authorization_missing_keytab_vars(self, gtuser_mock,
-                                                   db_mock):
-        req_data = json.dumps(dict(test='test'))
-        app.config.pop('KEYTAB_PATH')
-        self.setup_kerberos_auth()
-        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
-            response = self.app.post('/api/test_auth',
-                                     data=req_data,
-                                     headers=self.headers,
-                                     content_type='application/json')
-            self.assertRegex(cm.output[0],
-                             'No keytab_path in the app configuration')
-        self.assertEqual(response.status_code, 500)
         self.assertEqual(gtuser_mock.call_count, 1)
 
     @unittest.skipIf(gssapi is None or ipalib is None,
@@ -1519,19 +1472,6 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                              'Kerberos auth not enabled due to missing gssapi'
                              ' dependency')
         self.assertEqual(response.status_code, 500)
-
-    @unittest.skipIf(gssapi is None or ipalib is None,
-                     "gssapi or ipalib modules not installed")
-    def test_ipa_authorization_retrieve_kerberos_ConfigError(self, db_mock):
-        from dlrn.api.drivers.krbauthentication import IPAAuthorization
-        app.config.pop('KEYTAB_PATH')
-        with self.assertLogs("logger_dlrn", level="INFO") as cm:
-            try:
-                IPAAuthorization().retrieve_kerb_ticket()
-            except ConfigError as e:
-                self.assertEqual(cm.output[0], 'INFO:logger_dlrn:[0],'
-                                 ' Retrieving valid kerberos token...')
-                self.assertIsInstance(e, ConfigError)
 
     @unittest.skipIf(gssapi is None or ipalib is None,
                      "gssapi or ipalib modules not installed")
@@ -1574,9 +1514,9 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                         action_msg=action_msg,
                         success_msg=success_msg)
         def to_be_decorated(self):
-            raise ConfigError(error_msg)
+            raise Exception(error_msg)
         with self.assertLogs("logger_dlrn", level="INFO") as cm:
-            self.assertRaises(ConfigError, to_be_decorated, self)
+            self.assertRaises(Exception, to_be_decorated, self)  # noqa: H202
             self.assertRegex(cm.output[0], action_msg)
             self.assertRegex(cm.output[1], error_msg)
 
@@ -1704,3 +1644,154 @@ class TestGetLogger(DLRNAPITestCase):
                              result_auth_logger_dict[self.auth_logger_name])
         self.assertDictEqual(return_handlers[self.auth_handler_name],
                              result_auth_handler_dict[self.auth_handler_name])
+
+
+class TestConfigurationValidator(DLRNAPITestCase):
+    krb_basic_config = {"AUTHENTICATION_DRIVERS": "['KrbAuthentication']",
+                        "HTTP_KEYTAB_PATH": "http_keytab",
+                        "KEYTAB_PATH": "path",
+                        "KEYTAB_PRINC": "princ"}
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator.validate_api_drivers",
+                return_value=True)
+    def test_validate_config(self, vt_drivers):
+        config_validator = ConfigurationValidator({})
+        self.assertEqual(str(config_validator), "No errors were found during"
+                         " the API config validation.")
+        self.assertEqual(vt_drivers.call_count, 1)
+
+    def test_success_validate_api_roles_db(self):
+        configurations = [{"API_READ_ONLY_ROLES": "Role1",
+                           "API_READ_WRITE_ROLES": "Role2",
+                           "DB_PATH": "path1"},
+                          {"DB_PATH": "path1"}]
+        for config in configurations:
+            configuration_validation = ConfigurationValidator(config)
+            self.assertEqual(configuration_validation.is_valid(), True)
+
+    def test_failed_validate_api_roles_db(self):
+        configurations = [{"API_READ_ONLY_ROLES": "Role1",
+                           "DB_PATH": "path1"},
+                          {"API_READ_WRITE_ROLES": "Role2",
+                           "DB_PATH": "path1"}]
+        error_section = "Section: API_ROLES_ERROR"
+        error = "Declare both or none from API_READ_WRITE_ROLES "\
+                "and API_READ_ONLY_ROLES."
+        for config in configurations:
+            configuration_validation = ConfigurationValidator(config)
+            self.assertEqual(configuration_validation.is_valid(), False)
+            self.assertRegex(str(configuration_validation), error_section)
+            self.assertRegex(str(configuration_validation), error)
+
+    def test_success_validate_api_roles_krb(self):
+        confs = [{"API_READ_ONLY_ROLES": "Role1",
+                  "API_READ_WRITE_ROLES": "Role2"},
+                 {"ALLOWED_GROUP": "Role1"}]
+        for config in confs:
+            config.update(self.krb_basic_config)
+            configuration_validation = ConfigurationValidator(config)
+            self.assertEqual(configuration_validation.is_valid(), True)
+
+    def test_failed_validate_api_roles_krb(self):
+        confs = [{"API_READ_WRITE_ROLES": "Role2"},
+                 {}]
+        error_section = "Section: API_ROLES_ERROR"
+        errors = ["Declare both or none from API_READ_WRITE_ROLES "
+                  "and API_READ_ONLY_ROLES.",
+                  "KrbAuthentication driver requires setting either"
+                  " ALLOWED_GROUP or both API_READ_WRITE_ROLES and"
+                  " API_READ_ONLY_ROLES."]
+        for element in range(len(confs)):
+            confs[element].update(self.krb_basic_config)
+            configuration_validation = ConfigurationValidator(confs[element])
+            self.assertEqual(configuration_validation.is_valid(), False)
+            self.assertRegex(str(configuration_validation), error_section)
+            self.assertRegex(str(configuration_validation), errors[element])
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator."
+                "validate_KrbAuthentication_driver", return_value=True)
+    @mock.patch("dlrn.api.utils.ConfigurationValidator."
+                "validate_dbauthentication_driver", return_value=True)
+    def test_validate_api_drivers_all(self, db_driver, krb_driver):
+        config = {"AUTHENTICATION_DRIVERS": "['KrbAuthentication', \
+                  'DBAuthentication']"}
+        ConfigurationValidator(config)
+        self.assertEqual(krb_driver.call_count, 1)
+        self.assertEqual(db_driver.call_count, 1)
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator."
+                "validate_KrbAuthentication_driver", return_value=True)
+    @mock.patch("dlrn.api.utils.ConfigurationValidator."
+                "validate_dbauthentication_driver", return_value=True)
+    def test_validate_api_drivers_default(self, db_driver, krb_driver):
+        ConfigurationValidator({})
+        self.assertEqual(krb_driver.call_count, 0)
+        self.assertEqual(db_driver.call_count, 1)
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator."
+                "validate_KrbAuthentication_driver", return_value=True)
+    @mock.patch("dlrn.api.utils.ConfigurationValidator."
+                "validate_dbauthentication_driver", return_value=True)
+    def test_validate_api_drivers_db(self, db_driver, krb_driver):
+        config = {"AUTHENTICATION_DRIVERS": "['DBAuthentication']"}
+        ConfigurationValidator(config)
+        self.assertEqual(krb_driver.call_count, 0)
+        self.assertEqual(db_driver.call_count, 1)
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator."
+                "validate_KrbAuthentication_driver", return_value=True)
+    @mock.patch("dlrn.api.utils.ConfigurationValidator."
+                "validate_dbauthentication_driver", return_value=True)
+    def test_validate_api_drivers_krb(self, db_driver, krb_driver):
+        config = {"AUTHENTICATION_DRIVERS": "['KrbAuthentication']"}
+        ConfigurationValidator(config)
+        self.assertEqual(krb_driver.call_count, 1)
+        self.assertEqual(db_driver.call_count, 0)
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator.validate_api_roles",
+                return_value=True)
+    def test_success_validate_dbauthentication_driver(self, vt_roles):
+        config = {"AUTHENTICATION_DRIVERS": "['DBAuthentication']",
+                  "DB_PATH": "path1"}
+        configuration_validation = ConfigurationValidator(config)
+        self.assertEqual(configuration_validation.is_valid(), True)
+        self.assertEqual(vt_roles.call_count, 1)
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator.validate_api_roles",
+                return_value=True)
+    def test_failed_validate_dbauthentication_driver(self, vt_roles):
+        config = {"AUTHENTICATION_DRIVERS": "['DBAuthentication']"}
+        configuration_validation = ConfigurationValidator(config)
+        error_section = "Section: DBAUTH_DRIVER_ERROR"
+        error = "No DB_PATH in the app configuration."
+        self.assertEqual(configuration_validation.is_valid(), False)
+        self.assertRegex(str(configuration_validation), error_section)
+        self.assertRegex(str(configuration_validation), error)
+        self.assertEqual(vt_roles.call_count, 1)
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator.validate_api_roles",
+                return_value=True)
+    def test_success_validate_krbauthentication_driver(self, vt_roles):
+        config = {"AUTHENTICATION_DRIVERS": "['KrbAuthentication']",
+                  "HTTP_KEYTAB_PATH": "http_keytab", "KEYTAB_PATH": "path",
+                  "KEYTAB_PRINC": "princ"}
+        configuration_validation = ConfigurationValidator(config)
+        self.assertEqual(configuration_validation.is_valid(), True)
+        self.assertEqual(vt_roles.call_count, 1)
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator.validate_api_roles",
+                return_value=True)
+    def test_failed_validate_krbauthentication_driver(self, vt_roles):
+        config = {"AUTHENTICATION_DRIVERS": "['KrbAuthentication']"}
+        error_section = "Section: KRBAUTH_DRIVER_ERROR"
+        error_http_keytab_path = "No HTTP_KEYTAB_PATH in the app " \
+                                 "configuration."
+        error_keytab_path = "No KEYTAB_PATH in the app configuration."
+        error_keytab_princ = "No KEYTAB_PRINC in the app configuration."
+        configuration_validation = ConfigurationValidator(config)
+        self.assertEqual(configuration_validation.is_valid(), False)
+        self.assertRegex(str(configuration_validation), error_section)
+        self.assertRegex(str(configuration_validation), error_http_keytab_path)
+        self.assertRegex(str(configuration_validation), error_keytab_path)
+        self.assertRegex(str(configuration_validation), error_keytab_princ)
+        self.assertEqual(vt_roles.call_count, 1)

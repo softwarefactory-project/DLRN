@@ -37,11 +37,7 @@ class DBAuthentication(HTTPBasicAuth):
 
     def verify_pw(self, username, password):
         allowed = False
-        session = None
-        if 'DB_PATH' not in app.config.keys():
-            log_api.error("No DB_PATH in the app configuration.")
-        else:
-            session = getSession(app.config['DB_PATH'])
+        session = getSession(app.config['DB_PATH'])
         if not username or not password:
             log_api.error("No user or password in the request headers.")
         elif session is not None:
