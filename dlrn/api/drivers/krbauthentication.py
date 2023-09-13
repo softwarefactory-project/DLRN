@@ -191,12 +191,12 @@ class KrbAuthentication(HTTPAuth):
         except ModuleNotFoundError as e:
             log_api.exception(e)
             raise
+        self.ipa.set_username(username)
         try:
-            self.ipa.set_username(username)
             groups = self.ipa.return_user_roles()
         except Exception as e:
             log_api.error("Error while retrieving user's roles: %s" % e)
-            groups = None
+            raise
         return groups
 
     def verify_user(self, token):

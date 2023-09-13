@@ -1433,7 +1433,7 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 500)
         self.assertEqual(gtuser_mock.call_count, 1)
 
     @unittest.skipIf(gssapi is None or ipalib is None,

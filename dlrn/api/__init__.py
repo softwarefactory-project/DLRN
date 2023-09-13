@@ -44,3 +44,4 @@ if configuration_validation.is_valid():
     from dlrn.api import prom_metrics  # noqa
 else:
     log_api.error(configuration_validation)
+    raise Exception
