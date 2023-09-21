@@ -14,6 +14,7 @@ from functools import wraps
 
 import logging
 import os
+import time
 
 from flask import request
 from flask_httpauth import HTTPAuth
@@ -56,6 +57,7 @@ def retry_on_error(custom_error=None, action_msg="", success_msg=""):
                 except custom_error as e:
                     log_api.exception("Exception occurred %s" % e)
                     retry_index += 1
+                    time.sleep(2)
                 except (Exception, ConfigError) as e:
                     log_api.exception(e)
                     raise
@@ -95,7 +97,7 @@ class IPAAuthorization:
             self.api.Backend.rpcclient.disconnect()
             log_api.debug("Disconnected from IPA server")
         except Exception as e:
-            log_api.exception("Error while disconnecting from IPA: %s" % e)
+            log_api.error("Error while disconnecting from IPA: %s" % e)
 
     @retry_on_error(custom_error=KerberosError,
                     action_msg="Connecting to IPA for authorization...",
@@ -140,6 +142,7 @@ class IPAAuthorization:
             self.retrieve_kerb_ticket()
             self.connect_to_ipa_server()
             roles = self.execute_user_show()
+            self.disconnect_from_ipa()
         except Exception:
             raise
         return roles

@@ -1420,6 +1420,8 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".execute_user_show", side_effect=ConfigError)
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".disconnect_from_ipa")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".connect_to_ipa_server")
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".retrieve_kerb_ticket")
@@ -1427,6 +1429,7 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                 '.get_user', return_value="foo")
     def test_ipa_authorization_user_show_config_error(self, gtuser_mock,
                                                       retr_kerb, connect_ipa,
+                                                      disconnect_ipa,
                                                       ipaallowed_mock,
                                                       ipaauth_mock, db_mock):
         req_data = json.dumps(dict(test='test'))
@@ -1445,6 +1448,8 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".execute_user_show", side_effect=KeyError)
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".disconnect_from_ipa")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".connect_to_ipa_server")
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
                 ".retrieve_kerb_ticket")
@@ -1452,6 +1457,7 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                 '.get_user', return_value="foo")
     def test_ipa_authorization_user_show_key_error(self, gtuser_mock,
                                                    retr_kerb, connect_ipa,
+                                                   disconnect_ipa,
                                                    ipaallowed_mock,
                                                    ipaauth_mock, db_mock):
         req_data = json.dumps(dict(test='test'))
@@ -1538,7 +1544,6 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
         with self.assertLogs("logger_dlrn", level="ERROR") as cm:
             try:
                 IPAAuthorization().return_user_roles()
-                print(cm.output)
             except Exception as e:
                 self.assertRegex(cm.output[-1], 'ERROR:logger_dlrn:Maximum '
                                  'retries executed')
