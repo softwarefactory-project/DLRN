@@ -1219,11 +1219,7 @@ class TestAuthConfiguration(base.TestCase):
         config = {'AUTHENTICATION_DRIVERS': []}
         with self.assertLogs("logger_dlrn", level="INFO") as cm:
             auth = Auth(config).auth_multi
-            self.assertEqual(cm.output, ['INFO:logger_dlrn:Trying to load '
-                                         'default auth driver: dlrn.api.'
-                                         'drivers.dbauthentication.'
-                                         'DBAuthentication', 'INFO:logger_dlrn'
-                                         ':Default auth driver loaded.'])
+            self.assertRegex(''.join(cm.output), 'Default auth driver loaded.')
 
         self.assertIsInstance(auth.main_auth, self.DBAuthentication)
 
@@ -1239,8 +1235,8 @@ class TestAuthConfiguration(base.TestCase):
         config = {'AUTHENTICATION_DRIVERS': ["DBAuthentication"]}
         with self.assertLogs("logger_dlrn", level="INFO") as cm:
             auth = Auth(config).auth_multi
-            self.assertEqual(cm.output, ['INFO:logger_dlrn:Added auth driver:'
-                                         ' DBAuthentication'])
+            self.assertRegex(''.join(cm.output), 'Added auth driver: '
+                             'DBAuthentication')
         self.assertIsInstance(auth.main_auth, self.DBAuthentication)
 
     def test_krb_driver_conf(self):

@@ -38,7 +38,10 @@ class Auth:
 
         self._ext_mgr = stevedore.ExtensionManager(
             NAMESPACE,
-            invoke_on_load=True)
+            invoke_on_load=True,
+            on_load_failure_callback=lambda _, entry, exception:
+                logger.error(f"Error while initializing driver {entry.value} "
+                             f"with exception: {exception}"))
 
         for driver_name in config['AUTHENTICATION_DRIVERS']:
             try:
