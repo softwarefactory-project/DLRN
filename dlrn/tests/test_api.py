@@ -51,11 +51,25 @@ TEST_SUCCESS_ROLE = "test_success_role"
 TEST_WRONG_ROLE = "test_wrong_role"
 
 
-def mocked_session(url):
-    db_fd, filepath = tempfile.mkstemp()
-    session = db.getSession("sqlite:///%s" % filepath)
-    utils.loadYAML(session, './dlrn/tests/samples/commits_2.yaml')
-    return session
+def mocked_session(*args, **kwargs):
+    def wrapper(url=None, commit_file=None, raise_exception=None):
+        # Specifies the file to populate to the DB session
+        commit_file = kwargs["commit_file"] if "commit_file" in kwargs.keys() \
+            else None
+        # Specifies if an Exception should be raised when commiting
+        raise_exception = kwargs["raise_exception"] if "raise_exception" \
+            in kwargs.keys() else None
+        db_fd, filepath = tempfile.mkstemp()
+        session = db.getSession("sqlite:///%s" % filepath)
+        if not commit_file:
+            utils.loadYAML(session, "./dlrn/tests/samples/commits_2.yaml")
+        else:
+            utils.loadYAML(session, commit_file)
+        if raise_exception:
+            session.commit = mock.Mock()
+            session.commit.side_effect = Exception("Test Exception")
+        return session
+    return wrapper
 
 
 def mocked_get(url, timeout=None):
@@ -151,7 +165,7 @@ class DLRNAPITestCaseKrb(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.datetime')
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 class TestGetLastTestedRepo(DLRNAPITestCase):
     def test_get_last_tested_repo_no_results(self, db_mock, dt_mock):
         req_data = json.dumps(dict(max_age='48'))
@@ -278,9 +292,9 @@ class TestGetLastTestedRepo(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.datetime')
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestPostLastTestedRepo(DLRNAPITestCase):
     def test_post_last_tested_repo_needs_auth(self, db2_mock, db_mock,
                                               dt_mock):
@@ -391,9 +405,9 @@ class TestPostLastTestedRepo(DLRNAPITestCase):
         self.assertEqual(data['component'], 'foo-component')
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestReportResult(DLRNAPITestCase):
     def test_report_result_needs_auth(self, db2_mock, db_mock):
         response = self.app.post('/api/report_result')
@@ -502,9 +516,9 @@ class TestReportResult(DLRNAPITestCase):
         self.assertEqual(data['extended_hash'], '1234567890_1234567890')
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestPromote(DLRNAPITestCase):
     def test_promote_needs_auth(self, db2_mock, db_mock):
         response = self.app.post('/api/promote')
@@ -601,9 +615,9 @@ class TestPromote(DLRNAPITestCase):
         self.assertEqual(response.status_code, 403)
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestPromoteBatch(DLRNAPITestCase):
     def setUp(self):
         super(TestPromoteBatch, self).setUp()
@@ -748,9 +762,9 @@ class TestPromoteBatch(DLRNAPITestCase):
         self.assertEqual(ag_mock.call_count, 1)
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestRepoStatus(DLRNAPITestCase):
     def test_repo_status_missing_commit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(commit_hash='abc123', distro_hash='abc123'))
@@ -822,9 +836,9 @@ class TestRepoStatus(DLRNAPITestCase):
         self.assertEqual(data[0]['extended_hash'], '1234567890_1234567890')
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestAggStatus(DLRNAPITestCase):
     def test_agg_status_missing_hash(self, db2_mock, db_mock):
         response = self.app.get('/api/agg_status?success=true')
@@ -850,9 +864,9 @@ class TestAggStatus(DLRNAPITestCase):
         self.assertEqual(len(data), 0)
 
 
-@mock.patch('dlrn.remote.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.remote.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestRemoteImport(DLRNAPITestCase):
     def test_post_remote_import_needs_auth(self, db2_mock, db_mock):
         response = self.app.post('/api/remote/import')
@@ -884,9 +898,9 @@ class TestRemoteImport(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestGetCIVotes(DLRNAPITestCase):
     def test_get_civotes(self, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/civotes.html')
@@ -913,9 +927,9 @@ class TestGetCIVotes(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestGetCIAggVotes(DLRNAPITestCase):
     def test_get_ciaggvotes(self, db2_mock, db_mock, rt_mock):
         response = self.app.get('/api/civotes_agg.html')
@@ -940,18 +954,18 @@ class TestGetCIAggVotes(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.render_template', side_effect=' ')
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestGetReport(DLRNAPITestCase):
     def test_get_report(self, commit_mock, db2_mock, db_mock):
         response = self.app.get('/api/report.html')
         self.assertEqual(response.status_code, 200)
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestGetPromotions(DLRNAPITestCase):
     def test_get_promotions_missing_commit(self, db2_mock, db_mock):
         req_data = json.dumps(dict(distro_hash='abc123'))
@@ -1072,9 +1086,87 @@ class TestGetPromotions(DLRNAPITestCase):
         self.assertEqual(data[1]['aggregate_hash'], None)
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session(
+                commit_file='./dlrn/tests/samples/commits_3.yaml'))
+class TestRecheckPackage(DLRNAPITestCase):
+    def test_recheck_package_no_package_name(self, db_mock):
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:bar').decode('ascii'))}
+        response = self.app.post('/api/recheck_package',
+                                 data="",
+                                 headers=self.headers,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertRegex(data["message"], "Missing parameters:")
+
+    @mock.patch('dlrn.api.dlrn_api.getSession',
+                side_effect=mocked_session(
+                    commit_file='./dlrn/tests/samples/commits_3.yaml'))
+    def test_recheck_package_no_commit(self, db_mock, db2_mock):
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:bar').decode('ascii'))}
+        response = self.app.post('/api/recheck_package?package_name=foo-ci',
+                                 data="",
+                                 headers=self.headers,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertRegex(data["message"], "There are no existing commits")
+
+    @mock.patch('dlrn.api.dlrn_api.getSession',
+                side_effect=mocked_session(
+                    commit_file='./dlrn/tests/samples/commits_3.yaml'))
+    def test_recheck_package_commit_success(self, db_mock, db2_mock):
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:bar').decode('ascii'))}
+        endpoint = '/api/recheck_package?package_name=python-pysaml2'
+        response = self.app.post(endpoint,
+                                 data="",
+                                 headers=self.headers,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 409)
+        self.assertRegex(data["message"], "It's not possible to recheck a "
+                         "successful commit")
+
+    @mock.patch('dlrn.api.dlrn_api.getSession',
+                side_effect=mocked_session(
+                    commit_file='./dlrn/tests/samples/commits_3.yaml'))
+    def test_recheck_package_commit_failed(self, db_mock, db2_mock):
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:bar').decode('ascii'))}
+        endpoint = '/api/recheck_package?package_name=python-stevedore'
+        response = self.app.post(endpoint,
+                                 data="",
+                                 headers=self.headers,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 201)
+        self.assertRegex(data['result'], "ok")
+
+    @mock.patch('dlrn.api.dlrn_api.getSession',
+                side_effect=mocked_session(
+                    commit_file='./dlrn/tests/samples/commits_3.yaml',
+                    raise_exception=True))
+    def test_recheck_package_commit_failed_exception(self, db_mock, db2_mock):
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:bar').decode('ascii'))}
+        endpoint = '/api/recheck_package?package_name=python-stevedore'
+        response = self.app.post(endpoint,
+                                 data="",
+                                 headers=self.headers,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 500)
+        self.assertRegex(data['message'], "Error occurred while committing "
+                         "changes to database")
+
+
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session())
 class TestMetrics(DLRNAPITestCase):
     def test_metrics_missing_start_date(self, db2_mock, db_mock):
         req_data = json.dumps(dict(end_date='0'))
@@ -1175,9 +1267,9 @@ class TestMetrics(DLRNAPITestCase):
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestHealth(DLRNAPITestCase):
     def test_health_get(self, db2_mock, db_mock):
         response = self.app.get('/api/health')
@@ -1263,9 +1355,9 @@ class TestAuthConfiguration(base.TestCase):
         self.assertIsInstance(auth.additional_auth[0], self.DBAuthentication)
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 @mock.patch('dlrn.api.drivers.dbauthentication.getSession',
-            side_effect=mocked_session)
+            side_effect=mocked_session())
 class TestDBAuthDriver(DLRNAPITestCase):
 
     def test_basic_auth_no_headers(self, db2_mock, db_mock):
@@ -1304,7 +1396,7 @@ class TestDBAuthDriver(DLRNAPITestCase):
         self.assertEqual(db2_mock.call_count, 1)
 
 
-@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session)
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
 class TestKrbAuthDriver(DLRNAPITestCaseKrb):
     class CustomError(Exception):
         pass

@@ -677,6 +677,37 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Import'
+  /api/recheck_package:
+    post:
+      security:
+       - basicAuth: []
+      description: |
+        Executes a recheck for the given rpm package. This API call mimics the behavior
+        of the ``--recheck`` command of the DLRN building process and forces a rebuild
+        for a particular package.
+      parameters:
+        - name: params
+          in: query
+          description: The params to post
+          required: true
+          schema:
+            type: object
+            required:
+              - package_name
+            properties:
+              package_name:
+                description: |
+                  Package to recheck.
+                type: string
+      responses:
+        201:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              result:
+                type: string
+                description: A simple success string
 
 definitions:
   CIVote:
