@@ -175,4 +175,7 @@ class ConfigurationValidator(object):
         if 'KEYTAB_PRINC' not in self.config.keys():
             error_message = "No KEYTAB_PRINC in the app configuration."
             self.configuration_errors[error_section].append(error_message)
+        if 'CONN_MAX_RETRY' not in self.config.keys() or \
+           self.config["CONN_MAX_RETRY"] < 1:
+            self.config["CONN_MAX_RETRY"] = 5
         self.validate_api_roles(required_authorization=True)
