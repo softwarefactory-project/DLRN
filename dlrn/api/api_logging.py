@@ -71,9 +71,9 @@ def setup_dict_config(config):
         else "INFO"
     api_auth_log_file = get_config(config, "API_AUTH_LOG_FILE")
     api_auth_handler_name = "file_auth"
-    api_auth_logger_name = "logger_auth"
+    api_auth_logger_name = "auth"
     api_dlrn_handler_name = "file_dlrn"
-    api_dlrn_logger_name = "logger_dlrn"
+    api_dlrn_logger_name = "dlrn"
 
     if dlrn_log_file:
         file_dlrn_handler = create_rotating_file_handler_dict(

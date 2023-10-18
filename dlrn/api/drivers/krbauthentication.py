@@ -36,8 +36,8 @@ from werkzeug.datastructures import Authorization
 
 from dlrn.api import app
 
-log_auth = logging.getLogger("logger_auth")
-log_api = logging.getLogger("logger_dlrn")
+log_auth = logging.getLogger("auth")
+log_api = logging.getLogger("dlrn")
 
 IPALIB_CONTEXT = 'dlrn-api'
 MAX_RETRY = 5

@@ -1217,7 +1217,7 @@ class TestAuthConfiguration(base.TestCase):
 
     def test_default_auth_conf(self):
         config = {'AUTHENTICATION_DRIVERS': []}
-        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+        with self.assertLogs("dlrn", level="INFO") as cm:
             auth = Auth(config).auth_multi
             self.assertRegex(''.join(cm.output), 'Default auth driver loaded.')
 
@@ -1225,15 +1225,15 @@ class TestAuthConfiguration(base.TestCase):
 
     def test_non_existing_driver_conf(self):
         config = {'AUTHENTICATION_DRIVERS': ["non_existing_driver"]}
-        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+        with self.assertLogs("dlrn", level="ERROR") as cm:
             auth = Auth(config).auth_multi
-            self.assertEqual(cm.output, ["ERROR:logger_dlrn:Driver not found:"
+            self.assertEqual(cm.output, ["ERROR:dlrn:Driver not found:"
                                          " 'non_existing_driver'"])
         self.assertIsInstance(auth.main_auth, self.DBAuthentication)
 
     def test_db_driver_conf(self):
         config = {'AUTHENTICATION_DRIVERS': ["DBAuthentication"]}
-        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+        with self.assertLogs("dlrn", level="INFO") as cm:
             auth = Auth(config).auth_multi
             self.assertRegex(''.join(cm.output), 'Added auth driver: '
                              'DBAuthentication')
@@ -1245,9 +1245,9 @@ class TestAuthConfiguration(base.TestCase):
         app.config['KEYTAB_PRINC'] = "keytab_principal"
         app.config['HTTP_KEYTAB_PATH'] = "http_keytab_principal"
 
-        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+        with self.assertLogs("dlrn", level="INFO") as cm:
             auth = Auth(config).auth_multi
-            self.assertEqual(cm.output, ['INFO:logger_dlrn:Added auth driver:'
+            self.assertEqual(cm.output, ['INFO:dlrn:Added auth driver:'
                                          ' KrbAuthentication'])
         self.assertIsInstance(auth.main_auth, self.KrbAuthentication)
 
@@ -1271,12 +1271,12 @@ class TestDBAuthDriver(DLRNAPITestCase):
     def test_basic_auth_no_headers(self, db2_mock, db_mock):
         self.headers = {}
         req_data = json.dumps(dict(test='test'))
-        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+        with self.assertLogs("dlrn", level="ERROR") as cm:
             response = self.app.post('/api/health',
                                      data=req_data,
                                      headers=self.headers,
                                      content_type='application/json')
-            self.assertEqual(cm.output, ['ERROR:logger_dlrn:No user or'
+            self.assertEqual(cm.output, ['ERROR:dlrn:No user or'
                                          ' password in the request headers.'])
 
         self.assertEqual(response.status_code, 401)
@@ -1354,12 +1354,12 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                 ".__init__", return_value=None)
     def test_kerberos_auth_wrong_token(self, ipaauth_mock, db_mock):
         req_data = json.dumps(dict(test='test'))
-        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+        with self.assertLogs("dlrn", level="ERROR") as cm:
             response = self.app.post('/api/health',
                                      data=req_data,
                                      headers=self.headers,
                                      content_type='application/json')
-            self.assertEqual(cm.output, ['ERROR:logger_dlrn:Invalid token'
+            self.assertEqual(cm.output, ['ERROR:dlrn:Invalid token'
                                          ' while accessing "path": /api/health'
                                          ', "method": POST'])
         self.assertEqual(response.status_code, 401)
@@ -1447,7 +1447,7 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
         self.IPAAuthorization.api = None
         req_data = json.dumps(dict(test='test'))
         self.headers = {'Authorization': 'Negotiate VE9LRU4='}
-        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+        with self.assertLogs("dlrn", level="ERROR") as cm:
             response = self.app.post('/api/test_auth',
                                      data=req_data,
                                      headers=self.headers,
@@ -1463,7 +1463,7 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
         self.KrbAuthentication.gssapi = None
         req_data = json.dumps(dict(test='test'))
         self.headers = {'Authorization': 'Negotiate VE9LRU4='}
-        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+        with self.assertLogs("dlrn", level="ERROR") as cm:
             response = self.app.post('/api/health',
                                      data=req_data,
                                      headers=self.headers,
@@ -1477,11 +1477,11 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                      "gssapi or ipalib modules not installed")
     def test_ipa_authorization_retrieve_kerberos_kinit_Error(self, db_mock):
         from dlrn.api.drivers.krbauthentication import IPAAuthorization
-        with self.assertLogs("logger_dlrn", level="ERROR") as cm:
+        with self.assertLogs("dlrn", level="ERROR") as cm:
             try:
                 IPAAuthorization().return_user_roles()
             except Exception as e:
-                self.assertRegex(cm.output[-1], 'ERROR:logger_dlrn:Maximum '
+                self.assertRegex(cm.output[-1], 'ERROR:dlrn:Maximum '
                                  'retries executed')
                 self.assertIsInstance(e, Exception)
 
@@ -1497,7 +1497,7 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                         success_msg=success_msg)
         def to_be_decorated(self):
             return True
-        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+        with self.assertLogs("dlrn", level="INFO") as cm:
             to_be_decorated(self)
             self.assertRegex(cm.output[0], action_msg)
             self.assertRegex(cm.output[1], success_msg)
@@ -1515,7 +1515,7 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                         success_msg=success_msg)
         def to_be_decorated(self):
             raise Exception(error_msg)
-        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+        with self.assertLogs("dlrn", level="INFO") as cm:
             self.assertRaises(Exception, to_be_decorated, self)  # noqa: H202
             self.assertRegex(cm.output[0], action_msg)
             self.assertRegex(cm.output[1], error_msg)
@@ -1541,13 +1541,13 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
             raise self.CustomError2(error_msg)
 
         # Checking that first error type is risen 3 times
-        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+        with self.assertLogs("dlrn", level="INFO") as cm:
             self.assertRaises(Exception, to_be_decorated, self)  # noqa: H202
             self.assertRegex(cm.output[0], action_msg)
             self.assertRegex(cm.output[1], error_msg)
             self.assertRegex(cm.output[-1], "Maximum retries executed")
         # Checking that second error type is risen 3 times
-        with self.assertLogs("logger_dlrn", level="INFO") as cm:
+        with self.assertLogs("dlrn", level="INFO") as cm:
             self.assertRaises(Exception, to_be_decorated_2, self)  # noqa: H202
             self.assertRegex(cm.output[0], action_msg)
             self.assertRegex(cm.output[1], error_msg)
@@ -1558,8 +1558,8 @@ class TestGetLogger(DLRNAPITestCase):
     log_debug_var = "LOG_LEVEL"
     log_path_var = "Path1"
     config = {}
-    dlrn_logger_name = "logger_dlrn"
-    auth_logger_name = "logger_auth"
+    dlrn_logger_name = "dlrn"
+    auth_logger_name = "auth"
     dlrn_handler_name = "file_dlrn"
     auth_handler_name = "file_auth"
     file_path = "Path1"

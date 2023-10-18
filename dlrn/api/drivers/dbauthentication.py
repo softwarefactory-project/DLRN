@@ -20,8 +20,8 @@ from dlrn.db import getSession
 from dlrn.db import User
 
 
-log_auth = logging.getLogger("logger_auth")
-log_api = logging.getLogger("logger_dlrn")
+log_auth = logging.getLogger("auth")
+log_api = logging.getLogger("dlrn")
 
 
 class DBAuthentication(HTTPBasicAuth):

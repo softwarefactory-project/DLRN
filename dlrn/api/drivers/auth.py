@@ -19,7 +19,7 @@ from dlrn.utils import import_class
 
 DEFAULT_DRIVER = "dlrn.api.drivers.dbauthentication.DBAuthentication"
 NAMESPACE = 'dlrn.api.drivers'
-logger = logging.getLogger("logger_dlrn")
+logger = logging.getLogger("dlrn")
 
 
 class Auth:

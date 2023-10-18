@@ -32,7 +32,7 @@ def setup_api_logging(config):
 
 
 setup_api_logging(app.config)
-log_api = logging.getLogger("logger_dlrn")
+log_api = logging.getLogger("dlrn")
 configuration_validation = ConfigurationValidator(app.config)
 if configuration_validation.is_valid():
     log_api.debug(configuration_validation)

@@ -74,11 +74,11 @@ if 'API_READ_WRITE_ROLES' in app.config.keys():
 
 if (not can_read_roles and not can_write_roles) and \
     'ALLOWED_GROUP' in app.config.keys():
-    logging.getLogger("logger_dlrn").warning("Using deprecated configuration."
-                                             " Instead of using ALLOWED_GROUP"
-                                             " consider using"
-                                             " API_READ_WRITE_ROLES and"
-                                             " API_READ_ONLY_ROLES values")
+    logging.getLogger("dlrn").warning("Using deprecated configuration."
+                                      " Instead of using ALLOWED_GROUP"
+                                      " consider using"
+                                      " API_READ_WRITE_ROLES and"
+                                      " API_READ_ONLY_ROLES values")
     can_write_roles = can_read_roles = app.config['ALLOWED_GROUP']
 
 
@@ -142,7 +142,7 @@ def _rollback_batch_promotion(rollback_list):
 
 
 def _get_logger():
-    return logging.getLogger("logger_dlrn")
+    return logging.getLogger("dlrn")
 
 
 @app.errorhandler(InvalidUsage)
