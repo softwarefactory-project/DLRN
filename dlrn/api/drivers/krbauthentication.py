@@ -40,7 +40,7 @@ log_auth = logging.getLogger("auth")
 log_api = logging.getLogger("dlrn")
 
 IPALIB_CONTEXT = 'dlrn-api'
-MAX_RETRY = 5
+MAX_RETRY = app.config['CONN_MAX_RETRY']
 
 
 def retry_on_error(custom_error=None, action_msg="", success_msg=""):

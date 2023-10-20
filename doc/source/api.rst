@@ -677,7 +677,8 @@ users to access the protected API endpoints in an array. Available drivers are:
        ``KEYTAB_PATH`` and ``KEYTAB_PRINC`` in the app configuration. ``HTTP_KEYTAB_PATH`` is used
        to decrypt the received token.
        ``ALLOWED_GROUP`` has been deprecated, and ``API_READ_WRITE_ROLES`` and ``API_READ_ONLY_ROLES``
-       should be used instead
+       should be used instead.
+       ``CONN_MAX_RETRY`` refers the number of retries while connecting to kerberos KDC and IPA server.
 
 Those variables are also applied within the ``CONFIG_FILE`` with
 higher precedence.
@@ -704,6 +705,7 @@ in the above example, with the following syntax:
     KEYTAB_PATH = '/tmp/.keytab'
     KEYTAB_PRINC = 'example@PRINC.COM'
     HTTP_KEYTAB_PATH = '/tmp/.http-keytab'
+    CONN_MAX_RETRY = 3
 
     AUTHENTICATION_DRIVERS = ("KrbAuthentication","DBAuthentication")
 
@@ -713,8 +715,8 @@ and ``CONFIG_FILE`` will point to the projects.ini file used when running
 DLRN.
 
 Where ``DLRN_DEBUG``, ``DLRN_LOG_FILE``, ``API_AUTH_DEBUG``, ``API_AUTH_LOG_FILE``,
-``AUTHENTICATION_DRIVERS``, ``KEYTAB_PATH``, ``KEYTAB_PRINC`` and ``HTTP_KEYTAB_PATH``
-are defined at section "WSGI file and httpd configuration"
+``AUTHENTICATION_DRIVERS``, ``KEYTAB_PATH``, ``KEYTAB_PRINC``, ``HTTP_KEYTAB_PATH``
+and ``CONN_MAX_RETRY`` are defined at section "WSGI file and httpd configuration"
 
 ***************
 User management

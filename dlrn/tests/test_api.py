@@ -125,6 +125,7 @@ class DLRNAPITestCase(base.TestCase):
 
 
 class DLRNAPITestCaseKrb(DLRNAPITestCase):
+    app.config['CONN_MAX_RETRY'] = 5
     from dlrn.api.drivers.krbauthentication import IPAAuthorization
     from dlrn.api.drivers.krbauthentication import KrbAuthentication
 
@@ -1774,10 +1775,31 @@ class TestConfigurationValidator(DLRNAPITestCase):
     def test_success_validate_krbauthentication_driver(self, vt_roles):
         config = {"AUTHENTICATION_DRIVERS": "['KrbAuthentication']",
                   "HTTP_KEYTAB_PATH": "http_keytab", "KEYTAB_PATH": "path",
-                  "KEYTAB_PRINC": "princ"}
+                  "KEYTAB_PRINC": "princ", "CONN_MAX_RETRY": 3}
         configuration_validation = ConfigurationValidator(config)
+        self.assertEqual(configuration_validation.config["CONN_MAX_RETRY"], 3)
         self.assertEqual(configuration_validation.is_valid(), True)
         self.assertEqual(vt_roles.call_count, 1)
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator.validate_api_roles",
+                return_value=True)
+    def test_validate_krbauthentication_conn_max_retry_default(self, vt_roles):
+        config = {"AUTHENTICATION_DRIVERS": "['KrbAuthentication']",
+                  "HTTP_KEYTAB_PATH": "http_keytab", "KEYTAB_PATH": "path",
+                  "KEYTAB_PRINC": "princ"}
+        configuration_validation = ConfigurationValidator(config)
+        self.assertEqual(configuration_validation.config["CONN_MAX_RETRY"], 5)
+        self.assertEqual(configuration_validation.is_valid(), True)
+
+    @mock.patch("dlrn.api.utils.ConfigurationValidator.validate_api_roles",
+                return_value=True)
+    def test_validate_krbauthentication_conn_max_retry_zero(self, vt_roles):
+        config = {"AUTHENTICATION_DRIVERS": "['KrbAuthentication']",
+                  "HTTP_KEYTAB_PATH": "http_keytab", "KEYTAB_PATH": "path",
+                  "KEYTAB_PRINC": "princ", "CONN_MAX_RETRY": 0}
+        configuration_validation = ConfigurationValidator(config)
+        self.assertEqual(configuration_validation.config["CONN_MAX_RETRY"], 5)
+        self.assertEqual(configuration_validation.is_valid(), True)
 
     @mock.patch("dlrn.api.utils.ConfigurationValidator.validate_api_roles",
                 return_value=True)
