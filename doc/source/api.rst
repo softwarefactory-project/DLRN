@@ -582,6 +582,34 @@ Parameter         Type                             Description
 repo_url        string      Base repository URL for imported remote repo
 ==============  ==========  ==============================================================
 
+POST /api/recheck_package
+--------------------------
+
+Executes a recheck for the given rpm package. This API call mimics the behavior of the
+``--recheck`` command of the DLRN building process and forces a rebuild for a
+particular package.
+
+Normal response codes: 201
+
+Error response codes: 400, 404, 409, 500
+
+
+Request:
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+package_name         string      Indicates the package to be rechecked
+===================  ==========  ==============================================================
+
+Response:
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+result               string      A simple success string
+===================  ==========  ==============================================================
+
 *********************************
 Running the API server using WSGI
 *********************************

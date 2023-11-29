@@ -1,0 +1,32 @@
+commits:
+- commit_hash: 1c67b1ab8c6fe273d4e175a14f0df5d3cbbd0edd
+  distro_hash: 885e80778edb6cbb8ee4d8909623be8062369a04
+  extended_hash:
+  commit_branch: 'master'
+  dt_build: '1441675005'
+  dt_commit: '1441245153'
+  dt_distro: '1441674764'
+  flags: '0'
+  id: '5662'
+  notes: "\n\n  RAN: '/bin/docker run -t --volume=/home/centos-master/data:/data --volume=/home/centos-master/de"
+  project_name: python-stevedore
+  repo_dir: /home/centos-master/data/python-stevedore
+  artifacts: None
+  status: FAILED
+- commit_hash: 17234e9ab9dfab4cf5600f67f1d24db5064f1025
+  distro_hash: 024e24f0cf4366c2290c22f24e42de714d1addd1
+  component: tripleo
+  dt_build: '1441635089'
+  dt_commit: '1441634092'
+  dt_distro: '1431949433'
+  flags: '0'
+  id: '5627'
+  notes: OK
+  project_name: python-pysaml2
+  repo_dir: /home/centos-master/data/python-pysaml2
+  artifacts: repos/17/23/17234e9ab9dfab4cf5600f67f1d24db5064f1025_024e24f0/python-pysaml2-3.0-1a.el7.centos.noarch.rpm,repos/17/23/17234e9ab9dfab4cf5600f67f1d24db5064f1025_024e24f0/python-pysaml2-3.0-1a.el7.centos.src.rpm
+  status: SUCCESS
+users:
+- username: 'foo'
+# passlib.hash.sha512_crypt.encrypt("bar")
+  password: '$6$rounds=656000$T678cDhCoMtxLlnq$yXrpe.kJgiP8Y1JZpAYQ0.yCE12Qr6zv6nZY1VY7OP6bxhoZezlzWSitvoqkx26Z30pUBKM4kX/JZJPdMIv1a.'

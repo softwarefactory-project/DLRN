@@ -1206,6 +1206,51 @@ def get_report():
                            baseurl=config_options.baseurl)
 
 
+@app.route('/api/recheck_package', methods=['POST'])
+@auth_multi.login_required(optional=False, role=can_write_roles)
+def recheck_package():
+    # package_name: The package to execute the recheck
+    logger = _get_logger()
+    session = _get_db()
+    package_name = request.args.get('package_name', None)
+
+    if package_name is None:
+        message = ("Missing parameters: package_name")
+        raise InvalidUsage(message, status_code=400)
+
+    commit = session.query(Commit).filter(Commit.project_name == package_name,
+                                          Commit.type == 'rpm',
+                                          Commit.status != "RETRY") \
+                                  .order_by(desc(Commit.id)).first()
+    if commit is None:
+        message = (f'Error while rechecking {package_name}. '
+                   'There are no existing commits or the commit '
+                   'to be rechecked is already marked as RETRY.')
+        logger.error(message)
+        raise InvalidUsage(message, status_code=400)
+
+    if commit.status == 'FAILED':
+        session.delete(commit)
+        try:
+            session.commit()
+        except Exception as e:
+            message = ('Error occurred while committing changes to database: '
+                       f'{e}, change not applied')
+            logger.error(message)
+            session.rollback()
+            raise InvalidUsage(message, status_code=500)
+
+        logger.info(f'Successful recheck for {commit.project_name}')
+        result = {'result': 'ok'}
+        return jsonify(result), 201
+
+    if commit.status == 'SUCCESS':
+        message = (f"Error while rechecking {package_name}. "
+                   "It's not possible to recheck a successful commit")
+        logger.error(message)
+        raise InvalidUsage(message, status_code=409)
+
+
 @app.teardown_appcontext
 def teardown_db(exception=None):
     session = flask_g.pop('db', None)
