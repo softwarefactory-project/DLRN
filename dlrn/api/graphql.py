@@ -20,6 +20,7 @@ try:
     import graphene
     from graphene import relay
     from graphene_sqlalchemy import SQLAlchemyObjectType
+    from graphql import GraphQLError
 except ImportError:
     graphene = None
 
@@ -130,7 +131,8 @@ if graphene:
                                   timestamp=graphene.Int(),
                                   user=graphene.String(),
                                   offset=graphene.Int(),
-                                  limit=graphene.Int())
+                                  limit=graphene.Int(),
+                                  lastRefHash=graphene.Boolean())
 
         packageStatus = graphene.List(PackageStatus,
                                       projectName=graphene.String(),
@@ -221,12 +223,33 @@ if graphene:
             ci_in_progress = _as_bool(args.get("ciInProgress", None))
             timestamp = args.get("timestamp", None)
             user = args.get("user", None)
+            last_ref_hash = args.get("lastRefHash", None)
 
             # Make sure we do not exceed the pagination limit
             if limit > max_limit:
                 limit = max_limit
 
             query = CIVoteAgg.get_query(info)
+
+            if (ref_hash or timestamp) and last_ref_hash:
+                raise GraphQLError(
+                    'refHash/timestamp and last_ref_hash '
+                    'cannot be provided in the same query'
+                )
+
+            # Get all the jobs that contains the most recent hash
+            if last_ref_hash:
+                first_hash_record = query.order_by(
+                    desc(CIVoteAggModel.timestamp)).first()
+                if first_hash_record:
+                    most_recent_ref_hash = first_hash_record.ref_hash
+                    query = query.filter(
+                        CIVoteAggModel.ref_hash == most_recent_ref_hash
+                    )
+                    query = query.order_by(desc(CIVoteAggModel.id)).\
+                        limit(limit).\
+                        offset(offset)
+                    return query.all()
 
             if ref_hash:
                 query = query.filter(CIVoteAggModel.ref_hash == ref_hash)
