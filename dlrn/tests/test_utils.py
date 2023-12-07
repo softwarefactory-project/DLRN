@@ -25,6 +25,7 @@ from dlrn.tests.test_db import TestsWithData
 from dlrn import utils
 from mock import call
 from mock import MagicMock
+from mock import patch
 from yaml.loader import SafeLoader
 
 
@@ -156,4 +157,32 @@ class TestFetchRemoteFile(base.TestCase):
         expected_results = ["Line1\n", "Line2\n"]
         url.get('http://example.com', text='Line1\nLine2\n')
         results = utils.fetch_remote_file('http://example.com')
+        assert results == expected_results
+
+
+class TestRenameOutputDir(base.TestCase):
+    @patch('dlrn.db.Commit.getshardedcommitdir')
+    @patch('os.rename')
+    def test_rename_output_dir(self, mock_os_rename, mock_commit_dir):
+        mock_commit_dir.return_value = 'new_hash'
+        commit = db.Commit()
+        datadir = 'data'
+        output_dir = 'data/repos/old_hash'
+        expected_call = [call('data/repos/old_hash', 'data/repos/new_hash')]
+        expected_results = 'data/repos/new_hash'
+        results = utils.rename_output_dir(datadir, output_dir, commit)
+        assert mock_os_rename.call_args_list == expected_call
+        assert results == expected_results
+
+    @patch('dlrn.db.Commit.getshardedcommitdir')
+    @patch('os.rename')
+    def test_rename_same_output_dir(self, mock_os_rename, mock_commit_dir):
+        mock_commit_dir.return_value = 'same_hash'
+        commit = db.Commit()
+        datadir = 'data'
+        output_dir = 'data/repos/same_hash'
+        expected_call = []
+        expected_results = 'data/repos/same_hash'
+        results = utils.rename_output_dir(datadir, output_dir, commit)
+        assert mock_os_rename.call_args_list == expected_call
         assert results == expected_results

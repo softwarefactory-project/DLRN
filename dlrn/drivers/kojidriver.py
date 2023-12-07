@@ -17,6 +17,7 @@
 
 from dlrn.config import setup_logging
 from dlrn.drivers.buildrpm import BuildRPMDriver
+from dlrn import utils
 
 import io
 import logging
@@ -202,11 +203,7 @@ class KojiBuildDriver(BuildRPMDriver):
         # Since we are changing the extended_hash, we need to rename the
         # output directory to match the updated value
         datadir = os.path.realpath(self.config_options.datadir)
-        new_output_dir = os.path.join(datadir, "repos",
-                                      commit.getshardedcommitdir())
-        logger.info("Renaming %s to %s" % (output_dir, new_output_dir))
-        os.rename(output_dir, new_output_dir)
-        output_dir = new_output_dir
+        output_dir = utils.rename_output_dir(datadir, output_dir, commit)
 
         with io.open("%s/rhpkgbuild.log" % output_dir, 'a',
                      encoding='utf-8', errors='replace') as self.koji_fp:
