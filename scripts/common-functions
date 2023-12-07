@@ -110,8 +110,13 @@ function detect_version_and_release() {
         copy_src_to_mock_buildroot
         # setup.py outputs warning (to stdout) in some cases (python-posix_ipc)
         # so only look at the last line for version
-        setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && rm -rf *.egg-info && (([ -x /usr/bin/python3 ] && python3 setup.py --version 2> /dev/null) || python setup.py --version 2> /dev/null)"| tail -n 1) \
-                             $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && git log --abbrev=7 -n1 --format=format:%h")
+        if [ -z "$VERSION" ]; then
+            setversionandrelease $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && rm -rf *.egg-info && (([ -x /usr/bin/python3 ] && python3 setup.py --version 2> /dev/null) || python setup.py --version 2> /dev/null)"| tail -n 1) \
+                                 $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && git log --abbrev=7 -n1 --format=format:%h")
+        else
+            setversionandrelease $VERSION \
+                                 $(/usr/bin/mock -q -r ${DATA_DIR}/${MOCK_CONFIG} --chroot "cd /var/tmp/pkgsrc && git log --abbrev=7 -n1 --format=format:%h")
+        fi
     elif [ -r *.gemspec ]; then
         copy_src_to_mock_buildroot
         GEMSPEC=$(ls -l | grep gemspec | awk '{print $9}')

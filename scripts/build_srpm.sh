@@ -25,6 +25,10 @@ detect_python
 setup_mock
 
 if [ -z "$DLRN_KEEP_SPEC_AS_IS" ]; then
+    if [ "$DLRN_KEEP_VERSION" == "1" ]; then
+        VERSION=$(grep -e '^Version:' ${DISTGIT_DIR}/*.spec | awk '{print $2}')
+    fi
+
     # As a first step, calculate version and release
     detect_version_and_release
 
