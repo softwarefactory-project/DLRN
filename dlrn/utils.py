@@ -294,6 +294,8 @@ def run_external_preprocess(**kwargs):
     commit_hash = kwargs.get('commit_hash')
     username = os.environ.get('USER', None)
     datadir = kwargs.get('datadir')
+    output_directory = kwargs.get('output_directory')
+    versions_csv = kwargs.get('versions_csv')
 
     run_cmd = []
     # Append environment variables
@@ -313,6 +315,10 @@ def run_external_preprocess(**kwargs):
         run_cmd.append("DLRN_USER=%s" % username)
     if datadir:
         run_cmd.append("DLRN_DATADIR=%s" % datadir)
+    if output_directory:
+        run_cmd.append("DLRN_OUTPUT_DIRECTORY=%s" % output_directory)
+    if versions_csv:
+        run_cmd.append("DLRN_VERSIONS_CSV=%s" % versions_csv)
     run_cmd.extend([cmdline])
 
     logger.info('Running custom pre-process: %s' % ' '.join(run_cmd))

@@ -186,3 +186,41 @@ class TestRenameOutputDir(base.TestCase):
         results = utils.rename_output_dir(datadir, output_dir, commit)
         assert mock_os_rename.call_args_list == expected_call
         assert results == expected_results
+
+
+class TestRunExternalPreprocess(base.TestCase):
+    @patch('sh.env', create=True)
+    def test_all_args_except_user(self, mock_sh):
+        os.environ['USER'] = 'myuser'
+        os.environ['MOCK_CONFIG'] = '/tmp/mock_config'
+        os.environ['RELEASE_DATE'] = '1699903817.0'
+        os.environ['RELEASE_NUMBERING'] = '2'
+        utils.run_external_preprocess(cmdline='/bin/true',
+                                      pkgname='foo_pkgname',
+                                      distgit='/tmp/foo_distro',
+                                      upstream_distgit='/tmp/foo_us_distro',
+                                      distroinfo='foo_distroinfo',
+                                      source_dir='/tmp/foo',
+                                      commit_hash='foo_commit_hash',
+                                      datadir='/tmp',
+                                      output_directory='/tmp/output_dir',
+                                      versions_csv='foo.csv')
+        expected = [call(
+            ['DLRN_PACKAGE_NAME=foo_pkgname',
+             'DLRN_DISTGIT=/tmp/foo_distro',
+             'DLRN_UPSTREAM_DISTGIT=/tmp/foo_us_distro',
+             'DLRN_DISTROINFO_REPO=foo_distroinfo',
+             'DLRN_SOURCEDIR=/tmp/foo',
+             'DLRN_SOURCE_COMMIT=foo_commit_hash',
+             'DLRN_USER=myuser',
+             'DLRN_DATADIR=/tmp',
+             'DLRN_OUTPUT_DIRECTORY=/tmp/output_dir',
+             'DLRN_VERSIONS_CSV=foo.csv',
+             '/bin/true'],
+            _cwd='/tmp/foo_distro',
+            _env={'LANG': 'C',
+                  'MOCK_CONFIG': '/tmp/mock_config',
+                  'RELEASE_DATE': '1699903817.0',
+                  'RELEASE_MINOR': '0',
+                  'RELEASE_NUMBERING': '2'})]
+        self.assertEqual(mock_sh.call_args_list, expected)
