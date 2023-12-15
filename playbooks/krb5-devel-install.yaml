@@ -1,5 +1,5 @@
 ---
-- hosts: upstream-centos-8-stream
+- hosts: cloud-centos-8-stream
   tasks:
     - name: Install krb5-devel
       package:

@@ -298,7 +298,7 @@ class KojiBuildDriver(BuildRPMDriver):
                 output_dir = os.path.join(datadir, "repos",
                                           commit.getshardedcommitdir())
 
-            if type(build_exception) == sh.TimeoutException:
+            if isinstance(build_exception, sh.TimeoutException):
                 raise Exception("Brew building timeout excedeed.")
             # Find task id to download logs
             with open(logfile, 'r') as fp:

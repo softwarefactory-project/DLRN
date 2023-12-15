@@ -47,18 +47,6 @@
       centos_version: 'centos8'
     nodeset:
       nodes:
-        - name: upstream-centos-8-stream
-          label: upstream-centos-8-stream
-
-- job:
-    name: dlrn-rpmbuild-tripleo-ci-oooq-centos8
-    parent: dlrn-base
-    voting: false
-    description: Run DLRN to build a package using Tripleo-Quickstart playbooks on CentOS 8
-    run: playbooks/tripleo-ci-oooq.yaml
-    post-run: playbooks/tripleo-ci-oooq-getlogs.yaml
-    nodeset:
-      nodes:
         - name: cloud-centos-8-stream
           label: cloud-centos-8-stream
 
@@ -109,6 +97,10 @@
     parent: tox-py36
     pre-run: playbooks/krb5-devel-install.yaml
     run: playbooks/tox_run.yaml
+    nodeset:
+      nodes:
+        - name: cloud-centos-8-stream
+          label: cloud-centos-8-stream
 
 - project:
     name: DLRN
@@ -120,16 +112,11 @@
         - tox-pep8:
             nodeset: fedora-latest-pod
         - tox-py36-ci-config:
-            nodeset:
-              nodes:
-                - name: upstream-centos-8-stream
-                  label: upstream-centos-8-stream
             vars:
                 tox_install_bindep: false
         - dlrn-rpmbuild-centos-7
         - dlrn-rpmbuild-centos-9
         - dlrn-rpmbuild-centos-8
-        - dlrn-rpmbuild-tripleo-ci-oooq-centos8
         - dlrn-api-functional-centos-7
         - dlrn-api-functional-centos-8
         - docs-build
@@ -138,10 +125,6 @@
         - tox-pep8:
             nodeset: fedora-latest-pod
         - tox-py36-ci-config:
-            nodeset:
-              nodes:
-                - name: upstream-centos-8-stream
-                  label: upstream-centos-8-stream
             vars:
                 tox_install_bindep: false
         - dlrn-rpmbuild-centos-7
