@@ -41,6 +41,7 @@ log_api = logging.getLogger("dlrn")
 
 IPALIB_CONTEXT = 'dlrn-api'
 MAX_RETRY = app.config['CONN_MAX_RETRY']
+CACHE_TIMEOUT = app.config['IPA_CACHE_TIMEOUT']
 
 
 def retry_on_error(custom_error=None, action_msg="", success_msg=""):
@@ -146,6 +147,7 @@ class IPAAuthorization:
 class KrbAuthentication(HTTPAuth):
     # Optional module installed by Kerberos extras_require
     gssapi = gssapi
+    user_role_map_cache = {}
 
     def __init__(self, scheme='Negotiate', realm=None, header=None):
         super(KrbAuthentication, self).__init__(scheme=scheme, realm=realm,
@@ -185,18 +187,36 @@ class KrbAuthentication(HTTPAuth):
             user = str(sc.initiator_name).split("@")[0]
         return user
 
+    def check_authorization_cache(self, username):
+        if username not in self.user_role_map_cache:
+            return False
+        else:
+            cache_time = self.user_role_map_cache[username]["timestamp"]
+            return (time.time() - cache_time) < CACHE_TIMEOUT
+
+    def update_authorization_cache(self, username, groups):
+        log_api.debug(f"Updating {username} authorization cache")
+        self.user_role_map_cache[username] = {}
+        self.user_role_map_cache[username]["timestamp"] = time.time()
+        self.user_role_map_cache[username]["groups"] = groups
+
     def get_user_roles(self, username):
-        try:
-            self._start_authorization()
-        except ModuleNotFoundError as e:
-            log_api.exception(e)
-            raise
-        self.ipa.set_username(username)
-        try:
-            groups = self.ipa.return_user_roles()
-        except Exception as e:
-            log_api.error("Error while retrieving user's roles: %s" % e)
-            raise
+        if self.check_authorization_cache(username):
+            log_api.debug(f"Using {username} authorization cache")
+            groups = self.user_role_map_cache[username]["groups"]
+        else:
+            try:
+                self._start_authorization()
+            except ModuleNotFoundError as e:
+                log_api.exception(e)
+                raise
+            self.ipa.set_username(username)
+            try:
+                groups = self.ipa.return_user_roles()
+                self.update_authorization_cache(username, groups)
+            except Exception as e:
+                log_api.error("Error while retrieving user's roles: %s" % e)
+                raise
         return groups
 
     def verify_user(self, token):
