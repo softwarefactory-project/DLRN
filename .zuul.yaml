@@ -90,7 +90,7 @@
     nodeset:
       nodes:
         - name: container
-          label: zuul-worker-python
+          label: zuul-worker-f38
 
 - job:
     name: tox-py36-ci-config
