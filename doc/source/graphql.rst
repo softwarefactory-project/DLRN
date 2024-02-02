@@ -178,6 +178,7 @@ Arguments:
         user: String
         offset: Int
         limit: Int
+        lastRefHash: Boolean
     ): [CIVote_Aggregate]
 
 Arguments:
@@ -189,6 +190,7 @@ Arguments:
 - user: limit the results to the civote_aggregation belonging to the specified user.
 - offset: return the results after the specified entry.
 - limit: return a maximum amount of commits (100 by default, cannot be higher than 100).
+- lastRefHash: return a group of data that contains the same, most recent hash. If true, other arguments won't be considered. Intended to retrieve the jobs from the last generated hash.
 
 
 * packageStatus
