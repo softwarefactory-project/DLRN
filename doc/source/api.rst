@@ -706,7 +706,9 @@ users to access the protected API endpoints in an array. Available drivers are:
        to decrypt the received token.
        ``ALLOWED_GROUP`` has been deprecated, and ``API_READ_WRITE_ROLES`` and ``API_READ_ONLY_ROLES``
        should be used instead.
-       ``CONN_MAX_RETRY`` refers the number of retries while connecting to kerberos KDC and IPA server.
+       ``CONN_MAX_RETRY`` refers to the number of retries while connecting to kerberos KDC and IPA server.
+       ``IPA_CACHE_TIMEOUT`` refers to the expiration time for each entry in the IPA cache. This cache is used,
+       to save the roles of a given user in the request. Needs to be less than 24h, default values is 8 hours.
 
 Those variables are also applied within the ``CONFIG_FILE`` with
 higher precedence.
@@ -734,6 +736,7 @@ in the above example, with the following syntax:
     KEYTAB_PRINC = 'example@PRINC.COM'
     HTTP_KEYTAB_PATH = '/tmp/.http-keytab'
     CONN_MAX_RETRY = 3
+    IPA_CACHE_TIMEOUT = 8 * 3600
 
     AUTHENTICATION_DRIVERS = ("KrbAuthentication","DBAuthentication")
 
@@ -744,7 +747,8 @@ DLRN.
 
 Where ``DLRN_DEBUG``, ``DLRN_LOG_FILE``, ``API_AUTH_DEBUG``, ``API_AUTH_LOG_FILE``,
 ``AUTHENTICATION_DRIVERS``, ``KEYTAB_PATH``, ``KEYTAB_PRINC``, ``HTTP_KEYTAB_PATH``
-and ``CONN_MAX_RETRY`` are defined at section "WSGI file and httpd configuration"
+, ``CONN_MAX_RETRY`` and ``IPA_CACHE_TIMEOUT`` are defined at section "WSGI file and
+httpd configuration"
 
 ***************
 User management

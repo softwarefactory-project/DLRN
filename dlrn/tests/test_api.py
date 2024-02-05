@@ -16,6 +16,7 @@ import os
 import sh
 import shutil
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -140,12 +141,14 @@ class DLRNAPITestCase(base.TestCase):
 
 class DLRNAPITestCaseKrb(DLRNAPITestCase):
     app.config['CONN_MAX_RETRY'] = 5
+    app.config['IPA_CACHE_TIMEOUT'] = 8 * 3600
     from dlrn.api.drivers.krbauthentication import IPAAuthorization
     from dlrn.api.drivers.krbauthentication import KrbAuthentication
 
     def setUp(self):
         super(DLRNAPITestCaseKrb, self).setUp()
         self.KrbAuthentication.gssapi = gssapi
+        self.KrbAuthentication.user_role_map_cache.clear()
         self.IPAAuthorization.api = ipalib.api
         self.headers = {'Authorization': 'Negotiate VE9LRU4='}
         app.config['KEYTAB_PATH'] = ".keytab"
@@ -1405,6 +1408,12 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
     class CustomError2(Exception):
         pass
 
+    def create_user_role_map_cache_entry(self, username, timestamp):
+        user_role_map_cache = self.KrbAuthentication.user_role_map_cache
+        user_role_map_cache[username] = {}
+        user_role_map_cache[username]["timestamp"] = timestamp
+        user_role_map_cache[username]["groups"] = [TEST_SUCCESS_ROLE]
+
     @unittest.skipIf(gssapi is None or ipalib is None,
                      "gssapi or ipalib modules not installed")
     @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
@@ -1565,6 +1574,59 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                              'Kerberos auth not enabled due to missing gssapi'
                              ' dependency')
         self.assertEqual(response.status_code, 500)
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    def test_kerb_check_authorization_cache(self, db_mock):
+        self.create_user_role_map_cache_entry("test_user", time.time())
+        self.create_user_role_map_cache_entry("test_user2", 1)
+        assert self.KrbAuthentication.check_authorization_cache(
+            self.KrbAuthentication, "test_user")
+        assert not self.KrbAuthentication.check_authorization_cache(
+            self.KrbAuthentication, "test_user2")
+        assert not self.KrbAuthentication.check_authorization_cache(
+            self.KrbAuthentication, "test_user3")
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    def test_kerb_update_authorization_cache(self, db_mock):
+        krb_obj = self.KrbAuthentication
+        krb_obj.update_authorization_cache(
+            krb_obj, "test_user", "test_grp")
+        assert krb_obj.user_role_map_cache["test_user"]["groups"] == "test_grp"
+
+    @unittest.skipIf(gssapi is None or ipalib is None,
+                     "gssapi or ipalib modules not installed")
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".__init__", return_value=None)
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".return_user_roles", return_value=[TEST_WRONG_ROLE])
+    @mock.patch("dlrn.api.drivers.krbauthentication.IPAAuthorization"
+                ".disconnect_from_ipa")
+    @mock.patch('dlrn.api.drivers.krbauthentication.KrbAuthentication'
+                '.get_user', return_value="foo")
+    def test_ipa_authorization_success_with_cache(self, gtuser_mock,
+                                                  closeipa_mock,
+                                                  ipa_retr_roles, ipaauth_mock,
+                                                  db_mock):
+        req_data = json.dumps(dict(test='test'))
+        self.headers = {'Authorization': 'Negotiate VE9LRU4='}
+        response = self.app.post('/api/test_auth',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(gtuser_mock.call_count, 1)
+        self.assertEqual(ipa_retr_roles.call_count, 1)
+        self.KrbAuthentication.user_role_map_cache.clear()
+        self.create_user_role_map_cache_entry("foo", time.time())
+        response = self.app.post('/api/test_auth',
+                                 data=req_data,
+                                 headers=self.headers,
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(gtuser_mock.call_count, 2)
+        self.assertEqual(ipa_retr_roles.call_count, 1)
 
     @unittest.skipIf(gssapi is None or ipalib is None,
                      "gssapi or ipalib modules not installed")

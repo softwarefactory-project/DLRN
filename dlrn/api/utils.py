@@ -177,5 +177,11 @@ class ConfigurationValidator(object):
             self.configuration_errors[error_section].append(error_message)
         if 'CONN_MAX_RETRY' not in self.config.keys() or \
            self.config["CONN_MAX_RETRY"] < 1:
+            # TODO(evallesp): Adds warning log about the final value
             self.config["CONN_MAX_RETRY"] = 5
+        if 'IPA_CACHE_TIMEOUT' not in self.config.keys() or \
+           self.config["IPA_CACHE_TIMEOUT"] < 1 or \
+           self.config["IPA_CACHE_TIMEOUT"] > 86400:
+            # TODO(evallesp): Adds warning log about the final value
+            self.config["IPA_CACHE_TIMEOUT"] = 8 * 3600
         self.validate_api_roles(required_authorization=True)
