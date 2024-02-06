@@ -451,6 +451,16 @@ def fetch_remote_file(url):
     return result
 
 
+def rename_output_dir(datadir, output_dir, commit):
+    new_output_dir = os.path.join(datadir, "repos",
+                                  commit.getshardedcommitdir())
+    if output_dir == new_output_dir:
+        return new_output_dir
+    logger.info("Renaming %s to %s" % (output_dir, new_output_dir))
+    os.rename(output_dir, new_output_dir)
+    return new_output_dir
+
+
 if __name__ == '__main__':
     s = getSession('sqlite:///%s' % sys.argv[1])
     saveYAML(s, sys.argv[1] + ".yaml")

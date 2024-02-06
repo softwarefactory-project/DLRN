@@ -228,13 +228,15 @@ class TestDriverKoji(base.TestCase):
         self.assertEqual(rc_mock.call_count, 1)
         self.assertEqual(env_mock.call_args_list, expected)
 
+    @mock.patch('shutil.rmtree')
     @mock.patch('sh.git', create=True)
     @mock.patch('os.rename')
     @mock.patch('sh.rhpkg', create=True)
     @mock.patch('dlrn.drivers.kojidriver.time', side_effect=_mocked_time)
     @mock.patch('sh.kinit', create=True)
     def test_build_package_rhpkg(self, ki_mock, tm_mock, rhpkg_mock, rn_mock,
-                                 git_mock, ld_mock, env_mock, rc_mock):
+                                 git_mock, rmtree_mock, ld_mock, env_mock,
+                                 rc_mock):
         git_mock.bake().log.side_effect = _mocked_call
         self.config.koji_use_rhpkg = True
         commit = db.Commit(dt_commit=123, project_name='python-pysaml2',
@@ -294,6 +296,7 @@ class TestDriverKoji(base.TestCase):
         self.assertEqual(rhpkg_mock.bake().call_args_list, expected_rhpkg)
         self.assertEqual(git_mock.bake().log.call_args_list, expected_git)
 
+    @mock.patch('shutil.rmtree')
     @mock.patch('sh.git', create=True)
     @mock.patch('os.rename')
     @mock.patch('sh.rhpkg', create=True)
@@ -301,8 +304,8 @@ class TestDriverKoji(base.TestCase):
     @mock.patch('sh.kinit', create=True)
     def test_build_package_rhpkg_longexthash(self, ki_mock, tm_mock,
                                              rhpkg_mock, rn_mock,
-                                             git_mock, ld_mock,
-                                             env_mock, rc_mock):
+                                             git_mock, rmtree_mock,
+                                             ld_mock, env_mock, rc_mock):
         git_mock.bake().log.side_effect = _mocked_call
         self.config.koji_use_rhpkg = True
         commit = db.Commit(dt_commit=123, project_name='python-pysaml2',
@@ -366,6 +369,7 @@ class TestDriverKoji(base.TestCase):
         self.assertEqual(git_mock.bake().log.call_args_list, expected_git)
         self.assertEqual(rn_mock.call_args_list, expected_rn)
 
+    @mock.patch('shutil.rmtree')
     @mock.patch('sh.git', create=True)
     @mock.patch('os.rename')
     @mock.patch('sh.rhpkg', create=True)
@@ -373,7 +377,8 @@ class TestDriverKoji(base.TestCase):
     @mock.patch('sh.kinit', create=True)
     def test_build_package_rhpkg_longexthash_ds(self, ki_mock, tm_mock,
                                                 rhpkg_mock, rn_mock, git_mock,
-                                                ld_mock, env_mock, rc_mock):
+                                                rmtree_mock, ld_mock, env_mock,
+                                                rc_mock):
         git_mock.bake().log.side_effect = _mocked_call
         self.config.koji_use_rhpkg = True
         self.config.pkginfo_driver = (
@@ -565,6 +570,7 @@ class TestDriverKoji(base.TestCase):
         # in integer or string Built-in types.
         self.assertEqual(env_mock.call_count, 2)
 
+    @mock.patch('shutil.rmtree')
     @mock.patch('sh.git', create=True)
     @mock.patch('dlrn.drivers.kojidriver.KojiBuildDriver.get_own_task_id')
     @mock.patch('dlrn.drivers.kojidriver.KojiBuildDriver.cancel_brew_task')
@@ -574,7 +580,8 @@ class TestDriverKoji(base.TestCase):
     @mock.patch('sh.kinit', create=True)
     def test_build_package_rhpkg_timeout(self, ki_mock, tm_mock, rhpkg_mock,
                                          rn_mock, cl_mock, gt_mock, git_mock,
-                                         ld_mock, env_mock, rc_mock):
+                                         rmtree_mock, ld_mock, env_mock,
+                                         rc_mock):
         rhpkg_mock.bake().side_effect = _mocked_call_and_timeout
         git_mock.bake().log.side_effect = _mocked_call_and_timeout
         self.config.koji_use_rhpkg = True
