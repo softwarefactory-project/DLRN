@@ -97,7 +97,8 @@ def refreshrepo(url, path, config_options, branch="master", local=False,
                     unm_branch = branch.replace('stable/', 'unmaintained/')
                     eol_tag = branch.replace('stable/', '') + '-eol'
                     list_eol = git.tag('-l', eol_tag)
-                    if git.branch('--list', unm_branch):
+                    if git.branch('--list', '--remote',
+                                  'origin/' + unm_branch):
                         branch = unm_branch
                     elif list_eol:
                         branch = eol_tag

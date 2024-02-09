@@ -281,8 +281,9 @@ class TestRefreshRepo(base.TestCase):
                                  .checkout('-f', 'stable/branchless'),
                                  mock.call.bake().checkout('master')]
         expected_git_tag = [mock.call.tag('-l', 'branchless-eol')]
-        expected_git_branch = [mock.call.branch('--list',
-                                                'unmaintained/branchless'),
+        expected_git_branch = [mock.call.branch('--list', '--remote',
+                                                'origin/unmaintained/'
+                                                'branchless'),
                                mock.call.branch('--list', 'master')]
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/master')]
@@ -321,8 +322,9 @@ class TestRefreshRepo(base.TestCase):
                                  .checkout('-f', 'stable/branchless'),
                                  mock.call.bake().checkout('main')]
         expected_git_tag = [mock.call.tag('-l', 'branchless-eol')]
-        expected_git_branch = [mock.call.branch('--list',
-                                                'unmaintained/branchless'),
+        expected_git_branch = [mock.call.branch('--list', '--remote',
+                                                'origin/unmaintained/'
+                                                'branchless'),
                                mock.call.branch('--list', 'master'),
                                mock.call.branch('--list', 'main')]
         expected_git_reset = [mock.call.bake().reset('--hard',
