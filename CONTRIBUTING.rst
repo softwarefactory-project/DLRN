@@ -56,9 +56,17 @@ to SoftwareFactory's Gerrit instead, using git-review. The usual workflow is:
      $ git commit
      $ git review
 
+New patches should:
+   - Explain the changes in the commit message.
+   - Include unit tests for the new code to prove that it works
+     correctly and to prevent regressions.
+   - For changes visible to end-users (e.g. new API) we need to update the necessary RST files under the doc/ folder.
+
 Once submitted, your change request will show up here:
 
    https://softwarefactory-project.io/r/#/q/project:DLRN+status:open
+
+At least the approval from one core reviewer is needed to merge a change request.
 
 Generating the documentation
 ----------------------------
