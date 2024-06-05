@@ -8,82 +8,52 @@
     imported_commit_hash: "6fd1c8e407eb57bcb42198975dd1fdb1c0de1013"
     imported_distro_hash: "61f387110530b332a803754b6e53dd8a9ef6caca"
   tasks:
-    - name: If running on CentOS 8, set up different options
+    - name: Set up CentOS 9 options
       block:
-        - name: Set use_components for CentOS 8
+        - name: Set use_components for CentOS 9
           ini_file:
             path: "{{ working_dir }}/DLRN/projects.ini"
             section: DEFAULT
             option: use_components
             value: 1
-        - name: Set target for CentOS 8
+        - name: Set target for CentOS 9
           ini_file:
             path: "{{ working_dir }}/DLRN/projects.ini"
             section: DEFAULT
             option: target
-            value: centos8-stream
-        - name: Set baseurl for CentOS 8
+            value: centos9-stream
+        - name: Set baseurl for CentOS 9
           ini_file:
             path: "{{ working_dir }}/DLRN/projects.ini"
             section: DEFAULT
             option: baseurl
-            value: 'https://trunk.rdoproject.org/centos8-yoga/'
-        - name: Set distro for CentOS 8
+            value: 'https://trunk.rdoproject.org/centos9-yoga/'
+        - name: Set distro for CentOS 9
           ini_file:
             path: "{{ working_dir }}/DLRN/projects.ini"
             section: DEFAULT
             option: distro
             value: 'yoga-rdo'
-        - name: Set source for CentOS 8
+        - name: Set source for CentOS 9
           ini_file:
             path: "{{ working_dir }}/DLRN/projects.ini"
             section: DEFAULT
             option: source
             value: 'stable/yoga'
-        - name: Set tags for CentOS 8
+        - name: Set tags for CentOS 9
           ini_file:
             path: "{{ working_dir }}/DLRN/projects.ini"
             section: DEFAULT
             option: tags
             value: 'yoga'
-        - name: Set repo to import for CentOS 8
+        - name: Set repo to import for CentOS 9
           set_fact:
-            imported_repo: "https://trunk.rdoproject.org/centos8-yoga/component/tripleo/6f/d1/6fd1c8e407eb57bcb42198975dd1fdb1c0de1013_4df77f78/"
+            imported_repo: "https://trunk.rdoproject.org/centos9-yoga/component/tripleo/6f/d1/6fd1c8e407eb57bcb42198975dd1fdb1c0de1013_4df77f78/"
             imported_commit_hash: "6fd1c8e407eb57bcb42198975dd1fdb1c0de1013"
             imported_distro_hash: "4df77f783dfaabaff8fad2a5cc3c2c86db8d0914"
       when:
         - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version | int == 8
-
-    - name: Set options for CentOS 7, we will use stable/train
-      block:
-        - name: Set baseurl for CentOS 7 Train
-          ini_file:
-            path: "{{ working_dir }}/DLRN/projects.ini"
-            section: DEFAULT
-            option: baseurl
-            value: 'https://trunk.rdoproject.org/centos7-train/'
-        - name: Set distro for train
-          ini_file:
-            path: "{{ working_dir }}/DLRN/projects.ini"
-            section: DEFAULT
-            option: distro
-            value: train-rdo
-        - name: Set source for train
-          ini_file:
-            path: "{{ working_dir }}/DLRN/projects.ini"
-            section: DEFAULT
-            option: source
-            value: stable/train
-        - name: Set target for CentOS 7
-          ini_file:
-            path: "{{ working_dir }}/DLRN/projects.ini"
-            section: DEFAULT
-            option: target
-            value: centos
-      when:
-        - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version | int == 7
+        - ansible_distribution_major_version | int == 9
 
     # This task must be separated from reqs install
     - name: Prepare virtualenv
@@ -252,19 +222,12 @@
         path: "{{ working_dir }}/DLRN/data/repos/cipromotion"
       register: link
 
-    - name: Fail if symlink was not created (centos7)
-      fail:
-        msg: Promotion did not create symlink cipromotion
-      when:
-        - link.stat.islnk is not defined or not link.stat.islnk
-        - ansible_distribution == "CentOS" and ansible_distribution_major_version | int < 8
-
-    - name: Fail if cipromotion directory was not created (centos8)
+    - name: Fail if cipromotion directory was not created (centos9)
       fail:
         msg: Promotion did not create cipromotion directory
       when:
         - link.stat.isdir is not defined or not link.stat.isdir
-        - ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 8
+        - ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 9
 
     - name: Get the number of packages that were built from the API
       shell:
@@ -280,22 +243,12 @@
         msg: Did not get 5 successfully built packages
       when: (build_metrics.stdout | from_json).succeeded != 5
 
-    - name: Get metrics from the Prometheus endpoint (CentOS 8)
+    - name: Get metrics from the Prometheus endpoint (CentOS 9)
       uri:
         url: http://localhost:5000/metrics
         return_content: yes
       register: response
-      failed_when: "'dlrn_builds_succeeded_total{baseurl=\"https://trunk.rdoproject.org/centos8-yoga/\"} 5.0' not in response.content"
+      failed_when: "'dlrn_builds_succeeded_total{baseurl=\"https://trunk.rdoproject.org/centos9-yoga/\"} 5.0' not in response.content"
       when:
         - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version | int == 8
-
-    - name: Get metrics from the Prometheus endpoint (CentOS 7)
-      uri:
-        url: http://localhost:5000/metrics
-        return_content: yes
-      register: response
-      failed_when: "'dlrn_builds_succeeded_total{baseurl=\"https://trunk.rdoproject.org/centos7-train/\"} 5.0' not in response.content"
-      when:
-        - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version | int == 7
+        - ansible_distribution_major_version | int == 9

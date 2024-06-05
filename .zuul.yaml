@@ -9,18 +9,7 @@
     nodeset:
       nodes:
         - name: test-node
-          label: cloud-centos-7
-
-- job:
-    name: dlrn-rpmbuild-centos-7
-    parent: dlrn-base
-    description: Run DLRN to build a package
-    pre-run: playbooks/python-devel-install.yaml
-    run: playbooks/rpmbuild.yaml
-    vars:
-      python_version: py36
-      tag: train
-      centos_version: 'centos7'
+          label: cloud-centos-9-stream
 
 - job:
     name: dlrn-rpmbuild-centos-9
@@ -37,20 +26,6 @@
           label: cloud-centos-9-stream
 
 - job:
-    name: dlrn-rpmbuild-centos-8
-    parent: dlrn-base
-    description: Run DLRN to build a package using Python 3
-    run: playbooks/rpmbuild.yaml
-    vars:
-      python_version: py36
-      tag: 'wallaby'
-      centos_version: 'centos8'
-    nodeset:
-      nodes:
-        - name: cloud-centos-8-stream
-          label: cloud-centos-8-stream
-
-- job:
     name: dlrn-api-functional
     parent: dlrn-base
     description: Run a DLRN functional test, using the API and dlrnapi_client
@@ -62,21 +37,12 @@
       - dlrnapi_client
 
 - job:
-    name: dlrn-api-functional-centos-7
-    parent: dlrn-api-functional
-    pre-run: playbooks/openldap-devel-install.yaml
-    nodeset:
-      nodes:
-        - name: centos-7
-          label: rdo-centos-7
-
-- job:
-    name: dlrn-api-functional-centos-8
+    name: dlrn-api-functional-centos-9
     parent: dlrn-api-functional
     nodeset:
       nodes:
-        - name: cloud-centos-8-stream
-          label: cloud-centos-8-stream
+        - name: cloud-centos-9-stream
+          label: cloud-centos-9-stream
 
 - job:
     name: docs-build
@@ -90,17 +56,13 @@
     nodeset:
       nodes:
         - name: container
-          label: zuul-worker-f38
+          label: zuul-worker-f40
 
 - job:
-    name: tox-py36-ci-config
-    parent: tox-py36
+    name: tox-py312-ci-config
+    parent: tox-pre
     pre-run: playbooks/krb5-devel-install.yaml
     run: playbooks/tox_run.yaml
-    nodeset:
-      nodes:
-        - name: cloud-centos-8-stream
-          label: cloud-centos-8-stream
 
 - project:
     name: DLRN
@@ -110,26 +72,33 @@
     check:
       jobs:
         - tox-pep8:
-            nodeset: fedora-latest-pod
-        - tox-py36-ci-config:
+            nodeset:
+              nodes:
+                - name: zuul-worker-f40
+                  label: zuul-worker-f40
+        - tox-py312-ci-config:
+            nodeset:
+              nodes:
+                - name: zuul-worker-f40
+                  label: zuul-worker-f40
             vars:
                 tox_install_bindep: false
-        - dlrn-rpmbuild-centos-7
         - dlrn-rpmbuild-centos-9
-        - dlrn-rpmbuild-centos-8
-        - dlrn-api-functional-centos-7
-        - dlrn-api-functional-centos-8
+        - dlrn-api-functional-centos-9
         - docs-build
     gate:
       jobs:
         - tox-pep8:
-            nodeset: fedora-latest-pod
-        - tox-py36-ci-config:
-            vars:
-                tox_install_bindep: false
-        - dlrn-rpmbuild-centos-7
+            nodeset:
+              nodes:
+                - name: zuul-worker-f40
+                  label: zuul-worker-f40
+        - tox-py312-ci-config:
+            nodeset:
+              nodes:
+                - name: zuul-worker-f40
+                  label: zuul-worker-f40
         - dlrn-rpmbuild-centos-9
-        - dlrn-rpmbuild-centos-8
     post:
       jobs:
         - publish-readthedocs
