@@ -61,6 +61,7 @@ New patches should:
    - Include unit tests for the new code to prove that it works
      correctly and to prevent regressions.
    - For changes visible to end-users (e.g. new API) we need to update the necessary RST files under the doc/ folder.
+   - Execute all CI checks without errors by executing the command  tox.
 
 Once submitted, your change request will show up here:
 

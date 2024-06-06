@@ -63,6 +63,15 @@
     parent: tox-pre
     pre-run: playbooks/krb5-devel-install.yaml
     run: playbooks/tox_run.yaml
+    vars:
+      tox_envlist: py312
+
+- job:
+    name: py3-bandit
+    parent: tox
+    voting: false
+    vars:
+      tox_envlist: bandit
 
 - project:
     name: DLRN
@@ -83,6 +92,11 @@
                   label: zuul-worker-f40
             vars:
                 tox_install_bindep: false
+        - py3-bandit:
+            nodeset:
+              nodes:
+                - name: zuul-worker-f40
+                  label: zuul-worker-f40
         - dlrn-rpmbuild-centos-9
         - dlrn-api-functional-centos-9
         - docs-build

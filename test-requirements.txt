@@ -10,6 +10,7 @@ testscenarios>=0.4,<0.5
 testtools>=0.9.32
 gssapi
 ipalib
+bandit
 
 # docs requirements
 sphinx>=1.1.2
