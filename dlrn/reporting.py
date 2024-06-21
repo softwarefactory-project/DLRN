@@ -92,8 +92,9 @@ def genreports(packages, head_only, session, all_commits):
         os.makedirs(repodir)
 
     # configure jinja and filters
-    jinja_env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader([templatedir]))
+    jinja_env = jinja2.Environment(autoescape=True,
+                                   loader=jinja2.FileSystemLoader(
+                                       [templatedir]))
     jinja_env.filters["strftime"] = _jinja2_filter_strftime
     jinja_env.filters["get_commit_url"] = \
         partial(_jinja2_filter_get_commit_url, packages=packages)

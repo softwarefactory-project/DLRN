@@ -379,7 +379,8 @@ def aggregate_repo_files(dirname, datadir, session, reponame, packages,
             with open(csv_file, 'r') as fp:
                 csv_content.extend(fp.readlines()[1:])
 
-    file_hash = hashlib.md5(repo_content.encode()).hexdigest()
+    file_hash = hashlib.md5(repo_content.encode(),
+                            usedforsecurity=False).hexdigest()
 
     if hashed_dir:
         target_dir = os.path.join(datadir, "repos", dirname, file_hash[:2],

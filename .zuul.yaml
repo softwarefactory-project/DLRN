@@ -69,7 +69,6 @@
 - job:
     name: py3-bandit
     parent: tox
-    voting: false
     vars:
       tox_envlist: bandit
 

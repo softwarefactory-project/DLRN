@@ -79,8 +79,9 @@ def sendnotifymail(packages, commit):
     details["logurl"] = "%s/%s" % (config_options.baseurl,
                                    commit.getshardedcommitdir())
     # Render the notification template
-    jinja_env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader([config_options.templatedir]))
+    jinja_env = jinja2.Environment(autoescape=True,
+                                   loader=jinja2.FileSystemLoader(
+                                       [config_options.templatedir]))
     jinja_template = jinja_env.get_template("notification_email.j2")
     error_body = jinja_template.render(details=details)
 
