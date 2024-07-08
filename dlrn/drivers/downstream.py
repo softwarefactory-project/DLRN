@@ -302,7 +302,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                             distro_hash=distro_hash, dt_distro=dt_distro,
                             extended_hash=extended_hash,
                             dt_extended=dt_extended,
-                            versions_csv=version[9],
+                            versions_csv=version[len(version) - 1],
                             distgit_dir=self.distgit_dir(package['name']),
                             commit_branch=source_branch, component=component)
             project_toprocess.append(commit)
