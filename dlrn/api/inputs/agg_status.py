@@ -9,21 +9,16 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from typing import Optional
-
 from pydantic import BaseModel
 from pydantic import StrictStr
+from typing import Optional
 
 
-class RepoStatusInput(BaseModel):
-    """Input class that validates request's arguments for repo_status endpoint
+class AggStatusInput(BaseModel):
+    """Input class that validates request's arguments for agg_status endpoint
 
-    :param str commit_hash: A reference to the commit
-    :param str distro_hash: A reference to the distro
-    :param str extended_hash(optional): A reference to the extended commit
+    :param str aggregate_hash: A reference to the aggregate hash
     :param bool success(optional): Only report successful/unsuccessful votes
     """
-    commit_hash: StrictStr
-    distro_hash: StrictStr
-    extended_hash: Optional[StrictStr]
+    aggregate_hash: StrictStr
     success: Optional[bool]

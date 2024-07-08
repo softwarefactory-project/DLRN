@@ -28,8 +28,13 @@ from dlrn.api.api_logging import setup_dict_config
 from dlrn.api import app
 from dlrn.api import dlrn_api
 from dlrn.api.drivers.auth import Auth
+from dlrn.api.inputs.agg_status import AggStatusInput
+from dlrn.api.inputs.last_tested_repo import LastTestedRepoInput
+from dlrn.api.inputs.promotions import MAX_LIMIT
+from dlrn.api.inputs.promotions import PromotionsInput
 from dlrn.api.inputs.repo_status import RepoStatusInput
 from dlrn.api.utils import ConfigurationValidator
+from dlrn.api.utils import InvalidUsage
 from dlrn.config import ConfigOptions
 from dlrn import db
 from dlrn.tests import base
@@ -2004,3 +2009,87 @@ class TestRepoStatusInput(base.TestCase):
                        invalid_input_obj3, invalid_input_obj4]
         for input_obj in input_array:
             self.assertRaises(ValueError, RepoStatusInput, **input_obj)
+
+
+class TestAggStatusInput(base.TestCase):
+
+    def test_valid_input(self):
+        input_obj = dict(aggregate_hash="93eee77657978547f5fad1cb8cd30b570da")
+        assert isinstance(AggStatusInput(**input_obj), AggStatusInput)
+
+    def test_invalid_input(self):
+        valid_hash = "93eee77657978547f5fad1cb8cd30b570da"
+        invalid_input_obj1 = dict(aggregate_hash=123)
+        invalid_input_obj2 = dict(aggregate_hash=valid_hash, success=10)
+        input_array = [invalid_input_obj1, invalid_input_obj2]
+        for input_obj in input_array:
+            self.assertRaises(ValueError, AggStatusInput, **input_obj)
+
+
+class TestLastTestedRepo(base.TestCase):
+
+    def test_minimum_valid_input(self):
+        input_obj = dict(max_age="1")
+        assert isinstance(LastTestedRepoInput(**input_obj),
+                          LastTestedRepoInput)
+
+    def test_valid_input(self):
+        input_obj = dict(max_age="1", success="True", job_id="Job_name_1",
+                         sequential_mode="1", previous_job_id="prev_name_1",
+                         component="component")
+        assert isinstance(LastTestedRepoInput(**input_obj),
+                          LastTestedRepoInput)
+
+    def test_invalid_input(self):
+        invalid_input_obj1 = dict(max_age="-1")
+        invalid_input_obj2 = dict(max_age="1", job_id=1)
+        invalid_input_obj3 = dict(max_age="1", sequential_mode="True",
+                                  previous_job_id=1)
+        invalid_input_obj4 = dict(max_age="1", component=13221)
+        invalid_input_objs = [invalid_input_obj1, invalid_input_obj2,
+                              invalid_input_obj3, invalid_input_obj4]
+        for input_obj in invalid_input_objs:
+            self.assertRaises(ValueError, AggStatusInput, **input_obj)
+
+
+class TestPromotions(base.TestCase):
+
+    def test_minimum_valid_input(self):
+        assert isinstance(PromotionsInput(), PromotionsInput)
+
+    def test_valid_input(self):
+        input_obj = dict(commit_hash="hash1", distro_hash="hash2",
+                         extended_hash="hash3", aggregated_hash="hash4",
+                         promote_name="promote_name", offset="0", limit="12",
+                         component="component")
+        assert isinstance(PromotionsInput(**input_obj), PromotionsInput)
+
+    def test_max_limit(self):
+        input_obj = dict(limit="999999")
+        promotion_input = PromotionsInput(**input_obj)
+        assert promotion_input.limit == MAX_LIMIT
+        assert isinstance(promotion_input, PromotionsInput)
+
+    def test_invalid_distro_commit_hashes(self):
+        valid_hash = "93eee77657978547f5fad1cb8cd30b570da83e"
+        invalid_input_obj1 = dict(distro_hash=valid_hash)
+        invalid_input_obj2 = dict(commit_hash=valid_hash)
+        input_array = [invalid_input_obj1, invalid_input_obj2]
+        for input_obj in input_array:
+            self.assertRaises(InvalidUsage, PromotionsInput, **input_obj)
+
+    def test_invalid_input(self):
+        invalid_input_obj1 = dict(distro_hash=1, commit_hash=2)
+        invalid_input_obj2 = dict(extended_hash=1)
+        invalid_input_obj3 = dict(aggregate_hash=1)
+        invalid_input_obj4 = dict(max_age="1", component=13221)
+        invalid_input_obj5 = dict(promote_name=1)
+        invalid_input_obj6 = dict(offset="-1", limit="0")
+        invalid_input_obj7 = dict(limit="-1", offset="0")
+
+        invalid_input_objs = [invalid_input_obj1, invalid_input_obj2,
+                              invalid_input_obj3, invalid_input_obj4,
+                              invalid_input_obj5, invalid_input_obj6,
+                              invalid_input_obj7]
+        for input_obj in invalid_input_objs:
+            self.assertRaises(ValueError, PromotionsInput, **input_obj)

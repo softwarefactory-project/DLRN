@@ -18,6 +18,9 @@ import logging
 
 from dlrn.api import app
 from dlrn.api.drivers.auth import Auth
+from dlrn.api.inputs.agg_status import AggStatusInput
+from dlrn.api.inputs.last_tested_repo import LastTestedRepoInput
+from dlrn.api.inputs.promotions import PromotionsInput
 from dlrn.api.inputs.repo_status import RepoStatusInput
 from dlrn.api.utils import AggDetail
 from dlrn.api.utils import InvalidUsage
@@ -51,7 +54,6 @@ import time
 
 
 pagination_limit = 100
-max_limit = 100
 auth_multi = Auth(app.config).auth_multi
 
 if 'PROTECT_READ_ENDPOINTS' not in app.config.keys():
@@ -278,24 +280,14 @@ def repo_status():
 @auth_multi.login_required(optional=bypass_read_endpoints,
                            role=can_read_roles)
 def agg_status():
-    # aggregate_hash: aggregate hash
-    # success(optional): only report successful/unsuccessful votes
-    agg_hash = request.args.get('aggregate_hash', None)
-    success = request.args.get('success', None)
+    logger = _get_logger()
+    parsed_input = parse_input(logger=logger, obj=AggStatusInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
 
-    if request.headers.get('Content-Type') == 'application/json':
-        # This is the old, deprecated method of in-body parameters
-        # We will keep it for backwards compatibility
-        if agg_hash is None:
-            agg_hash = request.json.get('aggregate_hash', None)
-        if success is None:
-            success = request.json.get('success', None)
-
-    if agg_hash is None:
-        raise InvalidUsage('Missing parameters', status_code=400)
-
-    if success is not None:
-        success = bool(strtobool(success))
+    agg_hash = parsed_input.aggregate_hash
+    success = parsed_input.success
 
     # Find the aggregates
     session = _get_db()
@@ -323,57 +315,24 @@ def agg_status():
 @auth_multi.login_required(optional=bypass_read_endpoints,
                            role=can_read_roles)
 def last_tested_repo_GET():
-    # max_age: Maximum age in hours, used as base for the search
-    # success(optional): find repos with a successful/unsuccessful vote
-    # job_id(optional); name of the CI that sent the vote
-    # sequential_mode(optional): if set to true, change the search algorithm
-    #                            to only use previous_job_id as CI name to
-    #                            search for. Defaults to false
-    # previous_job_id(optional): CI name to search for, if sequential_mode is
-    #                            True
-    # component(optional): only get votes for this component
+    logger = _get_logger()
+    parsed_input = parse_input(logger=logger, obj=LastTestedRepoInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
 
-    max_age = request.args.get('max_age', None)
-    job_id = request.args.get('job_id', None)
-    success = request.args.get('success', None)
-    sequential_mode = request.args.get('sequential_mode', None)
-    previous_job_id = request.args.get('previous_job_id', None)
-    component = request.args.get('component', None)
-
-    if request.headers.get('Content-Type') == 'application/json':
-        # This is the old, deprecated method of in-body parameters
-        # We will keep it for backwards compatibility
-        if max_age is None:
-            max_age = request.json.get('max_age', None)
-        if job_id is None:
-            job_id = request.json.get('job_id', None)
-        if success is None:
-            success = request.json.get('success', None)
-        if sequential_mode is None:
-            sequential_mode = request.json.get('sequential_mode', None)
-        if previous_job_id is None:
-            previous_job_id = request.json.get('previous_job_id', None)
-        if component is None:
-            component = request.json.get('component', None)
-
-    if success is not None:
-        success = bool(strtobool(success))
-
-    if sequential_mode is not None:
-        sequential_mode = bool(strtobool(sequential_mode))
-
-    if sequential_mode and previous_job_id is None:
-        raise InvalidUsage('Missing parameter previous_job_id',
-                           status_code=400)
-
-    if max_age is None:
-        raise InvalidUsage('Missing parameters', status_code=400)
+    max_age = parsed_input.max_age
+    success = parsed_input.success
+    job_id = parsed_input.job_id
+    sequential_mode = parsed_input.sequential_mode
+    previous_job_id = parsed_input.previous_job_id
+    component = parsed_input.component
 
     # Calculate timestamp as now - max_age
-    if int(max_age) == 0:
+    if max_age == 0:
         timestamp = 0
     else:
-        oldest_time = datetime.now() - timedelta(hours=int(max_age))
+        oldest_time = datetime.now() - timedelta(hours=max_age)
         timestamp = time.mktime(oldest_time.timetuple())
 
     session = _get_db()
@@ -409,56 +368,22 @@ def last_tested_repo_GET():
 @auth_multi.login_required(optional=bypass_read_endpoints,
                            role=can_read_roles)
 def promotions_GET():
-    # commit_hash(optional): commit hash
-    # distro_hash(optional): distro hash
-    # extended_hash(optional): extended hash
-    # aggregate_hash(optional): aggregate hash
-    # promote_name(optional): only report promotions for promote_name
-    # offset(optional): skip the first X promotions (only 100 are shown
-    #                   per query)
-    # limit(optional): maximum number of entries to return
-    # component(optional): only report promotions for this component
-    commit_hash = request.args.get('commit_hash', None)
-    distro_hash = request.args.get('distro_hash', None)
-    extended_hash = request.args.get('extended_hash', None)
-    agg_hash = request.args.get('aggregate_hash', None)
-    promote_name = request.args.get('promote_name', None)
-    offset = int(request.args.get('offset', 0))
-    limit = int(request.args.get('limit', 100))
-    component = request.args.get('component', None)
+    logger = _get_logger()
+    parsed_input = parse_input(logger=logger, obj=PromotionsInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
 
-    if request.headers.get('Content-Type') == 'application/json':
-        # This is the old, deprecated method of in-body parameters
-        # We will keep it for backwards compatibility
-        if commit_hash is None:
-            commit_hash = request.json.get('commit_hash', None)
-        if distro_hash is None:
-            distro_hash = request.json.get('distro_hash', None)
-        if extended_hash is None:
-            extended_hash = request.json.get('extended_hash', None)
-        if agg_hash is None:
-            agg_hash = request.json.get('aggregate_hash', None)
-        if promote_name is None:
-            promote_name = request.json.get('promote_name', None)
-        if offset == 0:
-            offset = int(request.json.get('offset', 0))
-        if limit == 100:
-            limit = int(request.json.get('limit', 100))
-        if component is None:
-            component = request.json.get('component', None)
+    commit_hash = parsed_input.commit_hash
+    distro_hash = parsed_input.distro_hash
+    extended_hash = parsed_input.extended_hash
+    agg_hash = parsed_input.aggregate_hash
+    promote_name = parsed_input.promote_name
+    offset = parsed_input.offset
+    limit = parsed_input.limit
+    component = parsed_input.component
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
-
-    # Make sure we do not exceed
-    if limit > max_limit:
-        limit = max_limit
-
-    if ((commit_hash and not distro_hash) or
-            (distro_hash and not commit_hash)):
-
-        raise InvalidUsage('Both commit_hash and distro_hash must be '
-                           'specified if any of them is.',
-                           status_code=400)
 
     # Find the commit id for commit_hash/distro_hash
     session = _get_db()
