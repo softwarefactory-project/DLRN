@@ -49,8 +49,8 @@ The DLRN codebase is structured as follows:
     `Building packages`_ section).
   * *submit_review.sh*: script to open a Gerrit review after a build failure (see
     the `Error reporting`_ section).
-  * *centos.cfg*, *centos8.cfg*, *fedora.cfg* and *redhat.cfg*: base mock
-    configurations for  CentOS 7, CentOS 8, Fedora and RHEL 8 builders. For a RHEL 8
+  * *centos-stream-9.cfg*, *fedora.cfg* and *redhat.cfg*: base mock
+    configurations for CentOS Stream 9, Fedora and RHEL 9 builders. For a RHEL 9
     builder, you will have to make sure the appropriate base repos are configured,
     since those are not publicly available. These base configurations can be located
     in a separate directory, defined by the ``configdir`` option in projects.ini.
