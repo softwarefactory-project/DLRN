@@ -18,8 +18,10 @@ import logging
 
 from dlrn.api import app
 from dlrn.api.drivers.auth import Auth
+from dlrn.api.inputs.repo_status import RepoStatusInput
 from dlrn.api.utils import AggDetail
 from dlrn.api.utils import InvalidUsage
+from dlrn.api.utils import InvalidUsageWrapper
 from dlrn.api.utils import RepoDetail
 
 from dlrn.config import ConfigOptions
@@ -39,6 +41,7 @@ from flask import g as flask_g
 from flask import jsonify
 from flask import render_template
 from flask import request
+from flask_container_scaffold.util import parse_input
 
 import calendar
 import os
@@ -228,33 +231,16 @@ def health_post():
 @auth_multi.login_required(optional=bypass_read_endpoints,
                            role=can_read_roles)
 def repo_status():
-    # commit_hash: commit hash
-    # distro_hash: distro hash
-    # extended_hash(optional): extended hash
-    # success(optional): only report successful/unsuccessful votes
+    logger = _get_logger()
+    parsed_input = parse_input(logger=logger, obj=RepoStatusInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
 
-    commit_hash = request.args.get('commit_hash', None)
-    distro_hash = request.args.get('distro_hash', None)
-    extended_hash = request.args.get('extended_hash', None)
-    success = request.args.get('success', None)
-
-    if request.headers.get('Content-Type') == 'application/json':
-        # This is the old, deprecated method of in-body parameters
-        # We will keep it for backwards compatibility
-        if commit_hash is None:
-            commit_hash = request.json.get('commit_hash', None)
-        if distro_hash is None:
-            distro_hash = request.json.get('distro_hash', None)
-        if extended_hash is None:
-            extended_hash = request.json.get('extended_hash', None)
-        if success is None:
-            success = request.json.get('success', None)
-
-    if (commit_hash is None or distro_hash is None):
-        raise InvalidUsage('Missing parameters', status_code=400)
-
-    if success is not None:
-        success = bool(strtobool(success))
+    commit_hash = parsed_input.commit_hash
+    distro_hash = parsed_input.distro_hash
+    extended_hash = parsed_input.extended_hash
+    success = parsed_input.success
 
     # Find the commit id for commit_hash/distro_hash
     session = _get_db()
