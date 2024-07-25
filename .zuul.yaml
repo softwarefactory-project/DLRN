@@ -67,10 +67,17 @@
       tox_envlist: py312
 
 - job:
-    name: py3-bandit
+    name: py3-bandit-SAST
     parent: tox
     vars:
       tox_envlist: bandit
+
+- job:
+    name: pip-audit-cve
+    parent: tox
+    vars:
+      tox_envlist: pip-audit
+    voting: false
 
 - project:
     name: DLRN
@@ -91,7 +98,12 @@
                   label: zuul-worker-f40
             vars:
                 tox_install_bindep: false
-        - py3-bandit:
+        - py3-bandit-SAST:
+            nodeset:
+              nodes:
+                - name: zuul-worker-f40
+                  label: zuul-worker-f40
+        - pip-audit-cve:
             nodeset:
               nodes:
                 - name: zuul-worker-f40
