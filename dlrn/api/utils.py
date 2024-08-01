@@ -27,6 +27,15 @@ class InvalidUsage(Exception):
         return rv
 
 
+# Converts what parse-input expects to what the API returns
+# for maintaining same response format.
+# TODO(evallesp): Deprecate InvalidUsage to start using this instead
+class InvalidUsageWrapper(InvalidUsage):
+    def __init__(self, msg, errors=None):
+        msg += " " + str(errors)
+        super(InvalidUsageWrapper, self).__init__(message=msg, status_code=400)
+
+
 class RepoDetail(object):
     def __init__(self):
         self.commit_hash = None

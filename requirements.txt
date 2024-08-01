@@ -18,6 +18,8 @@ graphene<3.0
 graphene-sqlalchemy>=2.0
 flask-sqlalchemy
 flask-graphql
+flask-container-scaffold>=0.3.1
 prometheus-client
 cryptography<=37.0.2
 stevedore
+pydantic<2.0.0

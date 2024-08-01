@@ -28,6 +28,7 @@ from dlrn.api.api_logging import setup_dict_config
 from dlrn.api import app
 from dlrn.api import dlrn_api
 from dlrn.api.drivers.auth import Auth
+from dlrn.api.inputs.repo_status import RepoStatusInput
 from dlrn.api.utils import ConfigurationValidator
 from dlrn.config import ConfigOptions
 from dlrn import db
@@ -838,6 +839,13 @@ class TestRepoStatus(DLRNAPITestCase):
         data = json.loads(response.data)
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]['extended_hash'], '1234567890_1234567890')
+
+    def test_repo_status_invalid_args(self, db2_mock, db_mock):
+        response = self.app.get('/api/repo_status')
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.data)
+        self.assertEqual(data["message"], "Errors detected: 2 {'commit_hash': "
+                         "'field required', 'distro_hash': 'field required'}")
 
 
 @mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
@@ -1971,3 +1979,28 @@ class TestConfigurationValidator(DLRNAPITestCase):
         self.assertRegex(str(configuration_validation), error_keytab_path)
         self.assertRegex(str(configuration_validation), error_keytab_princ)
         self.assertEqual(vt_roles.call_count, 1)
+
+
+class TestRepoStatusInput(base.TestCase):
+
+    def test_valid_input(self):
+        input_obj = dict(commit_hash="93eee77657978547f5fad1cb8cd30b570da83e",
+                         distro_hash="008678d7b0e20fbae185f2bb1bd0d9d1675862")
+        assert isinstance(RepoStatusInput(**input_obj), RepoStatusInput)
+
+    def test_invalid_input(self):
+        valid_hash = "93eee77657978547f5fad1cb8cd30b570da83e"
+        valid_bool = "FaLsE"
+        invalid_input_obj1 = dict(commit_hash=valid_hash, distro_hash=123,
+                                  extended_hash=valid_hash, success=valid_bool)
+        invalid_input_obj2 = dict(commit_hash=123, distro_hash=valid_hash,
+                                  extended_hash=valid_hash, success=valid_bool)
+        invalid_input_obj3 = dict(commit_hash=valid_hash,
+                                  distro_hash=valid_hash, extended_hash=123)
+        invalid_input_obj4 = dict(commit_hash=valid_hash, success=4,
+                                  extended_hash=valid_hash,
+                                  distro_hash=valid_hash)
+        input_array = [invalid_input_obj1, invalid_input_obj2,
+                       invalid_input_obj3, invalid_input_obj4]
+        for input_obj in input_array:
+            self.assertRaises(ValueError, RepoStatusInput, **input_obj)
