@@ -641,8 +641,14 @@ def last_tested_repo_POST():
         Commit.status == 'SUCCESS',
         Commit.id == vote.commit_id).first()
 
-    logger.info("Added new vote to commit %s for component %s by user %s",
-                commit.commit_hash, vote.component, auth_multi.current_user())
+    logger.info("Added new vote to commit with hash {commit_hash}, \
+                distro_hash {distro_hash} and extended_hash {extended_hash} \
+                for component {component} by user {name}"
+                .format(commit_hash=commit.commit_hash,
+                        distro_hash=commit.distro_hash,
+                        extended_hash=commit.extended_hash,
+                        component=vote.component,
+                        name=auth_multi.current_user()))
 
     result = {'commit_hash': commit.commit_hash,
               'distro_hash': commit.distro_hash,
@@ -718,12 +724,17 @@ def report_result():
                       ci_vote=bool(strtobool(success)), ci_in_progress=False,
                       timestamp=int(timestamp), notes=notes,
                       user=auth_multi.current_user(), component=component)
-        log_message = 'Added new vote to commit {commit} for component \
+        log_message = 'Added new vote to commit with hash {commit_hash}, \
+                      distro_hash {distro_hash} and extended_hash \
+                      {extended_hash} for component \
                       {component} by user {name}'.format(
-                      commit=commit_hash, component=component,
+                      commit_hash=commit_hash, distro_hash=distro_hash,
+                      extended_hash=out_ext_hash, component=component,
                       name=auth_multi.current_user())
 
     else:
+        # No matters if the client gave extended_hash
+        # returning None as it wasn't used in this code path
         out_ext_hash = None
         prom = session.query(Promotion).filter(
             Promotion.aggregate_hash == aggregate_hash).first()
@@ -842,9 +853,17 @@ def promote():
 
     session.add(promotion)
     session.commit()
-    logger.info('Added new promotion named %s to commit %s for component %s \
-                by user %s', promote_name, commit_hash,
-                commit.component, auth_multi.current_user())
+    logger.info("Added new promotion named {promote_name} to \
+                commit with hash {commit_hash}, distro_ hash {distro_hash}, \
+                extended_hash {extended_hash} and aggregate_hash \
+                {aggregate_hash} for component {component} \
+                by user {name}".format(promote_name=promote_name,
+                                       commit_hash=commit_hash,
+                                       distro_hash=distro_hash,
+                                       extended_hash=extended_hash,
+                                       aggregate_hash=repo_checksum,
+                                       component=commit.component,
+                                       name=auth_multi.current_user()))
     repo_hash = _repo_hash(commit)
     repo_url = "%s/%s" % (config_options.baseurl, commit.getshardedcommitdir())
 
@@ -972,11 +991,19 @@ def promote_batch():
                               component=commit.component,
                               aggregate_hash=None)
         session.add(promotion)
-        log_messages.append("Added new promotion named {promote_name} to \
-                            commit {commit} for component {component} by \
-                            user {name}".format(promote_name=promote_name,
-                            commit=commit_hash, component=commit.component,
-                            name=auth_multi.current_user()))
+        log_messages.append("Added new promotion in batch \
+                            promotion named {promote_name} to \
+                            commit with hash {commit_hash}, distro_hash \
+                            {distro_hash}, extended_hash {extended_hash} \
+                            and aggregate_hash {aggregate_hash} \
+                            for component {component} by user {name}"
+                            .format(promote_name=promote_name,
+                                    commit_hash=commit_hash,
+                                    distro_hash=distro_hash,
+                                    extended_hash=extended_hash,
+                                    aggregate_hash=None,
+                                    component=commit.component,
+                                    name=auth_multi.current_user()))
 
     # And finally, if we are using components, update the top-level
     # repo file
@@ -991,6 +1018,10 @@ def promote_batch():
                                              hashed_dir=True)
         promotion.aggregate_hash = repo_checksum
         session.add(promotion)
+        log_messages.append("Promoted batch finished with aggregate_hash \
+                            {aggregate_hash} by user {name}"
+                            .format(aggregate_hash=repo_checksum,
+                                    name=auth_multi.current_user()))
 
     # Close session and return the last promotion we did (which includes the
     # repo checksum)
