@@ -15,7 +15,9 @@ from dlrn.api.inputs.last_tested_repo import LastTestedRepoInput
 from dlrn.api.inputs.last_tested_repo import LastTestedRepoInputPost
 from dlrn.api.inputs.metrics import MetricsInput
 from dlrn.api.inputs.promotions import MAX_LIMIT
+from dlrn.api.inputs.promotions import PromoteInput
 from dlrn.api.inputs.promotions import PromotionsInput
+from dlrn.api.inputs.remote_import import RemoteImportInput
 from dlrn.api.inputs.repo_status import RepoStatusInput
 from dlrn.api.inputs.report_result import ReportResultInput
 from dlrn.api.utils import InvalidUsage
@@ -135,10 +137,44 @@ class TestPromotions(base.TestCase):
 
     def test_invalid_offset(self):
         input_obj = dict(commit_hash="hash1", distro_hash="hash2",
-                         extended_hash="hash3", aggregated_hash="hash4",
-                         promote_name="promote_name", offset="-10", limit="12",
-                         component="component")
+                         extended_hash="hash3", offset="-10")
         self.assertRaises(ValidationError, PromotionsInput, **input_obj)
+
+
+class TestPromote(base.TestCase):
+
+    def test_valid_input(self):
+        input_obj_1 = dict(commit_hash="hash1", distro_hash="hash2",
+                           promote_name="name1", extended_hash="hash3")
+        input_obj_2 = dict(commit_hash="hash1", distro_hash="hash2",
+                           promote_name="name1")
+        for input_obj in [input_obj_1, input_obj_2]:
+            assert isinstance(PromoteInput(**input_obj), PromoteInput)
+
+    def test_missing_or_invalid_promote_name_promote_input(self):
+        invalid_base_object = dict(commit_hash="hash1", distro_hash="hash2",
+                                   extended_hash="hash3")
+        invalid_input_obj1 = dict(promote_name="consistent")
+        invalid_input_obj1.update(invalid_base_object)
+        invalid_input_obj2 = dict(promote_name="current")
+        invalid_input_obj2.update(invalid_base_object)
+        invalid_input_obj3 = dict(promote_name="name1")
+        input_objects = [invalid_input_obj1, invalid_input_obj2,
+                         invalid_input_obj3, invalid_base_object]
+        for input_object in input_objects:
+            self.assertRaises((ValueError, InvalidUsage), PromoteInput,
+                              **input_object)
+
+    def test_missing_hashes(self):
+        valid_hash = "93eee77657978547f5fad1cb8cd30b570da83e"
+        invalid_input_obj1 = dict(distro_hash=valid_hash)
+        invalid_input_obj2 = dict(commit_hash=valid_hash)
+        invalid_input_obj3 = dict(distro_hash=valid_hash,
+                                  extended_hash=valid_hash)
+        input_objects = [invalid_input_obj1, invalid_input_obj2,
+                         invalid_input_obj3]
+        for invalid_input in input_objects:
+            self.assertRaises(InvalidUsage, PromoteInput, **invalid_input)
 
 
 class TestMetrics(base.TestCase):
@@ -241,3 +277,20 @@ class TestReportResult(base.TestCase):
         for input_object in input_objects:
             self.assertRaises(ValidationError, ReportResultInput,
                               **input_object)
+
+
+class TestRemoteImport(base.TestCase):
+
+    def test_valid_input(self):
+        input_obj_1 = dict(repo_url="http://test.com")
+        input_obj_2 = dict(repo_url="https://test.com")
+        for repo_url in [input_obj_1, input_obj_2]:
+            assert isinstance(RemoteImportInput(**repo_url), RemoteImportInput)
+
+    def test_invalid_input(self):
+        input_obj_1 = dict(repo_url="ftp://test.com")
+        input_obj_2 = dict(repo_url="invalid_or_missing_url")
+        input_obj_3 = dict(repo_url="ssh://test.com")
+        for repo_url in [input_obj_1, input_obj_2, input_obj_3]:
+            self.assertRaises(ValidationError, RemoteImportInput,
+                              **dict(repo_url=repo_url))
