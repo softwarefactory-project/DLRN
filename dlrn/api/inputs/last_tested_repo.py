@@ -56,3 +56,12 @@ class LastTestedRepoInput(BaseModel):
             raise InvalidUsage('Missing parameter previous_job_id',
                                status_code=400)
         return values
+
+
+class LastTestedRepoInputPost(LastTestedRepoInput):
+    """Input class that validates request's arguments for last_tested_repo
+
+    :param str reporting_job_id: Name of the CI that will test this repo
+
+    """
+    reporting_job_id: StrictStr
