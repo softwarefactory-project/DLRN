@@ -19,11 +19,15 @@ from typing import List
 from dlrn.api import app
 from dlrn.api.drivers.auth import Auth
 from dlrn.api.inputs.agg_status import AggStatusInput
+from dlrn.api.inputs.civotes import CIVotesAggDetailInput
+from dlrn.api.inputs.civotes import CIVotesDetailInput
+from dlrn.api.inputs.civotes import CIVotesInput
 from dlrn.api.inputs.last_tested_repo import LastTestedRepoInput
 from dlrn.api.inputs.last_tested_repo import LastTestedRepoInputPost
 from dlrn.api.inputs.metrics import MetricsInput
 from dlrn.api.inputs.promotions import PromoteInput
 from dlrn.api.inputs.promotions import PromotionsInput
+from dlrn.api.inputs.recheck_package import RecheckPackageInput
 from dlrn.api.inputs.remote_import import RemoteImportInput
 from dlrn.api.inputs.repo_status import RepoStatusInput
 from dlrn.api.inputs.report_result import ReportResultInput
@@ -897,8 +901,14 @@ def strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
 @auth_multi.login_required(optional=bypass_read_endpoints,
                            role=can_read_roles)
 def get_civotes():
+    logger = _get_logger()
     session = _get_db()
-    offset = request.args.get('offset', 0)
+    config_options = _get_config_options(app.config['CONFIG_FILE'])
+    parsed_input = parse_input(logger=logger, obj=CIVotesInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
+    offset = parsed_input.offset
 
     votes = session.query(CIVote)
     votes = votes.filter(CIVote.ci_name != 'consistent')
@@ -933,8 +943,6 @@ def get_civotes():
 
     repolist = sorted(repolist, key=lambda repo: repo.timestamp, reverse=True)
 
-    config_options = _get_config_options(app.config['CONFIG_FILE'])
-
     return render_template('votes_general.j2',
                            target=config_options.target,
                            repodetail=repolist,
@@ -946,23 +954,23 @@ def get_civotes():
 @auth_multi.login_required(optional=bypass_read_endpoints,
                            role=can_read_roles)
 def get_civotes_detail():
-    commit_hash = request.args.get('commit_hash', None)
-    distro_hash = request.args.get('distro_hash', None)
-    component = request.args.get('component', None)
-    ci_name = request.args.get('ci_name', None)
-
+    logger = _get_logger()
     session = _get_db()
+    config_options = _get_config_options(app.config['CONFIG_FILE'])
+    parsed_input = parse_input(logger=logger, obj=CIVotesDetailInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
+
+    commit_hash = parsed_input.commit_hash
+    distro_hash = parsed_input.distro_hash
+    component = parsed_input.component  # noqa: F841
+    ci_name = parsed_input.ci_name  # noqa: F841
 
     commit_id = -1
     if commit_hash and distro_hash:
         commit = _get_commit(session, commit_hash, distro_hash)
         commit_id = commit.id if commit else -1
-    elif not ci_name and not component:
-        raise InvalidUsage("Please specify either commit_hash+distro_hash, "
-                           "component or ci_name as parameters.",
-                           status_code=400)
-
-    config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     return render_template('votes.j2',
                            target=config_options.target,
@@ -973,8 +981,14 @@ def get_civotes_detail():
 @auth_multi.login_required(optional=bypass_read_endpoints,
                            role=can_read_roles)
 def get_civotes_agg():
+    logger = _get_logger()
     session = _get_db()
-    offset = request.args.get('offset', 0)
+    config_options = _get_config_options(app.config['CONFIG_FILE'])
+    parsed_input = parse_input(logger=logger, obj=CIVotesInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
+    offset = parsed_input.offset
 
     votes = session.query(CIVote_Aggregate)
     votes = votes.order_by(desc(CIVote_Aggregate.timestamp))
@@ -1005,8 +1019,6 @@ def get_civotes_agg():
 
     agglist = sorted(agglist, key=lambda repo: repo.timestamp, reverse=True)
 
-    config_options = _get_config_options(app.config['CONFIG_FILE'])
-
     return render_template('votes_general_agg.j2',
                            target=config_options.target,
                            aggdetail=agglist,
@@ -1018,14 +1030,15 @@ def get_civotes_agg():
 @auth_multi.login_required(optional=bypass_read_endpoints,
                            role=can_read_roles)
 def get_civotes_agg_detail():
-    ref_hash = request.args.get('ref_hash', None)
-    ci_name = request.args.get('ci_name', None)
-
-    if not ref_hash and not ci_name:
-        raise InvalidUsage("Please specify either ref_hash or "
-                           "ci_name as parameters.", status_code=400)
-
+    logger = _get_logger()
     config_options = _get_config_options(app.config['CONFIG_FILE'])
+    parsed_input = parse_input(logger=logger, obj=CIVotesAggDetailInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
+    # Used for jinja templating
+    ref_hash = parsed_input.ref_hash  # noqa: F841
+    ci_name = parsed_input.ci_name  # noqa: F841
 
     return render_template('votes_agg.j2',
                            target=config_options.target)
@@ -1049,14 +1062,13 @@ def get_report():
 @app.route('/api/recheck_package', methods=['POST'])
 @auth_multi.login_required(optional=False, role=can_write_roles)
 def recheck_package():
-    # package_name: The package to execute the recheck
     logger = _get_logger()
     session = _get_db()
-    package_name = request.args.get('package_name', None)
-
-    if package_name is None:
-        message = ("Missing parameters: package_name")
-        raise InvalidUsage(message, status_code=400)
+    parsed_input = parse_input(logger=logger, obj=RecheckPackageInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
+    package_name = parsed_input.package_name
 
     commit = session.query(Commit).filter(Commit.project_name == package_name,
                                           Commit.type == 'rpm',

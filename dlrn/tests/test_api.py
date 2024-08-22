@@ -1106,11 +1106,24 @@ class TestRecheckPackage(DLRNAPITestCase):
             base64.b64encode(b'foo:bar').decode('ascii'))}
         response = self.app.post('/api/recheck_package',
                                  data="",
+                                 headers=self.headers)
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertRegex(data["message"], "Errors detected: 1 {'package_name':"
+                         " 'field required'}")
+
+    def test_recheck_package_not_allowed_package_name(self, db_mock):
+        self.headers = {'Authorization': 'Basic %s' % (
+            base64.b64encode(b'foo:bar').decode('ascii'))}
+        req_data = json.dumps(dict(package_name=None))
+        response = self.app.post('/api/recheck_package',
+                                 data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
-        self.assertRegex(data["message"], "Missing parameters:")
+        self.assertRegex(data["message"], "Errors detected: 1 {'package_name':"
+                         " 'none is not an allowed value'}")
 
     @mock.patch('dlrn.api.dlrn_api.getSession',
                 side_effect=mocked_session(
@@ -1118,8 +1131,9 @@ class TestRecheckPackage(DLRNAPITestCase):
     def test_recheck_package_no_commit(self, db_mock, db2_mock):
         self.headers = {'Authorization': 'Basic %s' % (
             base64.b64encode(b'foo:bar').decode('ascii'))}
-        response = self.app.post('/api/recheck_package?package_name=foo-ci',
-                                 data="",
+        req_data = json.dumps(dict(package_name="foo-ci"))
+        response = self.app.post('/api/recheck_package',
+                                 data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
         data = json.loads(response.data)
@@ -1129,12 +1143,12 @@ class TestRecheckPackage(DLRNAPITestCase):
     @mock.patch('dlrn.api.dlrn_api.getSession',
                 side_effect=mocked_session(
                     commit_file='./dlrn/tests/samples/commits_3.yaml'))
-    def test_recheck_package_commit_success(self, db_mock, db2_mock):
+    def test_recheck_package_successful_commit(self, db_mock, db2_mock):
         self.headers = {'Authorization': 'Basic %s' % (
             base64.b64encode(b'foo:bar').decode('ascii'))}
-        endpoint = '/api/recheck_package?package_name=python-pysaml2'
-        response = self.app.post(endpoint,
-                                 data="",
+        req_data = json.dumps(dict(package_name="python-pysaml2"))
+        response = self.app.post('/api/recheck_package',
+                                 data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
         data = json.loads(response.data)
@@ -1145,12 +1159,12 @@ class TestRecheckPackage(DLRNAPITestCase):
     @mock.patch('dlrn.api.dlrn_api.getSession',
                 side_effect=mocked_session(
                     commit_file='./dlrn/tests/samples/commits_3.yaml'))
-    def test_recheck_package_commit_failed(self, db_mock, db2_mock):
+    def test_recheck_package_failed_commit(self, db_mock, db2_mock):
         self.headers = {'Authorization': 'Basic %s' % (
             base64.b64encode(b'foo:bar').decode('ascii'))}
-        endpoint = '/api/recheck_package?package_name=python-stevedore'
-        response = self.app.post(endpoint,
-                                 data="",
+        req_data = json.dumps(dict(package_name="python-stevedore"))
+        response = self.app.post('/api/recheck_package',
+                                 data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
         data = json.loads(response.data)
@@ -1161,12 +1175,12 @@ class TestRecheckPackage(DLRNAPITestCase):
                 side_effect=mocked_session(
                     commit_file='./dlrn/tests/samples/commits_3.yaml',
                     raise_exception=True))
-    def test_recheck_package_commit_failed_exception(self, db_mock, db2_mock):
+    def test_recheck_package_failed_commit_exception(self, db_mock, db2_mock):
         self.headers = {'Authorization': 'Basic %s' % (
             base64.b64encode(b'foo:bar').decode('ascii'))}
-        endpoint = '/api/recheck_package?package_name=python-stevedore'
-        response = self.app.post(endpoint,
-                                 data="",
+        req_data = json.dumps(dict(package_name="python-stevedore"))
+        response = self.app.post('/api/recheck_package',
+                                 data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
         data = json.loads(response.data)
