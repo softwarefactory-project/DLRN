@@ -12,7 +12,6 @@
 
 from datetime import datetime
 from datetime import timedelta
-from distutils.util import strtobool
 from functools import wraps
 import logging
 
@@ -20,8 +19,11 @@ from dlrn.api import app
 from dlrn.api.drivers.auth import Auth
 from dlrn.api.inputs.agg_status import AggStatusInput
 from dlrn.api.inputs.last_tested_repo import LastTestedRepoInput
+from dlrn.api.inputs.last_tested_repo import LastTestedRepoInputPost
+from dlrn.api.inputs.metrics import MetricsInput
 from dlrn.api.inputs.promotions import PromotionsInput
 from dlrn.api.inputs.repo_status import RepoStatusInput
+from dlrn.api.inputs.report_result import ReportResultInput
 from dlrn.api.utils import AggDetail
 from dlrn.api.utils import InvalidUsage
 from dlrn.api.utils import InvalidUsageWrapper
@@ -46,7 +48,6 @@ from flask import render_template
 from flask import request
 from flask_container_scaffold.util import parse_input
 
-import calendar
 import os
 from six.moves import configparser
 from sqlalchemy import desc
@@ -439,34 +440,14 @@ def promotions_GET():
 @auth_multi.login_required(optional=bypass_read_endpoints,
                            role=can_read_roles)
 def get_metrics():
-    # start_date: start date for period, in YYYY-mm-dd format (UTC)
-    # end_date: end date for period, in YYYY-mm-dd format (UTC)
-    # package_name (optional): return metrics for package_name
-    start_date = request.args.get('start_date', None)
-    end_date = request.args.get('end_date', None)
-    package_name = request.args.get('package_name', None)
-
-    if request.headers.get('Content-Type') == 'application/json':
-        # This is the old, deprecated method of in-body parameters
-        # We will keep it for backwards compatibility
-        if start_date is None:
-            start_date = request.json.get('start_date', None)
-        if end_date is None:
-            end_date = request.json.get('end_date', None)
-        if package_name is None:
-            package_name = request.json.get('package_name', None)
-
-    if start_date is None or end_date is None:
-        raise InvalidUsage('Missing parameters', status_code=400)
-
-    # Convert dates to timestamp
-    fmt = '%Y-%m-%d'
-    try:
-        start_timestamp = int(calendar.timegm(time.strptime(start_date, fmt)))
-        end_timestamp = int(calendar.timegm(time.strptime(end_date, fmt)))
-    except ValueError:
-        raise InvalidUsage('Invalid date format, it must be YYYY-mm-dd',
-                           status_code=400)
+    logger = _get_logger()
+    parsed_input = parse_input(logger=logger, obj=MetricsInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
+    start_timestamp = parsed_input.start_date
+    end_timestamp = parsed_input.end_date
+    package_name = parsed_input.package_name
 
     # Find the commits count for each metric
     session = _get_db()
@@ -503,37 +484,19 @@ def get_metrics():
 @auth_multi.login_required(optional=False, role=can_write_roles)
 @_json_media_type
 def last_tested_repo_POST():
-    # max_age: Maximum age in hours, used as base for the search
-    # success(optional): find repos with a successful/unsuccessful vote
-    # job_id(optional); name of the CI that sent the vote
-    # reporting_job_id: name of the CI that will test this repo
-    # sequential_mode(optional): if set to true, change the search algorithm
-    #                            to only use previous_job_id as CI name to
-    #                            search for. Defaults to false
-    # previous_job_id(optional): CI name to search for, if sequential_mode is
-    #                            True
-    # component(optional): only get votes for this component
-    max_age = request.json.get('max_age', None)
-    my_job_id = request.json.get('reporting_job_id', None)
-    job_id = request.json.get('job_id', None)
-    success = request.json.get('success', None)
-    sequential_mode = request.json.get('sequential_mode', None)
-    previous_job_id = request.json.get('previous_job_id', None)
-    component = request.json.get('component', None)
     logger = _get_logger()
+    parsed_input = parse_input(logger=logger, obj=LastTestedRepoInputPost,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
 
-    if success is not None:
-        success = bool(strtobool(success))
-
-    if sequential_mode is not None:
-        sequential_mode = bool(strtobool(sequential_mode))
-
-    if sequential_mode and previous_job_id is None:
-        raise InvalidUsage('Missing parameter previous_job_id',
-                           status_code=400)
-
-    if (max_age is None or my_job_id is None):
-        raise InvalidUsage('Missing parameters', status_code=400)
+    max_age = parsed_input.max_age
+    my_job_id = parsed_input.reporting_job_id
+    job_id = parsed_input.job_id
+    success = parsed_input.success
+    sequential_mode = parsed_input.sequential_mode
+    previous_job_id = parsed_input.previous_job_id
+    component = parsed_input.component
 
     # Calculate timestamp as now - max_age
     if int(max_age) == 0:
@@ -591,46 +554,21 @@ def last_tested_repo_POST():
 @auth_multi.login_required(optional=False, role=can_write_roles)
 @_json_media_type
 def report_result():
-    # job_id: name of CI
-    # commit_hash: commit hash
-    # distro_hash: distro hash
-    # extended_hash(optional): extended hash
-    # aggregate_hash: hash of aggregate.
-    # url: URL where more information can be found
-    # timestamp: CI execution timestamp
-    # success: boolean
-    # notes(optional): notes
-    # Either commit_hash+distro_hash or aggregate_hash must be provided
-    try:
-        timestamp = request.json['timestamp']
-        job_id = request.json['job_id']
-        success = request.json['success']
-        url = request.json['url']
-    except KeyError:
-        raise InvalidUsage('Missing parameters', status_code=400)
-
-    commit_hash = request.json.get('commit_hash', None)
-    distro_hash = request.json.get('distro_hash', None)
-    extended_hash = request.json.get('extended_hash', None)
-    aggregate_hash = request.json.get('aggregate_hash', None)
     logger = _get_logger()
+    parsed_input = parse_input(logger=logger, obj=ReportResultInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
 
-    if not commit_hash and not distro_hash and not aggregate_hash:
-        raise InvalidUsage('Missing parameters', status_code=400)
-
-    if commit_hash and not distro_hash:
-        raise InvalidUsage('If commit_hash is provided, distro_hash '
-                           'must be provided too', status_code=400)
-
-    if distro_hash and not commit_hash:
-        raise InvalidUsage('If distro_hash is provided, commit_hash '
-                           'must be provided too', status_code=400)
-
-    if (aggregate_hash and distro_hash) or (aggregate_hash and commit_hash):
-        raise InvalidUsage('aggregate_hash and commit/distro_hash cannot be '
-                           'combined', status_code=400)
-
-    notes = request.json.get('notes', '')
+    timestamp = parsed_input.timestamp
+    job_id = parsed_input.job_id
+    success = parsed_input.success
+    url = parsed_input.url
+    commit_hash = parsed_input.commit_hash
+    distro_hash = parsed_input.distro_hash
+    extended_hash = parsed_input.extended_hash
+    aggregate_hash = parsed_input.aggregate_hash
+    notes = parsed_input.notes
 
     session = _get_db()
     # We have two paths here: one for votes on commit/distro/extended hash,
@@ -646,7 +584,7 @@ def report_result():
         out_ext_hash = commit.extended_hash
         component = commit.component
         vote = CIVote(commit_id=commit_id, ci_name=job_id, ci_url=url,
-                      ci_vote=bool(strtobool(success)), ci_in_progress=False,
+                      ci_vote=success, ci_in_progress=False,
                       timestamp=int(timestamp), notes=notes,
                       user=auth_multi.current_user(), component=component)
         log_message = 'Added new vote to commit with hash {commit_hash}, \
@@ -668,7 +606,7 @@ def report_result():
                                status_code=400)
 
         vote = CIVote_Aggregate(ref_hash=aggregate_hash, ci_name=job_id,
-                                ci_url=url, ci_vote=bool(strtobool(success)),
+                                ci_url=url, ci_vote=success,
                                 ci_in_progress=False, timestamp=int(timestamp),
                                 notes=notes, user=auth_multi.current_user())
         log_message = 'Added new vote to aggregate hash {aggregate_hash} by \
@@ -685,7 +623,7 @@ def report_result():
               'aggregate_hash': aggregate_hash,
               'timestamp': timestamp,
               'job_id': job_id,
-              'success': bool(strtobool(success)),
+              'success': success,
               'in_progress': False,
               'url': url,
               'notes': notes,
