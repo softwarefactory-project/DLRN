@@ -16,6 +16,8 @@
       <thead>
       <tr>
         <th>Project Name</th>
+        <th>NVR</th>
+        <th>Commit SHA</th>
         <th>Status</th>
         <th>First failure after success {{ msg }}</th>
         <th>Number of days since last success</th>
@@ -25,6 +27,12 @@
       {% for pkg in pkgs %}
         <tr {% if pkg["last_build"].status == "FAILED" %}class="failure"{% endif %}>
           <td>{{ pkg["name"] }}</td>
+          <td>
+              {{ pkg["last_build"].artifacts | getNVRfrompkgsrpm }}
+          </td>
+          <td>
+              {{ pkg["last_build"].commit_hash }}
+          </td>
           {% if pkg["last_build"].status == "SUCCESS"  %}
             <td>
               <i class="fas fa-thumbs-up pull-left" style="color:green"></i>

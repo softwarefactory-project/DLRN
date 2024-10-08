@@ -25,6 +25,7 @@ import jinja2
 from dlrn.config import getConfigOptions
 from dlrn.db import Commit
 from dlrn.db import getCommits
+from dlrn.utils import getNVRfromlist
 
 
 def get_commit_url(commit, pkg):
@@ -58,6 +59,12 @@ def get_commit_url(commit, pkg):
         commit_url = ''
 
     return commit_url
+
+
+def _jinja2_filter_getNVRfrom_artifact(artifacts):
+    # Selecting the srpm in the artifacts list
+    pkg = artifacts.split(',')[0] if artifacts else ""
+    return getNVRfromlist([pkg])
 
 
 def _jinja2_filter_strftime(date, fmt="%Y-%m-%d %H:%M:%S"):
@@ -96,6 +103,7 @@ def genreports(packages, head_only, session, all_commits):
                                    loader=jinja2.FileSystemLoader(
                                        [templatedir]))
     jinja_env.filters["strftime"] = _jinja2_filter_strftime
+    jinja_env.filters["getNVRfrompkgsrpm"] = _jinja2_filter_getNVRfrom_artifact
     jinja_env.filters["get_commit_url"] = \
         partial(_jinja2_filter_get_commit_url, packages=packages)
 
