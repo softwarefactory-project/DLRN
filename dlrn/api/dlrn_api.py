@@ -14,6 +14,7 @@ from datetime import datetime
 from datetime import timedelta
 from functools import wraps
 import logging
+from typing import List
 
 from dlrn.api import app
 from dlrn.api.drivers.auth import Auth
@@ -21,7 +22,9 @@ from dlrn.api.inputs.agg_status import AggStatusInput
 from dlrn.api.inputs.last_tested_repo import LastTestedRepoInput
 from dlrn.api.inputs.last_tested_repo import LastTestedRepoInputPost
 from dlrn.api.inputs.metrics import MetricsInput
+from dlrn.api.inputs.promotions import PromoteInput
 from dlrn.api.inputs.promotions import PromotionsInput
+from dlrn.api.inputs.remote_import import RemoteImportInput
 from dlrn.api.inputs.repo_status import RepoStatusInput
 from dlrn.api.inputs.report_result import ReportResultInput
 from dlrn.api.utils import AggDetail
@@ -47,6 +50,8 @@ from flask import jsonify
 from flask import render_template
 from flask import request
 from flask_container_scaffold.util import parse_input
+from pydantic import parse_obj_as
+from pydantic import ValidationError
 
 import os
 from six.moves import configparser
@@ -636,27 +641,20 @@ def report_result():
 @auth_multi.login_required(optional=False, role=can_write_roles)
 @_json_media_type
 def promote():
-    # commit_hash: commit hash
-    # distro_hash: distro hash
-    # extended_hash (optional): extended hash
-    # promote_name: symlink name
-    try:
-        commit_hash = request.json['commit_hash']
-        distro_hash = request.json['distro_hash']
-        promote_name = request.json['promote_name']
-    except KeyError:
-        raise InvalidUsage('Missing parameters', status_code=400)
-
-    extended_hash = request.json.get('extended_hash', None)
-
-    # Check for invalid promote names
-    if (promote_name == 'consistent' or promote_name == 'current'):
-        raise InvalidUsage('Invalid promote_name %s' % promote_name,
-                           status_code=403)
-    config_options = _get_config_options(app.config['CONFIG_FILE'])
 
     logger = _get_logger()
     session = _get_db()
+    config_options = _get_config_options(app.config['CONFIG_FILE'])
+    parsed_input = parse_input(logger=logger, obj=PromoteInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
+
+    commit_hash = parsed_input.commit_hash
+    distro_hash = parsed_input.distro_hash
+    promote_name = parsed_input.promote_name
+    extended_hash = parsed_input.extended_hash
+
     commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
     if commit is None:
         raise InvalidUsage('commit_hash+distro_hash+extended_hash combination'
@@ -747,30 +745,22 @@ def promote():
 @auth_multi.login_required(optional=False, role=can_write_roles)
 @_json_media_type
 def promote_batch():
-    # hash_pairs: list of commit/distro hash pairs
-    # promote_name: symlink name
-    hash_list = []
-    try:
-        for pair in request.json:
-            commit_hash = pair['commit_hash']
-            distro_hash = pair['distro_hash']
-            promote_name = pair['promote_name']
-            extended_hash = pair.get('extended_hash', None)
-            hash_item = [commit_hash, distro_hash, extended_hash, promote_name]
-            hash_list.append(hash_item)
-    except KeyError:
-        raise InvalidUsage('Missing parameters', status_code=400)
+    promote_batch = []
 
     config_options = _get_config_options(app.config['CONFIG_FILE'])
     session = _get_db()
     logger = _get_logger()
+    try:
+        promote_batch = parse_obj_as(List[PromoteInput], request.json)
+    except ValidationError as e:
+        raise InvalidUsage(str(e), status_code=400)
     # Now we will be running all checks for each combination
     # Check for invalid promote names
-    for hash_item in hash_list:
-        commit_hash = hash_item[0]
-        distro_hash = hash_item[1]
-        extended_hash = hash_item[2]
-        promote_name = hash_item[3]
+    for promote in promote_batch:
+        commit_hash = promote.commit_hash
+        distro_hash = promote.distro_hash
+        extended_hash = promote.extended_hash
+        promote_name = promote.promote_name
         if (promote_name == 'consistent' or promote_name == 'current'):
             raise InvalidUsage('Invalid promote_name %s for hash %s_%s' % (
                                promote_name, commit_hash, distro_hash),
@@ -805,12 +795,12 @@ def promote_batch():
     # After all checks have been performed, do all promotions
     log_messages = []
     rollback_list = []
-    for hash_item in hash_list:
+    for promote in promote_batch:
         rollback_item = {}
-        commit_hash = hash_item[0]
-        distro_hash = hash_item[1]
-        extended_hash = hash_item[2]
-        promote_name = hash_item[3]
+        commit_hash = promote.commit_hash
+        distro_hash = promote.distro_hash
+        extended_hash = promote.extended_hash
+        promote_name = promote.promote_name
         commit = _get_commit(session, commit_hash, distro_hash, extended_hash)
         # We should create a relative symlink
         yumrepodir = commit.getshardedcommitdir()
@@ -910,12 +900,13 @@ def promote_batch():
 @auth_multi.login_required(optional=False, role=can_write_roles)
 @_json_media_type
 def remote_import():
-    # repo_url: repository URL to import from
-    try:
-        repo_url = request.json['repo_url']
-    except KeyError:
-        raise InvalidUsage('Missing parameters', status_code=400)
+    logger = _get_logger()
+    parsed_input = parse_input(logger=logger, obj=RemoteImportInput,
+                               default_return=InvalidUsageWrapper)
+    if isinstance(parsed_input, InvalidUsageWrapper):
+        raise parsed_input
 
+    repo_url = parsed_input.repo_url
     try:
         import_commit(repo_url, app.config['CONFIG_FILE'],
                       db_connection=app.config['DB_PATH'])
