@@ -12,7 +12,3 @@ gssapi
 ipalib
 bandit
 pip-audit
-
-# docs requirements
-sphinx>=1.1.2
-sphinx-rtd-theme
