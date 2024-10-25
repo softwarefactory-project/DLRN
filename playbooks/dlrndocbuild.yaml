@@ -5,7 +5,7 @@
   tasks:
     - name: Install test-requirements for building Spinx doc
       pip:
-        requirements: "{{ working_dir }}/test-requirements.txt"
+        requirements: "{{ working_dir }}/doc/requirements.txt"
 
     - name: "Run sphinx-build"
       command:
