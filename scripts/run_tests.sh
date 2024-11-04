@@ -76,6 +76,9 @@ branch=""
 if [[ ${target} =~ "centos9" ]]; then
     baseurl_release="centos9"
     log_dir="centos9"
+elif [[ ${target} =~ "centos10" ]]; then
+    baseurl_release="centos10"
+    log_dir="centos10"
 fi
 
 # If we're testing a commit on a specific branch, make sure we're using it
