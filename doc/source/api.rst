@@ -310,16 +310,16 @@ In text/plain format:
 
     # HELP dlrn_builds_succeeded_total Total number of successful builds
     # TYPE dlrn_builds_succeeded_total counter
-    dlrn_builds_succeeded_total{baseurl="http://trunk.rdoproject.org/centos8/"} 9296.0
+    dlrn_builds_succeeded_total{baseurl="http://trunk.rdoproject.org/centos9/"} 9296.0
     # HELP dlrn_builds_failed_total Total number of failed builds
     # TYPE dlrn_builds_failed_total counter
-    dlrn_builds_failed_total{baseurl="http://trunk.rdoproject.org/centos8/"} 244.0
+    dlrn_builds_failed_total{baseurl="http://trunk.rdoproject.org/centos9/"} 244.0
     # HELP dlrn_builds_retry_total Total number of builds in retry state
     # TYPE dlrn_builds_retry_total counter
-    dlrn_builds_retry_total{baseurl="http://trunk.rdoproject.org/centos8/"} 119.0
+    dlrn_builds_retry_total{baseurl="http://trunk.rdoproject.org/centos9/"} 119.0
     # HELP dlrn_builds_total Total number of builds
     # TYPE dlrn_builds_total counter
-    dlrn_builds_total{baseurl="http://trunk.rdoproject.org/centos8/"} 9659.0
+    dlrn_builds_total{baseurl="http://trunk.rdoproject.org/centos9/"} 9659.0
 
 GET /api/graphql
 ----------------

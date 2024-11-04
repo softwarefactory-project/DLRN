@@ -68,19 +68,12 @@ else
 fi
 
 # Prepare config
-target="${2:-centos}"
-baseurl="${3:-http://trunk.rdoproject.org/centos7/}"
+target="${2:-centos9}"
+baseurl="${3:-http://trunk.rdoproject.org/centos9/}"
 src="master"
 branch=""
 
-if [ ${target} = "centos" ]; then
-    baseurl_release="centos7"
-    log_dir="centos"
-elif [[ ${target} =~ "centos8" ]]; then
-    baseurl_release="centos8"
-    log_dir="centos8"
-    target="centos8-stream"
-elif [[ ${target} =~ "centos9" ]]; then
+if [[ ${target} =~ "centos9" ]]; then
     baseurl_release="centos9"
     log_dir="centos9"
 fi

@@ -50,8 +50,9 @@ class TestBuild(base.TestCase):
         self.configfile.set('DEFAULT', 'baseurl', "file://%s" %
                             self.configfile.get('DEFAULT', 'datadir'))
         self.config = ConfigOptions(self.configfile)
-        shutil.copyfile(os.path.join("scripts", "centos8.cfg"),
-                        os.path.join(self.config.scriptsdir, "centos8.cfg"))
+        shutil.copyfile(os.path.join("scripts", "centos-stream-9.cfg"),
+                        os.path.join(self.config.scriptsdir,
+                                     "centos9.cfg"))
         with open(os.path.join(self.config.datadir,
                   "delorean-deps.repo"), "w") as fp:
             fp.write("[test]\nname=test\nenabled=0\n")
@@ -154,10 +155,10 @@ class TestBuild(base.TestCase):
                             'dlrn.drivers.mockdriver.MockBuildDriver')
         self.config = ConfigOptions(self.configfile)
 
-        shutil.copyfile(os.path.join("scripts", "centos8.cfg"),
-                        os.path.join(configdir, "centos8.cfg"))
+        shutil.copyfile(os.path.join("scripts", "centos-stream-9.cfg"),
+                        os.path.join(configdir, "centos9.cfg"))
         commit = db.getCommits(self.session)[-1]
-        expected = [mock.call('%s/centos8.cfg' % configdir,
+        expected = [mock.call('%s/centos9.cfg' % configdir,
                               '%s/dlrn-1.cfg.new' % self.config.datadir),
                     mock.call('%s/dlrn-1.cfg.new' % self.config.datadir,
                               '%s/dlrn-1.cfg' % self.config.datadir)]
