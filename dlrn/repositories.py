@@ -72,7 +72,12 @@ def refreshrepo(url, path, config_options, branch="master", local=False,
 
     if local is False or checkout_not_present is True:
         try:
-            git.fetch("origin")
+            git.fetch("--prune", "origin")
+            _branches = git.branch("-vv")
+            # We want to delete the branch locally if it's removed in remote.
+            if _branches and "origin/%s: gone" % branch in _branches:
+                git.checkout('HEAD')
+                git.branch("-D", "%s" % branch)
         except Exception:
             # Sometimes hg repositories get into a invalid state leaving them
             # unusable, to avoid a looping error just remove it so it will be

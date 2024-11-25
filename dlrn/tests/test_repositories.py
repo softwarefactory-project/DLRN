@@ -66,7 +66,7 @@ class TestRefreshRepo(base.TestCase):
     def test_clone_if_not_cloned(self, path_mock, git_mock):
         repositories.refreshrepo('url', 'path', self.config, branch='branch')
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake().checkout('-f', 'branch')]
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/branch')]
@@ -88,7 +88,7 @@ class TestRefreshRepo(base.TestCase):
         repositories.refreshrepo('url', 'path', self.config, branch='branch')
         expected_git_remote = [mock.call.bake()('remote', '-v')]
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.bake().fetch('origin')]
+        expected_git_fetch = [mock.call.bake().fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake().checkout('-f', 'branch')]
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/branch')]
@@ -117,7 +117,7 @@ class TestRefreshRepo(base.TestCase):
         repositories.refreshrepo('url', 'path', self.config, branch='branch',
                                  local=True)
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake().checkout('-f', 'branch')]
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/branch')]
@@ -144,7 +144,7 @@ class TestRefreshRepo(base.TestCase):
         self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
                           'url', 'path', self.config, branch='branch')
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake().checkout('-f', 'branch')]
 
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
@@ -164,7 +164,7 @@ class TestRefreshRepo(base.TestCase):
         self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
                           'url', 'path', self.config, branch='rpm-master')
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake().checkout('-f',
                                                            'rpm-master')]
 
@@ -186,7 +186,7 @@ class TestRefreshRepo(base.TestCase):
         self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
                           'url', 'path', self.config, branch='foo-bar')
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake().checkout('-f', 'foo-bar')]
 
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
@@ -209,7 +209,7 @@ class TestRefreshRepo(base.TestCase):
                                           branch='zed-rdo')
         self.assertEqual(result, ['rpm-master', 'None'])
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake().checkout('-f', 'zed-rdo'),
                                  mock.call.bake().checkout('rpm-master')]
         expected_git_reset = [mock.call.bake().reset('--hard',
@@ -241,7 +241,7 @@ class TestRefreshRepo(base.TestCase):
                                           branch='stable/eoled')
         self.assertEqual(result, ['eoled-eol', 'None'])
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake().checkout('-f',
                                                            'stable/eoled'),
                                  mock.call.bake().checkout('eoled-eol')]
@@ -276,12 +276,13 @@ class TestRefreshRepo(base.TestCase):
                                           branch='stable/branchless')
         self.assertEqual(result, ['master', 'None'])
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake()
                                  .checkout('-f', 'stable/branchless'),
                                  mock.call.bake().checkout('master')]
         expected_git_tag = [mock.call.tag('-l', 'branchless-eol')]
-        expected_git_branch = [mock.call.branch('--list', '--remote',
+        expected_git_branch = [mock.call.branch('-vv'),
+                               mock.call.branch('--list', '--remote',
                                                 'origin/unmaintained/'
                                                 'branchless'),
                                mock.call.branch('--list', 'master')]
@@ -317,12 +318,13 @@ class TestRefreshRepo(base.TestCase):
                                           branch='stable/branchless')
         self.assertEqual(result, ['main', 'None'])
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake()
                                  .checkout('-f', 'stable/branchless'),
                                  mock.call.bake().checkout('main')]
         expected_git_tag = [mock.call.tag('-l', 'branchless-eol')]
-        expected_git_branch = [mock.call.branch('--list', '--remote',
+        expected_git_branch = [mock.call.branch('-vv'),
+                               mock.call.branch('--list', '--remote',
                                                 'origin/unmaintained/'
                                                 'branchless'),
                                mock.call.branch('--list', 'master'),
@@ -357,7 +359,7 @@ class TestRefreshRepo(base.TestCase):
         self.assertRaises(sh.ErrorReturnCode_1, repositories.refreshrepo,
                           'url', 'path', self.config, branch='1.0.0')
         expected_git_clone = [mock.call.clone('url', 'path')]
-        expected_git_fetch = [mock.call.fetch('origin')]
+        expected_git_fetch = [mock.call.fetch('--prune', 'origin')]
         expected_git_checkout = [mock.call.bake().checkout('-f', '1.0.0')]
 
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
