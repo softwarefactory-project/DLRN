@@ -71,7 +71,7 @@ class TestRefreshRepo(base.TestCase):
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/branch')]
         expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.')]
+                                                 '-1', 'HEAD')]
 
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
         self.assertEqual(git_mock.bake().fetch.call_args_list,
@@ -93,7 +93,7 @@ class TestRefreshRepo(base.TestCase):
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/branch')]
         expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.')]
+                                                 '-1', 'HEAD')]
 
         self.assertEqual(git_mock.bake().call_args_list, expected_git_remote)
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
@@ -110,7 +110,7 @@ class TestRefreshRepo(base.TestCase):
         repositories.refreshrepo('url', 'path', self.config, branch='branch',
                                  local=True)
         expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.')]
+                                                 '-1', 'HEAD')]
         self.assertEqual(git_mock.bake().log.call_args_list, expected_git_log)
 
     def test_clone_fetch_if_local_repo_missing(self, git_mock):
@@ -122,7 +122,7 @@ class TestRefreshRepo(base.TestCase):
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/branch')]
         expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.')]
+                                                 '-1', 'HEAD')]
 
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
         self.assertEqual(git_mock.bake().fetch.call_args_list,
@@ -215,7 +215,7 @@ class TestRefreshRepo(base.TestCase):
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/rpm-master')]
         expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.')]
+                                                 '-1', 'HEAD')]
 
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
         self.assertEqual(git_mock.bake().fetch.call_args_list,
@@ -249,7 +249,7 @@ class TestRefreshRepo(base.TestCase):
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/eoled-eol')]
         expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.')]
+                                                 '-1', 'HEAD')]
 
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
         self.assertEqual(git_mock.bake().fetch.call_args_list,
@@ -289,7 +289,7 @@ class TestRefreshRepo(base.TestCase):
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/master')]
         expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.')]
+                                                 '-1', 'HEAD')]
 
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
         self.assertEqual(git_mock.bake().fetch.call_args_list,
@@ -332,7 +332,7 @@ class TestRefreshRepo(base.TestCase):
         expected_git_reset = [mock.call.bake().reset('--hard',
                                                      'origin/main')]
         expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.')]
+                                                 '-1', 'HEAD')]
 
         self.assertEqual(git_mock.clone.call_args_list, expected_git_clone)
         self.assertEqual(git_mock.bake().fetch.call_args_list,

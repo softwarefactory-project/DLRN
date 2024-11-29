@@ -146,7 +146,7 @@ def refreshrepo(url, path, config_options, branch="master", local=False,
             # Maybe it was a tag, not a branch
             git.reset("--hard", "%s" % branch)
 
-    repoinfo = str(git.log("--pretty=format:%H %ct", "-1", ".")).\
+    repoinfo = str(git.log("--pretty=format:%H %ct", "-1", "HEAD")).\
         strip().split(" ")
     repoinfo.insert(0, branch)
     return repoinfo
