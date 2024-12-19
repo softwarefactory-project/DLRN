@@ -11,12 +11,16 @@
 # under the License.
 
 from dlrn.api.inputs.agg_status import AggStatusInput
+from dlrn.api.inputs.civotes import CIVotesAggDetailInput
+from dlrn.api.inputs.civotes import CIVotesDetailInput
+from dlrn.api.inputs.civotes import CIVotesInput
 from dlrn.api.inputs.last_tested_repo import LastTestedRepoInput
 from dlrn.api.inputs.last_tested_repo import LastTestedRepoInputPost
 from dlrn.api.inputs.metrics import MetricsInput
 from dlrn.api.inputs.promotions import MAX_LIMIT
 from dlrn.api.inputs.promotions import PromoteInput
 from dlrn.api.inputs.promotions import PromotionsInput
+from dlrn.api.inputs.recheck_package import RecheckPackageInput
 from dlrn.api.inputs.remote_import import RemoteImportInput
 from dlrn.api.inputs.repo_status import RepoStatusInput
 from dlrn.api.inputs.report_result import ReportResultInput
@@ -294,3 +298,68 @@ class TestRemoteImport(base.TestCase):
         for repo_url in [input_obj_1, input_obj_2, input_obj_3]:
             self.assertRaises(ValidationError, RemoteImportInput,
                               **dict(repo_url=repo_url))
+
+
+class TestCIVotes(base.TestCase):
+    valid_hash = "hash"
+
+    def test_valid_CI_vote_input(self):
+        offset_array = [10, 0, "10", None]
+        for offset in offset_array:
+            assert isinstance(CIVotesInput(**dict(offset=offset)),
+                              CIVotesInput)
+
+    def test_invalid_CI_vote_input(self):
+        offset_array = [-10, "-3", "three"]
+        for offset in offset_array:
+            self.assertRaises((ValidationError, InvalidUsage), CIVotesInput,
+                              **dict(offset=offset))
+
+    def test_valid_CI_vote_detail_input(self):
+        input_valid_obj1 = dict(commit_hash=self.valid_hash,
+                                distro_hash=self.valid_hash)
+        input_valid_obj2 = dict(component="Component")
+        input_valid_obj3 = dict(ci_name="ci_name")
+        input_array = [input_valid_obj1, input_valid_obj2, input_valid_obj3]
+        for input_element in input_array:
+            assert isinstance(CIVotesDetailInput(**input_element),
+                              CIVotesDetailInput)
+
+    def test_invalid_CI_vote_detail_input(self):
+        input_invalid_obj1 = dict()
+        input_invalid_obj2 = dict(commit_hash=self.valid_hash)
+        input_invalid_obj3 = dict(distro_hash=self.valid_hash)
+        input_array = [input_invalid_obj1, input_invalid_obj2,
+                       input_invalid_obj3]
+        for input_element in input_array:
+            self.assertRaises(InvalidUsage, CIVotesDetailInput,
+                              **input_element)
+
+    def test_valid_CI_vote_agg_detail_input(self):
+        input_valid = dict(ref_hash=self.valid_hash,
+                           ci_name="test_ci_name")
+
+        assert isinstance(CIVotesAggDetailInput(**input_valid),
+                          CIVotesAggDetailInput)
+
+    def test_invalid_CI_vote_agg_detail_input(self):
+        input_invalid_obj1 = dict()
+        input_invalid_obj2 = dict(ref_hash=1)
+        input_invalid_obj3 = dict(cin_name=1300)
+        input_array = [input_invalid_obj1, input_invalid_obj2,
+                       input_invalid_obj3]
+        for input_element in input_array:
+            self.assertRaises(InvalidUsage, CIVotesAggDetailInput,
+                              **input_element)
+
+
+class TestRecheckPackage(base.TestCase):
+
+    def test_valid_input(self):
+        input_obj = dict(package_name="python-stevedore")
+        assert isinstance(RecheckPackageInput(**input_obj),
+                          RecheckPackageInput)
+
+    def test_invalid_input(self):
+        self.assertRaises(ValidationError, RecheckPackageInput,
+                          **dict(package_name=121))
