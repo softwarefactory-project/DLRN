@@ -52,7 +52,7 @@ release.
 
 For example:
 
-* Trunk: http://trunk.rdoproject.org/centos7/delorean-deps.repo
+* Trunk: http://trunk.rdoproject.org/centos9-master/delorean-deps.repo
 * Liberty: http://trunk.rdoproject.org/centos7-liberty/delorean-deps.repo
 
 DLRN repository: current
@@ -76,7 +76,7 @@ This repository is available at ``/current/delorean.repo`` for each release.
 
 For example:
 
-* Trunk: http://trunk.rdoproject.org/centos7/current/delorean.repo
+* Trunk: http://trunk.rdoproject.org/centos9-master/current/delorean.repo
 * Liberty: http://trunk.rdoproject.org/centos7-liberty/current/delorean.repo
 
 DLRN repository: consistent
@@ -97,7 +97,7 @@ This repository is available at ``/consistent/delorean.repo`` for each release.
 
 For example:
 
-* Trunk: http://trunk.rdoproject.org/centos7/consistent/delorean.repo
+* Trunk: http://trunk.rdoproject.org/centos9-master/consistent/delorean.repo
 * Liberty: http://trunk.rdoproject.org/centos7-liberty/consistent/delorean.repo
 
 DLRN repository: current-passed-ci
@@ -123,6 +123,6 @@ release.
 
 For example:
 
-* Trunk: http://trunk.rdoproject.org/centos7/current-passed-ci/delorean.repo
+* Trunk: http://trunk.rdoproject.org/centos9-master/current-passed-ci/delorean.repo
 * Liberty:
   http://trunk.rdoproject.org/centos7-liberty/current-passed-ci/delorean.repo
