@@ -154,6 +154,7 @@ Arguments:
     ): [CIVote]
 
 Arguments:
+
 - commitId: limit the results to the civote belonging to the commit id.
 - ciName: limit the results to the civote belonging to the CI name.
 - ciVote: limit the results to the civote belonging to the voting CI.
@@ -182,6 +183,7 @@ Arguments:
     ): [CIVote_Aggregate]
 
 Arguments:
+
 - refHash: limit the results to the civote_aggregation belonging to the specified reference hash.
 - ciName: limit the results to the civote_aggregation belonging to the specified CI name.
 - ciVote: limit the results to the civote_aggregation belonging to the specified CI vote.
@@ -203,6 +205,7 @@ Arguments:
     ): [PackageStatus]
 
 Arguments:
+
 - projectName: limit the results to the status of the specified project name.
 - status: limit the results to the packages with the specified status.
 
