@@ -83,6 +83,19 @@ if graphene:
             model = CIVoteAggModel
             interfaces = (relay.Node, )
 
+    class IntFilter(graphene.InputObjectType):
+        gt = graphene.Int()
+        gte = graphene.Int()
+        lt = graphene.Int()
+        lte = graphene.Int()
+        eq = graphene.Int()
+
+    class CIVoteWhere(graphene.InputObjectType):
+        timestamp = graphene.Field(IntFilter)
+
+    class CIVoteAggWhere(graphene.InputObjectType):
+        timestamp = graphene.Field(IntFilter)
+
     class PackageStatus(graphene.ObjectType):
         id = graphene.NonNull(
             graphene.ID,
@@ -121,7 +134,8 @@ if graphene:
                                user=graphene.String(),
                                component=graphene.String(),
                                offset=graphene.Int(),
-                               limit=graphene.Int())
+                               limit=graphene.Int(),
+                               where=graphene.Argument(CIVoteWhere))
 
         civoteAgg = graphene.List(CIVoteAgg,
                                   refHash=graphene.String(),
@@ -132,7 +146,8 @@ if graphene:
                                   user=graphene.String(),
                                   offset=graphene.Int(),
                                   limit=graphene.Int(),
-                                  lastRefHash=graphene.Boolean())
+                                  lastRefHash=graphene.Boolean(),
+                                  where=graphene.Argument(CIVoteAggWhere))
 
         packageStatus = graphene.List(PackageStatus,
                                       projectName=graphene.String(),
@@ -185,6 +200,7 @@ if graphene:
             timestamp = args.get("timestamp", None)
             user = args.get("user", None)
             component = args.get("component", None)
+            where = args.get("where", None)
 
             # Make sure we do not exceed the pagination limit
             if limit > max_limit:
@@ -207,6 +223,25 @@ if graphene:
             if component:
                 query = query.filter(CIVoteModel.component == component)
 
+            if where:
+                if where.timestamp:
+                    ts_filter = where.timestamp
+                    if ts_filter.gt is not None:
+                        query = query.filter(
+                            CIVoteModel.timestamp > ts_filter.gt)
+                    if ts_filter.gte is not None:
+                        query = query.filter(
+                            CIVoteModel.timestamp >= ts_filter.gte)
+                    if ts_filter.lt is not None:
+                        query = query.filter(
+                            CIVoteModel.timestamp < ts_filter.lt)
+                    if ts_filter.lte is not None:
+                        query = query.filter(
+                            CIVoteModel.timestamp <= ts_filter.lte)
+                    if ts_filter.eq is not None:
+                        query = query.filter(
+                            CIVoteModel.timestamp == ts_filter.eq)
+
             query = query.order_by(desc(CIVoteModel.id)).limit(limit).\
                 offset(offset)
             return query.all()
@@ -224,6 +259,7 @@ if graphene:
             timestamp = args.get("timestamp", None)
             user = args.get("user", None)
             last_ref_hash = args.get("lastRefHash", None)
+            where = args.get("where", None)
 
             # Make sure we do not exceed the pagination limit
             if limit > max_limit:
@@ -231,9 +267,10 @@ if graphene:
 
             query = CIVoteAgg.get_query(info)
 
-            if (ref_hash or timestamp) and last_ref_hash:
+            if ((ref_hash or timestamp or (where and where.timestamp))
+                    and last_ref_hash):
                 raise GraphQLError(
-                    'refHash/timestamp and last_ref_hash '
+                    'refHash/timestamp/where.timestamp and last_ref_hash '
                     'cannot be provided in the same query'
                 )
 
@@ -264,6 +301,25 @@ if graphene:
                 query = query.filter(CIVoteAggModel.timestamp == timestamp)
             if user:
                 query = query.filter(CIVoteAggModel.user == user)
+
+            if where:
+                if where.timestamp:
+                    ts_filter = where.timestamp
+                    if ts_filter.gt is not None:
+                        query = query.filter(
+                            CIVoteAggModel.timestamp > ts_filter.gt)
+                    if ts_filter.gte is not None:
+                        query = query.filter(
+                            CIVoteAggModel.timestamp >= ts_filter.gte)
+                    if ts_filter.lt is not None:
+                        query = query.filter(
+                            CIVoteAggModel.timestamp < ts_filter.lt)
+                    if ts_filter.lte is not None:
+                        query = query.filter(
+                            CIVoteAggModel.timestamp <= ts_filter.lte)
+                    if ts_filter.eq is not None:
+                        query = query.filter(
+                            CIVoteAggModel.timestamp == ts_filter.eq)
 
             query = query.order_by(desc(CIVoteAggModel.id)).limit(limit).\
                 offset(offset)

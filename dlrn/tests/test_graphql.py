@@ -405,6 +405,76 @@ class TestcivoteQuery(DLRNAPIGraphQLTestCase):
         self.assertEqual(data['data']['civote'][0]['user'], 'foo')
         assert 'component' not in data['data']['civote'][0]
 
+    def test_where_timestamp_gt_lt(self, db_mock):
+        query = """
+            query {
+                civote(where: {timestamp: {gt: 1441635089, lt: 1441635095}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 1)
+
+    def test_where_timestamp_gte_lte(self, db_mock):
+        query = """
+            query {
+                civote(where: {timestamp: {gte: 1441635089, lte: 1441635095}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 3)
+
+    def test_where_timestamp_eq(self, db_mock):
+        query = """
+            query {
+                civote(where: {timestamp: {eq: 1441635095}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 1)
+
+    def test_empty_where(self, db_mock):
+        query = """
+            query {
+                civote(where: {})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 5)
+
+    def test_empty_where_timestamp(self, db_mock):
+        query = """
+            query {
+                civote(where: {timestamp: {}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civote']), 5)
+
 
 @mock.patch('dlrn.api.graphql.getSession', side_effect=mocked_session)
 class TestCIVoteAggregationQuery(DLRNAPIGraphQLTestCase):
@@ -582,6 +652,127 @@ class TestCIVoteAggregationQuery(DLRNAPIGraphQLTestCase):
                          1441635195)
         self.assertEqual(data['data']['civoteAgg'][0]['notes'], '')
         assert 'user' not in data['data']['civoteAgg'][0]
+
+    def test_where_timestamp_gt_lt(self, db_mock):
+        query = """
+            query {
+                civoteAgg(where: {timestamp: {gt: 1441635095, lt: 1441635195}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 1)
+
+    def test_where_timestamp_gte_lte(self, db_mock):
+        query = """
+            query {
+                civoteAgg(where: {timestamp: {gte: 1441635095,
+                    lte: 1441635195}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 3)
+
+    def test_where_timestamp_eq(self, db_mock):
+        query = """
+            query {
+                civoteAgg(where: {timestamp: {eq: 1441635095}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 1)
+
+    def test_mix_where_and_other_filter(self, db_mock):
+        query = """
+            query {
+                civoteAgg(where: {timestamp: {gte: 1441635099}}, ciVote: true)
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 1)
+
+    def test_bad_where_filter(self, db_mock):
+        query = """
+            query {
+                civoteAgg(where: {doesntexist: {lt: 1234}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 400)
+
+    def test_bad_gt_value(self, db_mock):
+        query = """
+            query {
+                civoteAgg(where: {timestamp: {gt: "1234"}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 400)
+
+    def test_bad_timestamp_operator(self, db_mock):
+        query = """
+            query {
+                civoteAgg(where: {timestamp: {doesntexist: 1441635095}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 400)
+
+    def test_empty_where(self, db_mock):
+        query = """
+            query {
+                civoteAgg(where: {})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 3)
+
+    def test_empty_where_timestamp(self, db_mock):
+        query = """
+            query {
+                civoteAgg(where: {timestamp: {}})
+                {
+                    id
+                }
+            }
+        """
+        response = self.app.get('/api/graphql?query=%s' % query)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['data']['civoteAgg']), 3)
 
 
 @mock.patch('dlrn.drivers.rdoinfo.RdoInfoDriver.getpackages',
