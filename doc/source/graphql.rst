@@ -151,6 +151,7 @@ Arguments:
         component: String
         offset: Int
         limit: Int
+        where: CIVoteWhere
     ): [CIVote]
 
 Arguments:
@@ -164,6 +165,7 @@ Arguments:
 - component: limit the results to the civote belonging to the specified component.
 - offset: return the results after the specified entry.
 - limit: return a maximum amount of commits (100 by default, cannot be higher than 100).
+- where: see :ref:`civotewhere_and_civoteaggwhere`
 
 
 * civoteAgg
@@ -180,6 +182,7 @@ Arguments:
         offset: Int
         limit: Int
         lastRefHash: Boolean
+        where: CIVoteAggWhere
     ): [CIVote_Aggregate]
 
 Arguments:
@@ -193,6 +196,7 @@ Arguments:
 - offset: return the results after the specified entry.
 - limit: return a maximum amount of commits (100 by default, cannot be higher than 100).
 - lastRefHash: return a group of data that contains the same, most recent hash. If true, other arguments won't be considered. Intended to retrieve the jobs from the last generated hash.
+- where: see :ref:`civotewhere_and_civoteaggwhere`
 
 
 * packageStatus
@@ -237,3 +241,64 @@ POST example
 
 In this case, we are using a POST method, and the query is JSON-encoded. Note that it is
 also possible to use a GET method with a JSON-encoded payload.
+
+.. _civotewhere_and_civoteaggwhere:
+
+CIVoteWhere and CIVoteAggWhere
+------------------------------
+
+CIVoteWhere and CIVoteAggWhere enable advanced querying with the use of the ``where`` argument.
+The ``where`` argument is an object that can contain the following field:
+
+- timestamp: a field that is also an object, and can be filtered by the providing one or more of the following operators:
+
+  - gte: greater than or equal to
+  - gt: greater than
+  - lt: less than
+  - lte: less than or equal to
+  - eq: equal to
+
+Example Queries
+~~~~~~~~~~~~~~~
+
+Note the placement of curly braces.
+
+Select all civoteAggs with a timestamp greater than a provided timestamp:
+
+.. code-block::
+
+    query {
+        civoteAgg(where: {timestamp: {gt: 1234567890}})
+        {
+            id
+            timestamp
+            ciName
+        }
+    }
+
+Select from a range of timestamps:
+
+.. code-block::
+
+    query {
+        civoteAgg(where: {timestamp: {gte: 1234567890, lte: 1234567899}})
+        {
+            id
+            timestamp
+            ciName
+        }
+    }
+
+
+Combine ``where`` timestamp filtering with queries for other fields:
+
+.. code-block::
+
+    query {
+        civoteAgg(ciName: "example-name", where: {timestamp: {gte: 1234567890, lte: 1234567899}})
+        {
+            id
+            timestamp
+            ciName
+        }
+    }
