@@ -274,7 +274,7 @@ class TestDriverKoji(base.TestCase):
                           mock.call.rhpkg('build',
                                           '--skip-nvr-check', scratch=True)]
         expected_git = [mock.call.log('--pretty=format:%H %ct',
-                                      '-1', '.')]
+                                      '-1', 'HEAD')]
 
         # 1- kinit (handled by kb_mock)
         # 2- rhpkg import (handled by rhpkg_mock)
@@ -345,7 +345,7 @@ class TestDriverKoji(base.TestCase):
                           mock.call.bake()('build',
                                            '--skip-nvr-check', scratch=True)]
         expected_git = [mock.call.bake().log('--pretty=format:%H %ct',
-                                             '-1', '.')]
+                                             '-1', 'HEAD')]
 
         expected_rn = [mock.call(self.temp_dir, self.rhpkg_extra_dir_2)]
         # 1- kinit (handled by kb_mock)
@@ -421,9 +421,9 @@ class TestDriverKoji(base.TestCase):
                           mock.call.bake()('build',
                                            '--skip-nvr-check', scratch=True)]
         expected_git_log = [mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.'),
+                                                 '-1', 'HEAD'),
                             mock.call.bake().log('--pretty=format:%H %ct',
-                                                 '-1', '.')]
+                                                 '-1', 'HEAD')]
         expected_git_pull = [mock.call.bake().pull()]
 
         expected_rn = [mock.call(self.temp_dir, self.rhpkg_extra_dir_3)]

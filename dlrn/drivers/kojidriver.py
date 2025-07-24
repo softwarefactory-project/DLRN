@@ -174,7 +174,7 @@ class KojiBuildDriver(BuildRPMDriver):
         # After running rhpkg commit, we have a different commit hash, so
         # let's update it
         git = sh.git.bake(_cwd=distgit_dir, _tty_out=False, _timeout=3600)
-        repoinfo = str(git.log("--pretty=format:%H %ct", "-1", ".")).\
+        repoinfo = str(git.log("--pretty=format:%H %ct", "-1", "HEAD")).\
             strip().split(" ")
 
         if (self.config_options.pkginfo_driver ==
@@ -185,7 +185,7 @@ class KojiBuildDriver(BuildRPMDriver):
             # downstream source git, so we ensure we have the latest code
             git.pull()
             repoinfo_ds_git = str(git.log("--pretty=format:%H %ct",
-                                          "-1", ".")).strip().split(" ")
+                                          "-1", "HEAD")).strip().split(" ")
 
         logger.info("Updated git: %s" % repoinfo)
         # When using rhpkg with a pkginfo driver other than downstreamdriver,
