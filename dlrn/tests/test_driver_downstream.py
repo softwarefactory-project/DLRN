@@ -508,3 +508,31 @@ class TestDriverDownstream(base.TestCase):
         driver = DownstreamInfoDriver(cfg_options=self.config)
         driver._distgit_setup(package_name='foo')
         self.assertEqual(sh_render.bake.call_count, 1)
+
+    @mock.patch('dlrn.drivers.downstream.DownstreamInfoDriver._distgit_setup',
+                return_value=True)
+    @mock.patch('dlrn.drivers.downstream.refreshrepo',
+                side_effect=_mocked_refreshrepo)
+    def test_getinfo_bad_timestamp(self, rr_mock, ds_mock, uo_mock):
+        driver = DownstreamInfoDriver(cfg_options=self.config)
+        package = {
+            'name': 'openstack-ironic',
+            'project': 'ironic',
+            'upstream': 'git://git.openstack.org/openstack/ironic',
+            'distgit': 'git://git.example.com/rpms/ironic',
+            'master-distgit':
+                'git://git.example.com/rpms/ironic',
+            'name': 'openstack-ironic',
+        }
+        err_msg = (
+            'In versions file https://trunk.rdoproject.org/centos7-master/'
+            'current/versions.csv, "Last Success Timestamp" field of package '
+            '"openstack-ironic" has an invalid timestamp value. '
+            'Contact a DLRN administrator with this info for assistance.'
+        )
+        self.assertRaisesRegex(ValueError,
+                               err_msg,
+                               driver.getinfo,
+                               package=package,
+                               project='ironic',
+                               dev_mode=True)

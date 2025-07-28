@@ -292,11 +292,22 @@ class DownstreamInfoDriver(PkgInfoDriver):
                     dt, commit_hash = str(line).strip().strip("'").\
                                         split(" ")[:2]
 
+            try:
+                dt_commit = float(dt)
+            except ValueError:
+                raise ValueError(
+                    f'In versions file {self.config_options.versions_url}, '
+                    f'"Last Success Timestamp" field of package '
+                    f'"{package['name']}" has an invalid timestamp value. '
+                    f'Contact a DLRN administrator with this info for '
+                    f'assistance.'
+                )
+
             if self.config_options.use_components and 'component' in package:
                 component = package['component']
             else:
                 component = None
-            commit = Commit(dt_commit=float(dt), project_name=project,
+            commit = Commit(dt_commit=dt_commit, project_name=project,
                             type='rpm',
                             commit_hash=commit_hash, repo_dir=repo_dir,
                             distro_hash=distro_hash, dt_distro=dt_distro,
