@@ -31,6 +31,8 @@ from dlrn.api.inputs.recheck_package import RecheckPackageInput
 from dlrn.api.inputs.remote_import import RemoteImportInput
 from dlrn.api.inputs.repo_status import RepoStatusInput
 from dlrn.api.inputs.report_result import ReportResultInput
+from dlrn.api.responses.health import HealthResponse
+from dlrn.api.responses.metrics import MetricsResponse
 from dlrn.api.utils import AggDetail
 from dlrn.api.utils import InvalidUsage
 from dlrn.api.utils import InvalidUsageWrapper
@@ -220,10 +222,10 @@ def health():
     session = _get_db()
     commit = session.query(Commit).first()
     if commit:
-        result = {'result': 'ok'}
+        resp = HealthResponse(result='ok')
     else:
-        result = {'result': 'ok, no commits in DB'}
-    return jsonify(result), 200
+        resp = HealthResponse(result='ok, no commits in DB')
+    return jsonify(resp.dict()), 200
 
 
 @app.route('/api/health', methods=['POST'])
@@ -233,10 +235,10 @@ def health_post():
     session = _get_db()
     commit = session.query(Commit).first()
     if commit:
-        result = {'result': 'ok'}
+        resp = HealthResponse(result='ok')
     else:
-        result = {'result': 'ok, no commits in DB'}
-    return jsonify(result), 200
+        resp = HealthResponse(result='ok, no commits in DB')
+    return jsonify(resp.dict()), 200
 
 
 @app.route('/api/repo_status', methods=['GET'])
@@ -483,10 +485,12 @@ def get_metrics():
     failed_commits = commits.count()
     total_commits = successful_commits + failed_commits
 
-    result = {'succeeded': successful_commits,
-              'failed': failed_commits,
-              'total': total_commits}
-    return jsonify(result), 200
+    resp = MetricsResponse(
+        succeeded=successful_commits,
+        failed=failed_commits,
+        total=total_commits
+    )
+    return jsonify(resp.dict()), 200
 
 
 @app.route('/api/last_tested_repo', methods=['POST'])
