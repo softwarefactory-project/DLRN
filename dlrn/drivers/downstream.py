@@ -298,7 +298,7 @@ class DownstreamInfoDriver(PkgInfoDriver):
                 raise ValueError(
                     f'In versions file {self.config_options.versions_url}, '
                     f'"Last Success Timestamp" field of package '
-                    f'"{package['name']}" has an invalid timestamp value. '
+                    f'"{package["name"]}" has an invalid timestamp value. '
                     f'Contact a DLRN administrator with this info for '
                     f'assistance.'
                 )
