@@ -657,6 +657,20 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Promotion'
+  /api/components:
+    get:
+      description: |
+        Get a list of all available components.
+      responses:
+        200:
+          description: An array of components
+          schema:
+            type: object
+            properties:
+              components:
+                type: array
+                items:
+                  type: string
   /api/remote/import:
     post:
       security:

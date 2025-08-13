@@ -279,6 +279,13 @@ def getCommits(session, project=None, with_status=None, without_status=None,
     return commits
 
 
+# Return a list of all unique components from the promotions table
+def getComponents(session):
+    components = session.query(Promotion.component).distinct().order_by(
+        Promotion.component).all()
+    return [component[0] for component in components if component[0]]
+
+
 @event.listens_for(Engine, "connect")
 def connect(dbapi_connection, connection_record):
     connection_record.info['pid'] = os.getpid()

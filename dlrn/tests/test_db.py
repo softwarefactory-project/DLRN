@@ -183,3 +183,22 @@ class TestProject(TestsWithData):
         self.assertFalse(project.suppress_email())
         project.sent_email()
         self.assertTrue(project.suppress_email())
+
+
+class TestsWithData2(base.TestCase):
+    def setUp(self):
+        super(TestsWithData2, self).setUp()
+        self.db_fd, filepath = tempfile.mkstemp()
+        self.session = db.getSession("sqlite:///%s" % filepath)
+        utils.loadYAML(self.session, './dlrn/tests/samples/commits_2.yaml')
+
+    def tearDown(self):
+        super(TestsWithData2, self).tearDown()
+        os.close(self.db_fd)
+
+
+class TestGetComponents(TestsWithData2):
+    def test_get_components(self):
+        components = db.getComponents(self.session)
+        self.assertEqual(len(components), 2)
+        self.assertEqual(components, ['another-component', 'tripleo'])

@@ -44,6 +44,7 @@ from dlrn.db import CIVote_Aggregate
 from dlrn.db import closeSession
 from dlrn.db import Commit
 from dlrn.db import getCommits
+from dlrn.db import getComponents
 from dlrn.db import getSession
 from dlrn.db import Promotion
 from dlrn.purge import FLAG_PURGED
@@ -445,6 +446,15 @@ def promotions_GET():
              'user': promotion.user}
         data.append(d)
     return jsonify(data)
+
+
+@app.route('/api/components', methods=['GET'])
+@auth_multi.login_required(optional=bypass_read_endpoints,
+                           role=can_read_roles)
+def components_GET():
+    session = _get_db()
+    components = getComponents(session)
+    return jsonify({'components': components})
 
 
 @app.route('/api/metrics/builds', methods=['GET'])

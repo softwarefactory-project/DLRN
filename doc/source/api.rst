@@ -259,6 +259,23 @@ user             string      user who created the promotion
 
 The array will be sorted by the promotion timestamp, with the newest first.
 
+GET /api/components
+-------------------
+
+Get a list of all available components.
+
+Normal response codes: 200
+
+Error response codes: 401
+
+Response:
+
+===================  ==========  ==============================================================
+       Parameter       Type                             Description
+===================  ==========  ==============================================================
+components           array       An array of component names that are strings
+===================  ==========  ==============================================================
+
 GET /api/metrics/builds
 -----------------------
 

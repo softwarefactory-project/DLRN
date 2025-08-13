@@ -1992,3 +1992,17 @@ class TestConfigurationValidator(DLRNAPITestCase):
         self.assertRegex(str(configuration_validation), error_keytab_path)
         self.assertRegex(str(configuration_validation), error_keytab_princ)
         self.assertEqual(vt_roles.call_count, 1)
+
+
+@mock.patch('dlrn.api.dlrn_api.getSession', side_effect=mocked_session())
+@mock.patch('dlrn.api.drivers.dbauthentication.getSession',
+            side_effect=mocked_session())
+class TestGetComponentsAPI(DLRNAPITestCase):
+    def test_get_components(self, db2_mock, db_mock):
+        response = self.app.get('/api/components')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertIn('components', data)
+        self.assertEqual(len(data['components']), 2)
+        self.assertEqual(set(data['components']),
+                         {'tripleo', 'another-component'})

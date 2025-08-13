@@ -149,10 +149,12 @@ promotions:
   timestamp: '1503307094'
   user: 'foo'
   aggregate_hash: '12345678'
+  component: 'tripleo'
 - id: '2'
   commit_id: '5627'
   promotion_name: 'foo-ci'
   timestamp: '1503307099'
+  component: 'another-component'
 # This promotion has no user and no aggregate hash, to check that we support that, too
 - id: '3'
   commit_id: '5628'
@@ -164,3 +166,4 @@ promotions:
   promotion_name: 'test-ci'
   timestamp: '1503307100'
   aggregate_hash: 'abcdef00'
+  component: 'tripleo'
