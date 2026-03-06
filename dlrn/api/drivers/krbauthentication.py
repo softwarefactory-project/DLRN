@@ -157,6 +157,7 @@ class KrbAuthentication(HTTPAuth):
         self.get_user_roles_callback = self.get_user_roles
         # HTTP keytab for decrypting the token.
         os.environ["KRB5_KTNAME"] = "FILE:" + app.config['HTTP_KEYTAB_PATH']
+        os.environ["KRB5CCNAME"] = "KCM:"+str(os.getuid())+":dlrn_api"
         log_api.debug("KrbAuthentication started")
 
     def _start_authorization(self):

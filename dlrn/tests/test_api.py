@@ -1448,6 +1448,8 @@ class TestKrbAuthDriver(DLRNAPITestCaseKrb):
                                  data=req_data,
                                  headers=self.headers,
                                  content_type='application/json')
+        self.assertEqual(os.environ["KRB5CCNAME"],
+                         "KCM:"+str(os.getuid())+":dlrn_api")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(gtuser_mock.call_count, 1)
 
